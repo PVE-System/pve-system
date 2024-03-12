@@ -5,17 +5,11 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import NextLink from 'next/link'
 import HeadApp from '@/app/components/HeadApp/HeadApp'
-import MenuNav from '../components/MenuNav/MenuNav'
-
-/* import theme from '@/theme'
-import { ThemeProvider } from '@mui/material/styles' */
 
 export default function Dashboard() {
   return (
     <>
-      {/* <ThemeProvider theme={theme}> */}
       <HeadApp />
-      <MenuNav />
       <Container fixed>
         <Box
           sx={{
@@ -36,7 +30,6 @@ export default function Dashboard() {
           </Box>
         </Box>
       </Container>
-      {/* </ThemeProvider> */}
     </>
   )
 }

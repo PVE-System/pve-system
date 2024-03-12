@@ -1,10 +1,14 @@
+'use client'
 import * as React from 'react'
 import CssBaseline from '@mui/material/CssBaseline'
 import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
-import { TextField } from '@mui/material'
+import { TextField, useMediaQuery } from '@mui/material'
+
+import TemporaryDrawer from '@/app/components/MenuNav/MenuNav'
 
 export default function HeadApp() {
+  const textFieldSmallScreen = useMediaQuery('(max-width:600px)')
   return (
     <React.Fragment>
       <CssBaseline />
@@ -13,15 +17,28 @@ export default function HeadApp() {
           sx={{
             display: 'flex',
             justifyContent: 'center',
-            paddingY: 1,
+            alignItems: 'center',
+            paddingY: 2,
+            position: 'relative', // Adicionando para posicionar os itens corretamente
           }}
         >
-          <TextField id="outlined-basic" label="Outlined" variant="outlined" />
+          <Box
+            sx={{
+              marginLeft: textFieldSmallScreen ? '20%' : '0%',
+            }}
+          >
+            <TextField
+              id="outlined-basic"
+              label="Outlined"
+              variant="outlined"
+            />
+          </Box>
+          <Box sx={{ position: 'absolute', left: 0 }}>
+            <TemporaryDrawer />{' '}
+            {/* Aqui estou trazendo o botao do MenuNav para dentro do container HeadApp e deixando ele na lateral esquerda */}
+          </Box>
         </Box>
       </Container>
     </React.Fragment>
   )
 }
-
-// container vazio que ocupa a tela inteira
-// input de search com filtro

@@ -18,15 +18,15 @@ const theme = createTheme({
     primary: {
       main: '#EA650A', // ORANGE. Cor principal para os botoes e icones.
       light: '#ffffff', // WHITE. Cor alternativa para os botoes e icones.
-      contrastText: 'white', // WHITE. Cor alternativa para os textos.
+      contrastText: '#ffffff', // WHITE. Cor alternativa para os textos.
     },
     secondary: {
       main: '#2A2E30', // DARKGREEN. Cor principal para os background das paginas individuais de cada cliente.
       contrastText: 'EA650A', // ORANGE. Cor alternativa para os textos.
     },
     background: {
-      default: '#303030', // Cor de fundo principal.
-      paper: '#242529', // Cor de fundo alternativa para os componentes de papelaria como o MENUDRAWER SEARCH.
+      default: '#303030', // DARKGREY Cor de fundo principal.
+      paper: '#000000', // BLACK. Cor de fundo alternativa para os componentes de papelaria como o MENUDRAWER SEARCH.
     },
   },
 })
