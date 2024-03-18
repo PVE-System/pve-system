@@ -19,11 +19,22 @@ export default function Home() {
             alignItems: 'center',
           }}
         >
-          <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
+          <Typography
+            variant="h4"
+            component="h1"
+            sx={{ mb: 2, textAlign: 'center' }}
+          >
             Home Login - Sistema de login no arquivo page.tsx principal.
           </Typography>
-          <Button variant="contained" component={NextLink} href="/dashboard">
-            Go to the Dashboard Page.
+          <Button
+            /* className="button-size" */
+            variant="contained"
+            component={NextLink}
+            href="/dashboard"
+          >
+            <Typography variant="button" display="block">
+              Go to the Dashboard
+            </Typography>
           </Button>
           {/*           <Button variant="contained" component={NextLink} href="/about">
             Go to the about Page.

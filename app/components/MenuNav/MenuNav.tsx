@@ -1,5 +1,7 @@
 'use client'
 import * as React from 'react'
+import Image from 'next/image'
+
 import Box from '@mui/material/Box'
 import Drawer from '@mui/material/Drawer'
 import Button from '@mui/material/Button'
@@ -13,6 +15,15 @@ import ListItemText from '@mui/material/ListItemText'
 import MenuOpenIcon from '@mui/icons-material/MenuOpen'
 import DashboardIcon from '@mui/icons-material/Dashboard'
 import ApartmentIcon from '@mui/icons-material/Apartment'
+import { IconButton, Typography } from '@mui/material'
+
+import { ThemeProvider } from '@mui/material/styles'
+
+import Brightness4Icon from '@mui/icons-material/Brightness4'
+import Brightness7Icon from '@mui/icons-material/Brightness7'
+
+import { darkTheme, lightTheme } from '@/theme'
+
 /* import LocationCityIcon from '@mui/icons-material/LocationCity'
 import AddBusinessIcon from '@mui/icons-material/AddBusiness'
 import ArticleIcon from '@mui/icons-material/Article'
@@ -21,14 +32,23 @@ import ManageAccountsIcon from '@mui/icons-material/ManageAccounts' */
 
 export default function TemporaryDrawer() {
   const [open, setOpen] = React.useState(false)
-  /*  const drawerIconSmallScreen = useMediaQuery('(max-width:600px)'); */
+  const [mode, setMode] = React.useState<'dark' | 'light'>('dark')
+
+  const theme = React.useMemo(
+    () => (mode === 'dark' ? darkTheme : lightTheme),
+    [mode],
+  )
+
+  const toggleTheme = () => {
+    setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'))
+  }
 
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen)
   }
 
   const DrawerList = (
-    <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>
+    <Box sx={{ width: 230 }} role="presentation" onClick={toggleDrawer(false)}>
       <List>
         {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
           <ListItem key={text} disablePadding>
@@ -54,17 +74,77 @@ export default function TemporaryDrawer() {
           </ListItem>
         ))}
       </List>
+      <Divider />
     </Box>
   )
 
   return (
-    <div>
-      <Button sx={{ marginLeft: 0 }} onClick={toggleDrawer(true)}>
-        <MenuOpenIcon />
-      </Button>
-      <Drawer open={open} onClose={toggleDrawer(false)}>
-        {DrawerList}
-      </Drawer>
-    </div>
+    <ThemeProvider theme={theme}>
+      <div>
+        <Button sx={{ marginLeft: 0 }} onClick={toggleDrawer(true)}>
+          <MenuOpenIcon />
+        </Button>
+        <Drawer open={open} onClose={toggleDrawer(false)}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column', // Adiciona flex direction column
+              height: '100%', // Garante que o Drawer ocupe toda a altura
+            }}
+          >
+            <Box
+              height={150}
+              width={230}
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              gap={4}
+              p={2}
+              /* sx={{ border: '2px solid grey' }} */
+            >
+              <Image
+                src="/logoPveMenu.png"
+                alt="Foto do usuário"
+                width={120}
+                height={120}
+              />
+            </Box>
+            {DrawerList}
+            <IconButton onClick={toggleTheme} color="inherit">
+              {theme.palette.mode === 'dark' ? (
+                <Brightness4Icon />
+              ) : (
+                <Brightness7Icon />
+              )}
+            </IconButton>
+            <Box
+              height={150}
+              width={230}
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              justifyContent="center"
+              gap={1}
+              sx={{ border: '2px solid grey', marginTop: 'auto' }}
+            >
+              {' '}
+              <Image
+                src="/profile-placeholder.png"
+                alt="Foto do usuário"
+                width={80}
+                height={80}
+              />
+              <Typography
+                variant="subtitle2"
+                component="h1"
+                sx={{ mb: 2, textAlign: 'center' }}
+              >
+                Nome do Usuário
+              </Typography>
+            </Box>
+          </Box>
+        </Drawer>
+      </div>
+    </ThemeProvider>
   )
 }

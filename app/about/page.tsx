@@ -5,6 +5,8 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import NextLink from 'next/link'
 
+import MyApp from '@/app/components/ToggleTheme/ToggleTheme'
+
 export default function About() {
   return (
     <Container maxWidth="lg">
@@ -22,8 +24,9 @@ export default function About() {
         </Typography>
         <Box sx={{ maxWidth: 'sm' }}>
           <Button variant="contained" component={NextLink} href="/">
-            Go to the home page
+            Trocar de Tema
           </Button>
+          <MyApp />
         </Box>
       </Box>
     </Container>

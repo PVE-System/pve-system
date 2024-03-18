@@ -1,4 +1,6 @@
 import * as React from 'react'
+import '@/app/styles/globals.css'
+
 import Container from '@mui/material/Container'
 import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
@@ -20,12 +22,23 @@ export default function Dashboard() {
             alignItems: 'center',
           }}
         >
-          <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
+          <Typography
+            variant="h4"
+            component="h1"
+            sx={{ mb: 2, textAlign: 'center' }}
+          >
             DashBoard - Conteudo do Dashboard
           </Typography>
           <Box sx={{ maxWidth: 'sm' }}>
-            <Button variant="contained" component={NextLink} href="/">
-              Go to the home page
+            <Button
+              /* className="button-size" */
+              variant="contained"
+              component={NextLink}
+              href="/"
+            >
+              <Typography variant="button" display="block">
+                Go to the home page
+              </Typography>
             </Button>
           </Box>
         </Box>
