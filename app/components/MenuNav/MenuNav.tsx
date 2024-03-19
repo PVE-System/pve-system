@@ -1,28 +1,27 @@
-'use client'
-import * as React from 'react'
-import Image from 'next/image'
+'use client';
 
-import Box from '@mui/material/Box'
-import Drawer from '@mui/material/Drawer'
-import Button from '@mui/material/Button'
-import List from '@mui/material/List'
-import Divider from '@mui/material/Divider'
-import ListItem from '@mui/material/ListItem'
-import ListItemButton from '@mui/material/ListItemButton'
-import ListItemIcon from '@mui/material/ListItemIcon'
-import ListItemText from '@mui/material/ListItemText'
+import * as React from 'react';
+import Image from 'next/image';
 
-import MenuOpenIcon from '@mui/icons-material/MenuOpen'
-import DashboardIcon from '@mui/icons-material/Dashboard'
-import ApartmentIcon from '@mui/icons-material/Apartment'
-import { IconButton, Typography } from '@mui/material'
+import Box from '@mui/material/Box';
+import Drawer from '@mui/material/Drawer';
+import Button from '@mui/material/Button';
+import List from '@mui/material/List';
+import Divider from '@mui/material/Divider';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
 
-import { ThemeProvider } from '@mui/material/styles'
+import MenuOpenIcon from '@mui/icons-material/MenuOpen';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import ApartmentIcon from '@mui/icons-material/Apartment';
+import { IconButton, Typography } from '@mui/material';
 
-import Brightness4Icon from '@mui/icons-material/Brightness4'
-import Brightness7Icon from '@mui/icons-material/Brightness7'
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
 
-import { darkTheme, lightTheme } from '@/theme'
+import { useTheme } from '@/app/theme/ThemeContext';
 
 /* import LocationCityIcon from '@mui/icons-material/LocationCity'
 import AddBusinessIcon from '@mui/icons-material/AddBusiness'
@@ -31,21 +30,12 @@ import GroupAddIcon from '@mui/icons-material/GroupAdd'
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts' */
 
 export default function TemporaryDrawer() {
-  const [open, setOpen] = React.useState(false)
-  const [mode, setMode] = React.useState<'dark' | 'light'>('dark')
-
-  const theme = React.useMemo(
-    () => (mode === 'dark' ? darkTheme : lightTheme),
-    [mode],
-  )
-
-  const toggleTheme = () => {
-    setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'))
-  }
+  const [open, setOpen] = React.useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   const toggleDrawer = (newOpen: boolean) => () => {
-    setOpen(newOpen)
-  }
+    setOpen(newOpen);
+  };
 
   const DrawerList = (
     <Box sx={{ width: 230 }} role="presentation" onClick={toggleDrawer(false)}>
@@ -76,75 +66,69 @@ export default function TemporaryDrawer() {
       </List>
       <Divider />
     </Box>
-  )
+  );
 
   return (
-    <ThemeProvider theme={theme}>
-      <div>
-        <Button sx={{ marginLeft: 0 }} onClick={toggleDrawer(true)}>
-          <MenuOpenIcon />
-        </Button>
-        <Drawer open={open} onClose={toggleDrawer(false)}>
+    <div>
+      <Button sx={{ marginLeft: 0 }} onClick={toggleDrawer(true)}>
+        <MenuOpenIcon />
+      </Button>
+      <Drawer open={open} onClose={toggleDrawer(false)}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column', // Adiciona flex direction column
+            height: '100%', // Garante que o Drawer ocupe toda a altura
+          }}
+        >
           <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column', // Adiciona flex direction column
-              height: '100%', // Garante que o Drawer ocupe toda a altura
-            }}
+            height={150}
+            width={230}
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            gap={4}
+            p={2}
+            /* sx={{ border: '2px solid grey' }} */
           >
-            <Box
-              height={150}
-              width={230}
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              gap={4}
-              p={2}
-              /* sx={{ border: '2px solid grey' }} */
-            >
-              <Image
-                src="/logoPveMenu.png"
-                alt="Foto do usuário"
-                width={120}
-                height={120}
-              />
-            </Box>
-            {DrawerList}
-            <IconButton onClick={toggleTheme} color="inherit">
-              {theme.palette.mode === 'dark' ? (
-                <Brightness4Icon />
-              ) : (
-                <Brightness7Icon />
-              )}
-            </IconButton>
-            <Box
-              height={150}
-              width={230}
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-              justifyContent="center"
-              gap={1}
-              sx={{ border: '2px solid grey', marginTop: 'auto' }}
-            >
-              {' '}
-              <Image
-                src="/profile-placeholder.png"
-                alt="Foto do usuário"
-                width={80}
-                height={80}
-              />
-              <Typography
-                variant="subtitle2"
-                component="h1"
-                sx={{ mb: 2, textAlign: 'center' }}
-              >
-                Nome do Usuário
-              </Typography>
-            </Box>
+            <Image
+              src="/logoPveMenu.png"
+              alt="Foto do usuário"
+              width={120}
+              height={120}
+            />
           </Box>
-        </Drawer>
-      </div>
-    </ThemeProvider>
-  )
+          {DrawerList}
+          <IconButton onClick={toggleTheme} color="inherit">
+            {theme === 'dark' ? <Brightness4Icon /> : <Brightness7Icon />}
+          </IconButton>
+          <Box
+            height={150}
+            width={230}
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            justifyContent="center"
+            gap={1}
+            sx={{ border: '2px solid grey', marginTop: 'auto' }}
+          >
+            {' '}
+            <Image
+              src="/profile-placeholder.png"
+              alt="Foto do usuário"
+              width={80}
+              height={80}
+            />
+            <Typography
+              variant="subtitle2"
+              component="h1"
+              sx={{ mb: 2, textAlign: 'center' }}
+            >
+              Nome do Usuário
+            </Typography>
+          </Box>
+        </Box>
+      </Drawer>
+    </div>
+  );
 }
