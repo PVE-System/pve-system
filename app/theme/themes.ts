@@ -1,6 +1,6 @@
-'use client'
+'use client';
 /* import { Roboto } from 'next/font/google' */
-import { createTheme } from '@mui/material/styles'
+import { createTheme } from '@mui/material/styles';
 
 /* const roboto = Roboto({
   weight: ['300', '400', '500', '700'],
@@ -28,7 +28,7 @@ const lightTheme = createTheme({
       paper: '#FDD3A9', // Cinza claro. Cor de fundo alternativa para componentes como o Drawer.
     },
   },
-})
+});
 
 const darkTheme = createTheme({
   typography: {
@@ -50,9 +50,9 @@ const darkTheme = createTheme({
       paper: '#000000', // Preto. Cor de fundo alternativa para componentes como o Drawer.
     },
   },
-})
+});
 
-export { lightTheme, darkTheme }
+export { lightTheme, darkTheme };
 
 /* const theme = createTheme({
   typography: {

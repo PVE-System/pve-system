@@ -1,15 +1,19 @@
-'use client'
-import * as React from 'react'
-import CssBaseline from '@mui/material/CssBaseline'
-import Box from '@mui/material/Box'
-import Container from '@mui/material/Container'
+'use client';
+import * as React from 'react';
+import CssBaseline from '@mui/material/CssBaseline';
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
 
-import { TextField, useMediaQuery } from '@mui/material'
+import { TextField, styled, useMediaQuery } from '@mui/material';
 
-import TemporaryDrawer from '@/app/components/MenuNav/MenuNav'
+import TemporaryDrawer from '@/app/components/MenuNav/MenuNav';
+
+const CustomBox = styled(Box)(({ theme }) => ({
+  paddingTop: theme.spacing(2),
+}));
 
 export default function HeadApp() {
-  const isSmallScreen = useMediaQuery('(max-width:600px)')
+  const isSmallScreen = useMediaQuery('(max-width:600px)');
   return (
     <React.Fragment>
       <CssBaseline />
@@ -35,5 +39,5 @@ export default function HeadApp() {
         </Box>
       </Container>
     </React.Fragment>
-  )
+  );
 }
