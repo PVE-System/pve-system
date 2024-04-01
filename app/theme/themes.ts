@@ -7,6 +7,11 @@ import { createTheme } from '@mui/material/styles';
   subsets: ['latin'],
   display: 'swap',
 }) */
+declare module '@mui/material/styles' {
+  interface TypeBackground {
+    alternative: string;
+  }
+}
 
 const lightTheme = createTheme({
   typography: {
@@ -16,16 +21,21 @@ const lightTheme = createTheme({
     mode: 'light',
     primary: {
       main: '#EA650A', // Laranja. Cor principal para botões e ícones.
-      light: '#F6E7D8', // Branco. Cor alternativa para botões e ícones.
-      contrastText: '#ffffff', // Branco. Cor alternativa para textos.
+      light: '#F6E7D8', // Cor alternativa para botões e ícones especifica para temas claros.
+      contrastText: '#ffffff', // Branco. Cor para textos dentro do botão.
     },
     secondary: {
-      main: '#F6E7D8', // Verde escuro. Cor principal para fundos de páginas individuais de clientes.
-      contrastText: '#EA650A', // Laranja. Cor alternativa para textos.
+      main: '#F6E7D8', // Cor secundaria para botões e ícones.
+      contrastText: '#EA650A', // Laranja. Cor alternativa para textos dentro do botão.
     },
     background: {
-      default: '#F6E7D8', // Branco. Cor de fundo principal.
-      paper: '#FDD3A9', // Cinza claro. Cor de fundo alternativa para componentes como o Drawer.
+      default: '#F4f4f4', // Cinza claro. Cor de fundo principal.
+      alternative: '#2A2E30', // DarkGreen Cor de fundo alternativa.
+      paper: '#FDD3A9', // Rosa Pastel. Cor de fundo alternativa para componentes como o Drawer.
+    },
+    text: {
+      primary: '#000000', // Black. Cor do texto padrão.
+      secondary: 'EA650A', // Laranjado. Cor do texto secundário, como em listas e descrições.
     },
   },
 });
@@ -33,48 +43,30 @@ const lightTheme = createTheme({
 const darkTheme = createTheme({
   typography: {
     fontFamily: 'Roboto, sans-serif',
+    
   },
   palette: {
     mode: 'dark',
     primary: {
       main: '#EA650A', // Laranja. Cor principal para botões e ícones.
-      light: '#ffffff', // Branco. Cor alternativa para botões e ícones.
-      contrastText: '#ffffff', // Branco. Cor alternativa para textos.
+      dark: '#ffffff', // Cor alternativa para botões e ícones especifica para temas escuros.
+      contrastText: '#ffffff', // Branco. Cor para textos dentro do botão.
     },
     secondary: {
-      main: '#2A2E30', // Verde escuro. Cor principal para fundos de páginas individuais de clientes.
-      contrastText: '#EA650A', // Laranja. Cor alternativa para textos.
+      main: '#ffffff', // Cor secundaria para botões e ícones.
+      contrastText: '#EA650A', // Laranja. Cor alternativa para textos dentro do botão.
     },
     background: {
       default: '#303030', // Cinza escuro. Cor de fundo principal.
+      alternative: '#2A2E30', // DarkGreen Cor de fundo alternativa.
       paper: '#000000', // Preto. Cor de fundo alternativa para componentes como o Drawer.
+    },
+    text: {
+      primary: '#ffffff', // Branco. Cor do texto padrão.
+      secondary: '#6b6b6b', // Laranjado. Cor do texto secundário, como em listas e descrições.
     },
   },
 });
 
 export { lightTheme, darkTheme };
 
-/* const theme = createTheme({
-  typography: {
-    fontFamily: roboto.style.fontFamily,
-  },
-  palette: {
-    mode: 'dark',
-    primary: {
-      main: '#EA650A', // ORANGE. Cor principal para os botoes e icones.
-      light: '#ffffff', // WHITE. Cor alternativa para os botoes e icones.
-      contrastText: '#ffffff', // WHITE. Cor alternativa para os textos.
-    },
-    secondary: {
-      main: '#2A2E30', // DARKGREEN. Cor principal para os background das paginas individuais de cada cliente.
-      contrastText: 'EA650A', // ORANGE. Cor alternativa para os textos.
-    },
-    background: {
-      default: '#303030', // DARKGREY Cor de fundo principal.
-      paper: '#000000', // BLACK. Cor de fundo alternativa para os componentes de papelaria como o MENUDRAWER SEARCH.
-    },
-  },
-}) */
-
-/* export default theme
- */
