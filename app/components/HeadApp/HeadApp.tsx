@@ -24,6 +24,7 @@ export default function HeadApp() {
             justifyContent: 'center',
             alignItems: 'center',
             paddingTop: 20,
+
             paddingBottom: 20,
           }}
         >
