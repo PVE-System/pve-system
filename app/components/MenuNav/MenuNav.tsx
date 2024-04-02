@@ -22,6 +22,7 @@ import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 
 import { useTheme } from '@/app/theme/ThemeContext';
+import styles from './styles';
 
 /* import LocationCityIcon from '@mui/icons-material/LocationCity'
 import AddBusinessIcon from '@mui/icons-material/AddBusiness'
@@ -38,34 +39,49 @@ export default function TemporaryDrawer() {
   };
 
   const DrawerList = (
-    <Box sx={{ width: 230 }} role="presentation" onClick={toggleDrawer(false)}>
+    <div role="presentation" onClick={toggleDrawer(false)}>
       <List>
-        {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                {index % 2 === 0 ? <DashboardIcon /> : <ApartmentIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
+        {[
+          { name: 'Dashboard', icon: <DashboardIcon />, link: '/dashboard' },
+          { name: 'Clientes MS', icon: <ApartmentIcon />, link: '/' },
+          { name: 'Clientes MT', icon: <DashboardIcon />, link: '/dashboard' },
+          { name: 'Clientes BR', icon: <ApartmentIcon />, link: '/' },
+          {
+            name: 'Cadastrar Cliente',
+            icon: <DashboardIcon />,
+            link: '/dashboard',
+          },
+          { name: 'Planilha Excel', icon: <ApartmentIcon />, link: '/' },
+          // Adicione mais itens conforme necessário
+        ].map((item) => (
+          <ListItem key={item.name} disablePadding>
+            <ListItemButton component="a" href={item.link}>
+              <ListItemIcon>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.name} />
             </ListItemButton>
           </ListItem>
         ))}
       </List>
       <Divider />
       <List>
-        {['All mail', 'Trash', 'Spam'].map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                {index % 2 === 0 ? <DashboardIcon /> : <ApartmentIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
+        {[
+          {
+            name: 'Cadastrar Equipe',
+            icon: <DashboardIcon />,
+            link: '/dashboard',
+          },
+          { name: 'Editar Perfil', icon: <ApartmentIcon />, link: '/' },
+          // Adicione mais itens conforme necessário
+        ].map((item) => (
+          <ListItem key={item.name} disablePadding>
+            <ListItemButton component="a" href={item.link}>
+              <ListItemIcon>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.name} />
             </ListItemButton>
           </ListItem>
         ))}
       </List>
-      <Divider />
-    </Box>
+    </div>
   );
 
   return (
@@ -99,9 +115,6 @@ export default function TemporaryDrawer() {
             />
           </Box>
           {DrawerList}
-          <IconButton onClick={toggleTheme} color="inherit">
-            {theme === 'dark' ? <Brightness4Icon /> : <Brightness7Icon />}
-          </IconButton>
           <Box
             height={150}
             width={230}
@@ -110,9 +123,15 @@ export default function TemporaryDrawer() {
             alignItems="center"
             justifyContent="center"
             gap={1}
-            sx={{ border: '2px solid grey', marginTop: 'auto' }}
+            sx={{ /* border: '2px solid grey',  */ marginTop: 'auto' }}
           >
-            {' '}
+            <IconButton
+              sx={styles.iconTheme}
+              onClick={toggleTheme}
+              color="inherit"
+            >
+              {theme === 'dark' ? <Brightness4Icon /> : <Brightness7Icon />}
+            </IconButton>{' '}
             <Image
               src="/profile-placeholder.png"
               alt="Foto do usuário"

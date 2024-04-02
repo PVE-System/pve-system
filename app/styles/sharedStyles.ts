@@ -1,4 +1,4 @@
-const styles = {
+const sharedStyles = {
   container: {
     my: 4,
     display: 'flex',
@@ -12,4 +12,4 @@ const styles = {
   },
 };
 
-export default styles;
+export default sharedStyles;

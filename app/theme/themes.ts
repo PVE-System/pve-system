@@ -49,7 +49,7 @@ const darkTheme = createTheme({
     mode: 'dark',
     primary: {
       main: '#EA650A', // Laranja. Cor principal para botões e ícones.
-      dark: '#ffffff', // Cor alternativa para botões e ícones especifica para temas escuros.
+      light: '#F6E7D8', // Cor para hover nos botões e ícones especifica para temas escuros.
       contrastText: '#ffffff', // Branco. Cor para textos dentro do botão.
     },
     secondary: {
