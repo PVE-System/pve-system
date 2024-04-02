@@ -6,14 +6,14 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import NextLink from 'next/link';
 import HeadApp from '@/app/components/HeadApp/HeadApp';
-import styles from '@/app/dashboard/styles';
+import sharedStyles from '@/app/styles/sharedStyles';
 
 export default function Dashboard() {
   return (
     <>
       <HeadApp />
       <Container fixed>
-        <Box sx={styles.container}>
+        <Box sx={sharedStyles.container}>
           <Typography variant="h4" component="h1">
             DashBoard - Conteudo do Dashboard
           </Typography>
