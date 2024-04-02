@@ -1,7 +1,7 @@
 const styles = {
   iconTheme: {
-    display: 'flex',    
-    marginBottom: 1,        
+    display: 'flex',
+    marginBottom: 1,
   },
 };
 
