@@ -43,7 +43,6 @@ const lightTheme = createTheme({
 const darkTheme = createTheme({
   typography: {
     fontFamily: 'Roboto, sans-serif',
-    
   },
   palette: {
     mode: 'dark',
@@ -69,4 +68,3 @@ const darkTheme = createTheme({
 });
 
 export { lightTheme, darkTheme };
-
