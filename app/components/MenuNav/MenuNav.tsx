@@ -22,13 +22,16 @@ import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 
 import { useTheme } from '@/app/theme/ThemeContext';
-import styles from './styles';
+import styles from '@/app/components/MenuNav/styles';
 
-/* import LocationCityIcon from '@mui/icons-material/LocationCity'
-import AddBusinessIcon from '@mui/icons-material/AddBusiness'
-import ArticleIcon from '@mui/icons-material/Article'
-import GroupAddIcon from '@mui/icons-material/GroupAdd'
-import ManageAccountsIcon from '@mui/icons-material/ManageAccounts' */
+import LocationCityIcon from '@mui/icons-material/LocationCity';
+import AddBusinessIcon from '@mui/icons-material/AddBusiness';
+import ArticleIcon from '@mui/icons-material/Article';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import BusinessIcon from '@mui/icons-material/Business';
+
+// Hook navigation
 
 export default function TemporaryDrawer() {
   const [open, setOpen] = React.useState(false);
@@ -40,19 +43,21 @@ export default function TemporaryDrawer() {
 
   const DrawerList = (
     <div role="presentation" onClick={toggleDrawer(false)}>
-      <List>
+      <List sx={styles.textMenu}>
         {[
           { name: 'Dashboard', icon: <DashboardIcon />, link: '/dashboard' },
-          { name: 'Clientes MS', icon: <ApartmentIcon />, link: '/' },
-          { name: 'Clientes MT', icon: <DashboardIcon />, link: '/dashboard' },
-          { name: 'Clientes BR', icon: <ApartmentIcon />, link: '/' },
+          { name: 'Clientes MS', icon: <LocationCityIcon />, link: '/' },
           {
-            name: 'Cadastrar Cliente',
-            icon: <DashboardIcon />,
+            name: 'Clientes MT',
+            icon: <ApartmentIcon />,
             link: '/dashboard',
           },
-          { name: 'Planilha Excel', icon: <ApartmentIcon />, link: '/' },
-          // Adicione mais itens conforme necessário
+          { name: 'Clientes BR', icon: <BusinessIcon />, link: '/' },
+          {
+            name: 'Cadastrar Cliente',
+            icon: <AddBusinessIcon />,
+            link: '/dashboard',
+          },
         ].map((item) => (
           <ListItem key={item.name} disablePadding>
             <ListItemButton component="a" href={item.link}>
@@ -63,14 +68,15 @@ export default function TemporaryDrawer() {
         ))}
       </List>
       <Divider />
-      <List>
+      <List sx={styles.textMenu}>
         {[
+          { name: 'Planilha Excel', icon: <ArticleIcon />, link: '/' },
           {
             name: 'Cadastrar Equipe',
-            icon: <DashboardIcon />,
-            link: '/dashboard',
+            icon: <GroupAddIcon />,
+            link: '/',
           },
-          { name: 'Editar Perfil', icon: <ApartmentIcon />, link: '/' },
+          { name: 'Editar Perfil', icon: <ManageAccountsIcon />, link: '/' },
           // Adicione mais itens conforme necessário
         ].map((item) => (
           <ListItem key={item.name} disablePadding>
