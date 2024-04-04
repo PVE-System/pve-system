@@ -16,7 +16,7 @@ import ListItemText from '@mui/material/ListItemText';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ApartmentIcon from '@mui/icons-material/Apartment';
-import { IconButton, Typography } from '@mui/material';
+import { IconButton, Link, Typography } from '@mui/material';
 
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
@@ -30,12 +30,16 @@ import ArticleIcon from '@mui/icons-material/Article';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import BusinessIcon from '@mui/icons-material/Business';
+import LogoutIcon from '@mui/icons-material/Logout';
 
-// Hook navigation
+import { useMediaQuery } from '@mui/material';
 
 export default function TemporaryDrawer() {
   const [open, setOpen] = React.useState(false);
   const { theme, toggleTheme } = useTheme();
+
+  // Detecta se a tela é menor que o tamanho md (960px)
+  const isMobile = useMediaQuery('(max-width:600px)');
 
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen);
@@ -67,7 +71,7 @@ export default function TemporaryDrawer() {
           </ListItem>
         ))}
       </List>
-      <Divider />
+      <Divider sx={styles.dividerMenu} />
       <List sx={styles.textMenu}>
         {[
           { name: 'Planilha Excel', icon: <ArticleIcon />, link: '/' },
@@ -95,25 +99,23 @@ export default function TemporaryDrawer() {
       <Button sx={{ marginLeft: 0 }} onClick={toggleDrawer(true)}>
         <MenuOpenIcon />
       </Button>
-      <Drawer open={open} onClose={toggleDrawer(false)}>
+      <Drawer
+        open={open}
+        onClose={toggleDrawer(false)}
+        anchor={isMobile ? 'top' : 'left'}
+      >
         <Box
           sx={{
             display: 'flex',
-            flexDirection: 'column', // Adiciona flex direction column
-            height: '100%', // Garante que o Drawer ocupe toda a altura
+            flexDirection: 'column',
+            alignItems: isMobile ? 'center' : 'flex', // Centraliza na horizontal se for mobile, senão alinha à esquerda
+            justifyContent: isMobile ? 'center' : 'flex', // Centraliza na vertical se for mobile, senão alinha ao topo
+            height: '100%', // Garante que o conteúdo ocupe toda a altura do Drawer
           }}
         >
-          <Box
-            height={150}
-            width={230}
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            gap={4}
-            p={2}
-            /* sx={{ border: '2px solid grey' }} */
-          >
+          <Box sx={styles.logoMenu}>
             <Image
+              /* sx={styles.logoImg} nao foi possivel estilizar o component image dessa maneira */
               src="/logoPveMenu.png"
               alt="Foto do usuário"
               width={120}
@@ -121,16 +123,7 @@ export default function TemporaryDrawer() {
             />
           </Box>
           {DrawerList}
-          <Box
-            height={150}
-            width={230}
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            justifyContent="center"
-            gap={1}
-            sx={{ /* border: '2px solid grey',  */ marginTop: 'auto' }}
-          >
+          <Box sx={styles.containerMenu}>
             <IconButton
               sx={styles.iconTheme}
               onClick={toggleTheme}
@@ -138,6 +131,7 @@ export default function TemporaryDrawer() {
             >
               {theme === 'dark' ? <Brightness4Icon /> : <Brightness7Icon />}
             </IconButton>{' '}
+            <Divider sx={styles.dividerMenu} />
             <Image
               src="/profile-placeholder.png"
               alt="Foto do usuário"
@@ -151,6 +145,11 @@ export default function TemporaryDrawer() {
             >
               Nome do Usuário
             </Typography>
+          </Box>
+          <Box sx={styles.logoutIcon}>
+            <Link href="/">
+              <LogoutIcon />
+            </Link>
           </Box>
         </Box>
       </Drawer>
