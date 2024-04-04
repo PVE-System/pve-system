@@ -19,4 +19,4 @@
 ![POSTGRESQL](https://img.shields.io/badge/-PostgreSql-05122A?style=flat&color=red&logo=POSTGRESQL)
 ![POSTGRESQL](https://img.shields.io/badge/-AWS-05122A?style=flat&color=darkblue&logo=amazonaws)
 
-<h3>🐱‍🏍All rights reserved. © 2024 - PVE Representações.🐱‍🏍</h3>
+<h3>🐱‍🏍All rights reserved. © 2024 - PVE Representações Ltda.🐱‍🏍</h3>
