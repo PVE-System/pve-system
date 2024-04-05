@@ -1,3 +1,6 @@
+import { BorderColor } from '@mui/icons-material';
+import { grey, orange } from '@mui/material/colors';
+
 const sharedStyles = {
   container: {
     my: 4,
@@ -5,9 +8,14 @@ const sharedStyles = {
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    '& h1': {
-      mb: 2,
-      textAlign: 'center',
+    background: 'grey',
+  },
+
+  titlePage: {
+    margin: '8px',
+    textAlign: 'center',
+    '& span': {
+      color: orange[800],
     },
   },
 };
