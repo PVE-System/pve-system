@@ -6,6 +6,9 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import NextLink from 'next/link';
 import HeadApp from '@/app/components/HeadApp/HeadApp';
+
+import DashboardComponent from '../components/Dashboard/Dashboard';
+
 import sharedStyles from '@/app/styles/sharedStyles';
 
 export default function Dashboard() {
@@ -14,22 +17,12 @@ export default function Dashboard() {
       <HeadApp />
       <Container fixed>
         <Box sx={sharedStyles.container}>
-          <Typography variant="h4" component="h1">
-            DashBoard - Conteudo do Dashboard
+          <Typography variant="h4" component="h1" sx={sharedStyles.titlePage}>
+            <span>Dash</span>Board
           </Typography>
-          <Box sx={{ maxWidth: 'sm' }}>
-            <Button
-              /* className="button-size" */
-              variant="contained"
-              component={NextLink}
-              href="/"
-            >
-              <Typography variant="button" display="block">
-                Go to the home page
-              </Typography>
-            </Button>
-          </Box>
+          <Box sx={{ maxWidth: 'sm' }}></Box>
         </Box>
+        <DashboardComponent />
       </Container>
     </>
   );
