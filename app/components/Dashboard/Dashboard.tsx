@@ -1,4 +1,13 @@
-import { Grid, Card, CardContent, Typography, Container } from '@mui/material';
+'use client';
+
+import {
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+  Container,
+  Box,
+} from '@mui/material';
 import { orange } from '@mui/material/colors';
 
 // Acordion
@@ -10,157 +19,115 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import sharedStyles from '@/app/styles/sharedStyles';
 import styles from './styles';
+import { useState } from 'react';
 
 const DashboardComponent = () => {
+  const [expanded, setExpanded] = useState<string | null>(null);
+
+  const handleChange =
+    (panel: string) => (event: React.ChangeEvent<{}>, isExpanded: boolean) => {
+      setExpanded(isExpanded ? panel : null);
+    };
   return (
-    <Grid container spacing={2} justifyContent="center">
+    <Container maxWidth="lg" sx={sharedStyles.container}>
       {/* Primeira linha */}
-      <Grid item xs={12}>
-        <Grid container spacing={2}>
-          {/* Primeira coluna */}
-          <Grid
-            item
-            xs={6}
-            md={6}
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-end',
-              width: '200px',
-            }}
-          >
-            <Card
-              variant="outlined"
-              sx={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderRadius: 4,
-                width: '200px',
-                backgroundColor: 'transparent',
-                /* marginBottom: '20px', */
-              }}
-            >
-              <CardContent
-                sx={{
-                  backgroundColor: 'transparent',
-                  border: '1px solid white',
-                  width: '200px',
-                }}
-              >
-                <Typography variant="h6" sx={styles.textCard}>
-                  Clientes MS
-                </Typography>
-                <Typography variant="h6" sx={styles.textCard}>
-                  <span>336</span>
-                  <br />
-                  Cadastrados
-                </Typography>
-              </CardContent>
-            </Card>
-            <Card
-              variant="outlined"
-              sx={{
-                borderRadius: 4,
-                width: '200px',
-                backgroundColor: 'transparent',
-                marginTop: '20px',
-                /* marginBottom: '20px', */
-              }}
-            >
-              <CardContent
-                sx={{
-                  backgroundColor: 'transparent',
-                  border: '1px solid white',
-                  width: '200px',
-                }}
-              >
-                <Typography variant="h6" sx={styles.textCard}>
-                  Clientes MT
-                </Typography>
-                <Typography variant="h6" sx={styles.textCard}>
-                  <span>211</span>
-                  <br />
-                  Cadastrados
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          {/* Segunda coluna */}
-          <Grid item xs={12} md={6}>
-            <Card variant="outlined" sx={{ borderRadius: 4, height: '100%' }}>
-              <CardContent
-                sx={{
-                  backgroundColor: '#2A2E30',
-                  border: '1px solid white',
-                  height: '100%',
-                }}
-              >
-                <Typography variant="h6" sx={{ color: 'white' }}>
-                  Grafico dos cadastros
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-      </Grid>
+      <Box sx={styles.cardsContainer}>
+        {/* Primeira coluna */}
+        <Box sx={styles.cardsBoxCol1}>
+          <Card variant="outlined" sx={styles.cards}>
+            <CardContent sx={styles.cardsContent}>
+              <Typography variant="h6" sx={styles.cardsText}>
+                Clientes MS
+              </Typography>
+              <Typography variant="h6" sx={styles.cardsText}>
+                <span>336</span>
+                <br />
+                Cadastrados
+              </Typography>
+            </CardContent>
+          </Card>
+          <Card variant="outlined" sx={styles.cards}>
+            <CardContent sx={styles.cardsContent}>
+              <Typography variant="h6" sx={styles.cardsText}>
+                Clientes MT
+              </Typography>
+              <Typography variant="h6" sx={styles.cardsText}>
+                <span>211</span>
+                <br />
+                Cadastrados
+              </Typography>
+            </CardContent>
+          </Card>
+        </Box>
+        {/* Segunda coluna */}
+        <Box sx={styles.cardGraphicContainer}>
+          <Card variant="outlined" sx={styles.cardGraphic}>
+            <CardContent sx={styles.CardGraphicContent}>
+              <Typography variant="h6" sx={styles.cardsText}>
+                Gráfico dos cadastros:
+              </Typography>
+            </CardContent>
+          </Card>
+        </Box>
+      </Box>
       {/* Segunda linha */}
-      <Grid item xs={12}>
-        <Grid container justifyContent="center">
-          <Grid item xs={12} md={6}>
-            <Accordion>
-              <AccordionSummary
-                expandIcon={<ArrowDropDownIcon />}
-                aria-controls="panel1-content"
-                id="panel1-header"
-              >
-                <Typography sx={styles.textAccordion}>
-                  <span>276 </span>Clientes são ativos.
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Typography>
-                  Clientes são ativos, fieis e fazem pedidos com frequencia.
-                </Typography>
-              </AccordionDetails>
-            </Accordion>
-            <Accordion>
-              <AccordionSummary
-                expandIcon={<ArrowDropDownIcon />}
-                aria-controls="panel1-content"
-                id="panel1-header"
-              >
-                <Typography sx={styles.textAccordion}>
-                  <span>341 </span>Clientes com atividade moderada.
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Typography>
-                  Clientes moderado, pedidos com uma certa frequencia, mas
-                  poderia melhorar, compensa analisar os motivos e tentar fechar
-                  mais pedidos.
-                </Typography>
-              </AccordionDetails>
-            </Accordion>
-            <Accordion>
-              <AccordionSummary
-                expandIcon={<ArrowDropDownIcon />}
-                aria-controls="panel1-content"
-                id="panel1-header"
-              >
-                <Typography sx={styles.textAccordion}>
-                  <span>153 </span>Clientes não são ativos.
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Typography>
-                  Clientes não ativos fazem poucas vezes por ano.
-                </Typography>
-              </AccordionDetails>
-            </Accordion>
-          </Grid>
-        </Grid>
-      </Grid>
-    </Grid>
+      <Box sx={styles.accordionContainer}>
+        <Accordion
+          expanded={expanded === 'panel1'}
+          onChange={handleChange('panel1')}
+        >
+          <AccordionSummary
+            expandIcon={<ArrowDropDownIcon />}
+            aria-controls="panel1-content"
+            id="panel1-header"
+          >
+            <Typography>Clientes são ativos.</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Typography>
+              Clientes são ativos, fieis e fazem pedidos com frequencia.
+            </Typography>
+          </AccordionDetails>
+        </Accordion>
+        <Accordion
+          expanded={expanded === 'panel2'}
+          onChange={handleChange('panel2')}
+        >
+          <AccordionSummary
+            expandIcon={<ArrowDropDownIcon />}
+            aria-controls="panel2-content"
+            id="panel2-header"
+          >
+            <Typography>Clientes com atividade moderada.</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Typography>
+              Clientes moderado, pedidos com uma certa frequencia, mas poderia
+              melhorar, compensa analisar os motivos e tentar fechar mais
+              pedidos.
+            </Typography>
+          </AccordionDetails>
+        </Accordion>
+        <Accordion
+          expanded={expanded === 'panel3'}
+          onChange={handleChange('panel3')}
+        >
+          <AccordionSummary
+            expandIcon={<ArrowDropDownIcon />}
+            aria-controls="panel3-content"
+            id="panel3-header"
+          >
+            <Typography>Clientes não são ativos.</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Typography>
+              Clientes não ativos fazem pedidos poucas vezes por ano,
+              independente da concorrência.
+            </Typography>
+          </AccordionDetails>
+        </Accordion>
+      </Box>
+    </Container>
   );
 };
 

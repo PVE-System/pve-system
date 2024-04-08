@@ -9,6 +9,11 @@ const sharedStyles = {
     justifyContent: 'center',
     alignItems: 'center',
     background: 'grey',
+    '@media (max-width: 600px)': {
+      // Estilos para telas menores que 600px
+
+      width: '100%', // Definindo a largura como 100% para ocupar toda a largura da tela
+    },
   },
 
   titlePage: {
