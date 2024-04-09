@@ -14,6 +14,7 @@ import Container from '@mui/material/Container';
 /* import { createTheme, ThemeProvider } from '@mui/material/styles'; */
 import Image from 'next/image';
 import NextLink from 'next/link';
+import sharedStyles from '@/app/styles/sharedStyles';
 
 function Copyright(props: any) {
   return (
@@ -32,9 +33,6 @@ function Copyright(props: any) {
     </Typography>
   );
 }
-
-// TODO remove, this demo shouldn't need to reset the theme.
-/* const defaultTheme = createTheme(); */
 
 export default function SignIn() {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -57,18 +55,17 @@ export default function SignIn() {
           alignItems: 'center',
         }}
       >
-        <Box
-          sx={{
-            marginBottom: 5,
-          }}
-        >
+        <Box>
           <Image
             src="/logoPveMenu.png"
             alt="Logo PVE"
-            width={120}
-            height={120}
+            width={150}
+            height={150}
           />
         </Box>
+        <Typography variant="subtitle1" sx={sharedStyles.subtitle}>
+          PVE Representações Ltda.
+        </Typography>
 
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
           <TextField

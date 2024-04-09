@@ -34,7 +34,7 @@ const DashboardComponent = () => {
         {/* Primeira coluna */}
         <Box sx={styles.cardsBoxCol1}>
           <Card variant="outlined" sx={styles.cards}>
-            <CardContent sx={styles.cardsContent}>
+            <CardContent>
               <Typography variant="h6" sx={styles.cardsText}>
                 Clientes MS
               </Typography>
@@ -46,7 +46,7 @@ const DashboardComponent = () => {
             </CardContent>
           </Card>
           <Card variant="outlined" sx={styles.cards}>
-            <CardContent sx={styles.cardsContent}>
+            <CardContent>
               <Typography variant="h6" sx={styles.cardsText}>
                 Clientes MT
               </Typography>

@@ -29,9 +29,9 @@ const lightTheme = createTheme({
       contrastText: '#EA650A', // Laranja. Cor alternativa para textos dentro do botão.
     },
     background: {
-      default: '#F5F5F5', // Cinza claro. Body Cor de fundo principal.
+      default: '#F9F9F9', // Cinza claro. Body Cor de fundo principal.
       alternative: '#2A2E30', // DarkGreen Cor de fundo alternativa.
-      paper: '#B5C7D2', // Rosa Pastel. Cor de fundo alternativa para componentes como o Drawer.
+      paper: '#B5C7D2', // Azul Pastel. Cor de fundo alternativa para componentes como o Drawer.
     },
     text: {
       primary: '#000000', // Black. Cor do texto padrão.

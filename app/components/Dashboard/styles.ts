@@ -25,19 +25,20 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 4,
+    border: '1px solid white',
     width: '280px',
     marginBottom: '20px',
     '@media (max-width: 600px)': {
       width: '100%',
     },
   },
-  cardsContent: {
+  /*   cardsContent: {
     border: '1px solid white',
     width: '280px',
     '@media (max-width: 600px)': {
       width: '100%',
     },
-  },
+  }, */
   cardsText: {
     color: 'white',
     textAlign: 'center',
