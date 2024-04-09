@@ -8,7 +8,7 @@ const sharedStyles = {
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    background: 'grey',
+    /* background: 'grey', */
     '@media (max-width: 600px)': {
       // Estilos para telas menores que 600px
 

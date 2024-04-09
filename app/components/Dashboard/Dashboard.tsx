@@ -1,25 +1,23 @@
 'use client';
 
-import {
-  Grid,
-  Card,
-  CardContent,
-  Typography,
-  Container,
-  Box,
-} from '@mui/material';
-import { orange } from '@mui/material/colors';
+import { Card, CardContent, Typography, Container, Box } from '@mui/material';
 
-// Acordion
+import { useState } from 'react';
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import sharedStyles from '@/app/styles/sharedStyles';
 import styles from './styles';
-import { useState } from 'react';
+import { Rating } from '@mui/material';
+
+//Recurso para desativar o SSR (Server-Side Rendering). Foi necessario para colocar o grafico. (conferir com o Raras se é ok?)
+import dynamic from 'next/dynamic';
+const DynamicChartComponent = dynamic(
+  () => import('@/app/components/PieChart/PieChart'),
+  { ssr: false },
+);
 
 const DashboardComponent = () => {
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -28,6 +26,7 @@ const DashboardComponent = () => {
     (panel: string) => (event: React.ChangeEvent<{}>, isExpanded: boolean) => {
       setExpanded(isExpanded ? panel : null);
     };
+
   return (
     <Container maxWidth="lg" sx={sharedStyles.container}>
       {/* Primeira linha */}
@@ -60,15 +59,7 @@ const DashboardComponent = () => {
           </Card>
         </Box>
         {/* Segunda coluna */}
-        <Box sx={styles.cardGraphicContainer}>
-          <Card variant="outlined" sx={styles.cardGraphic}>
-            <CardContent sx={styles.CardGraphicContent}>
-              <Typography variant="h6" sx={styles.cardsText}>
-                Gráfico dos cadastros:
-              </Typography>
-            </CardContent>
-          </Card>
-        </Box>
+        <DynamicChartComponent />
       </Box>
       {/* Segunda linha */}
       <Box sx={styles.accordionContainer}>
@@ -81,7 +72,16 @@ const DashboardComponent = () => {
             aria-controls="panel1-content"
             id="panel1-header"
           >
-            <Typography>Clientes são ativos.</Typography>
+            <Rating
+              name="read-only"
+              value={3}
+              readOnly
+              max={3}
+              sx={styles.ratingStars}
+            />
+            <Typography sx={styles.accordionText}>
+              <span>117 </span>Clientes são ativos.
+            </Typography>
           </AccordionSummary>
           <AccordionDetails>
             <Typography>
@@ -98,7 +98,16 @@ const DashboardComponent = () => {
             aria-controls="panel2-content"
             id="panel2-header"
           >
-            <Typography>Clientes com atividade moderada.</Typography>
+            <Rating
+              name="read-only"
+              value={2}
+              readOnly
+              max={3}
+              sx={styles.ratingStars}
+            />
+            <Typography sx={styles.accordionText}>
+              <span>55 </span> Clientes com atividade moderada.
+            </Typography>
           </AccordionSummary>
           <AccordionDetails>
             <Typography>
@@ -117,7 +126,16 @@ const DashboardComponent = () => {
             aria-controls="panel3-content"
             id="panel3-header"
           >
-            <Typography>Clientes não são ativos.</Typography>
+            <Rating
+              name="read-only"
+              value={1}
+              readOnly
+              max={3}
+              sx={styles.ratingStars}
+            />
+            <Typography sx={styles.accordionText}>
+              <span>32 </span>Clientes não são ativos.
+            </Typography>
           </AccordionSummary>
           <AccordionDetails>
             <Typography>
