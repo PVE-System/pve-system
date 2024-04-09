@@ -29,9 +29,9 @@ const lightTheme = createTheme({
       contrastText: '#EA650A', // Laranja. Cor alternativa para textos dentro do botão.
     },
     background: {
-      default: '#F4f4f4', // Cinza claro. Cor de fundo principal.
+      default: '#F5F5F5', // Cinza claro. Body Cor de fundo principal.
       alternative: '#2A2E30', // DarkGreen Cor de fundo alternativa.
-      paper: '#FDD3A9', // Rosa Pastel. Cor de fundo alternativa para componentes como o Drawer.
+      paper: '#B5C7D2', // Rosa Pastel. Cor de fundo alternativa para componentes como o Drawer.
     },
     text: {
       primary: '#000000', // Black. Cor do texto padrão.
@@ -56,9 +56,9 @@ const darkTheme = createTheme({
       contrastText: '#EA650A', // Laranja. Cor alternativa para textos dentro do botão.
     },
     background: {
-      default: '#303030', // Cinza escuro. Cor de fundo principal.
+      default: '#303030', // Cinza escuro. Body, cor de fundo principal.
       alternative: '#2A2E30', // DarkGreen Cor de fundo alternativa.
-      paper: '#000000', // Preto. Cor de fundo alternativa para componentes como o Drawer.
+      paper: '#000000', // Preto. Cor de fundo alternativa para componentes como o Drawer e Accordion.
     },
     text: {
       primary: '#ffffff', // Branco. Cor do texto padrão.
