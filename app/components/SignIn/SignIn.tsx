@@ -63,7 +63,7 @@ export default function SignIn() {
             height={150}
           />
         </Box>
-        <Typography variant="subtitle1" sx={sharedStyles.subtitle}>
+        <Typography variant="subtitle1" sx={sharedStyles.subtitleSize}>
           PVE Representações Ltda.
         </Typography>
 

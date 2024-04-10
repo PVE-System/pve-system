@@ -27,7 +27,7 @@ const styles = {
     borderRadius: 4,
     border: '1px solid white',
     width: '280px',
-    marginBottom: '20px',
+    marginBottom: '40px',
     '@media (max-width: 600px)': {
       width: '100%',
     },
@@ -44,6 +44,18 @@ const styles = {
     textAlign: 'center',
     span: {
       color: orange[800],
+      fontSize: '22px',
+      '@media (max-width:1050px)': {
+        fontSize: '20px',
+      },
+      // Tamanho da fonte tela Tablet
+      '@media (max-width:800px)': {
+        fontSize: '18px',
+      },
+      // Tamanho da fonte tela Mobile
+      '@media (max-width:450px)': {
+        fontSize: '16px',
+      },
     },
   },
 
@@ -61,12 +73,26 @@ const styles = {
       width: '100%',
     },
   },
-  accordionBg: {
+  /*   accordionBg: {
     background: (theme: Theme) => theme.palette.background.alternative,
-  },
+  }, */
   accordionText: {
     span: {
       color: orange[800],
+      marginRight: '10px',
+      fontSize: '20px',
+      // Tamanho da fonte tela Notebook
+      '@media (max-width:1050px)': {
+        fontSize: '20px',
+      },
+      // Tamanho da fonte tela Tablet
+      '@media (max-width:800px)': {
+        fontSize: '18px',
+      },
+      // Tamanho da fonte tela Mobile
+      '@media (max-width:450px)': {
+        fontSize: '16px',
+      },
     },
   },
   ratingStars: {

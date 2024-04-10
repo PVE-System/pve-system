@@ -34,7 +34,7 @@ const sharedStyles = {
     },
   },
 
-  subtitle: {
+  subtitleSize: {
     // Tamanho da fonte tela desktop
     fontSize: '18px',
     // Tamanho da fonte tela Notebook
