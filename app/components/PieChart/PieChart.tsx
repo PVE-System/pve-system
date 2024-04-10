@@ -7,6 +7,8 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import { PieChart, Pie, Cell, Legend } from 'recharts';
+import styles from '../Dashboard/styles';
+import sharedStyles from '@/app/styles/sharedStyles';
 
 const SimpleChart = () => {
   const data = [
@@ -32,8 +34,11 @@ const SimpleChart = () => {
         }}
       >
         <CardContent>
-          <Typography variant="h6" color={'white'}>
-            Gráfico dos cadastros:
+          <Typography
+            variant="h6"
+            sx={{ ...styles.cardsText, ...sharedStyles.subtitleSize }}
+          >
+            Gráfico sobre cadastros:
           </Typography>
           <Box width={isSmallScreen ? '100%' : 'auto'}>
             <PieChart width={isSmallScreen ? 250 : 300} height={230}>

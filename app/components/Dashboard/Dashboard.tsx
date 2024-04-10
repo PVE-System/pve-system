@@ -35,10 +35,16 @@ const DashboardComponent = () => {
         <Box sx={styles.cardsBoxCol1}>
           <Card variant="outlined" sx={styles.cards}>
             <CardContent>
-              <Typography variant="h6" sx={styles.cardsText}>
+              <Typography
+                variant="h6"
+                sx={{ ...styles.cardsText, ...sharedStyles.subtitleSize }}
+              >
                 Clientes MS
               </Typography>
-              <Typography variant="h6" sx={styles.cardsText}>
+              <Typography
+                variant="h6"
+                sx={{ ...styles.cardsText, ...sharedStyles.subtitleSize }}
+              >
                 <span>336</span>
                 <br />
                 Cadastrados
@@ -47,10 +53,16 @@ const DashboardComponent = () => {
           </Card>
           <Card variant="outlined" sx={styles.cards}>
             <CardContent>
-              <Typography variant="h6" sx={styles.cardsText}>
+              <Typography
+                variant="h6"
+                sx={{ ...styles.cardsText, ...sharedStyles.subtitleSize }}
+              >
                 Clientes MT
               </Typography>
-              <Typography variant="h6" sx={styles.cardsText}>
+              <Typography
+                variant="h6"
+                sx={{ ...styles.cardsText, ...sharedStyles.subtitleSize }}
+              >
                 <span>211</span>
                 <br />
                 Cadastrados
@@ -79,13 +91,19 @@ const DashboardComponent = () => {
               max={3}
               sx={styles.ratingStars}
             />
-            <Typography sx={styles.accordionText}>
-              <span>117 </span>Clientes são ativos.
+            <Typography
+              sx={{ ...styles.accordionText, ...sharedStyles.subtitleSize }}
+            >
+              <span>117 </span>Clientes ativos
             </Typography>
           </AccordionSummary>
           <AccordionDetails>
-            <Typography>
-              Clientes são ativos, fieis e fazem pedidos com frequencia.
+            <Typography
+              sx={{ ...styles.accordionText, ...sharedStyles.subtitleSize }}
+            >
+              Fazem pedidos com frequência e confiam em nosso trabalho.
+              <br />
+              São clientes fidelizados que temos um bom relacionamento.
             </Typography>
           </AccordionDetails>
         </Accordion>
@@ -105,15 +123,19 @@ const DashboardComponent = () => {
               max={3}
               sx={styles.ratingStars}
             />
-            <Typography sx={styles.accordionText}>
-              <span>55 </span> Clientes com atividade moderada.
+            <Typography
+              sx={{ ...styles.accordionText, ...sharedStyles.subtitleSize }}
+            >
+              <span>055 </span> Clientes moderado
             </Typography>
           </AccordionSummary>
           <AccordionDetails>
-            <Typography>
-              Clientes moderado, pedidos com uma certa frequencia, mas poderia
-              melhorar, compensa analisar os motivos e tentar fechar mais
-              pedidos.
+            <Typography
+              sx={{ ...styles.accordionText, ...sharedStyles.subtitleSize }}
+            >
+              Fazem pedidos com uma certa frequência, mas poderia melhorar.
+              <br />
+              Compensa analisar os motivos e tentar fechar mais pedidos.
             </Typography>
           </AccordionDetails>
         </Accordion>
@@ -133,14 +155,19 @@ const DashboardComponent = () => {
               max={3}
               sx={styles.ratingStars}
             />
-            <Typography sx={styles.accordionText}>
-              <span>32 </span>Clientes não são ativos.
+            <Typography
+              sx={{ ...styles.accordionText, ...sharedStyles.subtitleSize }}
+            >
+              <span>032 </span>Clientes não ativos
             </Typography>
           </AccordionSummary>
           <AccordionDetails>
-            <Typography>
-              Clientes não ativos fazem pedidos poucas vezes por ano,
-              independente da concorrência.
+            <Typography
+              sx={{ ...styles.accordionText, ...sharedStyles.subtitleSize }}
+            >
+              Fazem pedidos poucas vezes por ano independente da concorrência.
+              <br />
+              Mas é importante sempre mantermos contato.
             </Typography>
           </AccordionDetails>
         </Accordion>
