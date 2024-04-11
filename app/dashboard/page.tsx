@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import NextLink from 'next/link';
-import HeadApp from '@/app/components/HeadApp/HeadApp';
+import HeadApp from '../components/HeadApp/HeadApp';
 
 import DashboardComponent from '../components/Dashboard/Dashboard';
 

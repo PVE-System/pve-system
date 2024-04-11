@@ -78,7 +78,7 @@ export default function TemporaryDrawer() {
           {
             name: 'Cadastrar Equipe',
             icon: <GroupAddIcon />,
-            link: '/',
+            link: '/registerTeam',
           },
           { name: 'Editar Perfil', icon: <ManageAccountsIcon />, link: '/' },
           // Adicione mais itens conforme necessário
