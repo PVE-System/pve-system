@@ -30,7 +30,8 @@ const SimpleChart = () => {
           marginBottom: '20px',
           background: (theme: Theme) => theme.palette.background.alternative,
           borderRadius: 4,
-          border: '1px solid white',
+          border: '1px solid',
+          borderColor: 'orange',
         }}
       >
         <CardContent>
