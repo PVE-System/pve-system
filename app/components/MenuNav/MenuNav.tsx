@@ -74,7 +74,11 @@ export default function TemporaryDrawer() {
       <Divider sx={styles.dividerMenu} />
       <List sx={styles.textMenu}>
         {[
-          { name: 'Planilha Excel', icon: <ArticleIcon />, link: '/' },
+          {
+            name: 'Planilha Excel',
+            icon: <ArticleIcon />,
+            link: '/excelDownloadFile',
+          },
           {
             name: 'Cadastrar Equipe',
             icon: <GroupAddIcon />,

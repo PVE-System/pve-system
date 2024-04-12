@@ -25,7 +25,8 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 4,
-    border: '1px solid white',
+    border: '1px solid',
+    borderColor: orange[800],
     width: '280px',
     marginBottom: '40px',
     '@media (max-width: 600px)': {

@@ -14,12 +14,13 @@ const sharedStyles = {
   },
 
   titlePage: {
+    fontSize: '32px',
     margin: '8px',
     textAlign: 'center',
     '& span': {
       color: orange[800],
     },
-    fontSize: '32px',
+
     // Tamanho da fonte tela Notebook
     '@media (max-width:1050px)': {
       fontSize: '30px',
@@ -48,6 +49,21 @@ const sharedStyles = {
     // Tamanho da fonte tela Mobile
     '@media (max-width:450px)': {
       fontSize: '12px',
+    },
+    span: {
+      color: orange[800],
+      fontSize: '20px',
+      '@media (max-width:1050px)': {
+        fontSize: '18px',
+      },
+      // Tamanho da fonte tela Tablet
+      '@media (max-width:800px)': {
+        fontSize: '16px',
+      },
+      // Tamanho da fonte tela Mobile
+      '@media (max-width:450px)': {
+        fontSize: '14px',
+      },
     },
   },
 };
