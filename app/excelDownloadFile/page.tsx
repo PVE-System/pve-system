@@ -1,5 +1,3 @@
-'use client';
-
 import HeadApp from '../components/HeadApp/HeadApp';
 import ExcelDownloadFileComponent from '../components/ExcelDownload/ExcelDownload';
 

@@ -14,20 +14,27 @@ const styles = {
     marginRight: '30px',
 
     '@media (max-width: 1000px)': {
-      marginRight: '0', // Removendo margem
+      marginRight: '0', // Remove margin
     },
     '@media (max-width: 425px)': {
       width: '80%',
     },
   },
   cards: {
-    background: (theme: Theme) => theme.palette.background.alternative,
+    background: (theme: Theme) =>
+      theme.palette.mode === 'light'
+        ? theme.palette.background.paper
+        : theme.palette.background.default,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 4,
-    border: '1px solid',
+    border: '2px solid',
     borderColor: orange[800],
     width: '280px',
+    cursor: 'pointer',
+    '&:hover': {
+      color: orange[800],
+    },
     marginBottom: '40px',
     '@media (max-width: 600px)': {
       width: '100%',
@@ -41,7 +48,6 @@ const styles = {
     },
   }, */
   cardsText: {
-    color: 'white',
     textAlign: 'center',
     span: {
       color: orange[800],
@@ -65,19 +71,20 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
-    width: '600px',
     overflowY: 'hidden',
-    '@media (max-width: 1000px)': {
-      width: '100%',
+    width: '600px',
+    '@media (max-width: 800px)': {
+      width: '400px',
     },
-    '@media (max-width: 600px)': {
-      width: '100%',
+    '@media (max-width: 450px)': {
+      width: '300px',
     },
   },
-  /*   accordionBg: {
-    background: (theme: Theme) => theme.palette.background.alternative,
-  }, */
+  accordionBg: {
+    backgroundColor: '#001F3F',
+  },
   accordionText: {
+    color: '#ffffff',
     span: {
       color: orange[800],
       marginRight: '10px',
@@ -98,6 +105,12 @@ const styles = {
   },
   ratingStars: {
     marginRight: '10px',
+  },
+  emptyIcon: {
+    color: '#606060',
+  },
+  arrowIcon: {
+    color: '#ffffff',
   },
 };
 

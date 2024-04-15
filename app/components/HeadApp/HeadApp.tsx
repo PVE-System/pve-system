@@ -12,6 +12,8 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import TemporaryDrawer from '@/app/components/MenuNav/MenuNav';
 import Menu from '@mui/material/Menu';
 
+import styles from '@/app/components/HeadApp/styles';
+
 export default function HeadApp() {
   const isSmallScreen = useMediaQuery('(max-width:600px)');
 
@@ -50,15 +52,7 @@ export default function HeadApp() {
     <React.Fragment>
       <CssBaseline />
       <Container maxWidth="xl">
-        <Box
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            paddingTop: 20,
-            paddingBottom: 20,
-          }}
-        >
+        <Box sx={styles.headAppContainer}>
           <Box style={{ position: 'absolute', left: isSmallScreen ? 0 : 20 }}>
             <TemporaryDrawer />
           </Box>
