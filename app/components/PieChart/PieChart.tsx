@@ -2,12 +2,11 @@ import {
   Box,
   Card,
   CardContent,
-  Theme,
   Typography,
   useMediaQuery,
 } from '@mui/material';
 import { PieChart, Pie, Cell, Legend } from 'recharts';
-import styles from '../Dashboard/styles';
+import styles from '@/app/components/PieChart/style';
 import sharedStyles from '@/app/styles/sharedStyles';
 
 const SimpleChart = () => {
@@ -24,21 +23,9 @@ const SimpleChart = () => {
 
   return (
     <Box sx={{ textAlign: 'center' }}>
-      <Card
-        variant="outlined"
-        sx={{
-          marginBottom: '20px',
-          background: (theme: Theme) => theme.palette.background.alternative,
-          borderRadius: 4,
-          border: '1px solid',
-          borderColor: 'orange',
-        }}
-      >
+      <Card variant="outlined" sx={styles.cardPieChart}>
         <CardContent>
-          <Typography
-            variant="h6"
-            sx={{ ...styles.cardsText, ...sharedStyles.subtitleSize }}
-          >
+          <Typography variant="h6" sx={sharedStyles.subtitleSize}>
             Gráfico sobre cadastros:
           </Typography>
           <Box width={isSmallScreen ? '100%' : 'auto'}>

@@ -1,3 +1,5 @@
+'use client';
+
 import { Box, Card, CardContent, Container, Typography } from '@mui/material';
 
 import styles from '@/app/components/ExcelDownload/style';
@@ -14,7 +16,7 @@ export default function ExcelDownloadFileComponent() {
           <span>Planilha</span>Excel
         </Typography>
       </Box>
-      <Box /* sx={styles.cardContainer} */>
+      <Box>
         <Card variant="outlined" sx={styles.card}>
           <CardContent sx={styles.cardContent}>
             <Typography variant="h6" sx={sharedStyles.subtitleSize}>

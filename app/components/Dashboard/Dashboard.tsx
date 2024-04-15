@@ -8,6 +8,7 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
 import sharedStyles from '@/app/styles/sharedStyles';
 import styles from './styles';
 import { Rating } from '@mui/material';
@@ -76,11 +77,12 @@ const DashboardComponent = () => {
       {/* Segunda linha */}
       <Box sx={styles.accordionContainer}>
         <Accordion
+          sx={styles.accordionBg}
           expanded={expanded === 'panel1'}
           onChange={handleChange('panel1')}
         >
           <AccordionSummary
-            expandIcon={<ArrowDropDownIcon />}
+            expandIcon={<ArrowDropDownIcon sx={styles.arrowIcon} />}
             aria-controls="panel1-content"
             id="panel1-header"
           >
@@ -89,6 +91,7 @@ const DashboardComponent = () => {
               value={3}
               readOnly
               max={3}
+              emptyIcon={<StarBorderIcon sx={styles.emptyIcon} />}
               sx={styles.ratingStars}
             />
             <Typography
@@ -108,11 +111,12 @@ const DashboardComponent = () => {
           </AccordionDetails>
         </Accordion>
         <Accordion
+          sx={styles.accordionBg}
           expanded={expanded === 'panel2'}
           onChange={handleChange('panel2')}
         >
           <AccordionSummary
-            expandIcon={<ArrowDropDownIcon />}
+            expandIcon={<ArrowDropDownIcon sx={styles.arrowIcon} />}
             aria-controls="panel2-content"
             id="panel2-header"
           >
@@ -121,6 +125,7 @@ const DashboardComponent = () => {
               value={2}
               readOnly
               max={3}
+              emptyIcon={<StarBorderIcon sx={styles.emptyIcon} />}
               sx={styles.ratingStars}
             />
             <Typography
@@ -140,11 +145,12 @@ const DashboardComponent = () => {
           </AccordionDetails>
         </Accordion>
         <Accordion
+          sx={styles.accordionBg}
           expanded={expanded === 'panel3'}
           onChange={handleChange('panel3')}
         >
           <AccordionSummary
-            expandIcon={<ArrowDropDownIcon />}
+            expandIcon={<ArrowDropDownIcon sx={styles.arrowIcon} />}
             aria-controls="panel3-content"
             id="panel3-header"
           >
@@ -153,6 +159,7 @@ const DashboardComponent = () => {
               value={1}
               readOnly
               max={3}
+              emptyIcon={<StarBorderIcon sx={styles.emptyIcon} />}
               sx={styles.ratingStars}
             />
             <Typography
