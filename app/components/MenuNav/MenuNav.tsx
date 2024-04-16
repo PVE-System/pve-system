@@ -84,7 +84,11 @@ export default function TemporaryDrawer() {
             icon: <GroupAddIcon />,
             link: '/registerTeam',
           },
-          { name: 'Editar Perfil', icon: <ManageAccountsIcon />, link: '/' },
+          {
+            name: 'Editar Perfil',
+            icon: <ManageAccountsIcon />,
+            link: '/editProfile',
+          },
           // Adicione mais itens conforme necessário
         ].map((item) => (
           <ListItem key={item.name} disablePadding>
