@@ -60,7 +60,7 @@ export default function TemporaryDrawer() {
           {
             name: 'Cadastrar Cliente',
             icon: <AddBusinessIcon />,
-            link: '/dashboard',
+            link: '/registerClient',
           },
         ].map((item) => (
           <ListItem key={item.name} disablePadding>
