@@ -4,15 +4,15 @@ import React, { useState } from 'react';
 import {
   Box,
   Button,
-  ButtonGroup,
   Container,
-  Divider,
   Rating,
   TextField,
   Typography,
 } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import Image from 'next/image';
+
+import styles from './styles';
 
 const RegisterClient: React.FC = () => {
   const { handleSubmit, control } = useForm();
@@ -35,48 +35,10 @@ const RegisterClient: React.FC = () => {
 
   return (
     <Container maxWidth="lg">
-      <Box
-        sx={{
-          backgroundColor: '#2A2E30',
-          border: '1px solid white',
-          borderRadius: '10px',
-          padding: '20px',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: { xs: 'column', md: 'row' },
-            gap: '20px',
-            '@media (max-width: 800px)': {
-              alignItems: 'center',
-            },
-          }}
-        >
-          {/* Grupo 1 */}
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              backgroundColor: '#2A2E30',
-              border: '1px solid white',
-              borderRadius: '10px',
-              padding: '20px',
-              width: '30%',
-              height: '500px',
-              '@media (max-width: 800px)': {
-                width: '100%',
-                height: '450px',
-                border: 'none',
-                borderRadius: '0px',
-                borderBottom: '3px solid white',
-              },
-            }}
-          >
-            {/* Campo para inserir a logomarca */}
+      <Box sx={styles.container}>
+        <Box sx={styles.boxContent}>
+          {/* Grupo 1 - Imagem e status */}
+          <Box sx={styles.boxCol1}>
             <label htmlFor="profile-picture-input">
               <input
                 id="profile-picture-input"
@@ -97,29 +59,14 @@ const RegisterClient: React.FC = () => {
                 }}
               />
             </label>
-            {/* Inputs */}
-            <Box
-              sx={{
-                marginBottom: '20px',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-              }}
-            >
-              <Typography variant="subtitle1" sx={{ color: 'white' }}>
-                Status:
-              </Typography>
+            <Box sx={styles.statusRating}>
+              <Typography variant="subtitle1">Status de Atividade</Typography>
               <Controller
                 name="rating"
                 control={control}
                 render={({ field }) => (
                   <Rating
-                    sx={{
-                      fontSize: '32px', // Define o tamanho da fonte para o Rating
-                      '@media (max-width: 800px)': {
-                        fontSize: '24px',
-                      },
-                    }}
+                    sx={styles.rating}
                     {...field}
                     name="rating"
                     defaultValue={0}
@@ -131,111 +78,63 @@ const RegisterClient: React.FC = () => {
                 )}
               />
             </Box>
-            <Box
-              sx={{
-                width: '100%',
-                marginBottom: '20px',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-              }}
-            >
-              <Typography variant="subtitle1" sx={{ color: 'white' }}>
-                Cliente Especial:
-              </Typography>
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                }}
-              >
-                <Controller
-                  name="clienteEspecial"
-                  control={control}
-                  render={({ field }) => (
-                    <Box
+            <Box sx={styles.clientCondition}>
+              <Typography variant="subtitle1">Condição do Cliente</Typography>
+              <Controller
+                name="clienteEspecial"
+                control={control}
+                render={({ field }) => (
+                  <Box sx={styles.clientConditionButtonBox}>
+                    <Button
+                      variant="outlined"
+                      color="success"
                       sx={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        gap: '5px',
-                        marginBottom: '20px',
-                        width: '100%',
-                        '@media (max-width: 800px)': {
-                          width: '80%',
-                        },
+                        ...styles.clientConditionButton,
+                        ...(field.value === 'normal' && {
+                          backgroundColor: 'green',
+                          color: 'white',
+                        }),
                       }}
+                      onClick={() => field.onChange('normal')}
                     >
-                      <Button
-                        variant="outlined"
-                        color="success"
-                        sx={{
-                          fontSize: '12px',
-                          '@media (max-width: 800px)': {
-                            fontSize: '10px',
-                          },
-                          ...(field.value === 'normal' && {
-                            backgroundColor: 'green',
-                            color: 'white',
-                          }),
-                        }}
-                        onClick={() => field.onChange('normal')}
-                      >
-                        Normal
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        color="warning"
-                        sx={{
-                          fontSize: '12px',
-                          '@media (max-width: 800px)': {
-                            fontSize: '10px',
-                          },
-                          ...(field.value === 'especial' && {
-                            backgroundColor: 'yellow',
-                            color: 'black',
-                          }),
-                        }}
-                        onClick={() => field.onChange('especial')}
-                      >
-                        Especial
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        color="error"
-                        sx={{
-                          fontSize: '12px',
-                          '@media (max-width: 800px)': {
-                            fontSize: '10px',
-                          },
-                          ...(field.value === 'suspenso' && {
-                            backgroundColor: 'red',
-                            color: 'white',
-                          }),
-                        }}
-                        onClick={() => field.onChange('suspenso')}
-                      >
-                        Suspenso
-                      </Button>
-                    </Box>
-                  )}
-                />
-              </Box>
+                      Normal
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      color="warning"
+                      sx={{
+                        ...styles.clientConditionButton,
+                        ...(field.value === 'especial' && {
+                          backgroundColor: '#FFD700',
+                          color: 'black',
+                        }),
+                      }}
+                      onClick={() => field.onChange('especial')}
+                    >
+                      Especial
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      sx={{
+                        ...styles.clientConditionButton,
+                        ...(field.value === 'suspenso' && {
+                          backgroundColor: 'red',
+                          color: 'white',
+                        }),
+                      }}
+                      onClick={() => field.onChange('suspenso')}
+                    >
+                      Suspenso
+                    </Button>
+                  </Box>
+                )}
+              />
             </Box>
           </Box>
 
           {/* Grupo 2 */}
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '20px',
-              width: '70%',
-              '@media (max-width: 800px)': {
-                width: '100%',
-              },
-            }}
-          >
+          <Box sx={styles.boxCol2}>
             {/* Labels e Inputs */}
             {[
               'Nome da empresa',
@@ -254,9 +153,7 @@ const RegisterClient: React.FC = () => {
               'Vendedor Responsável',
             ].map((label) => (
               <Box key={label}>
-                <Typography variant="subtitle1" sx={{ color: 'white' }}>
-                  {label}
-                </Typography>
+                <Typography variant="subtitle1">{label}</Typography>
                 <Controller
                   name={label.toLowerCase().replace(/\s+/g, '')}
                   control={control}
@@ -264,7 +161,7 @@ const RegisterClient: React.FC = () => {
                     <TextField
                       {...field}
                       variant="filled"
-                      sx={{ marginBottom: '10px', width: '100%' }}
+                      sx={styles.inputsCol2}
                     />
                   )}
                 />
@@ -272,18 +169,11 @@ const RegisterClient: React.FC = () => {
             ))}
           </Box>
         </Box>
-
-        {/* Botão Concluir Cadastro */}
+        {/* Concluir Cadastro */}
         <Button
           variant="contained"
           onClick={handleSubmit(onSubmit)}
-          sx={{
-            marginTop: '20px',
-            alignSelf: 'flex-end',
-            '@media (max-width: 800px)': {
-              alignSelf: 'center',
-            },
-          }}
+          sx={styles.registerButton}
         >
           Concluir Cadastro
         </Button>
