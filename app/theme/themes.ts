@@ -1,4 +1,5 @@
 'use client';
+import { orange } from '@mui/material/colors';
 /* import { Roboto } from 'next/font/google' */
 import { createTheme } from '@mui/material/styles';
 
@@ -20,7 +21,7 @@ const lightTheme = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: '#EA650A', // Laranja. Cor principal para botões e ícones.
+      main: '#FF8C00', // Laranja um pouco mais claro que no dark. Cor principal para botões e ícones.
       light: '#F6E7D8', // Cor alternativa para botões e ícones especifica para temas claros.
       contrastText: '#ffffff', // Branco. Cor para textos dentro do botão.
     },
@@ -29,9 +30,9 @@ const lightTheme = createTheme({
       contrastText: '#EA650A', // Laranja. Cor alternativa para textos dentro do botão.
     },
     background: {
-      default: '#F9F9F9', // Cinza claro. Body Cor de fundo principal.
+      default: '#B5C7D2', // Cinza claro. Body Cor de fundo principal.AED6F1
       alternative: '#2A2E30', // DarkGreen Cor de fundo alternativa.
-      paper: '#B5C7D2', // Azul Pastel. Cor de fundo alternativa para componentes como o Drawer.
+      paper: '#AED6F1', // Azul Pastel. Cor de fundo alternativa para componentes como o Drawer.B5C7D2
     },
     text: {
       primary: '#000000', // Black. Cor do texto padrão.
@@ -47,7 +48,7 @@ const darkTheme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: '#EA650A', // Laranja. Cor principal para botões e ícones.
+      main: orange[800], // Laranja. Cor principal para botões e ícones.
       light: '#F6E7D8', // Cor para hover nos botões e ícones especifica para temas escuros.
       contrastText: '#ffffff', // Branco. Cor para textos dentro do botão.
     },
