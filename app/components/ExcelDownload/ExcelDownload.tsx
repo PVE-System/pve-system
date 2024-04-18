@@ -13,20 +13,20 @@ export default function ExcelDownloadFileComponent() {
     <Container fixed>
       <Box sx={sharedStyles.container}>
         <Typography variant="h4" component="h1" sx={sharedStyles.titlePage}>
-          <span>Planilha</span>Excel
+          <span>Planilha </span>Excel
         </Typography>
       </Box>
       <Box>
         <Card variant="outlined" sx={styles.card}>
           <CardContent sx={styles.cardContent}>
             <Typography variant="h6" sx={sharedStyles.subtitleSize}>
-              <span>Download</span> Planilha
+              <span>Download </span>Planilha
             </Typography>
             <CloudDownloadIcon sx={styles.icon} />
           </CardContent>
           <CardContent sx={styles.cardContent}>
             <Typography variant="h6" sx={sharedStyles.subtitleSize}>
-              <span>Atualizar</span> Planilha
+              <span>Atualizar </span>Planilha
             </Typography>
             <CloudUploadIcon sx={styles.icon} />
           </CardContent>

@@ -6,6 +6,21 @@ const styles = {
     paddingTop: 3,
     paddingBottom: 3,
   },
+  menuIcon: {
+    position: 'absolute',
+    left: '20px',
+    '@media (max-width:450px)': {
+      left: '0px',
+    },
+  },
+  inputSearch: {
+    /* margin: 'auto', */
+    width: '500px',
+    '@media (max-width:450px)': {
+      width: '80%',
+      left: '20px',
+    },
+  },
 };
 
 export default styles;

@@ -15,6 +15,7 @@ import Container from '@mui/material/Container';
 import Image from 'next/image';
 import NextLink from 'next/link';
 import sharedStyles from '@/app/styles/sharedStyles';
+import styles from './styles';
 
 function Copyright(props: any) {
   return (
@@ -25,7 +26,7 @@ function Copyright(props: any) {
       {...props}
     >
       {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
+      <Link color="inherit" href="/">
         PVE System
       </Link>{' '}
       {new Date().getFullYear()}
@@ -47,14 +48,7 @@ export default function SignIn() {
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
-      <Box
-        sx={{
-          marginTop: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
-      >
+      <Box sx={styles.container}>
         <Box>
           <Image
             src="/logoPveMenu.png"
@@ -63,11 +57,16 @@ export default function SignIn() {
             height={150}
           />
         </Box>
-        <Typography variant="subtitle1" sx={sharedStyles.subtitleSize}>
+        <Typography variant="subtitle1" sx={sharedStyles.titleForm}>
           PVE Representações Ltda.
         </Typography>
 
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          noValidate
+          sx={sharedStyles.titleForm}
+        >
           <TextField
             margin="normal"
             required
@@ -88,17 +87,19 @@ export default function SignIn() {
             id="password"
             autoComplete="current-password"
           />
-          <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
-            label="Remember me"
-          />
+          <Box sx={sharedStyles.titleForm}>
+            <FormControlLabel
+              control={<Checkbox value="remember" color="primary" />}
+              label="Lembrar-me"
+            />
+          </Box>
           <Button
             type="submit"
             fullWidth
             variant="contained"
             component={NextLink}
             href="/dashboard"
-            sx={{ mt: 3, mb: 2 }}
+            sx={styles.button}
           >
             Entrar
           </Button>
@@ -110,13 +111,15 @@ export default function SignIn() {
             </Grid>
             <Grid item>
               <Link href="#" variant="body2">
-                {'Não tem uma conta? Inscrever-se'}
+                {'Não tem uma conta?'}
+                <br />
+                {'Inscrever-se'}
               </Link>
             </Grid>
           </Grid>
         </Box>
       </Box>
-      <Copyright sx={{ mt: 8, mb: 4 }} />
+      <Copyright sx={styles.copyright} />
     </Container>
   );
 }

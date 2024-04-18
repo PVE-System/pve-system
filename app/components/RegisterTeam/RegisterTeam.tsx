@@ -13,6 +13,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import NextLink from 'next/link';
 import sharedStyles from '@/app/styles/sharedStyles';
+import styles from './styles';
 
 function RegisterTeamComponent() {
   const [formData, setFormData] = useState({
@@ -33,14 +34,7 @@ function RegisterTeamComponent() {
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
-      <Box
-        sx={{
-          marginTop: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
-      >
+      <Box sx={styles.container}>
         <Box>
           <Image
             src="/logoPveMenu.png"
@@ -49,11 +43,16 @@ function RegisterTeamComponent() {
             height={150}
           />
         </Box>
-        <Typography variant="subtitle1" sx={sharedStyles.subtitleSize}>
+        <Typography variant="subtitle1" sx={sharedStyles.titleForm}>
           Digite email e senha para cadastrar equipe.
         </Typography>
 
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          noValidate
+          sx={{ ...sharedStyles.titleForm }}
+        >
           <TextField
             margin="normal"
             required
@@ -94,7 +93,7 @@ function RegisterTeamComponent() {
             type="submit"
             fullWidth
             variant="contained"
-            sx={{ mt: 3, mb: 2 }}
+            sx={styles.button}
           >
             Cadastrar equipe
           </Button>

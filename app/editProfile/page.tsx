@@ -15,7 +15,7 @@ const ProfilePage: React.FC = () => {
       <Container fixed>
         <Box sx={sharedStyles.container}>
           <Typography variant="h4" component="h1" sx={sharedStyles.titlePage}>
-            <span>Editar</span>Perfil
+            <span>Editar </span>Perfil
           </Typography>
         </Box>
         <EditProfile />

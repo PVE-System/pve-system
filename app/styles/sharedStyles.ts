@@ -35,6 +35,28 @@ const sharedStyles = {
     },
   },
 
+  titleForm: {
+    fontSize: '18px',
+
+    '@media (max-width:1050px)': {
+      fontSize: '18px',
+    },
+
+    '@media (max-width:800px)': {
+      fontSize: '16px',
+    },
+
+    '@media (max-width:450px)': {
+      fontSize: '14px',
+      '& .mui-1mxgcu1-MuiFormLabel-root-MuiInputLabel-root': {
+        fontSize: '14px',
+      },
+      '& .mui-11lg7ig-MuiTypography-root': {
+        fontSize: '14px',
+      },
+    },
+  },
+
   subtitleSize: {
     // Tamanho da fonte tela desktop
     fontSize: '18px',

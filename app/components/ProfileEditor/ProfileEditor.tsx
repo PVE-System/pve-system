@@ -24,7 +24,7 @@ const EditProfile: React.FC = () => {
   const [previewImage, setPreviewImage] = React.useState<string | null>(null);
 
   const onSubmit = (data: MyFormValues) => {
-    // Handle form submission logic here
+    // Lidar com a logica de submit aqui
     console.log(data);
   };
 
