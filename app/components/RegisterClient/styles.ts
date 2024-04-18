@@ -1,4 +1,3 @@
-import { orange } from '@mui/material/colors';
 import { Theme } from '@mui/material/styles/createTheme';
 
 const styles = {
@@ -14,6 +13,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
   },
+
   boxContent: {
     display: 'flex',
     flexDirection: { xs: 'column', md: 'row' },
@@ -22,6 +22,7 @@ const styles = {
       alignItems: 'center',
     },
   },
+
   boxCol1: {
     display: 'flex',
     flexDirection: 'column',
@@ -42,17 +43,25 @@ const styles = {
       height: '450px',
       border: 'none',
       borderRadius: '0px',
-      borderBottom: '3px solid',
+      borderBottom: '1px solid',
       borderColor: (theme: Theme) =>
         theme.palette.mode === 'light' ? '#000000' : '#ffffff',
     },
   },
+
+  imgProfile: {
+    borderRadius: '50%',
+    cursor: 'pointer',
+    marginBottom: '50px',
+  },
+
   statusRating: {
     marginBottom: '20px',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
   },
+
   rating: {
     color: '#FFA500',
     fontSize: '32px',
@@ -60,6 +69,7 @@ const styles = {
       fontSize: '24px',
     },
   },
+
   clientCondition: {
     width: '100%',
     marginBottom: '20px',
@@ -67,6 +77,7 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'center',
   },
+
   clientConditionButtonBox: {
     display: 'flex',
     justifyContent: 'center',
@@ -77,12 +88,14 @@ const styles = {
       width: '80%',
     },
   },
+
   clientConditionButton: {
     fontSize: '12px',
     '@media (max-width: 1050px)': {
       fontSize: '10px',
     },
   },
+
   boxCol2: {
     display: 'flex',
     flexDirection: 'column',
@@ -92,10 +105,14 @@ const styles = {
       width: '100%',
     },
   },
+
   inputsCol2: {
-    marginBottom: '10px',
     width: '100%',
+    '& .MuiInputBase-input': {
+      height: '10px', // Estilo para o input dentro do componente MUI
+    },
   },
+
   registerButton: {
     background: (theme: Theme) => theme.palette.primary.main,
     marginTop: '20px',

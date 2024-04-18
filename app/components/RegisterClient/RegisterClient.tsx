@@ -52,11 +52,7 @@ const RegisterClient: React.FC = () => {
                 alt="Placeholder"
                 width={180}
                 height={180}
-                style={{
-                  borderRadius: '50%',
-                  cursor: 'pointer',
-                  marginBottom: '50px',
-                }}
+                style={styles.imgProfile}
               />
             </label>
             <Box sx={styles.statusRating}>
