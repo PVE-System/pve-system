@@ -10,12 +10,11 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     textAlign: 'center',
-
     width: '100%',
     height: '300px',
     borderRadius: 4,
     border: '3px solid',
-    borderColor: orange[800],
+    borderColor: '#FF8C00', //ORANGE mais claro
 
     '@media (max-width:450px)': {
       flexDirection: 'column',

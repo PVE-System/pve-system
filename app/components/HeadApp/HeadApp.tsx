@@ -53,11 +53,16 @@ export default function HeadApp() {
       <CssBaseline />
       <Container maxWidth="xl">
         <Box sx={styles.headAppContainer}>
-          <Box style={{ position: 'absolute', left: isSmallScreen ? 0 : 20 }}>
+          <Box
+            sx={styles.menuIcon} /* sx={{
+              position: 'absolute',
+              left: isSmallScreen ? 0 : 20,
+            }} */
+          >
             <TemporaryDrawer />
           </Box>
           <TextField
-            style={{ margin: 'auto', width: isSmallScreen ? '200px' : '300px' }}
+            sx={styles.inputSearch}
             id="outlined-basic"
             label="Pesquisar"
             variant="outlined"
