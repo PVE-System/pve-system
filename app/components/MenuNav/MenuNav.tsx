@@ -31,6 +31,7 @@ import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import BusinessIcon from '@mui/icons-material/Business';
 import LogoutIcon from '@mui/icons-material/Logout';
+import CloseIcon from '@mui/icons-material/Close';
 
 import { useMediaQuery } from '@mui/material';
 
@@ -104,7 +105,7 @@ export default function TemporaryDrawer() {
 
   return (
     <div>
-      <Button sx={{ marginLeft: 0 }} onClick={toggleDrawer(true)}>
+      <Button /* sx={{ marginLeft: 0 }}  */ onClick={toggleDrawer(true)}>
         <MenuOpenIcon />
       </Button>
       <Drawer
@@ -112,18 +113,15 @@ export default function TemporaryDrawer() {
         onClose={toggleDrawer(false)}
         anchor={isMobile ? 'top' : 'left'}
       >
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: isMobile ? 'center' : 'flex', // Centraliza na horizontal se for mobile, senão alinha à esquerda
-            justifyContent: isMobile ? 'center' : 'flex', // Centraliza na vertical se for mobile, senão alinha ao topo
-            height: '100%', // Garante que o conteúdo ocupe toda a altura do Drawer
-          }}
-        >
+        {/* Ícone de fechar o menu */}
+        <Box sx={styles.iconCloseMenu}>
+          <IconButton onClick={toggleDrawer(false)}>
+            <CloseIcon sx={styles.iconCloseMenuColor} />
+          </IconButton>
+        </Box>
+        <Box sx={styles.containerMenu}>
           <Box sx={styles.logoMenu}>
             <Image
-              /* sx={styles.logoImg} nao foi possivel estilizar o component image dessa maneira */
               src="/logoPveMenu.png"
               alt="Foto do usuário"
               width={120}
@@ -131,7 +129,8 @@ export default function TemporaryDrawer() {
             />
           </Box>
           {DrawerList}
-          <Box sx={styles.containerMenu}>
+
+          <Box sx={styles.contentMenu}>
             <IconButton
               sx={styles.iconTheme}
               onClick={toggleTheme}
@@ -146,15 +145,11 @@ export default function TemporaryDrawer() {
               width={80}
               height={80}
             />
-            <Typography
-              variant="subtitle2"
-              component="h1"
-              sx={{ mb: 2, textAlign: 'center' }}
-            >
+            <Typography variant="subtitle2" component="h1">
               Nome do Usuário
             </Typography>
           </Box>
-          <Box sx={styles.logoutIcon}>
+          <Box sx={styles.iconLogout}>
             <Link href="/">
               <LogoutIcon />
             </Link>

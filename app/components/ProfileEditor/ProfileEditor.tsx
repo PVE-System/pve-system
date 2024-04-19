@@ -1,11 +1,11 @@
 'use client';
 
 import * as React from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { Box, Button, Container } from '@mui/material';
-import sharedStyles from '@/app/styles/sharedStyles';
-
 import Image from 'next/image';
+import { useForm, Controller } from 'react-hook-form';
+import { Box, Button, Container, TextField } from '@mui/material';
+
+import sharedStyles from '@/app/styles/sharedStyles';
 import styles from './styles';
 
 interface MyFormValues {
@@ -43,7 +43,7 @@ const EditProfile: React.FC = () => {
 
   return (
     <Container maxWidth="sm">
-      <Box sx={sharedStyles.container}>
+      <Box sx={{ ...sharedStyles.container, ...styles.formBox }}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Box sx={styles.formBox}>
             <Button component="label" sx={styles.formButtonImg}>
@@ -53,9 +53,7 @@ const EditProfile: React.FC = () => {
                   alt="Preview"
                   width={180}
                   height={180}
-                  style={{
-                    borderRadius: '50%',
-                  }}
+                  style={styles.formButtonImg}
                 />
               ) : (
                 <Image
@@ -63,13 +61,10 @@ const EditProfile: React.FC = () => {
                   alt="Placeholder"
                   width={180}
                   height={180}
-                  style={{
-                    borderRadius: '50%',
-                  }}
                 />
               )}
 
-              <input
+              <input /* Parece que a propriedade accept não é suportada pelo TextField, entao mantive input html */
                 id="profile-picture-input"
                 type="file"
                 accept="image/*"
@@ -82,11 +77,11 @@ const EditProfile: React.FC = () => {
             name="name"
             control={control}
             render={({ field }) => (
-              <input
+              <TextField
                 {...field}
                 type="text"
                 placeholder="Nome"
-                style={{ width: '100%', marginTop: '10px', padding: '8px' }}
+                sx={styles.inputName}
               />
             )}
           />
