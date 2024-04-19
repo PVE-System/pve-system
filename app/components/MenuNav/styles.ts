@@ -1,15 +1,30 @@
 import { orange } from '@mui/material/colors';
 
 const styles = {
+  iconCloseMenu: {
+    mt: 2,
+    ml: 2,
+    display: 'none',
+    '@media (max-width:450px)': {
+      display: 'block',
+    },
+  },
+
+  iconCloseMenuColor: {
+    color: orange[800],
+  },
+
   containerMenu: {
-    height: 150,
-    width: 230,
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 1,
-    marginTop: 'auto',
+    height: '100%', // Garante que o conteúdo ocupe toda a altura do Drawer
+    alignItems: 'flex', // Centraliza na horizontal se for mobile, senão alinha à esquerda
+    justifyContent: 'flex', // Centraliza na vertical se for mobile, senão alinha ao topo
+
+    '@media (max-width:450px)': {
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
   },
 
   logoMenu: {
@@ -18,13 +33,17 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 4,
-    p: 2,
   },
 
-  iconTheme: {
+  contentMenu: {
+    height: 150,
+    width: 230,
     display: 'flex',
-    marginBottom: 1,
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 1,
+    marginTop: 'auto',
   },
 
   textMenu: {
@@ -37,21 +56,24 @@ const styles = {
       },
   },
 
-  logoutIcon: {
-    my: 1,
+  dividerMenu: {
+    backgroundColor: 'grey',
+    width: 1,
+    height: 0.001,
+  },
+
+  iconTheme: {
+    display: 'flex',
+    marginBottom: 1,
+  },
+
+  iconLogout: {
+    my: 3,
     color: orange[800],
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-
-  dividerMenu: {
-    orientation: 'vertical',
-    dislplay: 'flexItem',
-    backgroundColor: 'grey',
-    width: 1,
-    height: 0.001,
   },
 };
 
