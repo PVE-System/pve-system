@@ -18,6 +18,27 @@ const lightTheme = createTheme({
   typography: {
     fontFamily: 'Roboto, sans-serif',
   },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        // Estilos para a barra de rolagem
+        '::-webkit-scrollbar': {
+          width: '12px',
+          height: '200px',
+        },
+        '::-webkit-scrollbar-thumb': {
+          backgroundColor: '#888',
+          borderRadius: '6px',
+        },
+        '::-webkit-scrollbar-thumb:hover': {
+          backgroundColor: orange[800],
+        },
+        '::-webkit-scrollbar-track': {
+          backgroundColor: '#B1C7D6',
+        },
+      },
+    },
+  },
   palette: {
     mode: 'light',
     primary: {
@@ -44,6 +65,26 @@ const lightTheme = createTheme({
 const darkTheme = createTheme({
   typography: {
     fontFamily: 'Roboto, sans-serif',
+  },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        // Estilos para a barra de rolagem
+        '::-webkit-scrollbar': {
+          width: '12px',
+        },
+        '::-webkit-scrollbar-thumb': {
+          backgroundColor: '#888',
+          borderRadius: '6px',
+        },
+        '::-webkit-scrollbar-thumb:hover': {
+          backgroundColor: orange[800],
+        },
+        '::-webkit-scrollbar-track': {
+          backgroundColor: '#303030',
+        },
+      },
+    },
   },
   palette: {
     mode: 'dark',

@@ -109,7 +109,7 @@ const styles = {
   inputsCol2: {
     width: '100%',
     '& .MuiInputBase-input': {
-      height: '10px', // Estilo para o input dentro do componente MUI
+      /* height: '10px', */
     },
   },
 
