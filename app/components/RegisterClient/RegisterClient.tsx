@@ -158,7 +158,7 @@ const RegisterClient: React.FC = () => {
               'Incluído pelo JSM',
               'Contribuinte ICMS',
               'Transporte entra',
-              'Qual a localização da empresa',
+              'Localização da empresa',
               'Segmento de Mercado e Natureza Jurídica',
             ].map((label) => (
               <Box key={label}>
