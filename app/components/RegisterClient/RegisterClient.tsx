@@ -221,7 +221,7 @@ const RegisterClient: React.FC = () => {
                         >
                           <MenuItem value="centro">Centro</MenuItem>
                           <MenuItem value="localidadeRural">
-                            Localidade Rural
+                            Área Rural
                           </MenuItem>
                         </TextField>
                       );
