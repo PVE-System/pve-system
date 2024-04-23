@@ -5,6 +5,8 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import NextLink from 'next/link';
 
+import ClientProfile from '../components/ProfileClient/ProfileClient';
+
 export default function About() {
   return (
     <Container maxWidth="lg">
@@ -17,6 +19,7 @@ export default function About() {
           alignItems: 'center',
         }}
       >
+        <ClientProfile />
         <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
           Material UI - Next.js example in TypeScript
         </Typography>

@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -16,7 +14,7 @@ import styles from './styles';
 
 import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
 
-const RegisterClient: React.FC = () => {
+const ClientPageTab1: React.FC = () => {
   const { handleSubmit, control, getValues } = useForm();
 
   // Aqui devemos criar a logica para lidar com os dados do formulário
@@ -176,4 +174,4 @@ const RegisterClient: React.FC = () => {
   );
 };
 
-export default RegisterClient;
+export default ClientPageTab1;
