@@ -10,8 +10,11 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+
 import { useForm, Controller } from 'react-hook-form';
+
 import Image from 'next/image';
+import NextLink from 'next/link';
 
 import styles from './styles';
 
@@ -265,7 +268,9 @@ const RegisterClient: React.FC = () => {
         {/* Concluir Cadastro */}
         <Button
           variant="contained"
-          onClick={handleSubmit(onSubmit)}
+          component={NextLink}
+          href="/registerSuccess"
+          /*  onClick={handleSubmit(onSubmit)} */
           sx={styles.registerButton}
         >
           Concluir Cadastro
