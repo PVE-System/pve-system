@@ -14,8 +14,6 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import ApartmentIcon from '@mui/icons-material/Apartment';
 import { IconButton, Link, Typography } from '@mui/material';
 
 import Brightness4Icon from '@mui/icons-material/Brightness4';
@@ -24,6 +22,8 @@ import Brightness7Icon from '@mui/icons-material/Brightness7';
 import { useTheme } from '@/app/theme/ThemeContext';
 import styles from '@/app/components/MenuNav/styles';
 
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import ApartmentIcon from '@mui/icons-material/Apartment';
 import LocationCityIcon from '@mui/icons-material/LocationCity';
 import AddBusinessIcon from '@mui/icons-material/AddBusiness';
 import ArticleIcon from '@mui/icons-material/Article';
