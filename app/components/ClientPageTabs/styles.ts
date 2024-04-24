@@ -19,13 +19,12 @@ const styles = {
   },
 
   sizeTabs: {
-    /* justifyContent: 'flex-start', */
-
-    /*     '& .MuiTab-root': {
+    justifyContent: 'flex-start',
+    '& .MuiTab-root': {
       minWidth: '100px',
-    }, */
+    },
     '@media (max-width: 800px)': {
-      /* justifyContent: 'center', */
+      justifyContent: 'center',
       '& .MuiTab-root': {
         minWidth: 'auto',
       },
