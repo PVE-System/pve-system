@@ -20,10 +20,10 @@ const styles = {
   },
 
   sizeTabs: {
-    justifyContent: 'center',
+    /*     justifyContent: 'center',
     '& .MuiTab-root': {
       minWidth: '100px',
-    },
+    }, */
     '@media (max-width: 800px)': {
       justifyContent: 'center',
       '& .MuiTab-root': {
