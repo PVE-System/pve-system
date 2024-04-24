@@ -66,28 +66,52 @@ export default function BasicTabs() {
             value={value}
             onChange={handleChange}
             aria-label="basic tabs example"
-            sx={styles.sizeTabs}
+            /* sx={styles.sizeTabs} */
           >
             <Tab
-              sx={{ fontSize: '12px' }}
+              sx={{
+                fontSize: '12px',
+                minWidth: '100px',
+                '@media (max-width: 800px)': {
+                  minWidth: 'auto',
+                },
+              }}
               label={isSmallScreen ? null : 'Informações do cliente'}
               icon={<InfoIcon />}
               {...a11yProps(0)}
             />
             <Tab
-              sx={{ fontSize: '12px' }}
+              sx={{
+                fontSize: '12px',
+                minWidth: '100px',
+                '@media (max-width: 800px)': {
+                  minWidth: 'auto',
+                },
+              }}
               label={isSmallScreen ? null : 'Informações de pedidos'}
               icon={<ShoppingCartIcon />}
               {...a11yProps(1)}
             />
             <Tab
-              sx={{ fontSize: '12px' }}
+              sx={{
+                fontSize: '12px',
+                minWidth: '100px',
+                '@media (max-width: 800px)': {
+                  minWidth: 'auto',
+                },
+              }}
               label={isSmallScreen ? null : 'Histórico de anotações'}
               icon={<NotesIcon />}
               {...a11yProps(2)}
             />
             <Tab
-              sx={{ fontSize: '12px' }}
+              sx={{
+                fontSize: '12px',
+                minWidth: '100px',
+                '@media (max-width: 800px)': {
+                  minWidth: 'auto',
+                },
+              }}
               label={isSmallScreen ? null : 'Arquivos e anexos'}
               icon={<AttachmentIcon />}
               {...a11yProps(3)}

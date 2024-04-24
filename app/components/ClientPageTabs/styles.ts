@@ -4,31 +4,21 @@ const styles = {
   containerTabs: {
     paddingLeft: '0px',
     paddingRight: '0px',
-    '& .mui-heg063-MuiTabs-flexContainer': {
+
+    /*     '& .mui-heg063-MuiTabs-flexContainer': {
       justifyContent: 'center',
-    },
+    }, */
   },
 
   boxTabs: {
     borderBottom: 1,
     borderColor: 'divider',
+    display: 'flex',
+    justifyContent: 'center',
 
     '@media (max-width: 800px)': {
       paddingLeft: '0px',
       paddingRight: '0px',
-    },
-  },
-
-  sizeTabs: {
-    /*     justifyContent: 'center',
-    '& .MuiTab-root': {
-      minWidth: '100px',
-    }, */
-    '@media (max-width: 800px)': {
-      justifyContent: 'center',
-      '& .MuiTab-root': {
-        minWidth: 'auto',
-      },
     },
   },
 
