@@ -12,6 +12,7 @@ const styles = {
   boxTabs: {
     borderBottom: 1,
     borderColor: 'divider',
+
     '@media (max-width: 800px)': {
       paddingLeft: '0px',
       paddingRight: '0px',
@@ -19,7 +20,7 @@ const styles = {
   },
 
   sizeTabs: {
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
     '& .MuiTab-root': {
       minWidth: '100px',
     },
