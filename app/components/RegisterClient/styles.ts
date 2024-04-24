@@ -108,9 +108,9 @@ const styles = {
 
   inputsCol2: {
     width: '100%',
-    '& .MuiInputBase-input': {
-      /* height: '10px', */
-    },
+    /* '& .MuiInputBaseInput': {
+      height: '10px',
+    }, */
   },
 
   registerButton: {
