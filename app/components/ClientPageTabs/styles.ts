@@ -20,7 +20,6 @@ const styles = {
 
   sizeTabs: {
     justifyContent: 'flex-start',
-
     '& .MuiTab-root': {
       minWidth: '100px',
     },
