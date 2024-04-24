@@ -1,22 +1,6 @@
 import { Theme } from '@mui/material/styles/createTheme';
 
 const styles = {
-  /*   container: {
-    background: (theme: Theme) =>
-      theme.palette.mode === 'light'
-        ? theme.palette.background.paper
-        : theme.palette.background.alternative,
-
-    border: '3px solid #FF8C00', //ORANGE mais claro
-    borderRadius: '10px',
-    padding: '20px',
-    display: 'flex',
-    flexDirection: 'column',
-    '& .mui-19kzrtu': {
-      padding: '0px',
-    },
-  }, */
-
   boxContent: {
     display: 'flex',
     flexDirection: { xs: 'column', md: 'row' },
@@ -56,6 +40,7 @@ const styles = {
   deleteButton: {
     background: (theme: Theme) => theme.palette.primary.main,
     backgroundColor: 'red',
+    width: '80px',
     marginTop: '20px',
     '@media (max-width: 800px)': {
       alignSelf: 'center',
@@ -64,8 +49,9 @@ const styles = {
 
   editButton: {
     background: (theme: Theme) => theme.palette.primary.main,
-    marginTop: '20px',
     backgroundColor: 'green',
+    width: '80px',
+    marginTop: '20px',
     '@media (max-width: 800px)': {
       alignSelf: 'center',
     },

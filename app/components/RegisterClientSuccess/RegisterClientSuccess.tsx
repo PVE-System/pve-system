@@ -24,7 +24,7 @@ export default function RegisterClientSuccess() {
             <Typography variant="h6" sx={sharedStyles.subtitleSize}>
               <span>Página </span>Cliente
             </Typography>
-            <Box component={NextLink} href="/dashboard">
+            <Box component={NextLink} href="/clientPage">
               <ApartmentIcon sx={styles.icon} />
             </Box>
           </CardContent>

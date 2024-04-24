@@ -8,14 +8,12 @@ const ClientPage: React.FC = () => {
   return (
     <>
       <HeadApp />
-      <Container fixed>
-        <Box sx={sharedStyles.container}>
-          <Typography variant="h4" component="h1" sx={sharedStyles.titlePage}>
-            <span>Perfil do </span>Cliente
-          </Typography>
-        </Box>
-        <ClientPageTabs />
-      </Container>
+      <Box sx={sharedStyles.container}>
+        <Typography variant="h4" component="h1" sx={sharedStyles.titlePage}>
+          <span>Perfil </span>Cliente
+        </Typography>
+      </Box>
+      <ClientPageTabs />
     </>
   );
 };
