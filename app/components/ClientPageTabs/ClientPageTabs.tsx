@@ -6,8 +6,6 @@ import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 
-import ClientPageTab1 from '@/app/components/ClientPageTab1/ClientPageTab1';
-import ClientPageTab2 from '@/app/components/ClientPageTab2/ClientPageTab2';
 import { Container, useMediaQuery, useTheme } from '@mui/material';
 import styles from '@/app/components/ClientPageTabs/styles';
 
@@ -15,6 +13,10 @@ import InfoIcon from '@mui/icons-material/Info';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import NotesIcon from '@mui/icons-material/Notes';
 import AttachmentIcon from '@mui/icons-material/Attachment';
+
+import ClientPageTab1 from '@/app/components/ClientPageTab1/ClientPageTab1';
+import ClientPageTab2 from '@/app/components/ClientPageTab2/ClientPageTab2';
+import ClientPageTab3 from '@/app/components/ClientPageTab3/ClientPageTab3';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -129,7 +131,9 @@ export default function BasicTabs() {
           </Box>
         </ClientPageTabs>
         <ClientPageTabs value={value} index={2}>
-          Item Three
+          <Box sx={styles.contentTabs}>
+            <ClientPageTab3 />
+          </Box>
         </ClientPageTabs>
         <ClientPageTabs value={value} index={3}>
           Item Four
