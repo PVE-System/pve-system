@@ -1,22 +1,6 @@
 import { Theme } from '@mui/material/styles/createTheme';
 
 const styles = {
-  /*   container: {
-    background: (theme: Theme) =>
-      theme.palette.mode === 'light'
-        ? theme.palette.background.paper
-        : theme.palette.background.alternative,
-
-    border: '3px solid #FF8C00', //ORANGE mais claro
-    borderRadius: '10px',
-    padding: '20px',
-    display: 'flex',
-    flexDirection: 'column',
-    '& .mui-19kzrtu': {
-      padding: '0px',
-    },
-  }, */
-
   boxContent: {
     display: 'flex',
     flexDirection: { xs: 'column', md: 'row' },
@@ -39,9 +23,6 @@ const styles = {
 
   inputsCol2: {
     width: '100%',
-    /*     '& .MuiInputBaseInput': {
-      height: '10px',
-    }, */
   },
 
   boxButton: {
