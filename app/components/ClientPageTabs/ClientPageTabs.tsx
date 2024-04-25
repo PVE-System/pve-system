@@ -17,6 +17,7 @@ import AttachmentIcon from '@mui/icons-material/Attachment';
 import ClientPageTab1 from '@/app/components/ClientPageTab1/ClientPageTab1';
 import ClientPageTab2 from '@/app/components/ClientPageTab2/ClientPageTab2';
 import ClientPageTab3 from '@/app/components/ClientPageTab3/ClientPageTab3';
+import ClientPageTab4 from '@/app/components/ClientPageTab4/ClientPageTab4';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -136,7 +137,9 @@ export default function BasicTabs() {
           </Box>
         </ClientPageTabs>
         <ClientPageTabs value={value} index={3}>
-          Item Four
+          <Box sx={styles.contentTabs}>
+            <ClientPageTab4 />
+          </Box>
         </ClientPageTabs>
       </Box>
     </Container>
