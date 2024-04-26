@@ -15,9 +15,9 @@ import {
   Link,
 } from '@mui/material';
 import { Rating } from '@mui/material';
-import styles from '@/app/components/ClientsMsList/styles';
+import styles from '@/app/components/ClientsMtList/styles';
 
-const ClientMsList = () => {
+const ClientMtList = () => {
   const clients = [
     {
       name: 'Cliente 1 Comércio de Mat e Const Ltda',
@@ -130,4 +130,4 @@ const ClientMsList = () => {
   );
 };
 
-export default ClientMsList;
+export default ClientMtList;
