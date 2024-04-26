@@ -59,7 +59,7 @@ export default function TemporaryDrawer() {
           {
             name: 'Clientes MT',
             icon: <ApartmentIcon />,
-            link: '/dashboard',
+            link: '/clientsMtList',
           },
           { name: 'Clientes BR', icon: <BusinessIcon />, link: '/' },
           {
