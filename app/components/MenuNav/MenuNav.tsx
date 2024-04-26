@@ -51,7 +51,11 @@ export default function TemporaryDrawer() {
       <List sx={styles.textMenu}>
         {[
           { name: 'Dashboard', icon: <DashboardIcon />, link: '/dashboard' },
-          { name: 'Clientes MS', icon: <LocationCityIcon />, link: '/' },
+          {
+            name: 'Clientes MS',
+            icon: <LocationCityIcon />,
+            link: '/clientsMsList',
+          },
           {
             name: 'Clientes MT',
             icon: <ApartmentIcon />,
