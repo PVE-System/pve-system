@@ -37,6 +37,10 @@ const styles = {
     width: '50px',
     height: '50px',
     transition: 'color 0.3s',
+    color: (theme: Theme) =>
+      theme.palette.mode === 'light'
+        ? theme.palette.secondary.main
+        : theme.palette.secondary.main,
     '&:hover': {
       color: orange[800],
     },

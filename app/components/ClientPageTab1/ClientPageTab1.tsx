@@ -155,10 +155,11 @@ const ClientPageTab1: React.FC = () => {
           type="submit"
           variant="contained"
           onClick={handleSubmit(onSubmit)}
-          sx={styles.deleteButton}
+          sx={styles.exportButton}
         >
-          Deletar
+          Exportar PDF
         </Button>
+
         <Button
           type="submit"
           variant="contained"

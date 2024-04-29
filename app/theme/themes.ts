@@ -42,18 +42,18 @@ const lightTheme = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: '#FF8C00', // Laranja um pouco mais claro que no dark. Cor principal para botões e ícones.
-      light: '#F6E7D8', // Cor alternativa para botões e ícones especifica para temas claros.
+      main: '#FF8C00', // Laranjado um pouco mais claro que no dark. Cor principal para botões e ícones.
+      /* light: '#F6E7D8', */ // Cor alternativa para botões e ícones especifica para temas claros.
       contrastText: '#ffffff', // Branco. Cor para textos dentro do botão.
     },
     secondary: {
-      main: '#F6E7D8', // Cor secundaria para botões e ícones.
+      main: '#A9A9A9', // DarkGrey. Cor secundaria para botões e ícones.
       contrastText: '#EA650A', // Laranja. Cor alternativa para textos dentro do botão.
     },
     background: {
-      default: '#dedfe1', // Pastel claro. Body Cor de fundo principal.AED6F1    B5C7D2 #f9f9f9 e0eafd
+      default: '#dedfe1', // Cinza um pouco mais escuro. Body, Cor de fundo principal.AED6F1    B5C7D2 #f9f9f9 e0eafd
       alternative: '#2A2E30', // DarkGreen Cor de fundo alternativa.
-      paper: '#f9f9f9', // . Cor de fundo alternativa para componentes como o Drawer.#AED1F1 Azul Pscina
+      paper: '#f9f9f9', // Cinza Claro Cor de fundo alternativa para componentes como o Drawer.#AED1F1 Azul Pscina
     },
     text: {
       primary: '#000000', // Black. Cor do texto padrão.
@@ -90,11 +90,11 @@ const darkTheme = createTheme({
     mode: 'dark',
     primary: {
       main: orange[800], // Laranja. Cor principal para botões e ícones.
-      light: '#F6E7D8', // Cor para hover nos botões e ícones especifica para temas escuros.
+      /* light: '#F6E7D8', */ // Cor para hover nos botões e ícones especifica para temas escuros.
       contrastText: '#ffffff', // Branco. Cor para textos dentro do botão.
     },
     secondary: {
-      main: '#ffffff', // Cor secundaria para botões e ícones.
+      main: '#ffffff', // Branco. Cor secundaria para botões e ícones.
       contrastText: '#EA650A', // Laranja. Cor alternativa para textos dentro do botão.
     },
     background: {

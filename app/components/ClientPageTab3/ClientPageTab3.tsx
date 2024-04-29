@@ -71,7 +71,7 @@ const ClientPageTab3: React.FC = () => {
                       color:
                         comments.length > 0 && comments[0].favorite
                           ? 'orange'
-                          : 'primary',
+                          : 'darkgrey',
                       marginBottom: '90px',
                       cursor: 'pointer',
                     }}
@@ -92,14 +92,14 @@ const ClientPageTab3: React.FC = () => {
         </Box>
       </Box>
       <Box sx={styles.boxButton}>
-        <Button
+        {/*         <Button
           type="submit"
           variant="contained"
           onClick={handleSubmit(onSubmit)}
           sx={styles.deleteButton}
         >
           Deletar
-        </Button>
+        </Button> */}
         <Button
           type="submit"
           variant="contained"

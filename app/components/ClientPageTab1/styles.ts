@@ -34,6 +34,15 @@ const styles = {
     },
   },
 
+  exportButton: {
+    background: (theme: Theme) => theme.palette.primary.main,
+    backgroundColor: 'darkorange',
+    marginTop: '20px',
+    '@media (max-width: 800px)': {
+      alignSelf: 'center',
+    },
+  },
+
   deleteButton: {
     background: (theme: Theme) => theme.palette.primary.main,
     backgroundColor: 'red',

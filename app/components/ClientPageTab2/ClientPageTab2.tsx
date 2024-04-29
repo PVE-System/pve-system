@@ -60,14 +60,14 @@ const ClientPageTab2: React.FC = () => {
         </Box>
       </Box>
       <Box sx={styles.boxButton}>
-        <Button
+        {/*         <Button
           type="submit"
           variant="contained"
           onClick={handleSubmit(onSubmit)}
           sx={styles.deleteButton}
         >
           Deletar
-        </Button>
+        </Button> */}
         <Button
           type="submit"
           variant="contained"
