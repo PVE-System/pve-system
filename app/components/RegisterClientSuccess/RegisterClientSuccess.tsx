@@ -3,10 +3,9 @@
 import { Box, Card, CardContent, Container, Typography } from '@mui/material';
 import NextLink from 'next/link';
 
-import styles from '@/app/components/ExcelDownload/style';
 import sharedStyles from '@/app/styles/sharedStyles';
+import styles from '@/app/components/RegisterClientSuccess/style';
 
-import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 

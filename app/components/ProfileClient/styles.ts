@@ -7,7 +7,7 @@ const styles = {
     alignItems: 'center',
     background: (theme: Theme) =>
       theme.palette.mode === 'light'
-        ? theme.palette.background.paper
+        ? theme.palette.background.default
         : theme.palette.background.alternative,
     borderColor: (theme: Theme) =>
       theme.palette.mode === 'light' ? '#000000' : '#ffffff',
@@ -69,6 +69,7 @@ const styles = {
 
   clientConditionButton: {
     fontSize: '12px',
+    /* border: 'solid 2px', */
     '@media (max-width: 1050px)': {
       fontSize: '10px',
     },

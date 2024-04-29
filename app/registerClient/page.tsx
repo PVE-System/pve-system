@@ -4,7 +4,7 @@ import { Box, Container, Typography } from '@mui/material';
 import sharedStyles from '../styles/sharedStyles';
 import RegisterClient from '../components/RegisterClient/RegisterClient';
 
-const ProfilePage: React.FC = () => {
+const RegisterClientPage: React.FC = () => {
   return (
     <>
       <HeadApp />
@@ -20,4 +20,4 @@ const ProfilePage: React.FC = () => {
   );
 };
 
-export default ProfilePage;
+export default RegisterClientPage;
