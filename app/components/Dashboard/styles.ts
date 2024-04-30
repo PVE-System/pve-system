@@ -23,8 +23,8 @@ const styles = {
   cards: {
     background: (theme: Theme) =>
       theme.palette.mode === 'light'
-        ? theme.palette.background.paper
-        : theme.palette.background.default,
+        ? theme.palette.background.alternative
+        : theme.palette.background.alternative,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 4,
@@ -81,10 +81,14 @@ const styles = {
     },
   },
   accordionBg: {
-    backgroundColor: '#001F3F',
+    /* backgroundColor: '#001F3F', */
+    background: (theme: Theme) =>
+      theme.palette.mode === 'light'
+        ? theme.palette.background.alternative
+        : theme.palette.background.alternative,
   },
   accordionText: {
-    color: '#ffffff',
+    /* color: '#ffffff', */
     span: {
       color: orange[800],
       marginRight: '10px',

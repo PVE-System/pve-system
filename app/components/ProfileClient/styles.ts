@@ -1,29 +1,32 @@
 import { Theme } from '@mui/material/styles/createTheme';
 
 const styles = {
-  boxCol1: {
+  boxProfile: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+
     background: (theme: Theme) =>
       theme.palette.mode === 'light'
         ? theme.palette.background.default
         : theme.palette.background.alternative,
-    borderColor: (theme: Theme) =>
-      theme.palette.mode === 'light' ? '#000000' : '#ffffff',
-    border: '1px solid',
+
+    border: '2px solid',
     borderRadius: '10px',
     padding: '20px',
     width: '30%',
     height: '500px',
+
     '@media (max-width: 800px)': {
       width: '100%',
       height: '450px',
       border: 'none',
       borderRadius: '0px',
       borderBottom: '1px solid',
-      borderColor: (theme: Theme) =>
-        theme.palette.mode === 'light' ? '#000000' : '#ffffff',
+      background: (theme: Theme) =>
+        theme.palette.mode === 'light'
+          ? theme.palette.background.paper
+          : theme.palette.background.alternative,
     },
   },
 
@@ -69,7 +72,6 @@ const styles = {
 
   clientConditionButton: {
     fontSize: '12px',
-    /* border: 'solid 2px', */
     '@media (max-width: 1050px)': {
       fontSize: '10px',
     },
