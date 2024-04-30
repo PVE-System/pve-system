@@ -42,22 +42,21 @@ const lightTheme = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: '#FF8C00', // Laranjado um pouco mais claro que no dark. Cor principal para botões e ícones.
-      /* light: '#F6E7D8', */ // Cor alternativa para botões e ícones especifica para temas claros.
-      contrastText: '#ffffff', // Branco. Cor para textos dentro do botão.
+      main: orange[500], // Orange. Um pouco mais claro que no tema dark. Cor principal para botões e ícones.
+      contrastText: '#ffffff', // White. Cor para textos dentro do botão.
     },
     secondary: {
-      main: '#A9A9A9', // DarkGrey. Cor secundaria para botões e ícones.
-      contrastText: '#EA650A', // Laranja. Cor alternativa para textos dentro do botão.
+      main: '#6b6b6b', // DarkGrey. Cor secundaria para botões e ícones.
+      contrastText: orange[600], // Orange. Cor alternativa para textos dentro do botão.
     },
     background: {
-      default: '#dedfe1', // Cinza um pouco mais escuro. Body, Cor de fundo principal.AED6F1    B5C7D2 #f9f9f9 e0eafd
-      alternative: '#2A2E30', // DarkGreen Cor de fundo alternativa.
-      paper: '#f9f9f9', // Cinza Claro Cor de fundo alternativa para componentes como o Drawer.#AED1F1 Azul Pscina
+      default: '#dedfe1', // LightGrey. Body, Cor de fundo principal.
+      alternative: '#A9A9A9', // MediumGray. Cor de fundo alternativa.
+      paper: '#f9f9f9', // WhiteGrey. Cor de fundo alternativa para componentes como o Drawer.
     },
     text: {
       primary: '#000000', // Black. Cor do texto padrão.
-      secondary: 'EA650A', // Laranjado. Cor do texto secundário, como em listas e descrições.
+      secondary: '#6b6b6b', // DarkGrey. Cor do texto secundário.
     },
   },
 });
@@ -89,22 +88,21 @@ const darkTheme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: orange[800], // Laranja. Cor principal para botões e ícones.
-      /* light: '#F6E7D8', */ // Cor para hover nos botões e ícones especifica para temas escuros.
-      contrastText: '#ffffff', // Branco. Cor para textos dentro do botão.
+      main: orange[800], // Orange. Cor principal para botões e ícones.
+      contrastText: '#ffffff', // White. Cor para textos dentro do botão.
     },
     secondary: {
-      main: '#ffffff', // Branco. Cor secundaria para botões e ícones.
-      contrastText: '#EA650A', // Laranja. Cor alternativa para textos dentro do botão.
+      main: '#ffffff', // White. Cor secundaria para botões e ícones.
+      contrastText: orange[800], // Orange. Cor alternativa para textos dentro do botão.
     },
     background: {
-      default: '#303030', // Cinza escuro. Body, cor de fundo principal.
-      alternative: '#2A2E30', // DarkGreen Cor de fundo alternativa.
-      paper: '#000000', // Preto. Cor de fundo alternativa para componentes como o Drawer e Accordion.
+      default: '#303030', // DarkGrey. Body, cor de fundo principal.
+      alternative: '#2A2E30', // DarkGreen. Cor de fundo alternativa.
+      paper: '#000000', // Black. Cor de fundo alternativa para componentes como o Drawer e Accordion.
     },
     text: {
-      primary: '#ffffff', // Branco. Cor do texto padrão.
-      secondary: '#6b6b6b', // Laranjado. Cor do texto secundário, como em listas e descrições.
+      primary: '#ffffff', // White. Cor do texto padrão.
+      secondary: '#f3f3f3', // LightGrey. Cor do texto secundário.
     },
   },
 });

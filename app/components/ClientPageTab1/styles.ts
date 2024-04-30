@@ -35,29 +35,30 @@ const styles = {
   },
 
   exportButton: {
-    background: (theme: Theme) => theme.palette.primary.main,
-    backgroundColor: 'darkorange',
     marginTop: '20px',
+    background: (theme: Theme) => theme.palette.primary.main,
     '@media (max-width: 800px)': {
       alignSelf: 'center',
     },
   },
 
-  deleteButton: {
+  /*   deleteButton: {
     background: (theme: Theme) => theme.palette.primary.main,
     backgroundColor: 'red',
     marginTop: '20px',
     '@media (max-width: 800px)': {
       alignSelf: 'center',
     },
-  },
+  }, */
 
   editButton: {
-    background: (theme: Theme) => theme.palette.primary.main,
     marginTop: '20px',
     backgroundColor: 'green',
-    '@media (max-width: 800px)': {
-      alignSelf: 'center',
+    '&:hover': {
+      backgroundColor: 'darkgreen',
+      '@media (max-width: 800px)': {
+        alignSelf: 'center',
+      },
     },
   },
 };

@@ -3,7 +3,7 @@ import { Theme } from '@mui/material/styles/createTheme';
 
 const styles = {
   cardPieChart: {
-    background: (theme: Theme) => theme.palette.background.alternative,
+    background: '#2A2E30',
     color: '#ffffff',
     marginBottom: '20px',
     borderRadius: 4,

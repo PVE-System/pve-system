@@ -38,7 +38,7 @@ const styles = {
     },
   },
 
-  deleteButton: {
+  /*   deleteButton: {
     background: (theme: Theme) => theme.palette.primary.main,
     backgroundColor: 'red',
     width: '80px',
@@ -46,15 +46,16 @@ const styles = {
     '@media (max-width: 800px)': {
       alignSelf: 'center',
     },
-  },
+  }, */
 
   editButton: {
-    background: (theme: Theme) => theme.palette.primary.main,
-    backgroundColor: 'green',
-    width: '80px',
     marginTop: '20px',
-    '@media (max-width: 800px)': {
-      alignSelf: 'center',
+    backgroundColor: 'green',
+    '&:hover': {
+      backgroundColor: 'darkgreen',
+      '@media (max-width: 800px)': {
+        alignSelf: 'center',
+      },
     },
   },
 };

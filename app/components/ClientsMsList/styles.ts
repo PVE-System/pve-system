@@ -8,7 +8,9 @@ const styles = {
         ? theme.palette.background.paper
         : theme.palette.background.alternative,
 
-    border: '3px solid #FF8C00', //ORANGE mais claro
+    border: '3px solid',
+    borderColor: (theme: Theme) =>
+      theme.palette.mode === 'light' ? orange[500] : orange[800],
     borderRadius: '10px',
     padding: '20px',
     display: 'flex',

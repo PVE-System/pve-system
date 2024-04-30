@@ -14,7 +14,8 @@ const styles = {
     height: '300px',
     borderRadius: 4,
     border: '3px solid',
-    borderColor: '#FF8C00', //ORANGE mais claro
+    borderColor: (theme: Theme) =>
+      theme.palette.mode === 'light' ? orange[500] : orange[800],
 
     '@media (max-width:450px)': {
       flexDirection: 'column',

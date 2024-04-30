@@ -27,13 +27,13 @@ const ClientProfile: React.FC = () => {
   };
 
   return (
-    <Box sx={styles.boxCol1}>
+    <Box sx={styles.boxProfile}>
       <label htmlFor="profile-picture-input">
         <input
           id="profile-picture-input"
           type="file"
           accept="image/*"
-          style={{ display: 'none', width: '100%' }}
+          style={{ display: 'none' }}
           onChange={handleImageChange}
         />
         <Image
@@ -77,6 +77,7 @@ const ClientProfile: React.FC = () => {
                   ...styles.clientConditionButton,
                   ...(field.value === 'normal' && {
                     backgroundColor: 'green',
+                    border: 'none',
                     color: 'white',
                   }),
                 }}
@@ -91,6 +92,7 @@ const ClientProfile: React.FC = () => {
                   ...styles.clientConditionButton,
                   ...(field.value === 'especial' && {
                     backgroundColor: '#FFD700',
+                    border: 'none',
                     color: 'black',
                   }),
                 }}
@@ -105,6 +107,7 @@ const ClientProfile: React.FC = () => {
                   ...styles.clientConditionButton,
                   ...(field.value === 'suspenso' && {
                     backgroundColor: 'red',
+                    border: 'none',
                     color: 'white',
                   }),
                 }}

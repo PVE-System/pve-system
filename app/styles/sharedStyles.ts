@@ -21,15 +21,15 @@ const sharedStyles = {
       color: orange[800],
     },
 
-    // Tamanho da fonte tela Notebook
+    // FontSize Notebook
     '@media (max-width:1050px)': {
       fontSize: '30px',
     },
-    // Tamanho da fonte tela Tablet
+    // FontSize Tablet
     '@media (max-width:800px)': {
       fontSize: '28px',
     },
-    // Tamanho da fonte tela Mobile
+    // FontSize Mobile
     '@media (max-width:450px)': {
       fontSize: '26px',
     },
@@ -37,15 +37,15 @@ const sharedStyles = {
 
   titleForm: {
     fontSize: '18px',
-
+    // FontSize Notebook
     '@media (max-width:1050px)': {
       fontSize: '18px',
     },
-
+    // FontSize Tablet
     '@media (max-width:800px)': {
       fontSize: '16px',
     },
-
+    // FontSize Mobile
     '@media (max-width:450px)': {
       fontSize: '14px',
       '& .mui-1mxgcu1-MuiFormLabel-root-MuiInputLabel-root': {
@@ -58,17 +58,17 @@ const sharedStyles = {
   },
 
   subtitleSize: {
-    // Tamanho da fonte tela desktop
+    // FontSize Desktop
     fontSize: '18px',
-    // Tamanho da fonte tela Notebook
+    // FontSize Notebook
     '@media (max-width:1050px)': {
       fontSize: '16px',
     },
-    // Tamanho da fonte tela Tablet
+    // FontSize Tablet
     '@media (max-width:800px)': {
       fontSize: '14px',
     },
-    // Tamanho da fonte tela Mobile
+    // FontSize Mobile
     '@media (max-width:450px)': {
       fontSize: '12px',
     },
@@ -78,11 +78,11 @@ const sharedStyles = {
       '@media (max-width:1050px)': {
         fontSize: '18px',
       },
-      // Tamanho da fonte tela Tablet
+      // FontSize Tablet
       '@media (max-width:800px)': {
         fontSize: '16px',
       },
-      // Tamanho da fonte tela Mobile
+      // FontSize Mobile
       '@media (max-width:450px)': {
         fontSize: '14px',
       },
