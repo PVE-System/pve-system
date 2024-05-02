@@ -34,10 +34,17 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import CloseIcon from '@mui/icons-material/Close';
 
 import { useMediaQuery } from '@mui/material';
+/* import ThemeSwitcher from '../ThemeSwitcher/ThemeSwitcher'; */
 
 export default function TemporaryDrawer() {
   const [open, setOpen] = React.useState(false);
   const { theme, toggleTheme } = useTheme();
+
+  const handleToggleTheme = () => {
+    const newTheme = theme === 'light' ? 'light' : 'dark';
+    localStorage.setItem('theme', newTheme);
+    toggleTheme(); // Chame toggleTheme depois de salvar o tema no localStorage
+  };
 
   // Detecta se a tela é menor que o tamanho md (960px)
   const isMobile = useMediaQuery('(max-width:600px)');
@@ -45,6 +52,10 @@ export default function TemporaryDrawer() {
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen);
   };
+
+  // Defina os ícones de tema com base no tema atual
+  const themeIcon =
+    theme === 'dark' ? <Brightness4Icon /> : <Brightness7Icon />;
 
   const DrawerList = (
     <div role="presentation" onClick={toggleDrawer(false)}>
@@ -108,7 +119,7 @@ export default function TemporaryDrawer() {
   );
 
   return (
-    <div>
+    <Box>
       <Button /* sx={{ marginLeft: 0 }}  */ onClick={toggleDrawer(true)}>
         <MenuOpenIcon />
       </Button>
@@ -133,15 +144,15 @@ export default function TemporaryDrawer() {
             />
           </Box>
           {DrawerList}
-
+          {/* Ícone que troca o tema */}
           <Box sx={styles.contentMenu}>
             <IconButton
               sx={styles.iconTheme}
-              onClick={toggleTheme}
+              onClick={handleToggleTheme} // Alteração aqui para chamar a função de alternar o tema
               color="inherit"
             >
-              {theme === 'dark' ? <Brightness4Icon /> : <Brightness7Icon />}
-            </IconButton>{' '}
+              {themeIcon}
+            </IconButton>
             <Divider sx={styles.dividerMenu} />
             <Image
               src="/profile-placeholder.png"
@@ -160,6 +171,6 @@ export default function TemporaryDrawer() {
           </Box>
         </Box>
       </Drawer>
-    </div>
+    </Box>
   );
 }
