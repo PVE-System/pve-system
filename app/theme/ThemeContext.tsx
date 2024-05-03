@@ -2,11 +2,13 @@
 
 import React, {
   createContext,
-  useContext,
   ReactNode,
   useState,
   useEffect,
+  useContext,
 } from 'react';
+
+/* import { lightTheme, darkTheme } from '@/app/theme/themes'; */
 
 interface ThemeContextType {
   theme: 'light' | 'dark';
@@ -23,30 +25,25 @@ interface ThemeProviderProps {
 }
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark'); //mudar padrao aqui
+  const [theme, setTheme] = useState<'dark' | 'light'>(
+    () => (localStorage.getItem('theme') as 'light' | 'dark') || 'dark',
+  );
 
   useEffect(() => {
-    const storedTheme = localStorage.getItem('theme') as 'light' | 'dark';
-    if (storedTheme) {
-      setTheme(storedTheme);
-    }
-  }, []);
+    document.body.dataset.theme = theme;
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
   };
 
   const contextValue = { theme, toggleTheme };
 
   return (
     <ThemeContext.Provider value={contextValue}>
-      {React.Children.map(children, (child) =>
-        React.isValidElement(child)
-          ? React.cloneElement(child as React.ReactElement, { theme }) // Corrigir o tipo do objeto para {}
-          : child,
-      )}
+      {children}
     </ThemeContext.Provider>
   );
 }
