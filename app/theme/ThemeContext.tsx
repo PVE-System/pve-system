@@ -1,56 +1,38 @@
 'use client';
 
-import React, {
-  createContext,
-  useContext,
-  ReactNode,
-  useState,
-  useEffect,
-} from 'react';
+import React, { createContext, useContext } from 'react';
 
 interface ThemeContextType {
-  theme: 'light' | 'dark';
+  theme: string;
   toggleTheme: () => void;
 }
 
-const ThemeContext = createContext<ThemeContextType>({
-  theme: 'light',
-  toggleTheme: () => {},
-});
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-interface ThemeProviderProps {
-  children: ReactNode;
+export function useTheme() {
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error('useTheme must be used within a ThemeProvider');
+  }
+  return context;
 }
 
-export function ThemeProvider({ children }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark'); //mudar padrao aqui
+interface ThemeProviderProps {
+  children: React.ReactNode;
+  theme: string;
+  toggleTheme: () => void;
+}
 
-  useEffect(() => {
-    const storedTheme = localStorage.getItem('theme') as 'light' | 'dark';
-    if (storedTheme) {
-      setTheme(storedTheme);
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
-  };
-
-  const contextValue = { theme, toggleTheme };
-
+export function ThemeProvider({
+  children,
+  theme,
+  toggleTheme,
+}: ThemeProviderProps) {
   return (
-    <ThemeContext.Provider value={contextValue}>
-      {React.Children.map(children, (child) =>
-        React.isValidElement(child)
-          ? React.cloneElement(child as React.ReactElement, { theme }) // Corrigir o tipo do objeto para {}
-          : child,
-      )}
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {children}
     </ThemeContext.Provider>
   );
 }
 
-export function useTheme() {
-  return useContext(ThemeContext);
-}
+export { ThemeContext };
