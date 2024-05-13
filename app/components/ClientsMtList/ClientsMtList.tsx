@@ -12,12 +12,11 @@ import {
   Container,
   Box,
   useMediaQuery,
-  Link,
 } from '@mui/material';
 import { Rating } from '@mui/material';
-import styles from '@/app/components/ClientsMtList/styles';
+import styles from '@/app/components/ClientsMsList/styles';
 
-const ClientMtList = () => {
+const ClientMsList = () => {
   const clients = [
     {
       name: 'Cliente 1 Comércio de Mat e Const Ltda',
@@ -53,6 +52,11 @@ const ClientMtList = () => {
 
   const isSmallScreen = useMediaQuery('(max-width:600px)');
 
+  const handleRowClick = () => {
+    // Redirecionar para a página do cliente
+    window.location.href = '/clientPage';
+  };
+
   return (
     <Container maxWidth="lg" sx={styles.container}>
       <TableContainer>
@@ -71,16 +75,12 @@ const ClientMtList = () => {
           </TableHead>
           <TableBody>
             {clients.map((client, index) => (
-              <TableRow key={index} sx={styles.rowHover}>
-                <TableCell sx={styles.fontSize}>
-                  <Link
-                    href="/clientPage"
-                    underline="none"
-                    sx={styles.textLink}
-                  >
-                    {client.name}
-                  </Link>
-                </TableCell>
+              <TableRow
+                key={index}
+                sx={{ ...styles.rowHover, cursor: 'pointer' }}
+                onClick={handleRowClick} // Adicionar evento de clique na linha
+              >
+                <TableCell sx={styles.fontSize}>{client.name}</TableCell>
                 {!isSmallScreen && (
                   <>
                     <TableCell sx={styles.fontSize}>{client.code}</TableCell>
@@ -97,7 +97,7 @@ const ClientMtList = () => {
                                 ? 'warning'
                                 : client.status === 'S'
                                   ? 'error'
-                                  : ('default' as any)
+                                  : 'inherit' // Substituído 'default' por 'inherit'
                           }
                         >
                           {client.status === 'N'
@@ -130,4 +130,4 @@ const ClientMtList = () => {
   );
 };
 
-export default ClientMtList;
+export default ClientMsList;

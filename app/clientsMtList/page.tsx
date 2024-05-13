@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import ClientsMtList from '@/app/components/ClientsMtList/ClientsMsList';
+import ClientsMtList from '@/app/components/ClientsMtList/ClientsMtList';
 import HeadApp from '../components/HeadApp/HeadApp';
 import sharedStyles from '../styles/sharedStyles';
 import { Box, Typography } from '@mui/material';

@@ -10,7 +10,6 @@ const styles = {
     mb: 2,
   },
   copyright: {
-    color: 'white',
     mt: 8,
     mb: 4,
   },

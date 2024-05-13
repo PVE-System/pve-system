@@ -120,7 +120,7 @@ export default function TemporaryDrawer() {
 
   return (
     <Box>
-      <Button /* sx={{ marginLeft: 0 }}  */ onClick={toggleDrawer(true)}>
+      <Button onClick={toggleDrawer(true)}>
         <MenuOpenIcon />
       </Button>
       <Drawer
