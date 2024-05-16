@@ -33,4 +33,18 @@ Spin down the database with:
 npm run db:down
 ```
 
+### Migrations
+
+Generate the database migration based on the schema changes:
+
+```bash
+npm run db:generate
+```
+
+Run the migrations with:
+
+```bash
+npm run db:migrate
+```
+
 <h3>🐱‍🏍All rights reserved. © 2024 - PVE Representações Ltda.🐱‍🏍</h3>
