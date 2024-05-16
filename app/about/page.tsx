@@ -6,10 +6,20 @@ import Button from '@mui/material/Button';
 import NextLink from 'next/link';
 
 import ClientProfile from '../components/ProfileClient/ProfileClient';
+import { db, users } from '../db';
 
-export default function About() {
+export default async function About() {
+  const result = await db.select().from(users);
+  // const result2 = await db.query.users.findMany();
+
+  // const newUser = {
+  //   fullName: 'User ' + Math.floor(Math.random() * 1000),
+  // };
+  // await db.insert(users).values({ fullName: newUser.fullName });
+
   return (
     <Container maxWidth="lg">
+      <pre>{JSON.stringify(result, null, 2)}</pre>
       <Box
         sx={{
           my: 4,
