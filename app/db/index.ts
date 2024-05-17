@@ -1,2 +1,3 @@
 export { db } from './db';
-export { users, User, NewUser } from './schema';
+export { users } from './schema';
+export type { User, NewUser } from './schema';
