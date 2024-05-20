@@ -15,6 +15,13 @@
       "when": 1715957317681,
       "tag": "0001_eminent_whirlwind",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1716201072615,
+      "tag": "0002_first_lightspeed",
+      "breakpoints": true
     }
   ]
 }
