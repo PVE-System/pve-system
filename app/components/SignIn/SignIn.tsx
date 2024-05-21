@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useState } from 'react';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
@@ -11,7 +12,6 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-/* import { createTheme, ThemeProvider } from '@mui/material/styles'; */
 import Image from 'next/image';
 import NextLink from 'next/link';
 import sharedStyles from '@/app/styles/sharedStyles';
@@ -36,13 +36,38 @@ function Copyright(props: any) {
 }
 
 export default function SignIn() {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const [message, setMessage] = useState<string | null>(null);
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    const formData = new FormData(event.currentTarget);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+
+    // Enviar requisição POST para a API de login
+    try {
+      const response = await fetch('/api/loginAuth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (response.ok) {
+        const { token } = await response.json();
+        localStorage.setItem('token', token); // Armazena o token no localStorage
+        // Redireciona para a página de dashboard após o login bem-sucedido
+        window.location.href = '/dashboard';
+      } else {
+        const error = await response.json();
+        // Exibe mensagem de erro se o login falhar
+        setMessage(`Erro: ${error.error}`);
+      }
+    } catch (error) {
+      // Exibe mensagem de erro se houver algum problema na conexão com o servidor
+      setMessage('Erro ao conectar com o servidor');
+    }
   };
 
   return (
@@ -60,6 +85,12 @@ export default function SignIn() {
         <Typography variant="subtitle1" sx={sharedStyles.titleForm}>
           PVE Representações Ltda.
         </Typography>
+
+        {message && (
+          <Typography variant="body2" color="error">
+            {message}
+          </Typography>
+        )}
 
         <Box
           component="form"
@@ -97,8 +128,6 @@ export default function SignIn() {
             type="submit"
             fullWidth
             variant="contained"
-            component={NextLink}
-            href="/dashboard"
             sx={styles.button}
           >
             Entrar
@@ -110,11 +139,13 @@ export default function SignIn() {
               </Link>
             </Grid>
             <Grid item>
-              <Link href="#" variant="body2">
-                {'Não tem uma conta?'}
-                <br />
-                {'Inscrever-se'}
-              </Link>
+              {/*               <NextLink href="/register" passHref>
+                <Link variant="body2">
+                  {'Não tem uma conta?'}
+                  <br />
+                  {'Inscrever-se'}
+                </Link>
+              </NextLink> */}
             </Grid>
           </Grid>
         </Box>

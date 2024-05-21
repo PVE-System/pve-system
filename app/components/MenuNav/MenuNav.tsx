@@ -34,11 +34,11 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import CloseIcon from '@mui/icons-material/Close';
 
 import { useMediaQuery } from '@mui/material';
-/* import ThemeSwitcher from '../ThemeSwitcher/ThemeSwitcher'; */
 
 export default function TemporaryDrawer() {
   const [open, setOpen] = React.useState(false);
   const { theme, toggleTheme } = useTheme();
+  const isMobile = useMediaQuery('(max-width:600px)');
 
   const handleToggleTheme = () => {
     const newTheme = theme === 'light' ? 'light' : 'dark';
@@ -46,8 +46,12 @@ export default function TemporaryDrawer() {
     toggleTheme(); // Chame toggleTheme depois de salvar o tema no localStorage
   };
 
-  // Detecta se a tela é menor que o tamanho md (960px)
-  const isMobile = useMediaQuery('(max-width:600px)');
+  const logout = () => {
+    // Limpar o token do localStorage
+    localStorage.removeItem('token');
+    // Redirecionar para a página de login
+    setOpen(false); // Fecha o drawer após logout
+  };
 
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen);
@@ -165,12 +169,18 @@ export default function TemporaryDrawer() {
             </Typography>
           </Box>
           <Box sx={styles.iconLogout}>
-            <Link href="/">
-              <LogoutIcon />
+            <Link href="/" onClick={logout}>
+              {/* Adiciona o link para a página inicial */}
+              <IconButton>
+                <LogoutIcon />
+              </IconButton>
             </Link>
           </Box>
         </Box>
       </Drawer>
     </Box>
   );
+}
+function redirectTo(arg0: string) {
+  throw new Error('Function not implemented.');
 }

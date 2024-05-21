@@ -1,11 +1,11 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { db, usersTeam, User, NewUser } from '@/app/db';
 import { eq } from 'drizzle-orm';
-/* import { usersTeam, User, NewUser } from '@/app/db/schema/usersTeam'; */
+import bcrypt from 'bcryptjs'; // Importando bcryptjs
 
 export async function GET(request: NextRequest) {
   return NextResponse.json({ usersTeam: await db.select().from(usersTeam) });
-  /*   const allUsers: User[] = await db.select().from(usersTeam);
+  /* const allUsers: User[] = await db.select().from(usersTeam);
   return NextResponse.json({ users: allUsers }); */
 }
 
@@ -13,13 +13,20 @@ export async function POST(request: NextRequest) {
   const newUser: NewUser = await request.json();
 
   try {
+    // Hash da senha do usuário
+    const hashedPassword = await bcrypt.hash(newUser.password, 10); // Hash da senha com 10 rounds
+
+    // Inserindo o usuário no banco de dados com a senha hasheada
     const createdUser = await db
       .insert(usersTeam)
-      .values(newUser)
+      .values({
+        email: newUser.email,
+        password: hashedPassword, // Usando a senha hasheada
+        createdAt: new Date(), // Adicionando a data de criação
+      })
       .returning({
         id: usersTeam.id,
         email: usersTeam.email,
-        password: usersTeam.password,
         createdAt: usersTeam.createdAt,
       })
       .execute();
