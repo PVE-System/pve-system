@@ -35,22 +35,20 @@ import CloseIcon from '@mui/icons-material/Close';
 
 import { useMediaQuery } from '@mui/material';
 
+import router from 'next/router';
+import Cookies from 'js-cookie';
+import { useAuth } from '@/app/contex/authContext';
+
 export default function TemporaryDrawer() {
   const [open, setOpen] = React.useState(false);
   const { theme, toggleTheme } = useTheme();
   const isMobile = useMediaQuery('(max-width:600px)');
+  const { logout } = useAuth();
 
   const handleToggleTheme = () => {
     const newTheme = theme === 'light' ? 'light' : 'dark';
     localStorage.setItem('theme', newTheme);
     toggleTheme(); // Chame toggleTheme depois de salvar o tema no localStorage
-  };
-
-  const logout = () => {
-    // Limpar o token do localStorage
-    localStorage.removeItem('token');
-    // Redirecionar para a página de login
-    setOpen(false); // Fecha o drawer após logout
   };
 
   const toggleDrawer = (newOpen: boolean) => () => {
@@ -169,8 +167,7 @@ export default function TemporaryDrawer() {
             </Typography>
           </Box>
           <Box sx={styles.iconLogout}>
-            <Link href="/" onClick={logout}>
-              {/* Adiciona o link para a página inicial */}
+            <Link onClick={logout}>
               <IconButton>
                 <LogoutIcon />
               </IconButton>
@@ -181,6 +178,7 @@ export default function TemporaryDrawer() {
     </Box>
   );
 }
-function redirectTo(arg0: string) {
+/* function redirectTo(arg0: string) {
   throw new Error('Function not implemented.');
 }
+ */

@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { useState } from 'react';
+import { setCookie } from 'nookies';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
@@ -44,7 +45,7 @@ export default function SignIn() {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
-    // Enviar requisição POST para a API de login
+    // Enviar requisição POST para a API de loginAuth
     try {
       const response = await fetch('/api/loginAuth', {
         method: 'POST',
@@ -55,14 +56,14 @@ export default function SignIn() {
       });
 
       if (response.ok) {
-        const { token } = await response.json();
-        localStorage.setItem('token', token); // Armazena o token no localStorage
+        const { message } = await response.json();
+        // A resposta já contém o cookie definido pelo servidor
         // Redireciona para a página de dashboard após o login bem-sucedido
         window.location.href = '/dashboard';
       } else {
         const error = await response.json();
         // Exibe mensagem de erro se o login falhar
-        setMessage(`Erro: ${error.error}`);
+        setMessage(`${error.error}`);
       }
     } catch (error) {
       // Exibe mensagem de erro se houver algum problema na conexão com o servidor
@@ -139,13 +140,15 @@ export default function SignIn() {
               </Link>
             </Grid>
             <Grid item>
-              {/*               <NextLink href="/register" passHref>
+              {/* 
+              <NextLink href="/register" passHref>
                 <Link variant="body2">
                   {'Não tem uma conta?'}
                   <br />
                   {'Inscrever-se'}
                 </Link>
-              </NextLink> */}
+              </NextLink> 
+              */}
             </Grid>
           </Grid>
         </Box>
