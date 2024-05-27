@@ -3,6 +3,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import * as React from 'react';
 import { ThemeProvider, ThemedComponent } from '@/app/theme';
 import { AuthProvider } from '@/app/contex/authContext';
+import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 
 export default function RootLayout(props: { children: React.ReactNode }) {
   return (
@@ -11,9 +12,10 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <ThemeProvider>
             <AuthProvider>
-              {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
               <CssBaseline />
-              <ThemedComponent>{props.children}</ThemedComponent>
+              <ThemedComponent>
+                <ProtectedRoute route="/">{props.children}</ProtectedRoute>
+              </ThemedComponent>
             </AuthProvider>
           </ThemeProvider>
         </AppRouterCacheProvider>

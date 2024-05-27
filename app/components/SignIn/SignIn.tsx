@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import { useState } from 'react';
-import { setCookie } from 'nookies';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
@@ -14,7 +13,8 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Image from 'next/image';
-import NextLink from 'next/link';
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
 import sharedStyles from '@/app/styles/sharedStyles';
 import styles from './styles';
 
@@ -38,6 +38,7 @@ function Copyright(props: any) {
 
 export default function SignIn() {
   const [message, setMessage] = useState<string | null>(null);
+  const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -45,7 +46,6 @@ export default function SignIn() {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
-    // Enviar requisição POST para a API de loginAuth
     try {
       const response = await fetch('/api/loginAuth', {
         method: 'POST',
@@ -56,17 +56,14 @@ export default function SignIn() {
       });
 
       if (response.ok) {
-        const { message } = await response.json();
-        // A resposta já contém o cookie definido pelo servidor
-        // Redireciona para a página de dashboard após o login bem-sucedido
-        window.location.href = '/dashboard';
+        const { token } = await response.json();
+        Cookies.set('token', token, { path: '/' });
+        router.push('/dashboard');
       } else {
         const error = await response.json();
-        // Exibe mensagem de erro se o login falhar
         setMessage(`${error.error}`);
       }
     } catch (error) {
-      // Exibe mensagem de erro se houver algum problema na conexão com o servidor
       setMessage('Erro ao conectar com o servidor');
     }
   };
