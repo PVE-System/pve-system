@@ -6,12 +6,12 @@ import Button from '@mui/material/Button';
 import NextLink from 'next/link';
 
 import ClientProfile from '../components/ProfileClient/ProfileClient';
-import { db, users } from '../db';
-import { usersTeam } from '../db/schema';
+import { db } from '../db';
+import { clients } from '../db/schema';
 
 export default async function About() {
-  const result = await db.select().from(users);
-  const resultTeam = await db.select().from(usersTeam);
+  const result = await db.select().from(clients);
+  /* const resultTeam = await db.select().from(clients); */
   // const result2 = await db.query.users.findMany();
 
   // const newUser = {
@@ -22,7 +22,7 @@ export default async function About() {
   return (
     <Container maxWidth="lg">
       <pre>{JSON.stringify(result, null, 2)}</pre>
-      <pre>{JSON.stringify(resultTeam, null, 2)}</pre>
+      {/* <pre>{JSON.stringify(resultTeam, null, 2)}</pre> */}
       <Box
         sx={{
           my: 4,

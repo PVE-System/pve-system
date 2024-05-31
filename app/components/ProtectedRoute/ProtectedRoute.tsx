@@ -38,6 +38,7 @@ export default ProtectedRoute;
 /* import { ReactNode, useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Cookies from 'js-cookie';
+import Loading from '../MenuNav/Loading/Loading';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -69,15 +70,14 @@ const ProtectedRoute = ({
   }, [pathname, route, router, unprotectedRoutes]);
 
   if (loading) {
-    return null; // Ou uma tela de carregamento se preferir
+    return <Loading />; // Ou uma tela de carregamento se preferir
   }
 
   if (!isAuthenticated && !unprotectedRoutes.includes(pathname)) {
-    return null; // Ou uma tela de carregamento se preferir
+    return <Loading />; // Ou uma tela de carregamento se preferir
   }
 
   return <>{children}</>;
 };
 
-export default ProtectedRoute;
- */
+export default ProtectedRoute; */

@@ -3,11 +3,15 @@ import { db, usersTeam, User, NewUser } from '@/app/db';
 import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs'; // Importando bcryptjs
 
+//METODO GET:
+
 export async function GET(request: NextRequest) {
   return NextResponse.json({ usersTeam: await db.select().from(usersTeam) });
   /* const allUsers: User[] = await db.select().from(usersTeam);
   return NextResponse.json({ users: allUsers }); */
 }
+
+//METODO POST:
 
 export async function POST(request: NextRequest) {
   const newUser: NewUser = await request.json();
@@ -44,6 +48,8 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+//METODO PUT:
 
 export async function PUT(request: NextRequest) {
   const userToUpdate: User = await request.json();
@@ -87,6 +93,8 @@ export async function PUT(request: NextRequest) {
     );
   }
 }
+
+//METODO DELETE:
 
 export async function DELETE(request: NextRequest) {
   const userToDelete = await request.json();

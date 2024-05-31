@@ -27,10 +27,41 @@ export const usersTeam = pgTable(
     };
   },
 );
-
-// Tipos inferidos para ser importados nas operações(route handlers(manipuladores)) na tabela uabaixo:
-/* export type User = typeof users.$inferSelect;
-export type NewUser = typeof users.$inferInsert; */
-
 export type User = typeof usersTeam.$inferSelect;
 export type NewUser = typeof usersTeam.$inferInsert;
+
+/*TABELA DE CLIENTES REGISTRADOS*/
+
+export const clients = pgTable('clients', {
+  id: serial('id').primaryKey(),
+  companyName: text('companyName').notNull(),
+  cnpj: text('cnpj').notNull(),
+  cpf: text('cpf').notNull(),
+  cep: text('cep').notNull(),
+  address: text('address').notNull(),
+  locationNumber: text('locationNumber').notNull(),
+  district: text('district').notNull(),
+  city: text('city').notNull(),
+  state: text('state').notNull(),
+  corfioCode: text('corfioCode').notNull(),
+  phone: text('phone').notNull(),
+  email: text('email').notNull(),
+  socialMedia: text('socialMedia').notNull(),
+  contactAtCompany: text('contactAtCompany').notNull(),
+  financialContact: text('financialContact').notNull(),
+  responsibleSeller: text('responsibleSeller').notNull(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+  companySize: text('companySize').notNull(),
+  hasOwnStore: text('hasOwnStore').notNull(),
+  isJSMClient: text('isJSMClient').notNull(),
+  includedByJSM: text('includedByJSM').notNull(),
+  icmsContributor: text('icmsContributor').notNull(),
+  transportationType: text('transportationType').notNull(),
+  companyLocation: text('companyLocation').notNull(),
+  marketSegmentNature: text('marketSegmentNature').notNull(),
+});
+
+export type Client = typeof clients.$inferSelect;
+export type NewClient = typeof clients.$inferInsert;
+
+// Tipos inferidos para ser importados nas operações(route handlers(manipuladores))
