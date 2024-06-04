@@ -46,6 +46,8 @@ export async function POST(request: NextRequest) {
         transportationType: newClient.transportationType,
         companyLocation: newClient.companyLocation,
         marketSegmentNature: newClient.marketSegmentNature,
+        rating: newClient.rating,
+        clientCondition: newClient.clientCondition,
       })
       .returning({
         id: clients.id,

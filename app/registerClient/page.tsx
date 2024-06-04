@@ -5,14 +5,14 @@ import sharedStyles from '../styles/sharedStyles';
 import RegisterClient from '../components/RegisterClient/RegisterClient';
 
 import { db } from '@/app/db'; // Ajuste o caminho conforme necessário
-import { clients, NewClient } from '@/app/db/schema';
+import { clients } from '@/app/db/schema';
 
 const RegisterClientPage: React.FC = async () => {
-  const result = await db.select().from(clients);
+  /* const result = await db.select().from(clients); */
 
   return (
     <>
-      <pre>{JSON.stringify(result, null, 2)}</pre>
+      {/* <pre>{JSON.stringify(result, null, 2)}</pre> */}
       <HeadApp />
       <Container fixed>
         <Box sx={sharedStyles.container}>

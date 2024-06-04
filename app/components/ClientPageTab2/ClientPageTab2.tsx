@@ -7,7 +7,11 @@ import { useForm, Controller } from 'react-hook-form';
 import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
 import styles from '@/app/components/ClientPageTab2/styles';
 
-const ClientPageTab2: React.FC = () => {
+interface ClientPageTab2Props {
+  clientId: string;
+}
+
+const ClientPageTab2: React.FC<ClientPageTab2Props> = ({ clientId }) => {
   const { handleSubmit, control, getValues } = useForm();
 
   // Aqui devemos criar a logica para lidar com os dados do formulário
@@ -21,7 +25,16 @@ const ClientPageTab2: React.FC = () => {
     <Box>
       <Box sx={styles.boxContent}>
         {/* Grupo 1 - Imagem e status do cliente. Col1 */}
-        <ClientProfile />
+        <ClientProfile
+          rating={0}
+          clientCondition={''}
+          setRating={function (rating: number): void {
+            throw new Error('Function not implemented.');
+          }}
+          setClientCondition={function (condition: string): void {
+            throw new Error('Function not implemented.');
+          }}
+        />
         {/* Grupo 2 - Infos sobre Pedidos.Col2 */}
         <Box sx={styles.boxCol2}>
           <FormControl onSubmit={handleSubmit(onSubmit)}>

@@ -32,7 +32,16 @@ export default async function About() {
           alignItems: 'center',
         }}
       >
-        <ClientProfile />
+        <ClientProfile
+          rating={0}
+          clientCondition={''}
+          setRating={function (rating: number): void {
+            throw new Error('Function not implemented.');
+          }}
+          setClientCondition={function (condition: string): void {
+            throw new Error('Function not implemented.');
+          }}
+        />
         <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
           Material UI - Next.js example in TypeScript
         </Typography>

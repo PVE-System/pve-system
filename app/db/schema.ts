@@ -1,7 +1,7 @@
 /* Propósito: O arquivo schema.ts é usado para definir a estrutura inicial do seu banco de dados.  Permite definir a estrutura completa do db*/
 /*Neste arquivo que criamos outras tabelas, não precisa ser outro arquivo*/
 
-import { uniqueIndex } from 'drizzle-orm/pg-core';
+import { integer, uniqueIndex } from 'drizzle-orm/pg-core';
 import { pgTable, serial, text, varchar, timestamp } from 'drizzle-orm/pg-core';
 
 // Definição da tabela users
@@ -32,7 +32,7 @@ export type NewUser = typeof usersTeam.$inferInsert;
 
 /*TABELA DE CLIENTES REGISTRADOS*/
 
-export const clients = pgTable('clients', {
+export const clients = pgTable('clients2', {
   id: serial('id').primaryKey(),
   companyName: text('companyName').notNull(),
   cnpj: text('cnpj').notNull(),
@@ -50,7 +50,6 @@ export const clients = pgTable('clients', {
   contactAtCompany: text('contactAtCompany').notNull(),
   financialContact: text('financialContact').notNull(),
   responsibleSeller: text('responsibleSeller').notNull(),
-  createdAt: timestamp('createdAt').defaultNow().notNull(),
   companySize: text('companySize').notNull(),
   hasOwnStore: text('hasOwnStore').notNull(),
   isJSMClient: text('isJSMClient').notNull(),
@@ -59,6 +58,9 @@ export const clients = pgTable('clients', {
   transportationType: text('transportationType').notNull(),
   companyLocation: text('companyLocation').notNull(),
   marketSegmentNature: text('marketSegmentNature').notNull(),
+  rating: integer('rating').notNull().default(0),
+  clientCondition: text('clientCondition').notNull().default('normal'),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
 });
 
 export type Client = typeof clients.$inferSelect;

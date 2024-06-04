@@ -25,7 +25,11 @@ interface TabPanelProps {
   value: number;
 }
 
-function ClientPageTabs(props: TabPanelProps) {
+interface BasicTabsProps {
+  clientId: string;
+}
+
+function ClientPageTabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
 
   return (
@@ -52,7 +56,7 @@ function a11yProps(index: number) {
   };
 }
 
-export default function BasicTabs() {
+export default function BasicTabs({ clientId }: BasicTabsProps) {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
   const [value, setValue] = React.useState(0);
@@ -69,7 +73,6 @@ export default function BasicTabs() {
             value={value}
             onChange={handleChange}
             aria-label="basic tabs example"
-            /* sx={styles.sizeTabs} */
           >
             <Tab
               sx={{
@@ -121,26 +124,26 @@ export default function BasicTabs() {
             />
           </Tabs>
         </Box>
-        <ClientPageTabs value={value} index={0}>
+        <ClientPageTabPanel value={value} index={0}>
           <Box sx={styles.contentTabs}>
-            <ClientPageTab1 />
+            <ClientPageTab1 clientId={clientId} />
           </Box>
-        </ClientPageTabs>
-        <ClientPageTabs value={value} index={1}>
+        </ClientPageTabPanel>
+        <ClientPageTabPanel value={value} index={1}>
           <Box sx={styles.contentTabs}>
-            <ClientPageTab2 />
+            <ClientPageTab2 clientId={clientId} />
           </Box>
-        </ClientPageTabs>
-        <ClientPageTabs value={value} index={2}>
+        </ClientPageTabPanel>
+        <ClientPageTabPanel value={value} index={2}>
           <Box sx={styles.contentTabs}>
-            <ClientPageTab3 />
+            <ClientPageTab3 clientId={clientId} />
           </Box>
-        </ClientPageTabs>
-        <ClientPageTabs value={value} index={3}>
+        </ClientPageTabPanel>
+        <ClientPageTabPanel value={value} index={3}>
           <Box sx={styles.contentTabs}>
-            <ClientPageTab4 />
+            <ClientPageTab4 clientId={clientId} />
           </Box>
-        </ClientPageTabs>
+        </ClientPageTabPanel>
       </Box>
     </Container>
   );
