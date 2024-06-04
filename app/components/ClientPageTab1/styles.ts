@@ -36,20 +36,25 @@ const styles = {
 
   exportButton: {
     marginTop: '20px',
-    background: (theme: Theme) => theme.palette.primary.main,
-    '@media (max-width: 800px)': {
-      alignSelf: 'center',
+    backgroundColor: 'mediumblue',
+    '&:hover': {
+      backgroundColor: 'darkblue',
+      '@media (max-width: 800px)': {
+        alignSelf: 'center',
+      },
     },
   },
 
-  /*   deleteButton: {
-    background: (theme: Theme) => theme.palette.primary.main,
-    backgroundColor: 'red',
+  deleteButton: {
     marginTop: '20px',
-    '@media (max-width: 800px)': {
-      alignSelf: 'center',
+    backgroundColor: 'red',
+    '&:hover': {
+      backgroundColor: 'darkred',
+      '@media (max-width: 800px)': {
+        alignSelf: 'center',
+      },
     },
-  }, */
+  },
 
   editButton: {
     marginTop: '20px',

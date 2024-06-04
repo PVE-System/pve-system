@@ -206,15 +206,25 @@ const ClientPageTab1: React.FC<ClientPageTab1Props> = ({
           {/*           {!readOnly && (
             <Button onClick={handleSubmit(onSubmit)}>Salvar</Button> // Esconde o botão Salvar quando readOnly é verdadeiro
           )} */}
+
           <Box sx={styles.boxButton}>
             <Button
               type="submit"
               variant="contained"
               onClick={handleSubmit(onSubmit)}
-              sx={styles.editButton}
+              sx={styles.deleteButton}
             >
               Deletar
             </Button>
+            <Button
+              type="submit"
+              variant="contained"
+              onClick={handleSubmit(onSubmit)}
+              sx={styles.exportButton}
+            >
+              Exportar PDF
+            </Button>
+
             <Button
               type="submit"
               variant="contained"
