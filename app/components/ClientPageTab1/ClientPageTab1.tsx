@@ -23,7 +23,7 @@ const ClientPageTab1: React.FC<ClientPageTab1Props> = ({
 
     console.log('Fetching client data for ID:', clientId);
 
-    fetch(`/api/getClient?id=${clientId}`)
+    fetch(`/api/getClient/[id]?id=${clientId}`)
       .then((response) => {
         if (!response.ok) {
           console.error('Network response was not ok');
@@ -87,7 +87,7 @@ const ClientPageTab1: React.FC<ClientPageTab1Props> = ({
       label: 'Porte da Empresa',
       name: 'companySize',
       type: 'select',
-      options: ['grande', 'medio', 'pequeno'],
+      options: ['pequeno', 'médio', 'grande'],
     },
     {
       label: 'Possui Loja Própria',
