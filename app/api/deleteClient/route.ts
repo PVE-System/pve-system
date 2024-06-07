@@ -3,11 +3,12 @@ import { clients } from '@/app/db/schema';
 import { db } from '@/app/db';
 import { eq } from 'drizzle-orm';
 
-export async function PUT(request: NextRequest) {
+export async function DELETE(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
 
   if (!id) {
+    console.error('Client ID is required');
     return NextResponse.json(
       { error: 'Client ID is required' },
       { status: 400 },
@@ -15,25 +16,26 @@ export async function PUT(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
-    const updatedClient = await db
-      .update(clients)
-      .set(body)
+    const deletedClient = await db
+      .delete(clients)
       .where(eq(clients.id, Number(id)))
-      .execute();
+      .returning();
 
-    if (!updatedClient) {
+    console.log('Deleted client data:', deletedClient); // Log the deleted client data
+
+    if (!deletedClient.length) {
+      console.error('Client not found');
       return NextResponse.json({ error: 'Client not found' }, { status: 404 });
     }
 
     return NextResponse.json(
-      { message: 'Client updated successfully' },
+      { message: 'Client deleted successfully', data: deletedClient },
       { status: 200 },
     );
   } catch (error) {
-    console.error('Error updating client data:', error);
+    console.error('Error deleting client data:', error);
     return NextResponse.json(
-      { error: 'Failed to update client data' },
+      { error: 'Failed to delete client data' },
       { status: 500 },
     );
   }
