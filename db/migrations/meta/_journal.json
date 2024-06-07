@@ -3,80 +3,10 @@
   "dialect": "postgresql",
   "entries": [
     {
-      "idx": 0,
+      "idx": 16,
       "version": "6",
-      "when": 1715902778700,
-      "tag": "0000_foamy_elektra",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1715957317681,
-      "tag": "0001_eminent_whirlwind",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1716201072615,
-      "tag": "0002_first_lightspeed",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1716900712625,
-      "tag": "0003_slimy_sentinels",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "6",
-      "when": 1717158144607,
-      "tag": "0004_gigantic_photon",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "6",
-      "when": 1717158850956,
-      "tag": "0005_empty_xorn",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "6",
-      "when": 1717158966768,
-      "tag": "0006_massive_nova",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "6",
-      "when": 1717159042838,
-      "tag": "0007_silky_patriot",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "6",
-      "when": 1717159670062,
-      "tag": "0008_warm_daimon_hellstrom",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "6",
-      "when": 1717160150973,
-      "tag": "0009_violet_ezekiel",
-      "breakpoints": true
-    },
-    {
-      "idx": 10,
-      "version": "6",
-      "when": 1717160818185,
-      "tag": "0010_gray_jetstream",
+      "when": 1717804524388,
+      "tag": "0016_init_db",
       "breakpoints": true
     }
   ]

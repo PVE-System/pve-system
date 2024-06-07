@@ -1,6 +1,6 @@
 {
-  "id": "21fc93f1-0221-42f1-8c5a-1ad2dbfb9a57",
-  "prevId": "0f04649e-6064-4229-b791-c1759be4d81f",
+  "id": "af0ed4da-ef0b-410b-98e6-708672e9e4aa",
+  "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "6",
   "dialect": "postgresql",
   "tables": {
@@ -14,8 +14,8 @@
           "primaryKey": true,
           "notNull": true
         },
-        "companyName": {
-          "name": "companyName",
+        "company_name": {
+          "name": "company_name",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -44,8 +44,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "locationNumber": {
-          "name": "locationNumber",
+        "location_number": {
+          "name": "location_number",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -68,8 +68,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "corfioCode": {
-          "name": "corfioCode",
+        "corfio_code": {
+          "name": "corfio_code",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -86,74 +86,74 @@
           "primaryKey": false,
           "notNull": true
         },
-        "socialMedia": {
-          "name": "socialMedia",
+        "social_media": {
+          "name": "social_media",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "contactAtCompany": {
-          "name": "contactAtCompany",
+        "contact_at_company": {
+          "name": "contact_at_company",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "financialContact": {
-          "name": "financialContact",
+        "financial_contact": {
+          "name": "financial_contact",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "responsibleSeller": {
-          "name": "responsibleSeller",
+        "responsible_seller": {
+          "name": "responsible_seller",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "companySize": {
-          "name": "companySize",
+        "company_size": {
+          "name": "company_size",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "hasOwnStore": {
-          "name": "hasOwnStore",
+        "has_own_store": {
+          "name": "has_own_store",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "isJSMClient": {
-          "name": "isJSMClient",
+        "is_jsm_client": {
+          "name": "is_jsm_client",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "includedByJSM": {
-          "name": "includedByJSM",
+        "included_by_jsm": {
+          "name": "included_by_jsm",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "icmsContributor": {
-          "name": "icmsContributor",
+        "icms_contributor": {
+          "name": "icms_contributor",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "transportationType": {
-          "name": "transportationType",
+        "transportation_type": {
+          "name": "transportation_type",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "companyLocation": {
-          "name": "companyLocation",
+        "company_location": {
+          "name": "company_location",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "marketSegmentNature": {
-          "name": "marketSegmentNature",
+        "market_segment_nature": {
+          "name": "market_segment_nature",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -165,15 +165,15 @@
           "notNull": true,
           "default": 0
         },
-        "clientCondition": {
-          "name": "clientCondition",
+        "client_condition": {
+          "name": "client_condition",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "default": "'normal'"
         },
-        "createdAt": {
-          "name": "createdAt",
+        "created_at": {
+          "name": "created_at",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
@@ -185,8 +185,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "public.usersTeam": {
-      "name": "usersTeam",
+    "public.users": {
+      "name": "users",
       "schema": "",
       "columns": {
         "id": {

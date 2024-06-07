@@ -6,6 +6,7 @@ import sharedStyles from '@/app/styles/sharedStyles';
 import { Box, Container, Typography } from '@mui/material';
 import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 
 const BasicTabs = dynamic(
   () => import('@/app/components/ClientPageTabs/ClientPageTabs'),
@@ -14,7 +15,7 @@ const BasicTabs = dynamic(
   },
 );
 
-export default function ClientPage() {
+export default function EditClientPage() {
   const searchParams = useSearchParams();
   const clientId = searchParams.get('id');
   console.log('Client ID:', clientId);
@@ -25,16 +26,18 @@ export default function ClientPage() {
 
   return (
     <>
-      <HeadApp />
-      <Container>
-        <Box sx={sharedStyles.container}>
-          <Typography variant="h4" component="h1" sx={sharedStyles.titlePage}>
-            <span>Editar </span>Cliente
-          </Typography>
-        </Box>
-        <EditClient clientId={clientId} />
-        {/*  <BasicTabs clientId={clientId} /> */}
-      </Container>
+      <Suspense>
+        <HeadApp />
+        <Container>
+          <Box sx={sharedStyles.container}>
+            <Typography variant="h4" component="h1" sx={sharedStyles.titlePage}>
+              <span>Editar </span>Cliente
+            </Typography>
+          </Box>
+          <EditClient clientId={clientId} />
+          {/*  <BasicTabs clientId={clientId} /> */}
+        </Container>
+      </Suspense>
     </>
   );
 }

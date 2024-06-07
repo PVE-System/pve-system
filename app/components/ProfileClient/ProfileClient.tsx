@@ -11,7 +11,7 @@ interface ClientProfileProps {
   clientCondition: string;
   setRating: (rating: number) => void;
   setClientCondition: (condition: string) => void;
-  readOnly: boolean;
+  readOnly?: boolean;
 }
 
 const ClientProfile: React.FC<ClientProfileProps> = ({

@@ -26,6 +26,7 @@ const ClientPageTab2: React.FC<ClientPageTab2Props> = ({ clientId }) => {
       <Box sx={styles.boxContent}>
         {/* Grupo 1 - Imagem e status do cliente. Col1 */}
         <ClientProfile
+          readOnly={false}
           rating={0}
           clientCondition={''}
           setRating={function (rating: number): void {
