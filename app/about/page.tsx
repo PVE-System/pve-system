@@ -41,6 +41,7 @@ export default async function About() {
           setClientCondition={function (condition: string): void {
             throw new Error('Function not implemented.');
           }}
+          readOnly={false}
         />
         <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
           Material UI - Next.js example in TypeScript
