@@ -4,9 +4,15 @@ import { Box, Container, Typography } from '@mui/material';
 import sharedStyles from '../styles/sharedStyles';
 import RegisterClient from '../components/RegisterClient/RegisterClient';
 
-const RegisterClientPage: React.FC = () => {
+import { db } from '@/app/db'; // Ajuste o caminho conforme necessário
+import { clients } from '@/app/db/schema';
+
+const RegisterClientPage: React.FC = async () => {
+  /* const result = await db.select().from(clients); */
+
   return (
     <>
+      {/* <pre>{JSON.stringify(result, null, 2)}</pre> */}
       <HeadApp />
       <Container fixed>
         <Box sx={sharedStyles.container}>

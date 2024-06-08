@@ -7,13 +7,17 @@ import FlagIcon from '@mui/icons-material/Flag';
 import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
 import styles from '@/app/components/ClientPageTab3/styles';
 
+interface ClientPageTab3Props {
+  clientId: string;
+}
+
 interface Comment {
   comment: string;
   date: string;
   favorite: boolean;
 }
 
-const ClientPageTab3: React.FC = () => {
+const ClientPageTab3: React.FC<ClientPageTab3Props> = ({ clientId }) => {
   const { handleSubmit, control, reset } = useForm();
   const [comments, setComments] = useState<Comment[]>([]);
 
@@ -51,10 +55,23 @@ const ClientPageTab3: React.FC = () => {
     );
   };
 
+  const handleRatingChange = (rating: number) => {
+    console.log('Rating:', rating);
+  };
+
+  const handleConditionChange = (condition: string) => {
+    console.log('Condition:', condition);
+  };
+
   return (
     <Box>
       <Box sx={styles.boxContent}>
-        <ClientProfile />
+        <ClientProfile
+          rating={0}
+          clientCondition={''}
+          onRatingChange={handleRatingChange}
+          onConditionChange={handleConditionChange}
+        />
         <Box sx={styles.boxCol2}>
           <FormControl onSubmit={handleSubmit(onSubmit)}>
             <TextField

@@ -3,10 +3,10 @@
   "dialect": "postgresql",
   "entries": [
     {
-      "idx": 0,
+      "idx": 16,
       "version": "6",
-      "when": 1715902778700,
-      "tag": "0000_foamy_elektra",
+      "when": 1717804524388,
+      "tag": "0016_init_db",
       "breakpoints": true
     }
   ]

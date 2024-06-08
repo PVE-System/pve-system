@@ -7,7 +7,11 @@ import styles from '@/app/components/ClientPageTab4/styles';
 import { orange } from '@mui/material/colors';
 import sharedStyles from '@/app/styles/sharedStyles';
 
-const ClientPageTab4: React.FC = () => {
+interface ClientPageTab4Props {
+  clientId: string;
+}
+
+const ClientPageTab4: React.FC<ClientPageTab4Props> = ({ clientId }) => {
   const handleAttachFiles = () => {
     // Lógica para anexar arquivos
     console.log('Anexar arquivos');
@@ -18,11 +22,24 @@ const ClientPageTab4: React.FC = () => {
     console.log('Baixar arquivos');
   };
 
+  const handleRatingChange = (rating: number) => {
+    console.log('Rating:', rating);
+  };
+
+  const handleConditionChange = (condition: string) => {
+    console.log('Condition:', condition);
+  };
+
   return (
     <Box>
       <Box sx={styles.boxContent}>
         {/* Grupo 1 - Imagem e status do cliente. Col1 */}
-        <ClientProfile />
+        <ClientProfile
+          rating={0}
+          clientCondition={''}
+          onRatingChange={handleRatingChange}
+          onConditionChange={handleConditionChange}
+        />
         {/* Grupo 2 - Anexar e baixar arquivos. Col2 */}
         <Box sx={styles.boxCol2}>
           <Box sx={styles.boxIcon}>

@@ -1,2 +1,8 @@
 export { db } from './db';
-export { users, User, NewUser } from './schema';
+export { users, clients } from './schema'; /*Tabelas*/
+export type {
+  User,
+  NewUser,
+  Client,
+  NewClient,
+} from './schema'; /*Tipos inferidos para ser importados*/

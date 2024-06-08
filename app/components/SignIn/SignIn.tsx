@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useState } from 'react';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
@@ -11,9 +12,9 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-/* import { createTheme, ThemeProvider } from '@mui/material/styles'; */
 import Image from 'next/image';
-import NextLink from 'next/link';
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
 import sharedStyles from '@/app/styles/sharedStyles';
 import styles from './styles';
 
@@ -36,13 +37,35 @@ function Copyright(props: any) {
 }
 
 export default function SignIn() {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const [message, setMessage] = useState<string | null>(null);
+  const router = useRouter();
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    const formData = new FormData(event.currentTarget);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+
+    try {
+      const response = await fetch('/api/loginAuth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (response.ok) {
+        const { token } = await response.json();
+        Cookies.set('token', token, { path: '/' });
+        router.push('/dashboard');
+      } else {
+        const error = await response.json();
+        setMessage(`${error.error}`);
+      }
+    } catch (error) {
+      setMessage('Erro ao conectar com o servidor');
+    }
   };
 
   return (
@@ -60,6 +83,12 @@ export default function SignIn() {
         <Typography variant="subtitle1" sx={sharedStyles.titleForm}>
           PVE Representações Ltda.
         </Typography>
+
+        {message && (
+          <Typography variant="body2" color="error">
+            {message}
+          </Typography>
+        )}
 
         <Box
           component="form"
@@ -97,8 +126,6 @@ export default function SignIn() {
             type="submit"
             fullWidth
             variant="contained"
-            component={NextLink}
-            href="/dashboard"
             sx={styles.button}
           >
             Entrar
@@ -110,11 +137,15 @@ export default function SignIn() {
               </Link>
             </Grid>
             <Grid item>
-              <Link href="#" variant="body2">
-                {'Não tem uma conta?'}
-                <br />
-                {'Inscrever-se'}
-              </Link>
+              {/* 
+              <NextLink href="/register" passHref>
+                <Link variant="body2">
+                  {'Não tem uma conta?'}
+                  <br />
+                  {'Inscrever-se'}
+                </Link>
+              </NextLink> 
+              */}
             </Grid>
           </Grid>
         </Box>

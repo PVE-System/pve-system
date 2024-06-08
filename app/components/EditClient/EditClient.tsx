@@ -1,23 +1,19 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import { Box, Button, MenuItem, TextField, Typography } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
-
+import { useRouter, useSearchParams } from 'next/navigation'; // Usar o roteador de navegação do cliente
 import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
 import styles from '@/app/components/ClientPageTab1/styles';
 
-interface ClientPageTab1Props {
-  clientId: string;
-  readOnly?: boolean;
-}
+interface ClientEditPageProps {}
 
-function onSubmitEdit(clientId: string) {
-  window.location.href = `/clientPage/editClient?id=${clientId}`;
-}
+const ClientEditPage: React.FC<ClientEditPageProps> = () => {
+  const searchParams = useSearchParams();
+  const clientId = searchParams.get('id');
 
-const ClientPageTab1: React.FC<ClientPageTab1Props> = ({
-  clientId,
-  readOnly = false,
-}) => {
+  const router = useRouter();
   const { handleSubmit, control, getValues, setValue } = useForm();
   const [clientData, setClientData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -51,14 +47,55 @@ const ClientPageTab1: React.FC<ClientPageTab1Props> = ({
       });
   }, [clientId, setValue]);
 
-  const onSubmit = (data: any) => {
-    console.log('Form data submitted:', data);
-    const formData = getValues();
-    console.log('Current form data:', formData);
+  const onSubmit = async (data: any) => {
+    console.log('Submitting data:', data); // Log the data before submission
+    try {
+      const response = await fetch(`/api/updateClient?id=${clientId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const errorResponse = await response.json();
+        throw new Error(errorResponse.error || 'Failed to update client data');
+      }
+
+      const result = await response.json();
+      console.log('Client data updated successfully:', result);
+      router.push(`/clientPage?id=${clientId}`);
+    } catch (error) {
+      console.error('Error updating client data:', error);
+    }
+  };
+
+  const onDelete = async () => {
+    try {
+      const response = await fetch(`/api/deleteClient?id=${clientId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const errorResponse = await response.json();
+        throw new Error(errorResponse.error || 'Failed to delete client');
+      }
+
+      const result = await response.json();
+      console.log('Client deleted successfully:', result);
+      router.push(`/dashboard`); // Redirecionar para a página de lista de clientes após a exclusão
+    } catch (error) {
+      console.error('Error deleting client:', error);
+    }
   };
 
   if (loading) {
     return <p>Loading...</p>;
+  }
+
+  if (!clientId) {
+    return <div>Client ID not provided</div>;
   }
 
   if (!clientData) {
@@ -159,89 +196,71 @@ const ClientPageTab1: React.FC<ClientPageTab1Props> = ({
           onConditionChange={(condition) =>
             setValue('clientCondition', condition)
           }
-          readOnly={readOnly} // Passando a propriedade readOnly
+          readOnly={false} // Permitir edição
         />
         {/* Grupo 2 - formulário de cadastro */}
         <Box sx={styles.boxCol2}>
-          {formFields.map(({ label, name, type, options }) => (
-            <Box key={name}>
-              <Typography variant="subtitle1">{label}</Typography>
-              <Controller
-                name={name}
-                control={control}
-                defaultValue={clientData[name] || ''} // Certifique-se de que o valor padrão seja uma string vazia
-                render={({ field }) => {
-                  if (type === 'select' && options) {
+          <form onSubmit={handleSubmit(onSubmit)}>
+            {formFields.map(({ label, name, type, options }) => (
+              <Box key={name}>
+                <Typography variant="subtitle1">{label}</Typography>
+                <Controller
+                  name={name}
+                  control={control}
+                  defaultValue={clientData[name] || ''} // Certifique-se de que o valor padrão seja uma string vazia
+                  render={({ field }) => {
+                    if (type === 'select' && options) {
+                      return (
+                        <TextField
+                          {...field}
+                          select
+                          variant="filled"
+                          sx={styles.inputsCol2}
+                          value={field.value || ''} // Defina o valor atual ou uma string vazia
+                          InputProps={{
+                            readOnly: false, // Permitir edição
+                          }}
+                        >
+                          {options.map((option) => (
+                            <MenuItem key={option} value={option}>
+                              {option.charAt(0).toUpperCase() + option.slice(1)}
+                            </MenuItem>
+                          ))}
+                        </TextField>
+                      );
+                    }
                     return (
                       <TextField
                         {...field}
-                        select
                         variant="filled"
                         sx={styles.inputsCol2}
-                        value={field.value || ''} // Defina o valor atual ou uma string vazia
                         InputProps={{
-                          readOnly: readOnly, // Desativa o campo quando readOnly é verdadeiro
+                          readOnly: false, // Permitir edição
                         }}
-                        disabled={readOnly} // Desativa o campo quando readOnly é verdadeiro
-                      >
-                        {options.map((option) => (
-                          <MenuItem key={option} value={option}>
-                            {option.charAt(0).toUpperCase() + option.slice(1)}
-                          </MenuItem>
-                        ))}
-                      </TextField>
+                      />
                     );
-                  }
-                  return (
-                    <TextField
-                      {...field}
-                      variant="filled"
-                      sx={styles.inputsCol2}
-                      InputProps={{
-                        readOnly: readOnly, // Desativa o campo quando readOnly é verdadeiro
-                      }}
-                      disabled={readOnly} // Desativa o campo quando readOnly é verdadeiro
-                    />
-                  );
-                }}
-              />
+                  }}
+                />
+              </Box>
+            ))}
+            <Box sx={styles.boxButton}>
+              <Button
+                type="button"
+                variant="contained"
+                sx={styles.deleteButton}
+                onClick={onDelete}
+              >
+                Deletar
+              </Button>
+              <Button type="submit" variant="contained" sx={styles.editButton}>
+                Salvar
+              </Button>
             </Box>
-          ))}
-          {/*           {!readOnly && (
-            <Button onClick={handleSubmit(onSubmit)}>Salvar</Button> // Esconde o botão Salvar quando readOnly é verdadeiro
-          )} */}
-
-          <Box sx={styles.boxButton}>
-            {/*             <Button
-              type="submit"
-              variant="contained"
-              onClick={handleSubmit(onSubmit)}
-              sx={styles.deleteButton}
-            >
-              Deletar
-            </Button> */}
-            <Button
-              type="submit"
-              variant="contained"
-              onClick={handleSubmit(onSubmit)}
-              sx={styles.exportButton}
-            >
-              Exportar PDF
-            </Button>
-
-            <Button
-              type="button"
-              variant="contained"
-              onClick={() => onSubmitEdit(clientId)}
-              sx={styles.editButton}
-            >
-              Editar
-            </Button>
-          </Box>
+          </form>
         </Box>
       </Box>
     </Box>
   );
 };
 
-export default ClientPageTab1;
+export default ClientEditPage;

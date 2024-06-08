@@ -1,18 +1,27 @@
 'use client';
 
-import React from 'react';
-import { useState } from 'react';
-
+import React, { useEffect, useState } from 'react';
 import { Box, Button, Rating, Typography } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
-
 import Image from 'next/image';
 import styles from '@/app/components/ProfileClient/styles';
 
-/* Grupo 1 - Imagem e status */
+interface ClientProfileProps {
+  rating: number;
+  clientCondition: string;
+  onRatingChange: (rating: number) => void;
+  onConditionChange: (condition: string) => void;
+  readOnly?: boolean;
+}
 
-const ClientProfile: React.FC = () => {
-  const { handleSubmit, control, getValues } = useForm();
+const ClientProfile: React.FC<ClientProfileProps> = ({
+  rating,
+  clientCondition,
+  onRatingChange,
+  onConditionChange,
+  readOnly,
+}) => {
+  const { control } = useForm();
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,6 +44,7 @@ const ClientProfile: React.FC = () => {
           accept="image/*"
           style={{ display: 'none' }}
           onChange={handleImageChange}
+          disabled={readOnly}
         />
         <Image
           src={previewImage || '/profile-placeholder.png'}
@@ -54,70 +64,83 @@ const ClientProfile: React.FC = () => {
               sx={styles.rating}
               {...field}
               name="rating"
-              defaultValue={0}
+              value={rating}
               max={3}
               onChange={(event, value) => {
-                field.onChange(value);
+                if (!readOnly) {
+                  field.onChange(value);
+                  onRatingChange(value || 0);
+                }
               }}
+              readOnly={readOnly}
             />
           )}
         />
       </Box>
       <Box sx={styles.clientCondition}>
         <Typography variant="subtitle1">Condição do Cliente</Typography>
-        <Controller
-          name="clienteEspecial"
-          control={control}
-          render={({ field }) => (
-            <Box sx={styles.clientConditionButtonBox}>
-              <Button
-                variant="outlined"
-                color="success"
-                sx={{
-                  ...styles.clientConditionButton,
-                  ...(field.value === 'normal' && {
-                    backgroundColor: 'green',
-                    border: 'none',
-                    color: 'white',
-                  }),
-                }}
-                onClick={() => field.onChange('normal')}
-              >
-                Normal
-              </Button>
-              <Button
-                variant="outlined"
-                color="warning"
-                sx={{
-                  ...styles.clientConditionButton,
-                  ...(field.value === 'especial' && {
-                    backgroundColor: '#FFD700',
-                    border: 'none',
-                    color: 'black',
-                  }),
-                }}
-                onClick={() => field.onChange('especial')}
-              >
-                Especial
-              </Button>
-              <Button
-                variant="outlined"
-                color="error"
-                sx={{
-                  ...styles.clientConditionButton,
-                  ...(field.value === 'suspenso' && {
-                    backgroundColor: 'red',
-                    border: 'none',
-                    color: 'white',
-                  }),
-                }}
-                onClick={() => field.onChange('suspenso')}
-              >
-                Suspenso
-              </Button>
-            </Box>
-          )}
-        />
+        <Box sx={styles.clientConditionButtonBox}>
+          <Button
+            variant="outlined"
+            color="success"
+            sx={{
+              ...styles.clientConditionButton,
+              ...(clientCondition === 'normal' && {
+                backgroundColor: 'green',
+                border: 'none',
+                color: 'white',
+              }),
+            }}
+            disabled={readOnly}
+            onClick={() => {
+              if (!readOnly) {
+                onConditionChange('normal');
+              }
+            }}
+          >
+            Normal
+          </Button>
+          <Button
+            variant="outlined"
+            color="warning"
+            sx={{
+              ...styles.clientConditionButton,
+              ...(clientCondition === 'especial' && {
+                backgroundColor: '#FFD700',
+                border: 'none',
+                color: 'black',
+              }),
+            }}
+            disabled={readOnly}
+            onClick={() => {
+              if (!readOnly) {
+                onConditionChange('especial');
+              }
+            }}
+          >
+            Especial
+          </Button>
+          <Button
+            variant="outlined"
+            color="error"
+            sx={{
+              ...styles.clientConditionButton,
+              ...(clientCondition === 'suspenso' && {
+                backgroundColor: 'red',
+                border: 'none',
+                color: 'white',
+              }),
+            }}
+            disabled={readOnly}
+            onClick={() => {
+              if (!readOnly) {
+                onConditionChange('suspenso');
+              }
+            }}
+          >
+            Suspenso
+          </Button>
+        </Box>
       </Box>
     </Box>
   );

@@ -38,7 +38,7 @@ npm run db:down
 Generate the database migration based on the schema changes:
 
 ```bash
-npm run db:generate
+npm run db:generate -- --name <migration-name>
 ```
 
 Run the migrations with:
