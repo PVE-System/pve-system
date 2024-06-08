@@ -169,6 +169,7 @@ const RegisterClient: React.FC = () => {
         setMessage(`Erro: ${error.error}`);
       }
     } catch (error) {
+      console.log(error);
       setMessage('Erro ao conectar com o servidor');
     } finally {
       setLoading(false);

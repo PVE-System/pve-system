@@ -8,7 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 //METODO GET:
 
 export async function GET(request: NextRequest) {
-  return NextResponse.json({ usersTeam: await db.select().from(clients) });
+  return NextResponse.json({ users: await db.select().from(clients) });
 }
 
 //METODO POST:

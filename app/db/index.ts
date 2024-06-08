@@ -1,5 +1,5 @@
 export { db } from './db';
-export { users, usersTeam, clients } from './schema'; /*Tabelas*/
+export { users, clients } from './schema'; /*Tabelas*/
 export type {
   User,
   NewUser,

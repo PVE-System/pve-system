@@ -70,7 +70,7 @@ function RegisterTeamComponent() {
 
     // Enviar requisição POST para a API
     try {
-      const response = await fetch('/api/usersTeam', {
+      const response = await fetch('/api/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

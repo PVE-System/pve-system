@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from 'next/server';
-import { db, usersTeam } from '@/app/db';
+import { db, users } from '@/app/db';
 import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -11,8 +11,8 @@ export async function POST(request: NextRequest) {
 
   const user = await db
     .select()
-    .from(usersTeam)
-    .where(eq(usersTeam.email, email))
+    .from(users)
+    .where(eq(users.email, email))
     .limit(1);
 
   if (user.length === 0) {

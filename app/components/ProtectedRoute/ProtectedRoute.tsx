@@ -18,17 +18,17 @@ const ProtectedRoute = ({
   const router = useRouter();
   const pathname = usePathname();
 
-  useEffect(() => {
-    const token = Cookies.get('token');
-    console.log('ProtectedRoute useEffect Token:', token);
-    console.log('ProtectedRoute Pathname:', pathname);
+  // useEffect(() => {
+  //   const token = Cookies.get('token');
+  //   console.log('ProtectedRoute useEffect Token:', token);
+  //   console.log('ProtectedRoute Pathname:', pathname);
 
-    if (!token && !unprotectedRoutes.includes(pathname)) {
-      router.push(route);
-    } else if (token && pathname === '/') {
-      router.push('/dashboard');
-    }
-  }, [pathname, route, router, unprotectedRoutes]);
+  //   if (!token && !unprotectedRoutes.includes(pathname)) {
+  //     router.push(route);
+  //   } else if (token && pathname === '/') {
+  //     router.push('/dashboard');
+  //   }
+  // }, [pathname, route, router, unprotectedRoutes]);
 
   return <>{children}</>;
 };
