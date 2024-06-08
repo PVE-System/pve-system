@@ -55,18 +55,22 @@ const ClientPageTab3: React.FC<ClientPageTab3Props> = ({ clientId }) => {
     );
   };
 
+  const handleRatingChange = (rating: number) => {
+    console.log('Rating:', rating);
+  };
+
+  const handleConditionChange = (condition: string) => {
+    console.log('Condition:', condition);
+  };
+
   return (
     <Box>
       <Box sx={styles.boxContent}>
         <ClientProfile
           rating={0}
           clientCondition={''}
-          setRating={function (rating: number): void {
-            throw new Error('Function not implemented.');
-          }}
-          setClientCondition={function (condition: string): void {
-            throw new Error('Function not implemented.');
-          }}
+          onRatingChange={handleRatingChange}
+          onConditionChange={handleConditionChange}
         />
         <Box sx={styles.boxCol2}>
           <FormControl onSubmit={handleSubmit(onSubmit)}>

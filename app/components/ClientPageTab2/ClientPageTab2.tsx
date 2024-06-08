@@ -21,6 +21,14 @@ const ClientPageTab2: React.FC<ClientPageTab2Props> = ({ clientId }) => {
     console.log(formData);
   };
 
+  const handleRatingChange = (rating: number) => {
+    console.log('Rating:', rating);
+  };
+
+  const handleConditionChange = (condition: string) => {
+    console.log('Condition:', condition);
+  };
+
   return (
     <Box>
       <Box sx={styles.boxContent}>
@@ -29,12 +37,8 @@ const ClientPageTab2: React.FC<ClientPageTab2Props> = ({ clientId }) => {
           readOnly={false}
           rating={0}
           clientCondition={''}
-          setRating={function (rating: number): void {
-            throw new Error('Function not implemented.');
-          }}
-          setClientCondition={function (condition: string): void {
-            throw new Error('Function not implemented.');
-          }}
+          onRatingChange={handleRatingChange}
+          onConditionChange={handleConditionChange}
         />
         {/* Grupo 2 - Infos sobre Pedidos.Col2 */}
         <Box sx={styles.boxCol2}>

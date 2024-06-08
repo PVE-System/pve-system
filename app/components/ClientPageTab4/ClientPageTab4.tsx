@@ -22,6 +22,14 @@ const ClientPageTab4: React.FC<ClientPageTab4Props> = ({ clientId }) => {
     console.log('Baixar arquivos');
   };
 
+  const handleRatingChange = (rating: number) => {
+    console.log('Rating:', rating);
+  };
+
+  const handleConditionChange = (condition: string) => {
+    console.log('Condition:', condition);
+  };
+
   return (
     <Box>
       <Box sx={styles.boxContent}>
@@ -29,12 +37,8 @@ const ClientPageTab4: React.FC<ClientPageTab4Props> = ({ clientId }) => {
         <ClientProfile
           rating={0}
           clientCondition={''}
-          setRating={function (rating: number): void {
-            throw new Error('Function not implemented.');
-          }}
-          setClientCondition={function (condition: string): void {
-            throw new Error('Function not implemented.');
-          }}
+          onRatingChange={handleRatingChange}
+          onConditionChange={handleConditionChange}
         />
         {/* Grupo 2 - Anexar e baixar arquivos. Col2 */}
         <Box sx={styles.boxCol2}>

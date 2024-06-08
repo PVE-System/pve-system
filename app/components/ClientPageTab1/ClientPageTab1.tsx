@@ -155,8 +155,8 @@ const ClientPageTab1: React.FC<ClientPageTab1Props> = ({
         <ClientProfile
           rating={clientData.rating}
           clientCondition={clientData.clientCondition}
-          setRating={(rating) => setValue('rating', rating)}
-          setClientCondition={(condition) =>
+          onRatingChange={(rating) => setValue('rating', rating)}
+          onConditionChange={(condition) =>
             setValue('clientCondition', condition)
           }
           readOnly={readOnly} // Passando a propriedade readOnly

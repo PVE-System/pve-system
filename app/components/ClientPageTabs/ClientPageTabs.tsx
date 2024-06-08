@@ -18,6 +18,7 @@ import ClientPageTab1 from '@/app/components/ClientPageTab1/ClientPageTab1';
 import ClientPageTab2 from '@/app/components/ClientPageTab2/ClientPageTab2';
 import ClientPageTab3 from '@/app/components/ClientPageTab3/ClientPageTab3';
 import ClientPageTab4 from '@/app/components/ClientPageTab4/ClientPageTab4';
+import { useSearchParams } from 'next/navigation';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -25,9 +26,7 @@ interface TabPanelProps {
   value: number;
 }
 
-interface BasicTabsProps {
-  clientId: string;
-}
+interface BasicTabsProps {}
 
 function ClientPageTabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
@@ -56,7 +55,10 @@ function a11yProps(index: number) {
   };
 }
 
-export default function BasicTabs({ clientId }: BasicTabsProps) {
+export default function BasicTabs({}: BasicTabsProps) {
+  const searchParams = useSearchParams();
+  const clientId = searchParams.get('id');
+
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
   const [value, setValue] = React.useState(0);
@@ -64,6 +66,10 @@ export default function BasicTabs({ clientId }: BasicTabsProps) {
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
+
+  if (!clientId) {
+    return <div>Client ID not provided</div>;
+  }
 
   return (
     <Container maxWidth="lg" sx={styles.containerTabs}>

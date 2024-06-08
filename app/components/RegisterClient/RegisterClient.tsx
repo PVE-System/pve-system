@@ -184,8 +184,8 @@ const RegisterClient: React.FC = () => {
           <ClientProfile
             rating={formData.rating}
             clientCondition={formData.clientCondition}
-            setRating={setRating}
-            setClientCondition={setClientCondition}
+            onRatingChange={setRating}
+            onConditionChange={setClientCondition}
             readOnly={false}
           />
           <Box sx={styles.boxCol2}>

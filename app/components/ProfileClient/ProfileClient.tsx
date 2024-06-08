@@ -9,16 +9,16 @@ import styles from '@/app/components/ProfileClient/styles';
 interface ClientProfileProps {
   rating: number;
   clientCondition: string;
-  setRating: (rating: number) => void;
-  setClientCondition: (condition: string) => void;
+  onRatingChange: (rating: number) => void;
+  onConditionChange: (condition: string) => void;
   readOnly?: boolean;
 }
 
 const ClientProfile: React.FC<ClientProfileProps> = ({
   rating,
   clientCondition,
-  setRating,
-  setClientCondition,
+  onRatingChange,
+  onConditionChange,
   readOnly,
 }) => {
   const { control } = useForm();
@@ -69,7 +69,7 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
               onChange={(event, value) => {
                 if (!readOnly) {
                   field.onChange(value);
-                  setRating(value || 0);
+                  onRatingChange(value || 0);
                 }
               }}
               readOnly={readOnly}
@@ -94,7 +94,7 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
             disabled={readOnly}
             onClick={() => {
               if (!readOnly) {
-                setClientCondition('normal');
+                onConditionChange('normal');
               }
             }}
           >
@@ -114,7 +114,7 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
             disabled={readOnly}
             onClick={() => {
               if (!readOnly) {
-                setClientCondition('especial');
+                onConditionChange('especial');
               }
             }}
           >
@@ -134,7 +134,7 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
             disabled={readOnly}
             onClick={() => {
               if (!readOnly) {
-                setClientCondition('suspenso');
+                onConditionChange('suspenso');
               }
             }}
           >

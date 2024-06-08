@@ -5,7 +5,7 @@ import HeadApp from '@/app/components/HeadApp/HeadApp';
 import sharedStyles from '@/app/styles/sharedStyles';
 import { Box, Container, Typography } from '@mui/material';
 import dynamic from 'next/dynamic';
-import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 
 const BasicTabs = dynamic(
   () => import('@/app/components/ClientPageTabs/ClientPageTabs'),
@@ -15,14 +15,6 @@ const BasicTabs = dynamic(
 );
 
 export default function EditClientPage() {
-  const searchParams = useSearchParams();
-  const clientId = searchParams.get('id');
-  console.log('Client ID:', clientId);
-
-  if (!clientId) {
-    return <div>Client ID not provided</div>;
-  }
-
   return (
     <>
       <HeadApp />
@@ -32,7 +24,9 @@ export default function EditClientPage() {
             <span>Editar </span>Cliente
           </Typography>
         </Box>
-        <EditClient clientId={clientId} />
+        <Suspense>
+          <EditClient />
+        </Suspense>
         {/*  <BasicTabs clientId={clientId} /> */}
       </Container>
     </>

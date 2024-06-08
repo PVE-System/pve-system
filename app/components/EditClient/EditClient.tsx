@@ -3,15 +3,16 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Button, MenuItem, TextField, Typography } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
-import { useRouter } from 'next/navigation'; // Usar o roteador de navegação do cliente
+import { useRouter, useSearchParams } from 'next/navigation'; // Usar o roteador de navegação do cliente
 import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
 import styles from '@/app/components/ClientPageTab1/styles';
 
-interface ClientEditPageProps {
-  clientId: string;
-}
+interface ClientEditPageProps {}
 
-const ClientEditPage: React.FC<ClientEditPageProps> = ({ clientId }) => {
+const ClientEditPage: React.FC<ClientEditPageProps> = () => {
+  const searchParams = useSearchParams();
+  const clientId = searchParams.get('id');
+
   const router = useRouter();
   const { handleSubmit, control, getValues, setValue } = useForm();
   const [clientData, setClientData] = useState<any>(null);
@@ -91,6 +92,10 @@ const ClientEditPage: React.FC<ClientEditPageProps> = ({ clientId }) => {
 
   if (loading) {
     return <p>Loading...</p>;
+  }
+
+  if (!clientId) {
+    return <div>Client ID not provided</div>;
   }
 
   if (!clientData) {
@@ -187,8 +192,8 @@ const ClientEditPage: React.FC<ClientEditPageProps> = ({ clientId }) => {
         <ClientProfile
           rating={clientData.rating}
           clientCondition={clientData.clientCondition}
-          setRating={(rating) => setValue('rating', rating)}
-          setClientCondition={(condition) =>
+          onRatingChange={(rating) => setValue('rating', rating)}
+          onConditionChange={(condition) =>
             setValue('clientCondition', condition)
           }
           readOnly={false} // Permitir edição
