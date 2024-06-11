@@ -3,10 +3,10 @@
   "dialect": "postgresql",
   "entries": [
     {
-      "idx": 16,
+      "idx": 0,
       "version": "6",
-      "when": 1717804524388,
-      "tag": "0016_init_db",
+      "when": 1718106135418,
+      "tag": "0000_init_db_vercel",
       "breakpoints": true
     }
   ]
