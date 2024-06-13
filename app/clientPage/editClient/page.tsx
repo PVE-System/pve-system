@@ -7,12 +7,12 @@ import { Box, Container, Typography } from '@mui/material';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 
-const BasicTabs = dynamic(
+/* const BasicTabs = dynamic(
   () => import('@/app/components/ClientPageTabs/ClientPageTabs'),
   {
     ssr: false,
   },
-);
+); */
 
 export default function EditClientPage() {
   return (

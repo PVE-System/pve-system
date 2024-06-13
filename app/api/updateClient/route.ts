@@ -15,32 +15,31 @@ export async function PUT(request: NextRequest) {
     );
   }
 
+  const idNumber = Number(id);
+  if (isNaN(idNumber)) {
+    console.error('Invalid Client ID');
+    return NextResponse.json({ error: 'Invalid Client ID' }, { status: 400 });
+  }
+
   try {
     const body = await request.json();
-    console.log('Request body:', body); // Log the request body
+    console.log('Request body:', body);
 
-    // Foi necessario remover o campo `createdAt` do objeto de atualização para funcionar update(desestruturação" de objetos JS, combinada com o operador de espalhamento)
-    const { createdAt, ...updateBody } = body;
+    const { rating, clientCondition, ...otherData } = body;
 
-    const updatedClient = await db
+    await db
       .update(clients)
-      .set(updateBody)
-      .where(eq(clients.id, Number(id)))
-      .returning();
+      .set({
+        ...otherData,
+        rating: rating !== undefined ? rating : undefined,
+        clientCondition:
+          clientCondition !== undefined ? clientCondition : undefined,
+      })
+      .where(eq(clients.id, idNumber));
 
-    console.log('Updated client data:', updatedClient); // Log the updated client data
-
-    if (!updatedClient.length) {
-      console.error('Client not found');
-      return NextResponse.json({ error: 'Client not found' }, { status: 404 });
-    }
-
-    return NextResponse.json(
-      { message: 'Client updated successfully', data: updatedClient },
-      { status: 200 },
-    );
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error updating client data:', error);
+    console.error('Error updating client:', error);
     return NextResponse.json(
       { error: 'Failed to update client data' },
       { status: 500 },
