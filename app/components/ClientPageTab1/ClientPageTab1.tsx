@@ -1,33 +1,33 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Button, MenuItem, TextField, Typography } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
-
 import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
 import styles from '@/app/components/ClientPageTab1/styles';
+import { jsPDF } from 'jspdf';
 
 interface ClientPageTab1Props {
   clientId: string;
-  readOnly?: boolean;
+  readOnly?: boolean; // Propriedade opcional para definir se o formulário é apenas leitura
 }
 
 function onSubmitEdit(clientId: string) {
-  window.location.href = `/clientPage/editClient?id=${clientId}`;
+  window.location.href = `/clientPage/editClient?id=${clientId}`; // Redireciona para a página de edição do cliente
 }
 
 const ClientPageTab1: React.FC<ClientPageTab1Props> = ({
   clientId,
   readOnly = false,
 }) => {
-  const { handleSubmit, control, getValues, setValue } = useForm();
-  const [clientData, setClientData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const { handleSubmit, control, getValues, setValue } = useForm(); // Hooks do react-hook-form para gerenciar o formulário
+  const [clientData, setClientData] = useState<any>(null); // Estado para armazenar os dados do cliente
+  const [loading, setLoading] = useState(true); // Estado para controlar o carregamento
 
   useEffect(() => {
     if (!clientId) return;
 
     console.log('Fetching client data for ID:', clientId);
 
-    fetch(`/api/getClient/[id]?id=${clientId}`)
+    fetch(`/api/getClient/[id]?id=${clientId}`) // Busca os dados do cliente da API
       .then((response) => {
         if (!response.ok) {
           console.error('Network response was not ok');
@@ -37,28 +37,88 @@ const ClientPageTab1: React.FC<ClientPageTab1Props> = ({
       })
       .then((data) => {
         console.log('Client data received:', data);
-        setClientData(data);
+        setClientData(data); // Armazena os dados do cliente no estado
         setLoading(false);
 
-        // Preencher os valores do formulário com os dados do cliente
+        // Preenche os valores do formulário com os dados do cliente
         Object.keys(data).forEach((key) => {
           setValue(key, data[key]);
         });
       })
       .catch((error) => {
         console.error('Error fetching client data:', error);
-        setLoading(false);
+        setLoading(false); // Define loading como falso em caso de erro
       });
   }, [clientId, setValue]);
 
   const onSubmit = (data: any) => {
     console.log('Form data submitted:', data);
-    const formData = getValues();
+    const formData = getValues(); // Obtém os valores atuais do formulário
     console.log('Current form data:', formData);
   };
 
+  // Mapeamento dos nomes dos campos do banco de dados para nomes mais amigáveis
+  const fieldLabels: { [key: string]: string } = {
+    companyName: 'Nome da empresa',
+    cnpj: 'CNPJ',
+    cpf: 'CPF',
+    cep: 'CEP',
+    address: 'Endereço',
+    locationNumber: 'Número do local',
+    district: 'Bairro',
+    city: 'Cidade',
+    state: 'Estado',
+    corfioCode: 'Código Corfio',
+    phone: 'Fone',
+    email: 'E-mail',
+    socialMedia: 'Redes Sociais',
+    contactAtCompany: 'Contato na Empresa',
+    financialContact: 'Contato Financeiro',
+    responsibleSeller: 'Vendedor Responsável',
+    companySize: 'Porte da Empresa',
+    hasOwnStore: 'Possui Loja Própria',
+    isJSMClient: 'Cliente JSM',
+    includedByJSM: 'Incluído pelo JSM',
+    icmsContributor: 'Contribuinte ICMS',
+    transportationType: 'Transporte entra',
+    companyLocation: 'Localização da empresa',
+    marketSegmentNature: 'Segmento de Mercado e Natureza Jurídica',
+    rating: 'Status de Atividade',
+    clientCondition: 'Condição do Cliente',
+  };
+
+  //Start Export
+
+  const exportPDF = () => {
+    const doc = new jsPDF(); // Cria uma nova instância do jsPDF
+
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Detalhes sobre o cadastro do cliente:', 10, 10);
+    doc.setFont('helvetica', 'normal'); // Volta para o estilo de fonte normal
+
+    let yPosition = 20;
+
+    // Adiciona os detalhes do cliente ao PDF
+    Object.keys(clientData).forEach((key) => {
+      if (key === 'id' || key === 'createdAt') {
+        return; // Ignora os campos 'id' e 'createdAt'
+      }
+
+      const label = fieldLabels[key] || key;
+      const value = clientData[key];
+
+      doc.text(`${label}: ${value}`, 10, yPosition);
+      yPosition += 10;
+    });
+
+    doc.save(`Cadastro cliente_${clientId}.pdf`); // Salva o PDF
+  };
+
+  //End Export
+
   if (loading) {
-    return <p>Loading...</p>;
+    return <p>Loading...</p>; // Exibe uma mensagem de carregamento
   }
 
   if (!clientData) {
@@ -67,13 +127,14 @@ const ClientPageTab1: React.FC<ClientPageTab1Props> = ({
         Client not found. Please check if the client ID is correct and the API
         is returning the expected data.
       </p>
-    );
+    ); // Exibe uma mensagem de erro se os dados do cliente não forem encontrados
   }
 
-  // Definição dos campos do formulário
+  // Definição dos campos do formulário vinculando com o nome das propriedade da tabela no db
   const formFields = [
     { label: 'Nome da empresa', name: 'companyName' },
     { label: 'CNPJ/CPF', name: 'cnpj' },
+    { label: 'CPF', name: 'cpf' },
     { label: 'CEP', name: 'cep' },
     { label: 'Endereço', name: 'address' },
     { label: 'Número do local', name: 'locationNumber' },
@@ -207,28 +268,15 @@ const ClientPageTab1: React.FC<ClientPageTab1Props> = ({
               />
             </Box>
           ))}
-          {/*           {!readOnly && (
-            <Button onClick={handleSubmit(onSubmit)}>Salvar</Button> // Esconde o botão Salvar quando readOnly é verdadeiro
-          )} */}
-
           <Box sx={styles.boxButton}>
-            {/*             <Button
-              type="submit"
-              variant="contained"
-              onClick={handleSubmit(onSubmit)}
-              sx={styles.deleteButton}
-            >
-              Deletar
-            </Button> */}
             <Button
-              type="submit"
+              type="button"
               variant="contained"
-              onClick={handleSubmit(onSubmit)}
+              onClick={exportPDF}
               sx={styles.exportButton}
             >
               Exportar PDF
             </Button>
-
             <Button
               type="button"
               variant="contained"
