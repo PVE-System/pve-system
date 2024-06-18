@@ -1,5 +1,5 @@
 {
-  "id": "0498fa65-d248-446d-ba19-231bbee9da91",
+  "id": "ef8d5049-f665-4987-9c26-63982ff3ed3d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "6",
   "dialect": "postgresql",
@@ -182,6 +182,85 @@
       },
       "indexes": {},
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.sales_information": {
+      "name": "sales_information",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "client_id": {
+          "name": "client_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "commercial": {
+          "name": "commercial",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "marketing": {
+          "name": "marketing",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "invoicing": {
+          "name": "invoicing",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cables": {
+          "name": "cables",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "financial": {
+          "name": "financial",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "invoice": {
+          "name": "invoice",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "sales_information_client_id_clients_id_fk": {
+          "name": "sales_information_client_id_clients_id_fk",
+          "tableFrom": "sales_information",
+          "tableTo": "clients",
+          "columnsFrom": [
+            "client_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },

@@ -29,11 +29,29 @@ CREATE TABLE IF NOT EXISTS "clients" (
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "sales_information" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"client_id" integer NOT NULL,
+	"commercial" text NOT NULL,
+	"marketing" text NOT NULL,
+	"invoicing" text NOT NULL,
+	"cables" text NOT NULL,
+	"financial" text NOT NULL,
+	"invoice" text NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "users" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"email" varchar(256) NOT NULL,
 	"password" varchar(256) NOT NULL,
 	"createdAt" timestamp DEFAULT now() NOT NULL
 );
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "sales_information" ADD CONSTRAINT "sales_information_client_id_clients_id_fk" FOREIGN KEY ("client_id") REFERENCES "public"."clients"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
 --> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "unique_idx" ON "users" ("email");

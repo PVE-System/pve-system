@@ -6,6 +6,9 @@ import { pgTable, serial, text, varchar, timestamp } from 'drizzle-orm/pg-core';
 
 // Definição da tabela users com índice único no email.
 // Nenhuma linha na tabela pode ter o mesmo valor para colunas que fazem parte do índice único.
+
+/*TABELA DE USUARIOS DA EQUIPE*/
+
 export const users = pgTable(
   'users',
   {
@@ -58,5 +61,24 @@ export const clients = pgTable('clients', {
 
 export type Client = typeof clients.$inferSelect;
 export type NewClient = typeof clients.$inferInsert;
+
+/*TABELA DE INFORMAÇÕES SOBRE OS PEDIDOS*/
+
+export const salesInformation = pgTable('sales_information', {
+  id: serial('id').primaryKey(),
+  clientId: integer('client_id')
+    .references(() => clients.id)
+    .notNull(),
+  commercial: text('commercial').notNull(),
+  marketing: text('marketing').notNull(),
+  invoicing: text('invoicing').notNull(),
+  cables: text('cables').notNull(),
+  financial: text('financial').notNull(),
+  invoice: text('invoice').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export type SalesInformation = typeof salesInformation.$inferSelect;
+export type NewSalesInformation = typeof salesInformation.$inferInsert;
 
 // Tipos inferidos para ser importados nas operações(route handlers(manipuladores))
