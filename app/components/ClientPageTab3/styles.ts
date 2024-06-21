@@ -24,9 +24,6 @@ const styles = {
   inputsCol2: {
     width: '100%',
     marginBottom: '20px',
-    /*     '& .MuiInputBaseInput': {
-      height: '10px',
-    }, */
   },
 
   boxButton: {
@@ -38,24 +35,46 @@ const styles = {
     },
   },
 
-  /*   deleteButton: {
-    background: (theme: Theme) => theme.palette.primary.main,
-    backgroundColor: 'red',
-    width: '80px',
+  postCommentsButton: {
     marginTop: '20px',
-    '@media (max-width: 800px)': {
-      alignSelf: 'center',
-    },
-  }, */
-
-  editButton: {
-    background: (theme: Theme) => theme.palette.primary.main,
     backgroundColor: 'green',
-    width: '80px',
-    marginTop: '20px',
-    '@media (max-width: 800px)': {
-      alignSelf: 'center',
+    '&:hover': {
+      backgroundColor: 'darkgreen',
+      '@media (max-width: 800px)': {
+        alignSelf: 'center',
+      },
     },
+  },
+
+  boxComments: {
+    background: (theme: Theme) =>
+      theme.palette.mode === 'light'
+        ? theme.palette.background.default
+        : theme.palette.background.alternative,
+
+    marginBottom: '16px',
+    border: '1px solid #ffffff',
+    padding: '8px',
+    borderRadius: '8px',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+
+  commentsContent: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '8px',
+  },
+
+  commentsData: {
+    display: 'block',
+    marginTop: '50px',
+  },
+
+  commentsIcons: {
+    width: 20,
   },
 };
 

@@ -1,7 +1,7 @@
 /* Propósito: O arquivo schema.ts é usado para definir a estrutura inicial do seu banco de dados.  Permite definir a estrutura completa do db*/
 /*Neste arquivo que criamos outras tabelas, não precisa ser outro arquivo*/
 
-import { integer, uniqueIndex } from 'drizzle-orm/pg-core';
+import { boolean, integer, uniqueIndex } from 'drizzle-orm/pg-core';
 import { pgTable, serial, text, varchar, timestamp } from 'drizzle-orm/pg-core';
 
 // Definição da tabela users com índice único no email.
@@ -80,5 +80,21 @@ export const salesInformation = pgTable('sales_information', {
 
 export type SalesInformation = typeof salesInformation.$inferSelect;
 export type NewSalesInformation = typeof salesInformation.$inferInsert;
+
+/*TABELA DOS COMENTARIOS SOBRE O CLIENTE*/
+
+export const comments = pgTable('comments', {
+  id: serial('id').primaryKey(),
+  clientId: integer('client_id')
+    .references(() => clients.id)
+    .notNull(),
+  comment: text('comment').notNull(),
+  date: timestamp('date').defaultNow().notNull(),
+  favorite: boolean('favorite').default(false).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export type Comment = typeof comments.$inferSelect;
+export type NewComment = typeof comments.$inferInsert;
 
 // Tipos inferidos para ser importados nas operações(route handlers(manipuladores))

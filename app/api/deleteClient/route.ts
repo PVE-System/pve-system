@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { clients } from '@/app/db/schema';
+import { clients, salesInformation } from '@/app/db/schema';
 import { db } from '@/app/db';
 import { eq } from 'drizzle-orm';
 
@@ -16,12 +16,21 @@ export async function DELETE(request: NextRequest) {
   }
 
   try {
+    // Deletar primeiro os dados da tabela salesInformation
+    const deletedSalesInformation = await db
+      .delete(salesInformation)
+      .where(eq(salesInformation.clientId, Number(id)))
+      .returning();
+
+    console.log('Deleted sales information data:', deletedSalesInformation);
+
+    // Deletar o cliente da tabela clients
     const deletedClient = await db
       .delete(clients)
       .where(eq(clients.id, Number(id)))
       .returning();
 
-    console.log('Deleted client data:', deletedClient); // Log the deleted client data
+    console.log('Deleted client data:', deletedClient);
 
     if (!deletedClient.length) {
       console.error('Client not found');
