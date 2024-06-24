@@ -11,7 +11,7 @@ interface ClientPageTab1Props {
 }
 
 function onSubmitEdit(clientId: string) {
-  window.location.href = `/clientPage/editClient?id=${clientId}`; // Redireciona para a página de edição do cliente
+  window.location.href = `/clientPage/editClient?id=${clientId}`; // Redirecionar para edição do cliente
 }
 
 const ClientPageTab1: React.FC<ClientPageTab1Props> = ({
@@ -216,6 +216,8 @@ const ClientPageTab1: React.FC<ClientPageTab1Props> = ({
         <ClientProfile
           rating={clientData.rating}
           clientCondition={clientData.clientCondition}
+          companyName={clientData?.companyName} // Pass companyName
+          corfioCode={clientData?.corfioCode} // Pass corfioCode
           onRatingChange={(rating) => setValue('rating', rating)}
           onConditionChange={(condition) =>
             setValue('clientCondition', condition)

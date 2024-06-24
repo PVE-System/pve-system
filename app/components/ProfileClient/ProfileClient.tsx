@@ -9,6 +9,8 @@ import styles from '@/app/components/ProfileClient/styles';
 interface ClientProfileProps {
   rating: number;
   clientCondition: string;
+  companyName: string; // New prop
+  corfioCode: string; // New prop
   onRatingChange: (rating: number) => void;
   onConditionChange: (condition: string) => void;
   readOnly?: boolean;
@@ -17,6 +19,8 @@ interface ClientProfileProps {
 const ClientProfile: React.FC<ClientProfileProps> = ({
   rating,
   clientCondition,
+  companyName,
+  corfioCode,
   onRatingChange,
   onConditionChange,
   readOnly,
@@ -37,6 +41,15 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
 
   return (
     <Box sx={styles.boxProfile}>
+      <Typography
+        variant="h6"
+        sx={{ marginBottom: '16px', textAlign: 'center' }}
+      >
+        {companyName}
+      </Typography>{' '}
+      <Typography variant="subtitle2" sx={{ marginBottom: '16px' }}>
+        Código Corfio: {corfioCode}
+      </Typography>{' '}
       <label htmlFor="profile-picture-input">
         <input
           id="profile-picture-input"
@@ -55,7 +68,7 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
         />
       </label>
       <Box sx={styles.statusRating}>
-        <Typography variant="subtitle1">Status de Atividade</Typography>
+        <Typography variant="subtitle2">Status de Atividade:</Typography>
         <Controller
           name="rating"
           control={control}
@@ -78,7 +91,7 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
         />
       </Box>
       <Box sx={styles.clientCondition}>
-        <Typography variant="subtitle1">Condição do Cliente</Typography>
+        <Typography variant="subtitle2">Condição do Cliente:</Typography>
         <Box sx={styles.clientConditionButtonBox}>
           <Button
             variant="outlined"

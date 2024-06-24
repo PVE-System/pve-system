@@ -19,7 +19,7 @@ const styles = {
 
     '@media (max-width: 800px)': {
       width: '100%',
-      height: '450px',
+      height: '600px',
       border: 'none',
       borderRadius: '0px',
       borderBottom: '1px solid',
@@ -33,7 +33,7 @@ const styles = {
   imgProfile: {
     borderRadius: '50%',
     cursor: 'pointer',
-    marginBottom: '50px',
+    marginBottom: '16px',
   },
 
   statusRating: {

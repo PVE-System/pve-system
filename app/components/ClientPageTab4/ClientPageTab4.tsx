@@ -39,6 +39,8 @@ const ClientPageTab4: React.FC<ClientPageTab4Props> = ({ clientId }) => {
           clientCondition={''}
           onRatingChange={handleRatingChange}
           onConditionChange={handleConditionChange}
+          companyName={''}
+          corfioCode={''}
         />
         {/* Grupo 2 - Anexar e baixar arquivos. Col2 */}
         <Box sx={styles.boxCol2}>

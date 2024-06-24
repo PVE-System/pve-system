@@ -191,6 +191,8 @@ const ClientPageTab3: React.FC<ClientPageTab3Props> = ({ clientId }) => {
         <ClientProfile
           rating={clientData?.rating}
           clientCondition={clientData?.clientCondition}
+          companyName={clientData?.companyName}
+          corfioCode={clientData?.corfioCode}
           onRatingChange={handleRatingChange}
           onConditionChange={handleConditionChange}
         />

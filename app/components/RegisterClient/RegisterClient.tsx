@@ -133,6 +133,8 @@ const RegisterClient: React.FC = () => {
         body: JSON.stringify(formData),
       });
 
+      const result = await response.json();
+
       if (response.ok) {
         setFormData({
           companyName: '',
@@ -163,13 +165,13 @@ const RegisterClient: React.FC = () => {
           clientCondition: '',
         });
         setMessage('Cliente cadastrado com sucesso!');
-        router.push('/registerClientSuccess');
+        const clientId = result.clientId;
+        router.push(`/registerClientSuccess?clientId=${clientId}`);
       } else {
-        const error = await response.json();
-        setMessage(`Erro: ${error.error}`);
+        setMessage(`Erro: ${result.error}`);
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       setMessage('Erro ao conectar com o servidor');
     } finally {
       setLoading(false);
@@ -185,6 +187,8 @@ const RegisterClient: React.FC = () => {
             rating={formData.rating}
             clientCondition={formData.clientCondition}
             onRatingChange={setRating}
+            companyName={''}
+            corfioCode={''}
             onConditionChange={setClientCondition}
             readOnly={false}
           />

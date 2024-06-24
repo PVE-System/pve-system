@@ -118,6 +118,8 @@ const ClientPageTab2: React.FC<ClientPageTab2Props> = ({
       <ClientProfile
         rating={clientData?.rating}
         clientCondition={clientData?.clientCondition}
+        companyName={clientData?.companyName}
+        corfioCode={clientData?.corfioCode}
         onRatingChange={(rating) => setValue('rating', rating)}
         onConditionChange={(condition) =>
           setValue('clientCondition', condition)

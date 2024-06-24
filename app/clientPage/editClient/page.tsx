@@ -1,5 +1,6 @@
 'use client';
 
+import BasicTabs from '@/app/components/ClientPageTabs/ClientPageTabs';
 import EditClient from '@/app/components/EditClient/EditClient';
 import HeadApp from '@/app/components/HeadApp/HeadApp';
 import sharedStyles from '@/app/styles/sharedStyles';

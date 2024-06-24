@@ -1,9 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, MenuItem, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Container,
+  MenuItem,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import { useRouter, useSearchParams } from 'next/navigation';
 import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
-import styles from '@/app/components/ClientPageTab1/styles';
+/* import styles from '@/app/components/ClientPageTab1/styles'; */
+import styles from '@/app/components/EditClient/styles';
 
 const fieldLabels: { [key: string]: string } = {
   companyName: 'Nome da Empresa ou Pessoa',
@@ -143,11 +151,13 @@ const ClientEditPage: React.FC = () => {
   }
 
   return (
-    <Box>
+    <Box sx={styles.contentTabs}>
       <Box sx={styles.boxContent}>
         <ClientProfile
           rating={watch('rating')}
           clientCondition={watch('clientCondition')}
+          companyName={clientData?.companyName}
+          corfioCode={clientData?.corfioCode}
           onRatingChange={(rating) => setValue('rating', rating)}
           onConditionChange={(condition) =>
             setValue('clientCondition', condition)
@@ -193,10 +203,6 @@ const ClientEditPage: React.FC = () => {
               return null;
             })}
             <Box sx={styles.boxButton}>
-              <Button type="submit" variant="contained" sx={styles.editButton}>
-                Salvar
-              </Button>
-
               <Button
                 type="button"
                 variant="contained"
@@ -204,6 +210,9 @@ const ClientEditPage: React.FC = () => {
                 onClick={onDelete}
               >
                 Deletar
+              </Button>
+              <Button type="submit" variant="contained" sx={styles.editButton}>
+                Salvar
               </Button>
             </Box>
           </form>

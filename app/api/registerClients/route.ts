@@ -1,18 +1,14 @@
-// \app\api\registerClients\route.ts
-
 import { NextApiRequest, NextApiResponse } from 'next';
 import { db } from '@/app/db'; // Ajuste o caminho conforme necessário
 import { clients, NewClient } from '@/app/db/schema'; // Ajuste o caminho conforme necessário
 import { NextRequest, NextResponse } from 'next/server';
 
-//METODO GET:
-
+// METODO GET:
 export async function GET(request: NextRequest) {
   return NextResponse.json({ users: await db.select().from(clients) });
 }
 
-//METODO POST:
-
+// METODO POST:
 export async function POST(request: NextRequest) {
   const newClient: NewClient = await request.json();
 
@@ -51,12 +47,10 @@ export async function POST(request: NextRequest) {
       })
       .returning({
         id: clients.id,
-        companyName: clients.companyName,
-        createdAt: clients.createdAt,
       })
       .execute();
 
-    return NextResponse.json({ clients: createdClient });
+    return NextResponse.json({ clientId: createdClient[0].id });
   } catch (error: unknown) {
     if (error instanceof Error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
@@ -68,5 +62,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
-// END
