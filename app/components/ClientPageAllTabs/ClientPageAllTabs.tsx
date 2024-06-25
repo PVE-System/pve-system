@@ -7,17 +7,17 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 
 import { Container, useMediaQuery, useTheme } from '@mui/material';
-import styles from '@/app/components/ClientPageTabs/styles';
+import styles from '@/app/components/ClientPageAllTabs/styles';
 
 import InfoIcon from '@mui/icons-material/Info';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import NotesIcon from '@mui/icons-material/Notes';
 import AttachmentIcon from '@mui/icons-material/Attachment';
 
-import ClientPageTab1 from '@/app/components/ClientPageTab1/ClientPageTab1';
-import ClientPageTab2 from '@/app/components/ClientPageTab2/ClientPageTab2';
-import ClientPageTab3 from '@/app/components/ClientPageTab3/ClientPageTab3';
-import ClientPageTab4 from '@/app/components/ClientPageTab4/ClientPageTab4';
+import ClientPageTabInfos from '@/app/components/ClientPageTabInfos/ClientPageTabInfos';
+import ClientPageTabSalesInfos from '@/app/components/ClientPageTabSalesInfos/ClientPageTabSalesInfos';
+import ClientPageTabAnnotation from '@/app/components/ClientPageTabAnnotation/ClientPageTabAnnotation';
+import ClientPageTabFiles from '@/app/components/ClientPageTabFiles/ClientPageTabFiles';
 import { useSearchParams } from 'next/navigation';
 
 interface TabPanelProps {
@@ -132,22 +132,22 @@ export default function BasicTabs({}: BasicTabsProps) {
         </Box>
         <ClientPageTabPanel value={value} index={0}>
           <Box sx={styles.contentTabs}>
-            <ClientPageTab1 clientId={clientId} />
+            <ClientPageTabInfos clientId={clientId} />
           </Box>
         </ClientPageTabPanel>
         <ClientPageTabPanel value={value} index={1}>
           <Box sx={styles.contentTabs}>
-            <ClientPageTab2 clientId={clientId} />
+            <ClientPageTabSalesInfos clientId={clientId} />
           </Box>
         </ClientPageTabPanel>
         <ClientPageTabPanel value={value} index={2}>
           <Box sx={styles.contentTabs}>
-            <ClientPageTab3 clientId={clientId} />
+            <ClientPageTabAnnotation clientId={clientId} />
           </Box>
         </ClientPageTabPanel>
         <ClientPageTabPanel value={value} index={3}>
           <Box sx={styles.contentTabs}>
-            <ClientPageTab4 clientId={clientId} />
+            <ClientPageTabFiles clientId={clientId} />
           </Box>
         </ClientPageTabPanel>
       </Box>

@@ -7,11 +7,11 @@ import { format, parseISO } from 'date-fns';
 import FlagIcon from '@mui/icons-material/Flag';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
-import styles from '@/app/components/ClientPageTab3/styles';
+import styles from '@/app/components/ClientPageTabAnnotation/styles';
 import { useRouter } from 'next/navigation';
 import { ptBR } from 'date-fns/locale';
 
-interface ClientPageTab3Props {
+interface ClientPageTabAnnotationProps {
   clientId: string;
 }
 
@@ -22,7 +22,9 @@ interface Comment {
   favorite: boolean;
 }
 
-const ClientPageTab3: React.FC<ClientPageTab3Props> = ({ clientId }) => {
+const ClientPageTabAnnotation: React.FC<ClientPageTabAnnotationProps> = ({
+  clientId,
+}) => {
   const { handleSubmit, control, reset } = useForm();
   const [loading, setLoading] = useState(true);
   const [comments, setComments] = useState<Comment[]>([]);
@@ -269,4 +271,4 @@ const ClientPageTab3: React.FC<ClientPageTab3Props> = ({ clientId }) => {
   );
 };
 
-export default ClientPageTab3;
+export default ClientPageTabAnnotation;

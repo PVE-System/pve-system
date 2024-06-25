@@ -53,12 +53,7 @@ export default function HeadApp() {
       <CssBaseline />
       <Container maxWidth="xl">
         <Box sx={styles.headAppContainer}>
-          <Box
-            sx={styles.menuIcon} /* sx={{
-              position: 'absolute',
-              left: isSmallScreen ? 0 : 20,
-            }} */
-          >
+          <Box sx={styles.menuIcon}>
             <TemporaryDrawer />
           </Box>
           <TextField

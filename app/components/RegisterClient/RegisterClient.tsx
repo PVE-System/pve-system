@@ -72,7 +72,7 @@ const RegisterClient: React.FC = () => {
     transportationType: 'Transporte entra',
     companyLocation: 'Localização da Empresa',
     marketSegmentNature: 'Segmento de Mercado e Natureza Jurídica',
-    rating: 'Status',
+    rating: 'Status de Atividade',
     clientCondition: 'Condição do Cliente',
   };
 
@@ -164,7 +164,7 @@ const RegisterClient: React.FC = () => {
           rating: 0,
           clientCondition: '',
         });
-        setMessage('Cliente cadastrado com sucesso!');
+        /* setMessage('Cliente cadastrado com sucesso!'); */
         const clientId = result.clientId;
         router.push(`/registerClientSuccess?clientId=${clientId}`);
       } else {

@@ -8,7 +8,7 @@ import HeadApp from '../components/HeadApp/HeadApp';
 import { Suspense } from 'react';
 
 const BasicTabs = dynamic(
-  () => import('../components/ClientPageTabs/ClientPageTabs'),
+  () => import('../components/ClientPageAllTabs/ClientPageAllTabs'),
   {
     ssr: false,
   },

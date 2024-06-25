@@ -4,10 +4,10 @@ import React, { useEffect, useState } from 'react';
 import { Box, Button, TextField, Typography } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
-import styles from '@/app/components/ClientPageTab2/styles';
+import styles from '@/app/components/ClientPageTabSalesInfos/styles';
 import { useRouter } from 'next/navigation';
 
-interface ClientPageTab2Props {
+interface ClientPageAllTabsalesInfosProps {
   clientId: string;
   readOnly?: boolean;
 }
@@ -21,7 +21,7 @@ const fieldLabels: { [key: string]: string } = {
   invoice: 'Nota Fiscal',
 };
 
-const ClientPageTab2: React.FC<ClientPageTab2Props> = ({
+const ClientPageAllTabsalesInfos: React.FC<ClientPageAllTabsalesInfosProps> = ({
   clientId,
   readOnly = false,
 }) => {
@@ -163,4 +163,4 @@ const ClientPageTab2: React.FC<ClientPageTab2Props> = ({
   );
 };
 
-export default ClientPageTab2;
+export default ClientPageAllTabsalesInfos;

@@ -10,7 +10,7 @@ import {
 import { useForm, Controller } from 'react-hook-form';
 import { useRouter, useSearchParams } from 'next/navigation';
 import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
-/* import styles from '@/app/components/ClientPageTab1/styles'; */
+/* import styles from '@/app/components/ClientPageTabInfos/styles'; */
 import styles from '@/app/components/EditClient/styles';
 
 const fieldLabels: { [key: string]: string } = {
@@ -38,7 +38,7 @@ const fieldLabels: { [key: string]: string } = {
   transportationType: 'Transporte entra',
   companyLocation: 'Localização da Empresa',
   marketSegmentNature: 'Segmento de Mercado e Natureza Jurídica',
-  rating: 'Status',
+  rating: 'Status de Atividade',
   clientCondition: 'Condição do Cliente',
 };
 

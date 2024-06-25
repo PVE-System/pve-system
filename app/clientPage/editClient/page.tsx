@@ -1,6 +1,6 @@
 'use client';
 
-import BasicTabs from '@/app/components/ClientPageTabs/ClientPageTabs';
+import BasicTabs from '@/app/components/ClientPageAllTabs/ClientPageAllTabs';
 import EditClient from '@/app/components/EditClient/EditClient';
 import HeadApp from '@/app/components/HeadApp/HeadApp';
 import sharedStyles from '@/app/styles/sharedStyles';
@@ -9,7 +9,7 @@ import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 
 /* const BasicTabs = dynamic(
-  () => import('@/app/components/ClientPageTabs/ClientPageTabs'),
+  () => import('@/app/components/ClientPageAllTabs/ClientPageAllTabs'),
   {
     ssr: false,
   },

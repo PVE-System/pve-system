@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Box, Button, MenuItem, TextField, Typography } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
-import styles from '@/app/components/ClientPageTab1/styles';
+import styles from '@/app/components/ClientPageTabInfos/styles';
 import { jsPDF } from 'jspdf';
 
-interface ClientPageTab1Props {
+interface ClientPageTabInfosProps {
   clientId: string;
   readOnly?: boolean; // Propriedade opcional para definir se o formulário é apenas leitura
 }
@@ -14,7 +14,7 @@ function onSubmitEdit(clientId: string) {
   window.location.href = `/clientPage/editClient?id=${clientId}`; // Redirecionar para edição do cliente
 }
 
-const ClientPageTab1: React.FC<ClientPageTab1Props> = ({
+const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
   clientId,
   readOnly = false,
 }) => {
@@ -132,18 +132,18 @@ const ClientPageTab1: React.FC<ClientPageTab1Props> = ({
 
   // Definição dos campos do formulário vinculando com o nome das propriedade da tabela no db
   const formFields = [
-    { label: 'Nome da empresa', name: 'companyName' },
-    { label: 'CNPJ/CPF', name: 'cnpj' },
+    { label: 'Nome da Empresa ou Pessoa', name: 'companyName' },
+    { label: 'CNPJ', name: 'cnpj' },
     { label: 'CPF', name: 'cpf' },
     { label: 'CEP', name: 'cep' },
-    { label: 'Endereço', name: 'address' },
-    { label: 'Número do local', name: 'locationNumber' },
+    { label: 'Rua', name: 'address' },
+    { label: 'Número', name: 'locationNumber' },
     { label: 'Bairro', name: 'district' },
     { label: 'Cidade', name: 'city' },
     { label: 'Estado', name: 'state' },
     { label: 'Código Corfio', name: 'corfioCode' },
-    { label: 'Fone', name: 'phone' },
-    { label: 'E-mail', name: 'email' },
+    { label: 'Telefone/fax', name: 'phone' },
+    { label: 'Email', name: 'email' },
     { label: 'Redes Sociais', name: 'socialMedia' },
     { label: 'Contato na Empresa', name: 'contactAtCompany' },
     { label: 'Contato Financeiro', name: 'financialContact' },
@@ -241,11 +241,10 @@ const ClientPageTab1: React.FC<ClientPageTab1Props> = ({
                         select
                         variant="filled"
                         sx={styles.inputsCol2}
-                        value={field.value || ''} // Defina o valor atual ou uma string vazia
+                        value={field.value || ''}
                         InputProps={{
-                          readOnly: readOnly, // Desativa o campo quando readOnly é verdadeiro
+                          readOnly: readOnly,
                         }}
-                        disabled={readOnly} // Desativa o campo quando readOnly é verdadeiro
                       >
                         {options.map((option) => (
                           <MenuItem key={option} value={option}>
@@ -261,9 +260,8 @@ const ClientPageTab1: React.FC<ClientPageTab1Props> = ({
                       variant="filled"
                       sx={styles.inputsCol2}
                       InputProps={{
-                        readOnly: readOnly, // Desativa o campo quando readOnly é verdadeiro
+                        readOnly: true, // Desativei deixando verdadeiro
                       }}
-                      disabled={readOnly} // Desativa o campo quando readOnly é verdadeiro
                     />
                   );
                 }}
@@ -294,4 +292,4 @@ const ClientPageTab1: React.FC<ClientPageTab1Props> = ({
   );
 };
 
-export default ClientPageTab1;
+export default ClientPageTabInfos;
