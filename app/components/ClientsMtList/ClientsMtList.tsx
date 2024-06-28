@@ -26,6 +26,17 @@ interface Client {
   state: string;
 }
 
+// Função para capitalizar a primeira letra de cada palavra em uma string
+const capitalize = (str: any) => {
+  if (typeof str !== 'string') {
+    return '';
+  }
+  return str
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+};
+
 const ClientMtList = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
@@ -96,7 +107,9 @@ const ClientMtList = () => {
                 sx={{ ...styles.rowHover, cursor: 'pointer' }}
                 onClick={() => handleRowClick(client.id)}
               >
-                <TableCell sx={styles.fontSize}>{client.companyName}</TableCell>
+                <TableCell sx={styles.fontSize}>
+                  {capitalize(client.companyName)}
+                </TableCell>
                 {!isSmallScreen && (
                   <>
                     <TableCell sx={styles.fontSize}>

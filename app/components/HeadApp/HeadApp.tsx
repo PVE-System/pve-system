@@ -10,14 +10,11 @@ import InputAdornment from '@mui/material/InputAdornment';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Menu from '@mui/material/Menu';
-
 import TemporaryDrawer from '@/app/components/MenuNav/MenuNav';
 import styles from '@/app/components/HeadApp/styles';
 
 export default function HeadApp() {
   const isSmallScreen = useMediaQuery('(max-width:600px)');
-
-  /*Start Funcionalidade provisoria para o filtro de busca*/
   const [filter, setFilter] = React.useState('');
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
     null,
@@ -42,11 +39,34 @@ export default function HeadApp() {
   };
 
   const handleMenuItemClick = (value: string) => {
-    console.log('Item clicado:', value);
     setFilter(value);
     handleCloseMenu();
+    // Lógica de redirecionamento para filtros específicos
+    let route = '';
+    switch (value) {
+      case 'MS':
+        route = '/clientsMsList';
+        break;
+      case 'MT':
+        route = '/clientsMtList';
+        break;
+      case 'Outros estados':
+        route = '/clientsBrList';
+        break;
+      case 'CNPJ':
+      case 'CPF':
+        route = `/searchResults?query=${encodeURIComponent(value)}`;
+        break;
+      // Adicione outras opções de redirecionamento conforme necessário
+    }
+    if (route) {
+      window.location.href = route;
+    }
   };
-  /*End Funcionalidade provisoria para o filtro de busca*/
+
+  const handleSearch = () => {
+    window.location.href = `/searchResults?query=${encodeURIComponent(filter)}`;
+  };
 
   return (
     <React.Fragment>
@@ -63,6 +83,11 @@ export default function HeadApp() {
             variant="outlined"
             value={filter}
             onChange={handleFilterChange}
+            onKeyPress={(event) => {
+              if (event.key === 'Enter') {
+                handleSearch();
+              }
+            }}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
@@ -86,12 +111,7 @@ export default function HeadApp() {
                     <MenuItem
                       onClick={() => handleMenuItemClick('Outros estados')}
                     >
-                      Outros estados
-                    </MenuItem>
-                    <MenuItem
-                      onClick={() => handleMenuItemClick('Cliente especial')}
-                    >
-                      Cliente especial
+                      BR
                     </MenuItem>
                     <MenuItem onClick={() => handleMenuItemClick('CNPJ')}>
                       CNPJ

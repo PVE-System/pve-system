@@ -2,6 +2,21 @@ import { orange } from '@mui/material/colors';
 import { Theme } from '@mui/material/styles/createTheme';
 
 const styles = {
+  container: {
+    background: (theme: Theme) =>
+      theme.palette.mode === 'light'
+        ? theme.palette.background.paper
+        : theme.palette.background.alternative,
+
+    border: '3px solid',
+    borderColor: (theme: Theme) =>
+      theme.palette.mode === 'light' ? orange[500] : orange[800], //ORANGE mais claro
+    borderRadius: '10px',
+    padding: '20px',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+
   containerTabs: {
     paddingLeft: '0px',
     paddingRight: '0px',

@@ -16,6 +16,17 @@ interface ClientProfileProps {
   readOnly?: boolean;
 }
 
+// Função para capitalizar a primeira letra de cada palavra em uma string
+const capitalize = (str: any) => {
+  if (typeof str !== 'string') {
+    return '';
+  }
+  return str
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+};
+
 const ClientProfile: React.FC<ClientProfileProps> = ({
   rating,
   clientCondition,
@@ -45,7 +56,7 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
         variant="h6"
         sx={{ marginBottom: '16px', textAlign: 'center' }}
       >
-        {companyName}
+        {capitalize(companyName)}
       </Typography>{' '}
       <Typography variant="subtitle2" sx={{ marginBottom: '16px' }}>
         Código Corfio: {corfioCode}

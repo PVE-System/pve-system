@@ -24,6 +24,27 @@ interface Client {
   clientCondition: string;
   rating: number;
   state: string;
+  cnpj: string;
+  cpf: string;
+  cep: string;
+  address: string;
+  locationNumber: string;
+  district: string;
+  city: string;
+  phone: string;
+  email: string;
+  socialMedia: string;
+  contactAtCompany: string;
+  financialContact: string;
+  responsibleSeller: string;
+  companySize: string;
+  hasOwnStore: string;
+  isJSMClient: string;
+  includedByJSM: string;
+  icmsContributor: string;
+  transportationType: string;
+  companyLocation: string;
+  marketSegmentNature: string;
 }
 
 // Função para capitalizar a primeira letra de cada palavra em uma string
@@ -37,10 +58,11 @@ const capitalize = (str: any) => {
     .join(' ');
 };
 
-const ClientMsList = () => {
+const SearchResults = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const isSmallScreen = useMediaQuery('(max-width:600px)');
+  const query = new URLSearchParams(window.location.search).get('query') || '';
 
   useEffect(() => {
     const fetchClients = async () => {
@@ -50,10 +72,22 @@ const ClientMsList = () => {
           throw new Error('Network response was not ok');
         }
         const data = await response.json();
+        const searchTerm = query.toLowerCase();
+
         const filteredClients = data.clients.filter((client: Client) => {
-          const stateLower = client.state.toLowerCase();
-          return stateLower === 'mato grosso do sul' || stateLower === 'ms';
+          // Filtra clientes com CNPJ preenchido ou sem CNPJ preenchido
+          if (searchTerm === 'cnpj') {
+            return !!client.cnpj;
+          } else if (searchTerm === 'cpf') {
+            return !client.cnpj;
+          } else {
+            // Verifica se a palavra-chave está em qualquer campo relevante
+            return Object.values(client).some((value) =>
+              value.toString().toLowerCase().includes(searchTerm),
+            );
+          }
         });
+
         setClients(filteredClients);
         setLoading(false);
       } catch (error) {
@@ -62,8 +96,10 @@ const ClientMsList = () => {
       }
     };
 
-    fetchClients();
-  }, []);
+    if (query) {
+      fetchClients();
+    }
+  }, [query]);
 
   const handleRowClick = (clientId: string) => {
     window.location.href = `/clientPage?id=${clientId}`;
@@ -154,4 +190,4 @@ const ClientMsList = () => {
   );
 };
 
-export default ClientMsList;
+export default SearchResults;

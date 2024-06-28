@@ -37,7 +37,7 @@ const capitalize = (str: any) => {
     .join(' ');
 };
 
-const ClientMsList = () => {
+const ClientBrList = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const isSmallScreen = useMediaQuery('(max-width:600px)');
@@ -50,10 +50,22 @@ const ClientMsList = () => {
           throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        const filteredClients = data.clients.filter((client: Client) => {
-          const stateLower = client.state.toLowerCase();
-          return stateLower === 'mato grosso do sul' || stateLower === 'ms';
+
+        // Limpar e normalizar os estados antes de filtrar
+        const cleanedClients = data.clients.map((client: Client) => ({
+          ...client,
+          state: client.state.trim().toLowerCase(), // Remove espaços extras e converte para minúsculas
+        }));
+
+        const filteredClients = cleanedClients.filter((client: Client) => {
+          return !(
+            client.state === 'mato grosso' ||
+            client.state === 'mt' ||
+            client.state === 'mato grosso do sul' ||
+            client.state === 'ms'
+          );
         });
+
         setClients(filteredClients);
         setLoading(false);
       } catch (error) {
@@ -154,4 +166,4 @@ const ClientMsList = () => {
   );
 };
 
-export default ClientMsList;
+export default ClientBrList;

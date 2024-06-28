@@ -16,7 +16,6 @@ import sharedStyles from '@/app/styles/sharedStyles';
 import styles from './styles';
 
 const RegisterClient: React.FC = () => {
-  // Definindo o estado inicial do formulário
   const [formData, setFormData] = useState({
     companyName: '',
     cnpj: '',
@@ -42,11 +41,10 @@ const RegisterClient: React.FC = () => {
     transportationType: '',
     companyLocation: '',
     marketSegmentNature: '',
-    rating: 0, // Novo campo
-    clientCondition: '', // Novo campo
+    rating: 1,
+    clientCondition: 'normal',
   });
 
-  // Labels dos campos do formulário em português
   const fieldLabels: { [key: string]: string } = {
     companyName: 'Nome da Empresa ou Pessoa',
     cnpj: 'CNPJ',
@@ -76,7 +74,6 @@ const RegisterClient: React.FC = () => {
     clientCondition: 'Condição do Cliente',
   };
 
-  // Opções para campos de seleção
   const selectOptions: { [key: string]: string[] } = {
     companySize: ['Pequeno', 'Médio', 'Grande'],
     hasOwnStore: ['Sim', 'Não'],
@@ -97,19 +94,47 @@ const RegisterClient: React.FC = () => {
       'PJ Não cont',
       'Atacarejo',
     ],
+    state: [
+      'Acre',
+      'Alagoas',
+      'Amapá',
+      'Amazonas',
+      'Bahia',
+      'Ceará',
+      'Distrito Federal',
+      'Espírito Santo',
+      'Goiás',
+      'Maranhão',
+      'Mato Grosso',
+      'Mato Grosso do Sul',
+      'Minas Gerais',
+      'Pará',
+      'Paraíba',
+      'Paraná',
+      'Pernambuco',
+      'Piauí',
+      'Rio de Janeiro',
+      'Rio Grande do Norte',
+      'Rio Grande do Sul',
+      'Rondônia',
+      'Roraima',
+      'Santa Catarina',
+      'São Paulo',
+      'Sergipe',
+      'Tocantins',
+    ],
+    rating: ['1', '2', '3'],
+    clientCondition: ['Normal', 'Especial', 'Suspenso'],
   };
 
-  // Definindo o estado para mensagens e carregamento
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  // Função para lidar com mudanças nos campos do formulário
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [event.target.name]: event.target.value });
   };
 
-  // Funções para definir a classificação e condição do cliente
   const setRating = (rating: number) => {
     setFormData({ ...formData, rating });
   };
@@ -118,7 +143,6 @@ const RegisterClient: React.FC = () => {
     setFormData({ ...formData, clientCondition: condition });
   };
 
-  // Função para lidar com a submissão do formulário
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
@@ -164,7 +188,6 @@ const RegisterClient: React.FC = () => {
           rating: 0,
           clientCondition: '',
         });
-        /* setMessage('Cliente cadastrado com sucesso!'); */
         const clientId = result.clientId;
         router.push(`/registerClientSuccess?clientId=${clientId}`);
       } else {
@@ -182,7 +205,6 @@ const RegisterClient: React.FC = () => {
     <Container maxWidth="lg">
       <Box sx={styles.container}>
         <Box sx={styles.boxContent}>
-          {/* Componente do perfil do cliente */}
           <ClientProfile
             rating={formData.rating}
             clientCondition={formData.clientCondition}
@@ -194,7 +216,6 @@ const RegisterClient: React.FC = () => {
           />
           <Box sx={styles.boxCol2}>
             <form onSubmit={handleSubmit}>
-              {/* Mapeando os campos do formulário */}
               {Object.keys(formData).map((key) => (
                 <Box key={key}>
                   <Typography variant="subtitle1">

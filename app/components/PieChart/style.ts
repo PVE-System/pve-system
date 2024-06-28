@@ -9,6 +9,10 @@ const styles = {
     borderRadius: 4,
     border: '3px solid',
     borderColor: orange[800],
+    height: '370px',
+    '@media (max-width: 600px)': {
+      height: 'auto',
+    },
   },
 };
 

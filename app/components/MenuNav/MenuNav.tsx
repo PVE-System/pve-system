@@ -34,9 +34,6 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import CloseIcon from '@mui/icons-material/Close';
 
 import { useMediaQuery } from '@mui/material';
-
-import router from 'next/router';
-import Cookies from 'js-cookie';
 import { useAuth } from '@/app/contex/authContext';
 
 export default function TemporaryDrawer() {
@@ -74,7 +71,11 @@ export default function TemporaryDrawer() {
             icon: <ApartmentIcon />,
             link: '/clientsMtList',
           },
-          { name: 'Clientes BR', icon: <BusinessIcon />, link: '/' },
+          {
+            name: 'Clientes BR',
+            icon: <BusinessIcon />,
+            link: '/clientsBrList',
+          },
           {
             name: 'Cadastrar Cliente',
             icon: <AddBusinessIcon />,
@@ -150,7 +151,7 @@ export default function TemporaryDrawer() {
           <Box sx={styles.contentMenu}>
             <IconButton
               sx={styles.iconTheme}
-              onClick={handleToggleTheme} // Alteração aqui para chamar a função de alternar o tema
+              onClick={handleToggleTheme} //função alternar o tema
               color="inherit"
             >
               {themeIcon}

@@ -31,13 +31,15 @@ const styles = {
     border: '2px solid',
     borderColor: orange[800],
     width: '280px',
+    height: '100px',
     cursor: 'pointer',
     '&:hover': {
       color: orange[800],
     },
-    marginBottom: '40px',
+    marginBottom: '33px',
     '@media (max-width: 600px)': {
       width: '100%',
+      height: 'auto',
     },
   },
   /*   cardsContent: {

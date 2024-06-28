@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, MenuItem, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  CircularProgress,
+  MenuItem,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
 import styles from '@/app/components/ClientPageTabInfos/styles';
@@ -87,6 +94,17 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
     clientCondition: 'Condição do Cliente',
   };
 
+  // Função para capitalizar a primeira letra de cada palavra em uma string e deixar maiscula
+  const capitalize = (str: any) => {
+    if (typeof str !== 'string') {
+      return '';
+    }
+    return str
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  };
+
   //Start Export
 
   const exportPDF = () => {
@@ -99,16 +117,21 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
 
     let yPosition = 20;
 
-    // Adiciona os detalhes do cliente ao PDF
+    // Adiciona os detalhes do cliente ao PDF, mas ignorando estes campos que nao sao necessarios
     Object.keys(clientData).forEach((key) => {
-      if (key === 'id' || key === 'createdAt') {
-        return; // Ignora os campos 'id' e 'createdAt'
+      if (
+        key === 'id' ||
+        key === 'createdAt' ||
+        key === 'rating' ||
+        key === 'clientCondition'
+      ) {
+        return;
       }
 
       const label = fieldLabels[key] || key;
       const value = clientData[key];
 
-      doc.text(`${label}: ${value}`, 10, yPosition);
+      doc.text(`${label}: ${capitalize(value)}`, 10, yPosition);
       yPosition += 10;
     });
 
@@ -118,14 +141,18 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
   //End Export
 
   if (loading) {
-    return <p>Loading...</p>; // Exibe uma mensagem de carregamento
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center">
+        <CircularProgress />
+      </Box>
+    ); // mensagem de carregamento
   }
 
   if (!clientData) {
     return (
       <p>
-        Client not found. Please check if the client ID is correct and the API
-        is returning the expected data.
+        Cliente não encontrado. Verifique se o ID do cliente está correto e se a
+        API está retornando os dados esperados.
       </p>
     ); // Exibe uma mensagem de erro se os dados do cliente não forem encontrados
   }
@@ -248,7 +275,7 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
                       >
                         {options.map((option) => (
                           <MenuItem key={option} value={option}>
-                            {option.charAt(0).toUpperCase() + option.slice(1)}
+                            {capitalize(option)}
                           </MenuItem>
                         ))}
                       </TextField>
@@ -259,6 +286,7 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
                       {...field}
                       variant="filled"
                       sx={styles.inputsCol2}
+                      value={capitalize(field.value)}
                       InputProps={{
                         readOnly: true, // Desativei deixando verdadeiro
                       }}

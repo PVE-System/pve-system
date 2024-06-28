@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   Box,
   Button,
+  CircularProgress,
   Container,
   MenuItem,
   TextField,
@@ -43,24 +44,53 @@ const fieldLabels: { [key: string]: string } = {
 };
 
 const selectOptions: { [key: string]: string[] } = {
-  companySize: ['pequeno', 'médio', 'grande'],
-  hasOwnStore: ['sim', 'não'],
-  isJSMClient: ['sim', 'não'],
-  includedByJSM: ['sim', 'não'],
-  icmsContributor: ['sim', 'não'],
-  transportationType: ['carreta', 'truck', 'ambos', 'nenhum'],
-  companyLocation: ['área rural', 'centro'],
+  companySize: ['Pequeno', 'Médio', 'Grande'],
+  hasOwnStore: ['Sim', 'Não'],
+  isJSMClient: ['Sim', 'Não'],
+  includedByJSM: ['Sim', 'Não'],
+  icmsContributor: ['Sim', 'Não'],
+  transportationType: ['Carreta', 'Truck', 'Ambos', 'Nenhum'],
+  companyLocation: ['Área rural', 'Centro'],
   marketSegmentNature: [
-    'atacado',
-    'varejo',
-    'industrialização',
-    'produtor rural',
-    'instaladora',
-    'pessoa jurídica cont',
-    'pessoa física não cont',
-    'construtora',
-    'pJ Não cont',
-    'atacarejo',
+    'Atacado',
+    'Varejo',
+    'Industrialização',
+    'Produtor rural',
+    'Instaladora',
+    'Pessoa jurídica cont',
+    'Pessoa física não cont',
+    'Construtora',
+    'PJ Não cont',
+    'Atacarejo',
+  ],
+  state: [
+    'Acre',
+    'Alagoas',
+    'Amapá',
+    'Amazonas',
+    'Bahia',
+    'Ceará',
+    'Distrito Federal',
+    'Espírito Santo',
+    'Goiás',
+    'Maranhão',
+    'Mato Grosso',
+    'Mato Grosso do Sul',
+    'Minas Gerais',
+    'Pará',
+    'Paraíba',
+    'Paraná',
+    'Pernambuco',
+    'Piauí',
+    'Rio de Janeiro',
+    'Rio Grande do Norte',
+    'Rio Grande do Sul',
+    'Rondônia',
+    'Roraima',
+    'Santa Catarina',
+    'São Paulo',
+    'Sergipe',
+    'Tocantins',
   ],
 };
 
@@ -134,7 +164,11 @@ const ClientEditPage: React.FC = () => {
   };
 
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center">
+        <CircularProgress />
+      </Box>
+    );
   }
 
   if (!clientId) {
@@ -190,7 +224,10 @@ const ClientEditPage: React.FC = () => {
                         >
                           {key in selectOptions &&
                             selectOptions[key].map((option) => (
-                              <MenuItem key={option} value={option}>
+                              <MenuItem
+                                key={option}
+                                value={option.toLowerCase()}
+                              >
                                 {option}
                               </MenuItem>
                             ))}
