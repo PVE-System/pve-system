@@ -31,22 +31,13 @@ const styles = {
 
   boxButton: {
     display: 'flex',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
     gap: 2,
     '@media (max-width: 800px)': {
-      justifyContent: 'center',
+      flexDirection: 'column',
+      gap: 0,
     },
   },
-
-  /*   deleteButton: {
-    background: (theme: Theme) => theme.palette.primary.main,
-    backgroundColor: 'red',
-    width: '80px',
-    marginTop: '20px',
-    '@media (max-width: 800px)': {
-      alignSelf: 'center',
-    },
-  }, */
 
   editButton: {
     marginTop: '20px',

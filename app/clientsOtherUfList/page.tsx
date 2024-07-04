@@ -1,22 +1,22 @@
 import * as React from 'react';
 
-import ClientsBrList from '@/app/components/ClientsBrList/ClientsBrList';
 import HeadApp from '../components/HeadApp/HeadApp';
 import sharedStyles from '../styles/sharedStyles';
 import { Box, Typography } from '@mui/material';
+import ClientsOtherUfList from '../components/ClientsOtherUfList/ClientsOtherUfList';
 
-const ClientBrListPage: React.FC = () => {
+const ClientOtherUfListPage: React.FC = () => {
   return (
     <>
       <HeadApp />
       <Box sx={sharedStyles.container}>
         <Typography variant="h4" component="h1" sx={sharedStyles.titlePage}>
-          Clientes <span>BR</span>
+          Clientes de outras <span>UF</span>
         </Typography>
       </Box>
-      <ClientsBrList />
+      <ClientsOtherUfList />
     </>
   );
 };
 
-export default ClientBrListPage;
+export default ClientOtherUfListPage;

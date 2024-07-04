@@ -11,6 +11,16 @@ const styles = {
     },
   },
 
+  /*   boxCol1: {
+    justifyContent: 'center',
+    alignItens: 'center',
+    gap: '20px',
+    width: '30%',
+    '@media (max-width: 800px)': {
+      width: '100%',
+    },
+  }, */
+
   boxCol2: {
     display: 'flex',
     flexDirection: 'column',
@@ -27,25 +37,27 @@ const styles = {
 
   boxButton: {
     display: 'flex',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
     gap: 2,
     '@media (max-width: 800px)': {
-      justifyContent: 'center',
+      flexDirection: 'column',
+      gap: 0,
     },
   },
 
   exportButton: {
     marginTop: '20px',
     backgroundColor: 'mediumblue',
+
     '&:hover': {
       backgroundColor: 'darkblue',
       '@media (max-width: 800px)': {
-        alignSelf: 'center',
+        /* alignSelf: 'center', */
       },
     },
   },
 
-  deleteButton: {
+  /*   deleteButton: {
     marginTop: '20px',
     backgroundColor: 'red',
     '&:hover': {
@@ -54,7 +66,7 @@ const styles = {
         alignSelf: 'center',
       },
     },
-  },
+  }, */
 
   editButton: {
     marginTop: '20px',

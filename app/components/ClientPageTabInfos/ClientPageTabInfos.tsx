@@ -240,17 +240,39 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
     <Box>
       <Box sx={styles.boxContent}>
         {/* Grupo 1 - Imagem e status do cliente. Col1 */}
-        <ClientProfile
-          rating={clientData.rating}
-          clientCondition={clientData.clientCondition}
-          companyName={clientData?.companyName} // Pass companyName
-          corfioCode={clientData?.corfioCode} // Pass corfioCode
-          onRatingChange={(rating) => setValue('rating', rating)}
-          onConditionChange={(condition) =>
-            setValue('clientCondition', condition)
-          }
-          readOnly={readOnly} // Passando a propriedade readOnly
-        />
+        <Box>
+          <ClientProfile
+            rating={clientData.rating}
+            clientCondition={clientData.clientCondition}
+            companyName={clientData?.companyName} // Pass companyName
+            corfioCode={clientData?.corfioCode} // Pass corfioCode
+            phone={clientData?.phone} // Pass phone
+            email={clientData?.email} // Pass email
+            onRatingChange={(rating) => setValue('rating', rating)}
+            onConditionChange={(condition) =>
+              setValue('clientCondition', condition)
+            }
+            readOnly={readOnly} // Passando a propriedade readOnly
+          />
+          <Box sx={styles.boxButton}>
+            <Button
+              type="button"
+              variant="contained"
+              onClick={exportPDF}
+              sx={styles.exportButton}
+            >
+              Exportar PDF
+            </Button>
+            <Button
+              type="button"
+              variant="contained"
+              onClick={() => onSubmitEdit(clientId)}
+              sx={styles.editButton}
+            >
+              Editar
+            </Button>
+          </Box>
+        </Box>
         {/* Grupo 2 - formulário de cadastro */}
         <Box sx={styles.boxCol2}>
           {formFields.map(({ label, name, type, options }) => (
@@ -296,7 +318,7 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
               />
             </Box>
           ))}
-          <Box sx={styles.boxButton}>
+          {/*           <Box sx={styles.boxButton}>
             <Button
               type="button"
               variant="contained"
@@ -313,7 +335,7 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
             >
               Editar
             </Button>
-          </Box>
+          </Box> */}
         </Box>
       </Box>
     </Box>

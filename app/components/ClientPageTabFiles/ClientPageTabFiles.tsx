@@ -86,6 +86,8 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
           onConditionChange={handleConditionChange}
           companyName={clientData?.companyName}
           corfioCode={clientData?.corfioCode}
+          phone={clientData?.phone}
+          email={clientData?.email}
         />
         {/* Grupo 2 - Anexar e baixar arquivos. Col2 */}
         <Box sx={styles.boxCol2}>

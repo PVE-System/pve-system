@@ -258,9 +258,10 @@ const DashboardComponent = () => {
             <Typography
               sx={{ ...styles.accordionText, ...sharedStyles.subtitleSize }}
             >
-              Fazem pedidos com pouca frequência ou apenas uma vez.
+              Fazem pedidos com pouca frequência ou apenas uma única vez.
               <br />
-              Importante fazer um follow up e entender os motivos.
+              Importante fazer uma análise, entender os motivos e conversar com
+              o cliente.
             </Typography>
           </AccordionDetails>
         </Accordion>

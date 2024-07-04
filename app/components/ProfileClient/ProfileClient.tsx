@@ -7,10 +7,13 @@ import Image from 'next/image';
 import styles from '@/app/components/ProfileClient/styles';
 
 interface ClientProfileProps {
+  // New props
   rating: number;
   clientCondition: string;
-  companyName: string; // New prop
-  corfioCode: string; // New prop
+  companyName: string;
+  corfioCode: string;
+  email: string;
+  phone: string;
   onRatingChange: (rating: number) => void;
   onConditionChange: (condition: string) => void;
   readOnly?: boolean;
@@ -32,6 +35,8 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
   clientCondition,
   companyName,
   corfioCode,
+  email,
+  phone,
   onRatingChange,
   onConditionChange,
   readOnly,
@@ -57,9 +62,6 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
         sx={{ marginBottom: '16px', textAlign: 'center' }}
       >
         {capitalize(companyName)}
-      </Typography>{' '}
-      <Typography variant="subtitle2" sx={{ marginBottom: '16px' }}>
-        Código Corfio: {corfioCode}
       </Typography>{' '}
       <label htmlFor="profile-picture-input">
         <input
@@ -165,6 +167,21 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
             Suspenso
           </Button>
         </Box>
+      </Box>
+      <Box
+        sx={{
+          alignSelf: 'start',
+        }}
+      >
+        <Typography variant="subtitle2" sx={{ marginBottom: '5px' }}>
+          Código Corfio: {corfioCode}
+        </Typography>{' '}
+        <Typography variant="subtitle2" sx={{ marginBottom: '5px' }}>
+          Telefone: {phone}
+        </Typography>{' '}
+        <Typography variant="subtitle2" sx={{ marginBottom: '5px' }}>
+          Email: {email}
+        </Typography>{' '}
       </Box>
     </Box>
   );

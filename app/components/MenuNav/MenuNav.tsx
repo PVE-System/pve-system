@@ -72,9 +72,9 @@ export default function TemporaryDrawer() {
             link: '/clientsMtList',
           },
           {
-            name: 'Clientes BR',
+            name: 'Outras UF',
             icon: <BusinessIcon />,
-            link: '/clientsBrList',
+            link: '/clientsOtherUfList',
           },
           {
             name: 'Cadastrar Cliente',

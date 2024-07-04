@@ -37,7 +37,7 @@ const capitalize = (str: any) => {
     .join(' ');
 };
 
-const ClientBrList = () => {
+const ClientsOtherUfList = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const isSmallScreen = useMediaQuery('(max-width:600px)');
@@ -166,4 +166,4 @@ const ClientBrList = () => {
   );
 };
 
-export default ClientBrList;
+export default ClientsOtherUfList;

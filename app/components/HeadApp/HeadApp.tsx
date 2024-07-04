@@ -51,7 +51,7 @@ export default function HeadApp() {
         route = '/clientsMtList';
         break;
       case 'Outros estados':
-        route = '/clientsBrList';
+        route = '/clientsOtherUfList';
         break;
       case 'CNPJ':
       case 'CPF':
@@ -111,7 +111,7 @@ export default function HeadApp() {
                     <MenuItem
                       onClick={() => handleMenuItemClick('Outros estados')}
                     >
-                      BR
+                      Outras UF
                     </MenuItem>
                     <MenuItem onClick={() => handleMenuItemClick('CNPJ')}>
                       CNPJ

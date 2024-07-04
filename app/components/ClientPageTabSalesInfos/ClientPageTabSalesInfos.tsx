@@ -7,7 +7,7 @@ import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
 import styles from '@/app/components/ClientPageTabSalesInfos/styles';
 import { useRouter } from 'next/navigation';
 
-interface ClientPageAllTabsalesInfosProps {
+interface ClientPageTabSalesInfosProps {
   clientId: string;
   readOnly?: boolean;
 }
@@ -21,7 +21,7 @@ const fieldLabels: { [key: string]: string } = {
   invoice: 'Nota Fiscal',
 };
 
-const ClientPageAllTabsalesInfos: React.FC<ClientPageAllTabsalesInfosProps> = ({
+const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
   clientId,
   readOnly = false,
 }) => {
@@ -115,19 +115,35 @@ const ClientPageAllTabsalesInfos: React.FC<ClientPageAllTabsalesInfosProps> = ({
 
   return (
     <Box sx={styles.boxContent}>
-      <ClientProfile
-        rating={clientData?.rating}
-        clientCondition={clientData?.clientCondition}
-        companyName={clientData?.companyName}
-        corfioCode={clientData?.corfioCode}
-        onRatingChange={(rating) => setValue('rating', rating)}
-        onConditionChange={(condition) =>
-          setValue('clientCondition', condition)
-        }
-        readOnly={readOnly}
-      />
+      <Box>
+        <ClientProfile
+          rating={clientData?.rating}
+          clientCondition={clientData?.clientCondition}
+          companyName={clientData?.companyName}
+          corfioCode={clientData?.corfioCode}
+          phone={clientData?.phone}
+          email={clientData?.email}
+          onRatingChange={(rating) => setValue('rating', rating)}
+          onConditionChange={(condition) =>
+            setValue('clientCondition', condition)
+          }
+          readOnly={readOnly}
+        />
+        {!readOnly && (
+          <Box sx={styles.boxButton}>
+            <Button
+              type="button"
+              variant="contained"
+              sx={styles.editButton}
+              onClick={handleSubmit(onSubmit)}
+            >
+              Atualizar Informações
+            </Button>
+          </Box>
+        )}
+      </Box>
       <Box sx={styles.boxCol2}>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form>
           {Object.keys(fieldLabels).map((key) => (
             <Box key={key}>
               <Typography variant="subtitle1">{fieldLabels[key]}</Typography>
@@ -150,17 +166,10 @@ const ClientPageAllTabsalesInfos: React.FC<ClientPageAllTabsalesInfosProps> = ({
               />
             </Box>
           ))}
-          {!readOnly && (
-            <Box sx={styles.boxButton}>
-              <Button type="submit" variant="contained" sx={styles.editButton}>
-                Atualizar Informações
-              </Button>
-            </Box>
-          )}
         </form>
       </Box>
     </Box>
   );
 };
 
-export default ClientPageAllTabsalesInfos;
+export default ClientPageTabSalesInfos;

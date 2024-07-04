@@ -82,10 +82,11 @@ const styles = {
 
   boxButton: {
     display: 'flex',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
     gap: 2,
     '@media (max-width: 800px)': {
-      justifyContent: 'center',
+      flexDirection: 'column',
+      gap: 0,
     },
   },
 

@@ -14,15 +14,15 @@ const styles = {
     border: '2px solid',
     borderRadius: '10px',
     padding: '20px',
-    width: '30%',
-    height: '500px',
+    width: '300px', //alterei aqui
+    height: '550px',
 
     '@media (max-width: 800px)': {
-      width: '100%',
-      height: '600px',
+      width: '200px', //alterei aqui
+      /* height: '600px', */
       border: 'none',
       borderRadius: '0px',
-      borderBottom: '1px solid',
+      /* borderBottom: '1px solid', */
       background: (theme: Theme) =>
         theme.palette.mode === 'light'
           ? theme.palette.background.paper

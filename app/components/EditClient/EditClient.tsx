@@ -3,7 +3,6 @@ import {
   Box,
   Button,
   CircularProgress,
-  Container,
   MenuItem,
   TextField,
   Typography,
@@ -187,19 +186,41 @@ const ClientEditPage: React.FC = () => {
   return (
     <Box sx={styles.contentTabs}>
       <Box sx={styles.boxContent}>
-        <ClientProfile
-          rating={watch('rating')}
-          clientCondition={watch('clientCondition')}
-          companyName={clientData?.companyName}
-          corfioCode={clientData?.corfioCode}
-          onRatingChange={(rating) => setValue('rating', rating)}
-          onConditionChange={(condition) =>
-            setValue('clientCondition', condition)
-          }
-          readOnly={false}
-        />
+        <Box>
+          <ClientProfile
+            rating={watch('rating')}
+            clientCondition={watch('clientCondition')}
+            companyName={clientData?.companyName}
+            corfioCode={clientData?.corfioCode}
+            phone={clientData?.phone}
+            email={clientData?.email}
+            onRatingChange={(rating) => setValue('rating', rating)}
+            onConditionChange={(condition) =>
+              setValue('clientCondition', condition)
+            }
+            readOnly={false}
+          />
+          <Box sx={styles.boxButton}>
+            <Button
+              type="button"
+              variant="contained"
+              sx={styles.deleteButton}
+              onClick={onDelete}
+            >
+              Deletar
+            </Button>
+            <Button
+              type="button"
+              variant="contained"
+              sx={styles.editButton}
+              onClick={handleSubmit(onSubmit)} // Use handleSubmit directly
+            >
+              Salvar
+            </Button>
+          </Box>
+        </Box>
         <Box sx={styles.boxCol2}>
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form>
             {Object.keys(clientData).map((key) => {
               if (key !== 'id' && key !== 'createdAt') {
                 // Ajuste aqui
@@ -239,19 +260,6 @@ const ClientEditPage: React.FC = () => {
               }
               return null;
             })}
-            <Box sx={styles.boxButton}>
-              <Button
-                type="button"
-                variant="contained"
-                sx={styles.deleteButton}
-                onClick={onDelete}
-              >
-                Deletar
-              </Button>
-              <Button type="submit" variant="contained" sx={styles.editButton}>
-                Salvar
-              </Button>
-            </Box>
           </form>
         </Box>
       </Box>

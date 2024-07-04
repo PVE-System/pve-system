@@ -195,6 +195,8 @@ const ClientPageTabAnnotation: React.FC<ClientPageTabAnnotationProps> = ({
           clientCondition={clientData?.clientCondition}
           companyName={clientData?.companyName}
           corfioCode={clientData?.corfioCode}
+          phone={clientData?.phone}
+          email={clientData?.email}
           onRatingChange={handleRatingChange}
           onConditionChange={handleConditionChange}
         />
@@ -214,30 +216,19 @@ const ClientPageTabAnnotation: React.FC<ClientPageTabAnnotationProps> = ({
                   sx={styles.inputsCol2}
                   InputProps={{
                     style: { minHeight: '150px' },
-                    /*                     endAdornment: (
-                      <FlagIcon
-                        sx={{
-                          color:
-                            comments.length > 0 && comments[0].favorite
-                              ? 'orange'
-                              : 'darkgrey',
-                          marginBottom: '90px',
-                          cursor: 'pointer',
-                        }}
-                        onClick={() => handleFavorite(0)}
-                      />
-                    ), */
                   }}
                 />
               )}
             />
-            <Button
-              type="submit"
-              variant="contained"
-              sx={styles.postCommentsButton}
-            >
-              Publicar
-            </Button>
+            <Box sx={styles.boxButton}>
+              <Button
+                type="submit"
+                variant="contained"
+                sx={styles.postCommentsButton}
+              >
+                Publicar
+              </Button>
+            </Box>
           </form>
           <Box>
             {Array.isArray(comments) &&
