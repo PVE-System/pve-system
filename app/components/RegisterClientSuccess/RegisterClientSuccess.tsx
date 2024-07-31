@@ -1,5 +1,6 @@
 'use client';
 
+import React, { Suspense } from 'react';
 import { Box, Card, CardContent, Container, Typography } from '@mui/material';
 import NextLink from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -10,7 +11,8 @@ import styles from '@/app/components/RegisterClientSuccess/style';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 
-export default function RegisterClientSuccess() {
+// Componente com Suspense
+const RegisterClientSuccessContent = () => {
   const searchParams = useSearchParams();
   const clientId = searchParams.get('clientId');
 
@@ -46,5 +48,14 @@ export default function RegisterClientSuccess() {
         </Card>
       </Box>
     </Container>
+  );
+};
+
+// Componente principal com Suspense
+export default function RegisterClientSuccess() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <RegisterClientSuccessContent />
+    </Suspense>
   );
 }

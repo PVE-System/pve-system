@@ -61,8 +61,16 @@ const capitalize = (str: any) => {
 const SearchResults = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState('');
   const isSmallScreen = useMediaQuery('(max-width:600px)');
-  const query = new URLSearchParams(window.location.search).get('query') || '';
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const queryParam =
+        new URLSearchParams(window.location.search).get('query') || '';
+      setQuery(queryParam);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchClients = async () => {
@@ -102,7 +110,9 @@ const SearchResults = () => {
   }, [query]);
 
   const handleRowClick = (clientId: string) => {
-    window.location.href = `/clientPage?id=${clientId}`;
+    if (typeof window !== 'undefined') {
+      window.location.href = `/clientPage?id=${clientId}`;
+    }
   };
 
   if (loading) {
