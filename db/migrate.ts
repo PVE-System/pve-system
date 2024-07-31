@@ -3,11 +3,12 @@
 import { drizzle } from 'drizzle-orm/postgres-js'; // Importa a função para configurar o Drizzle ORM com PostgreSQL
 import { migrate } from 'drizzle-orm/postgres-js/migrator'; // Importa a função de migração do Drizzle para PostgreSQL
 import postgres from 'postgres'; // Importa o cliente PostgreSQL
+import { DB_HOST, DB_NAME, DB_PASS, DB_PORT, DB_USER } from '../config';
 
 async function runMigrations() {
   // Cria uma conexão com o banco de dados PostgreSQL
   const migrationClient = postgres(
-    'postgres://postgres:postgres@0.0.0.0:5432/postgres', // URL de conexão com usuário, senha, host, porta e banco de dados
+    `postgres://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}`, // URL de conexão com usuário, senha, host, porta e banco de dados
     { max: 1 }, // Limita a conexão a um cliente
   );
 

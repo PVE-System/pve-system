@@ -1,9 +1,10 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
+import { DB_HOST, DB_NAME, DB_PASS, DB_PORT, DB_USER } from '../../config';
 import * as schema from './schema';
 
 const queryClient = postgres(
-  'postgres://postgres:postgres@0.0.0.0:5432/postgres',
+  `postgres://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}`,
 );
 
 export const db = drizzle(queryClient, { schema });
