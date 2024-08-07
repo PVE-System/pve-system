@@ -34,7 +34,12 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
 
     console.log('Fetching client data for ID:', clientId);
 
-    fetch(`/api/getClient/[id]?id=${clientId}`) // Busca os dados do cliente da API
+    const baseUrl =
+      process.env.NODE_ENV === 'production'
+        ? 'https://pve-system-3kuwnoalz-pve-representacoes-s-projects.vercel.app'
+        : '';
+
+    fetch(`${baseUrl}/api/getClient/[id]?id=${clientId}`) // Busca os dados do cliente da API
       .then((response) => {
         if (!response.ok) {
           console.error('Network response was not ok');
