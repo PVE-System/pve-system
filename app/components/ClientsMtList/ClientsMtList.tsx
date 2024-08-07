@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Table,
   TableBody,
@@ -12,50 +12,77 @@ import {
   Container,
   Box,
   useMediaQuery,
+  CircularProgress,
 } from '@mui/material';
 import { Rating } from '@mui/material';
 import styles from '@/app/components/ClientsMsList/styles';
 
-const ClientMsList = () => {
-  const clients = [
-    {
-      name: 'Cliente 1 Comércio de Mat e Const Ltda',
-      code: '12345',
-      status: 'N',
-      rating: 2,
-    },
-    {
-      name: 'Cliente 2  Comércio de Mat e Const Ltda',
-      code: '54321',
-      status: 'S',
-      rating: 1,
-    },
-    {
-      name: 'Cliente 3  Comércio de Mat e Const Ltda',
-      code: '98765',
-      status: 'E',
-      rating: 3,
-    },
-    {
-      name: 'Cliente 4  Comércio de Mat e Const Ltda',
-      code: '45678',
-      status: 'N',
-      rating: 2,
-    },
-    {
-      name: 'Cliente 5  Comércio de Mat e Const Ltda',
-      code: '87654',
-      status: 'E',
-      rating: 3,
-    },
-  ];
+interface Client {
+  id: string;
+  companyName: string;
+  corfioCode: string;
+  clientCondition: string;
+  rating: number;
+  state: string;
+}
 
+// Função para capitalizar a primeira letra de cada palavra em uma string
+const capitalize = (str: any) => {
+  if (typeof str !== 'string') {
+    return '';
+  }
+  return str
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+};
+
+const ClientMtList = () => {
+  const [clients, setClients] = useState<Client[]>([]);
+  const [loading, setLoading] = useState(true);
   const isSmallScreen = useMediaQuery('(max-width:600px)');
 
-  const handleRowClick = () => {
-    // Redirecionar para a página do cliente
-    window.location.href = '/clientPage';
+  useEffect(() => {
+    const fetchClients = async () => {
+      try {
+        const response = await fetch('/api/getAllClients');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+
+        // Limpar e normalizar os estados antes de filtrar
+        const cleanedClients = data.clients.map((client: Client) => ({
+          ...client,
+          state: client.state.trim().toLowerCase(), // Remove espaços extras e converte para minúsculas
+        }));
+
+        const filteredClients = cleanedClients.filter((client: Client) => {
+          return client.state === 'mato grosso' || client.state === 'mt';
+        });
+
+        setClients(filteredClients);
+        setLoading(false);
+      } catch (error) {
+        console.error('Failed to fetch clients:', error);
+        setLoading(false);
+      }
+    };
+
+    fetchClients();
+  }, []);
+
+  const handleRowClick = (clientId: string) => {
+    window.location.href = `/clientPage?id=${clientId}`;
   };
+
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center">
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Container maxWidth="lg" sx={styles.container}>
@@ -74,16 +101,20 @@ const ClientMsList = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {clients.map((client, index) => (
+            {clients.map((client) => (
               <TableRow
-                key={index}
+                key={client.id}
                 sx={{ ...styles.rowHover, cursor: 'pointer' }}
-                onClick={handleRowClick} // Adicionar evento de clique na linha
+                onClick={() => handleRowClick(client.id)}
               >
-                <TableCell sx={styles.fontSize}>{client.name}</TableCell>
+                <TableCell sx={styles.fontSize}>
+                  {capitalize(client.companyName)}
+                </TableCell>
                 {!isSmallScreen && (
                   <>
-                    <TableCell sx={styles.fontSize}>{client.code}</TableCell>
+                    <TableCell sx={styles.fontSize}>
+                      {client.corfioCode}
+                    </TableCell>
                     <TableCell sx={styles.fontSize}>
                       <Box>
                         <Button
@@ -91,20 +122,20 @@ const ClientMsList = () => {
                           variant="contained"
                           size="small"
                           color={
-                            client.status === 'N'
+                            client.clientCondition === 'normal'
                               ? 'success'
-                              : client.status === 'E'
+                              : client.clientCondition === 'especial'
                                 ? 'warning'
-                                : client.status === 'S'
+                                : client.clientCondition === 'suspenso'
                                   ? 'error'
-                                  : 'inherit' // Substituído 'default' por 'inherit'
+                                  : 'inherit'
                           }
                         >
-                          {client.status === 'N'
+                          {client.clientCondition === 'normal'
                             ? 'Normal'
-                            : client.status === 'E'
+                            : client.clientCondition === 'especial'
                               ? 'Especial'
-                              : client.status === 'S'
+                              : client.clientCondition === 'suspenso'
                                 ? 'Suspenso'
                                 : 'Unknown'}
                         </Button>
@@ -112,7 +143,7 @@ const ClientMsList = () => {
                     </TableCell>
                     <TableCell sx={styles.fontSize}>
                       <Rating
-                        name={`rating-${index}`}
+                        name={`rating-${client.id}`}
                         value={client.rating}
                         readOnly
                         size="medium"
@@ -130,4 +161,4 @@ const ClientMsList = () => {
   );
 };
 
-export default ClientMsList;
+export default ClientMtList;

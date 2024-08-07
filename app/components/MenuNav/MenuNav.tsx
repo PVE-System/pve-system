@@ -34,20 +34,19 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import CloseIcon from '@mui/icons-material/Close';
 
 import { useMediaQuery } from '@mui/material';
-/* import ThemeSwitcher from '../ThemeSwitcher/ThemeSwitcher'; */
+import { useAuth } from '@/app/contex/authContext';
 
 export default function TemporaryDrawer() {
   const [open, setOpen] = React.useState(false);
   const { theme, toggleTheme } = useTheme();
+  const isMobile = useMediaQuery('(max-width:600px)');
+  const { logout } = useAuth();
 
   const handleToggleTheme = () => {
     const newTheme = theme === 'light' ? 'light' : 'dark';
     localStorage.setItem('theme', newTheme);
     toggleTheme(); // Chame toggleTheme depois de salvar o tema no localStorage
   };
-
-  // Detecta se a tela é menor que o tamanho md (960px)
-  const isMobile = useMediaQuery('(max-width:600px)');
 
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen);
@@ -72,7 +71,11 @@ export default function TemporaryDrawer() {
             icon: <ApartmentIcon />,
             link: '/clientsMtList',
           },
-          { name: 'Clientes BR', icon: <BusinessIcon />, link: '/' },
+          {
+            name: 'Outras UF',
+            icon: <BusinessIcon />,
+            link: '/clientsOtherUfList',
+          },
           {
             name: 'Cadastrar Cliente',
             icon: <AddBusinessIcon />,
@@ -148,7 +151,7 @@ export default function TemporaryDrawer() {
           <Box sx={styles.contentMenu}>
             <IconButton
               sx={styles.iconTheme}
-              onClick={handleToggleTheme} // Alteração aqui para chamar a função de alternar o tema
+              onClick={handleToggleTheme} //função alternar o tema
               color="inherit"
             >
               {themeIcon}
@@ -165,8 +168,10 @@ export default function TemporaryDrawer() {
             </Typography>
           </Box>
           <Box sx={styles.iconLogout}>
-            <Link href="/">
-              <LogoutIcon />
+            <Link onClick={logout}>
+              <IconButton>
+                <LogoutIcon />
+              </IconButton>
             </Link>
           </Box>
         </Box>
@@ -174,3 +179,7 @@ export default function TemporaryDrawer() {
     </Box>
   );
 }
+/* function redirectTo(arg0: string) {
+  throw new Error('Function not implemented.');
+}
+ */

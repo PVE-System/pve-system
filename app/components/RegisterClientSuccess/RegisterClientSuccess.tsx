@@ -1,7 +1,9 @@
 'use client';
 
+import React, { Suspense } from 'react';
 import { Box, Card, CardContent, Container, Typography } from '@mui/material';
 import NextLink from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
 import sharedStyles from '@/app/styles/sharedStyles';
 import styles from '@/app/components/RegisterClientSuccess/style';
@@ -9,7 +11,15 @@ import styles from '@/app/components/RegisterClientSuccess/style';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 
-export default function RegisterClientSuccess() {
+// Componente com Suspense
+const RegisterClientSuccessContent = () => {
+  const searchParams = useSearchParams();
+  const clientId = searchParams.get('clientId');
+
+  if (!clientId) {
+    return <p>Erro: clientId não fornecido.</p>;
+  }
+
   return (
     <Container fixed>
       <Box sx={sharedStyles.container}>
@@ -23,7 +33,7 @@ export default function RegisterClientSuccess() {
             <Typography variant="h6" sx={sharedStyles.subtitleSize}>
               <span>Página </span>Cliente
             </Typography>
-            <Box component={NextLink} href="/clientPage">
+            <Box component={NextLink} href={`/clientPage?id=${clientId}`}>
               <ApartmentIcon sx={styles.icon} />
             </Box>
           </CardContent>
@@ -38,5 +48,14 @@ export default function RegisterClientSuccess() {
         </Card>
       </Box>
     </Container>
+  );
+};
+
+// Componente principal com Suspense
+export default function RegisterClientSuccess() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <RegisterClientSuccessContent />
+    </Suspense>
   );
 }

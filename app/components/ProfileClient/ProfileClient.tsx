@@ -1,18 +1,47 @@
 'use client';
 
-import React from 'react';
-import { useState } from 'react';
-
+import React, { useEffect, useState } from 'react';
 import { Box, Button, Rating, Typography } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
-
 import Image from 'next/image';
 import styles from '@/app/components/ProfileClient/styles';
 
-/* Grupo 1 - Imagem e status */
+interface ClientProfileProps {
+  // New props
+  rating: number;
+  clientCondition: string;
+  companyName: string;
+  corfioCode: string;
+  email: string;
+  phone: string;
+  onRatingChange: (rating: number) => void;
+  onConditionChange: (condition: string) => void;
+  readOnly?: boolean;
+}
 
-const ClientProfile: React.FC = () => {
-  const { handleSubmit, control, getValues } = useForm();
+// Função para capitalizar a primeira letra de cada palavra em uma string
+const capitalize = (str: any) => {
+  if (typeof str !== 'string') {
+    return '';
+  }
+  return str
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+};
+
+const ClientProfile: React.FC<ClientProfileProps> = ({
+  rating,
+  clientCondition,
+  companyName,
+  corfioCode,
+  email,
+  phone,
+  onRatingChange,
+  onConditionChange,
+  readOnly,
+}) => {
+  const { control } = useForm();
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -28,6 +57,12 @@ const ClientProfile: React.FC = () => {
 
   return (
     <Box sx={styles.boxProfile}>
+      <Typography
+        variant="h6"
+        sx={{ marginBottom: '16px', textAlign: 'center' }}
+      >
+        {capitalize(companyName)}
+      </Typography>{' '}
       <label htmlFor="profile-picture-input">
         <input
           id="profile-picture-input"
@@ -35,6 +70,7 @@ const ClientProfile: React.FC = () => {
           accept="image/*"
           style={{ display: 'none' }}
           onChange={handleImageChange}
+          disabled={readOnly}
         />
         <Image
           src={previewImage || '/profile-placeholder.png'}
@@ -45,7 +81,7 @@ const ClientProfile: React.FC = () => {
         />
       </label>
       <Box sx={styles.statusRating}>
-        <Typography variant="subtitle1">Status de Atividade</Typography>
+        <Typography variant="subtitle2">Status de Atividade:</Typography>
         <Controller
           name="rating"
           control={control}
@@ -54,70 +90,98 @@ const ClientProfile: React.FC = () => {
               sx={styles.rating}
               {...field}
               name="rating"
-              defaultValue={0}
+              value={rating}
               max={3}
               onChange={(event, value) => {
-                field.onChange(value);
+                if (!readOnly) {
+                  field.onChange(value);
+                  onRatingChange(value || 0);
+                }
               }}
+              readOnly={readOnly}
             />
           )}
         />
       </Box>
       <Box sx={styles.clientCondition}>
-        <Typography variant="subtitle1">Condição do Cliente</Typography>
-        <Controller
-          name="clienteEspecial"
-          control={control}
-          render={({ field }) => (
-            <Box sx={styles.clientConditionButtonBox}>
-              <Button
-                variant="outlined"
-                color="success"
-                sx={{
-                  ...styles.clientConditionButton,
-                  ...(field.value === 'normal' && {
-                    backgroundColor: 'green',
-                    border: 'none',
-                    color: 'white',
-                  }),
-                }}
-                onClick={() => field.onChange('normal')}
-              >
-                Normal
-              </Button>
-              <Button
-                variant="outlined"
-                color="warning"
-                sx={{
-                  ...styles.clientConditionButton,
-                  ...(field.value === 'especial' && {
-                    backgroundColor: '#FFD700',
-                    border: 'none',
-                    color: 'black',
-                  }),
-                }}
-                onClick={() => field.onChange('especial')}
-              >
-                Especial
-              </Button>
-              <Button
-                variant="outlined"
-                color="error"
-                sx={{
-                  ...styles.clientConditionButton,
-                  ...(field.value === 'suspenso' && {
-                    backgroundColor: 'red',
-                    border: 'none',
-                    color: 'white',
-                  }),
-                }}
-                onClick={() => field.onChange('suspenso')}
-              >
-                Suspenso
-              </Button>
-            </Box>
-          )}
-        />
+        <Typography variant="subtitle2">Condição do Cliente:</Typography>
+        <Box sx={styles.clientConditionButtonBox}>
+          <Button
+            variant="outlined"
+            color="success"
+            sx={{
+              ...styles.clientConditionButton,
+              ...(clientCondition === 'normal' && {
+                backgroundColor: 'green',
+                border: 'none',
+                color: 'white',
+              }),
+            }}
+            disabled={readOnly}
+            onClick={() => {
+              if (!readOnly) {
+                onConditionChange('normal');
+              }
+            }}
+          >
+            Normal
+          </Button>
+          <Button
+            variant="outlined"
+            color="warning"
+            sx={{
+              ...styles.clientConditionButton,
+              ...(clientCondition === 'especial' && {
+                backgroundColor: '#FFD700',
+                border: 'none',
+                color: 'black',
+              }),
+            }}
+            disabled={readOnly}
+            onClick={() => {
+              if (!readOnly) {
+                onConditionChange('especial');
+              }
+            }}
+          >
+            Especial
+          </Button>
+          <Button
+            variant="outlined"
+            color="error"
+            sx={{
+              ...styles.clientConditionButton,
+              ...(clientCondition === 'suspenso' && {
+                backgroundColor: 'red',
+                border: 'none',
+                color: 'white',
+              }),
+            }}
+            disabled={readOnly}
+            onClick={() => {
+              if (!readOnly) {
+                onConditionChange('suspenso');
+              }
+            }}
+          >
+            Suspenso
+          </Button>
+        </Box>
+      </Box>
+      <Box
+        sx={{
+          alignSelf: 'start',
+        }}
+      >
+        <Typography variant="subtitle2" sx={{ marginBottom: '5px' }}>
+          Código Corfio: {corfioCode}
+        </Typography>{' '}
+        <Typography variant="subtitle2" sx={{ marginBottom: '5px' }}>
+          Telefone: {phone}
+        </Typography>{' '}
+        <Typography variant="subtitle2" sx={{ marginBottom: '5px' }}>
+          Email: {email}
+        </Typography>{' '}
       </Box>
     </Box>
   );

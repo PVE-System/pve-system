@@ -16,19 +16,87 @@ import sharedStyles from '@/app/styles/sharedStyles';
 import styles from './styles';
 
 function RegisterTeamComponent() {
+  // Estado para armazenar os dados do formulário
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     confirmPassword: '',
   });
 
+  // Estado para armazenar mensagens de feedback
+  const [message, setMessage] = useState<string | null>(null);
+
+  // Função para lidar com as mudanças nos campos do formulário
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [event.target.name]: event.target.value });
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  // Função para validar o email
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Função para validar a senha
+  const validatePassword = (password: string): boolean => {
+    const passwordRegex = /(?=.*[A-Z])(?=.*[0-9]).{6,}/;
+    return passwordRegex.test(password);
+  };
+
+  // Função para lidar com a submissão do formulário
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log(formData);
+
+    // Validar o email
+    if (!validateEmail(formData.email)) {
+      setMessage('Por favor, insira um email válido');
+      return;
+    }
+
+    // Validar a senha
+    if (!validatePassword(formData.password)) {
+      setMessage(
+        'Senhas com pelo menos 6 caracteres, contendo 1 letra maiúscula e 1 número)',
+      );
+
+      return;
+    }
+
+    // Verificar se as senhas são iguais
+    if (formData.password !== formData.confirmPassword) {
+      setMessage('As senhas devem ser iguais');
+      return;
+    }
+
+    // Enviar requisição POST para a API
+    try {
+      const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      if (response.ok) {
+        // Limpar o formulário se o cadastro for bem-sucedido
+        setFormData({
+          email: '',
+          password: '',
+          confirmPassword: '',
+        });
+        /* const result = await response.json(); */ // A variável result é declarada, mas não utilizada. Pode ser removida.
+        setMessage('Usuário cadastrado com sucesso!');
+      } else {
+        const error = await response.json();
+        setMessage(`Erro: ${error.error}`);
+      }
+    } catch (error) {
+      setMessage('Erro ao conectar com o servidor');
+    }
   };
 
   return (
@@ -47,6 +115,12 @@ function RegisterTeamComponent() {
           Digite email e senha para cadastrar equipe.
         </Typography>
 
+        {message && (
+          <Typography variant="body2" color="error">
+            {message}
+          </Typography>
+        )}
+
         <Box
           component="form"
           onSubmit={handleSubmit}
@@ -64,6 +138,12 @@ function RegisterTeamComponent() {
             autoFocus
             value={formData.email}
             onChange={handleChange}
+            // Regex para validar email
+            inputProps={{
+              pattern: '^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$',
+            }}
+            // Mensagem de erro personalizada
+            /* helperText="Por favor, insira um email válido" */
           />
           <TextField
             margin="normal"
@@ -76,6 +156,11 @@ function RegisterTeamComponent() {
             autoComplete="new-password"
             value={formData.password}
             onChange={handleChange}
+            inputProps={{
+              pattern: '(?=.*[A-Z])(?=.*[0-9]).{6,}',
+            }}
+            // Mensagem de erro personalizada
+            /* helperText="A partir de 6 caracteres, incluindo 1 letra maiúscula e 1 número" */
           />
           <TextField
             margin="normal"
@@ -88,6 +173,11 @@ function RegisterTeamComponent() {
             autoComplete="new-password"
             value={formData.confirmPassword}
             onChange={handleChange}
+            // Verificação simples para garantir que a confirmação da senha seja obrigatória
+            inputProps={{
+              minLength: 6,
+            }}
+            /*  helperText="Confirme sua senha" */
           />
           <Button
             type="submit"
