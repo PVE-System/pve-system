@@ -36,7 +36,7 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
 
     const baseUrl =
       process.env.NODE_ENV === 'production'
-        ? 'https://pve-system-3kuwnoalz-pve-representacoes-s-projects.vercel.app'
+        ? 'https://pve-system-git-debug-build-pve-representacoes-s-projects.vercel.app/'
         : '';
 
     fetch(`${baseUrl}/api/getClient/[id]?id=${clientId}`) // Busca os dados do cliente da API
