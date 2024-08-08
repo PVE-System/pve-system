@@ -3,11 +3,13 @@ import { db } from '@/app/db';
 import { salesInformation, clients } from '@/app/db/schema';
 import { eq } from 'drizzle-orm';
 
-export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const clientId = searchParams.get('id'); // Usar clientId em vez de id
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } },
+) {
+  const { id } = params;
 
-  if (!clientId) {
+  if (!id) {
     console.error('Client ID is required');
     return NextResponse.json(
       { error: 'Client ID is required' },
@@ -16,36 +18,32 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    console.log('Fetching sales information for client ID:', clientId);
+    console.log('Fetching sales information for client ID:', id);
 
     const salesInfo = await db
       .select()
       .from(salesInformation)
-      .where(eq(salesInformation.clientId, Number(clientId))) // Buscar por clientId
+      .where(eq(salesInformation.clientId, Number(id)))
       .execute();
 
     if (salesInfo.length === 0) {
-      console.warn('Sales information not found for client ID:', clientId);
+      console.warn('Sales information not found for client ID:', id);
       return NextResponse.json(
         { error: 'Sales information not found' },
         { status: 404 },
       );
     }
 
-    console.log('Sales information found:', salesInfo);
-
     const clientInfo = await db
       .select()
       .from(clients)
-      .where(eq(clients.id, Number(clientId))) // Garantir que estamos buscando o cliente correto
+      .where(eq(clients.id, Number(id)))
       .execute();
 
     if (clientInfo.length === 0) {
-      console.warn('Client not found for ID:', clientId);
+      console.warn('Client not found for ID:', id);
       return NextResponse.json({ error: 'Client not found' }, { status: 404 });
     }
-
-    console.log('Client information found:', clientInfo);
 
     const combinedData = {
       ...salesInfo[0],
