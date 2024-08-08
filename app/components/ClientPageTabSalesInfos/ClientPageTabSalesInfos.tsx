@@ -38,9 +38,7 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
 
     const fetchClientData = async () => {
       try {
-        const clientResponse = await fetch(
-          `/api/getClient/[id]?id=${clientId}`,
-        );
+        const clientResponse = await fetch(`/api/getClient/${clientId}`);
         if (!clientResponse.ok) {
           throw new Error('Network response was not ok');
         }
@@ -48,7 +46,7 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
         setClientData(clientData);
 
         const salesResponse = await fetch(
-          `/api/getSalesInformation/[id]?id=${clientId}`,
+          `/api/getSalesInformation/${clientId}`,
         );
         if (salesResponse.ok) {
           const salesData = await salesResponse.json();
