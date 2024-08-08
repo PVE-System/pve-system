@@ -30,16 +30,17 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
   const [loading, setLoading] = useState(true); // Estado para controlar o carregamento
 
   useEffect(() => {
-    if (!clientId) return;
-
-    console.log('Fetching client data for ID:', clientId);
+    if (!clientId || isNaN(Number(clientId))) {
+      console.error('Invalid client ID:', clientId);
+      return;
+    }
 
     const baseUrl =
       process.env.NODE_ENV === 'production'
         ? 'https://pve-system.vercel.app'
-        : '';
+        : 'http://localhost:3000';
 
-    fetch(`${baseUrl}/api/getClient/[id]?id=${clientId}`) // Busca os dados do cliente da API
+    fetch(`${baseUrl}/api/getClient/${clientId}`)
       .then((response) => {
         if (!response.ok) {
           console.error('Network response was not ok');
@@ -49,17 +50,15 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
       })
       .then((data) => {
         console.log('Client data received:', data);
-        setClientData(data); // Armazena os dados do cliente no estado
+        setClientData(data);
         setLoading(false);
-
-        // Preenche os valores do formulário com os dados do cliente
         Object.keys(data).forEach((key) => {
           setValue(key, data[key]);
         });
       })
       .catch((error) => {
         console.error('Error fetching client data:', error);
-        setLoading(false); // Define loading como falso em caso de erro
+        setLoading(false);
       });
   }, [clientId, setValue]);
 
