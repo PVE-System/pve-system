@@ -34,7 +34,7 @@ const ClientPageTabAnnotation: React.FC<ClientPageTabAnnotationProps> = ({
   const fetchComments = useCallback(async () => {
     try {
       const commentsResponse = await fetch(
-        `/api/getHistoryComments/[id]?id=${clientId}`,
+        `/api/getHistoryComments/${clientId}`,
       );
       if (commentsResponse.ok) {
         const commentsData = await commentsResponse.json();
@@ -52,7 +52,7 @@ const ClientPageTabAnnotation: React.FC<ClientPageTabAnnotationProps> = ({
 
   const fetchClientData = useCallback(async () => {
     try {
-      const clientResponse = await fetch(`/api/getClient/[id]?id=${clientId}`);
+      const clientResponse = await fetch(`/api/getClient/${clientId}`);
       if (!clientResponse.ok) {
         throw new Error('Network response was not ok');
       }
@@ -64,13 +64,21 @@ const ClientPageTabAnnotation: React.FC<ClientPageTabAnnotationProps> = ({
   }, [clientId]);
 
   useEffect(() => {
-    if (!clientId) return;
+    if (!clientId) {
+      console.error('Client ID is missing');
+      return;
+    }
 
     const fetchData = async () => {
-      setLoading(true);
-      await fetchClientData();
-      await fetchComments();
-      setLoading(false);
+      try {
+        setLoading(true);
+        await fetchClientData();
+        await fetchComments();
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchData();
@@ -87,7 +95,7 @@ const ClientPageTabAnnotation: React.FC<ClientPageTabAnnotationProps> = ({
     };
 
     try {
-      const response = await fetch(`/api/postHistoryComments`, {
+      const response = await fetch('/api/postHistoryComments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ clientId, ...newComment }),
@@ -116,9 +124,7 @@ const ClientPageTabAnnotation: React.FC<ClientPageTabAnnotationProps> = ({
         {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            favorite: targetComment.favorite,
-          }),
+          body: JSON.stringify({ favorite: targetComment.favorite }),
         },
       );
 
@@ -234,7 +240,7 @@ const ClientPageTabAnnotation: React.FC<ClientPageTabAnnotationProps> = ({
             {Array.isArray(comments) &&
               comments.map((comment, index) => (
                 <Box key={comment.id} sx={styles.boxComments}>
-                  <Box /* sx={{ flexGrow: 1 }} */>
+                  <Box>
                     <Typography variant="body1">{comment.comment}</Typography>
                     <Typography variant="caption" sx={styles.commentsData}>
                       {formatCommentDate(comment.date)}
