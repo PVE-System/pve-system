@@ -1,11 +1,15 @@
+// /api/getHistoryComments/[clientId]/route.ts
+
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/app/db';
 import { comments } from '@/app/db/schema';
-import { eq, sql } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 
-export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const clientId = searchParams.get('id');
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { clientId: string } },
+) {
+  const { clientId } = params;
 
   if (!clientId) {
     return NextResponse.json(
@@ -19,13 +23,19 @@ export async function GET(request: NextRequest) {
       .select()
       .from(comments)
       .where(eq(comments.clientId, Number(clientId)))
-      .orderBy(sql`${comments.favorite} DESC, ${comments.date} DESC`)
+      .orderBy(desc(comments.favorite), desc(comments.date))
       .execute();
 
-    // Formatando a data para ISO 8601 antes de retornar
+    if (commentsData.length === 0) {
+      return NextResponse.json(
+        { message: 'No comments found for this client.' },
+        { status: 200 },
+      );
+    }
+
     const formattedComments = commentsData.map((comment) => ({
       ...comment,
-      date: comment.date.toISOString(), // Garante que a data está em formato ISO 8601
+      date: comment.date.toISOString(),
     }));
 
     return NextResponse.json(formattedComments, { status: 200 });
