@@ -22,7 +22,7 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
 
   const fetchClientData = useCallback(async () => {
     try {
-      const clientResponse = await fetch(`/api/getClient/[id]?id=${clientId}`);
+      const clientResponse = await fetch(`/api/getClient/${clientId}`);
       if (!clientResponse.ok) {
         throw new Error('Network response was not ok');
       }
