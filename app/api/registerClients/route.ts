@@ -67,12 +67,13 @@ export async function POST(request: NextRequest) {
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/app/db';
 import { clients, NewClient } from '@/app/db/schema';
+import { revalidateTag } from 'next/cache'; // Importar a função de revalidação
 
 export async function POST(request: NextRequest) {
   const newClient: NewClient = await request.json();
 
   try {
-    // Verifique se db.insert().values() é realmente assíncrono
+    // Inserir novo cliente no banco de dados
     const createdClient = await db
       .insert(clients)
       .values({
@@ -107,7 +108,10 @@ export async function POST(request: NextRequest) {
       .returning({
         id: clients.id,
       })
-      .execute(); // Verifique se execute() é assíncrono
+      .execute();
+
+    // Revalidar a tag 'clients' para garantir que o cache seja atualizado
+    revalidateTag('clients');
 
     const response = NextResponse.json({ clientId: createdClient[0].id });
     response.headers.set('Cache-Control', 'no-store, max-age=0');
