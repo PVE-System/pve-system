@@ -12,15 +12,15 @@ export async function GET(request: NextRequest) {
 import { db } from '@/app/db';
 import { clients, Client } from '@/app/db/schema';
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidateTag } from 'next/cache'; // Importar a função de revalidação
 
 export async function GET(request: NextRequest) {
+  // Buscar todos os clientes no banco de dados
   const allClients: Client[] = await db.select().from(clients);
 
-  // Cria a resposta JSON com a lista de clientes
-  const response = NextResponse.json({ clients: allClients });
+  // Revalidar a tag 'clients' para garantir que o cache seja atualizado
+  revalidateTag('clients');
 
-  // Define o cabeçalho Cache-Control para evitar cache
-  response.headers.set('Cache-Control', 'no-store, max-age=0');
-
-  return response;
+  // Criar a resposta JSON com a lista de clientes
+  return NextResponse.json({ clients: allClients });
 }
