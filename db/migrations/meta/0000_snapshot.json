@@ -1,5 +1,5 @@
 {
-  "id": "0923bfdc-8c38-4fc1-a873-f360df13d148",
+  "id": "7e5e4c87-52a9-4730-b3d4-35f7658a23d9",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "6",
   "dialect": "postgresql",
@@ -80,8 +80,20 @@
           "primaryKey": false,
           "notNull": true
         },
-        "email": {
-          "name": "email",
+        "email_commercial": {
+          "name": "email_commercial",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email_financial": {
+          "name": "email_financial",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email_xml": {
+          "name": "email_xml",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -118,18 +130,6 @@
         },
         "has_own_store": {
           "name": "has_own_store",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "is_jsm_client": {
-          "name": "is_jsm_client",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "included_by_jsm": {
-          "name": "included_by_jsm",
           "type": "text",
           "primaryKey": false,
           "notNull": true
