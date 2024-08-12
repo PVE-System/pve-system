@@ -64,24 +64,15 @@ export async function POST(request: NextRequest) {
 }
  */
 
-import { NextApiRequest, NextApiResponse } from 'next';
-import { db } from '@/app/db'; // Ajuste o caminho conforme necessário
-import { clients, NewClient } from '@/app/db/schema'; // Ajuste o caminho conforme necessário
 import { NextRequest, NextResponse } from 'next/server';
+import { db } from '@/app/db';
+import { clients, NewClient } from '@/app/db/schema';
 
-// METODO GET:
-export async function GET(request: NextRequest) {
-  const users = await db.select().from(clients);
-  const response = NextResponse.json({ users });
-  response.headers.set('Cache-Control', 'no-store, max-age=0');
-  return response;
-}
-
-// METODO POST:
 export async function POST(request: NextRequest) {
   const newClient: NewClient = await request.json();
 
   try {
+    // Verifique se db.insert().values() é realmente assíncrono
     const createdClient = await db
       .insert(clients)
       .values({
@@ -116,7 +107,7 @@ export async function POST(request: NextRequest) {
       .returning({
         id: clients.id,
       })
-      .execute();
+      .execute(); // Verifique se execute() é assíncrono
 
     const response = NextResponse.json({ clientId: createdClient[0].id });
     response.headers.set('Cache-Control', 'no-store, max-age=0');
