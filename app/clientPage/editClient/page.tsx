@@ -6,7 +6,7 @@ import HeadApp from '@/app/components/HeadApp/HeadApp';
 import sharedStyles from '@/app/styles/sharedStyles';
 import { Box, Container, Typography } from '@mui/material';
 import dynamic from 'next/dynamic';
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
 
 /* const BasicTabs = dynamic(
   () => import('@/app/components/ClientPageAllTabs/ClientPageAllTabs'),
@@ -15,7 +15,13 @@ import { Suspense } from 'react';
   },
 ); */
 
+interface FormDataState {
+  [key: string]: string;
+}
+
 export default function EditClientPage() {
+  const [formData, setFormData] = useState<FormDataState>({});
+
   return (
     <>
       <HeadApp />
@@ -26,7 +32,7 @@ export default function EditClientPage() {
           </Typography>
         </Box>
         <Suspense>
-          <EditClient />
+          <EditClient setFormData={setFormData} />
         </Suspense>
         {/*  <BasicTabs clientId={clientId} /> */}
       </Container>
