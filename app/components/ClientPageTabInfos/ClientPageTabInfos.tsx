@@ -99,14 +99,33 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
   };
 
   // Função para capitalizar a primeira letra de cada palavra em uma string e deixar maiscula
-  const capitalize = (str: any) => {
-    if (typeof str !== 'string') {
-      return '';
+  const capitalize = (str: string, isEmail: boolean = false) => {
+    if (typeof str !== 'string' || isEmail) {
+      return str;
     }
     return str
       .split(' ')
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(' ');
+  };
+
+  const handleChange = (name: string, value: string) => {
+    let formattedValue = value;
+
+    if (
+      name === 'emailCommercial' ||
+      name === 'emailFinancial' ||
+      name === 'emailXml'
+    ) {
+      // E-mails não serão formatados pela função capitalize
+      /* formattedValue = value.toLowerCase(); */
+      // Você pode remover essa linha se não quiser alterar o formato para minúsculas
+    } else {
+      // Capitaliza os outros campos
+      formattedValue = capitalize(value);
+    }
+
+    setValue(name, formattedValue);
   };
 
   //Start Export
@@ -302,7 +321,12 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
                       {...field}
                       variant="filled"
                       sx={styles.inputsCol2}
-                      value={capitalize(field.value)}
+                      value={
+                        name.startsWith('email')
+                          ? field.value
+                          : capitalize(field.value)
+                      }
+                      onChange={(e) => handleChange(name, e.target.value)}
                       InputProps={{
                         readOnly: true, // Desativei deixando verdadeiro
                       }}

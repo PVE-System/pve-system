@@ -12,6 +12,12 @@ import {
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
+import {
+  formatCPF,
+  formatCNPJ,
+  formatPhone,
+  formatCEP,
+} from '@/app/components/FormFormatter/FormFormatter';
 import sharedStyles from '@/app/styles/sharedStyles';
 import styles from './styles';
 
@@ -77,8 +83,8 @@ const RegisterClient: React.FC = () => {
   const selectOptions: { [key: string]: string[] } = {
     companySize: ['Pequeno', 'Médio', 'Grande'],
     hasOwnStore: ['Sim', 'Não'],
-    isJSMClient: ['Sim', 'Não'],
-    includedByJSM: ['Sim', 'Não'],
+    /*     isJSMClient: ['Sim', 'Não'],
+    includedByJSM: ['Sim', 'Não'], */
     icmsContributor: ['Sim', 'Não'],
     transportationType: ['Carreta', 'Truck', 'Ambos', 'Nenhum'],
     companyLocation: ['Área Rural', 'Centro'],
@@ -132,7 +138,24 @@ const RegisterClient: React.FC = () => {
   const router = useRouter();
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [event.target.name]: event.target.value });
+    const { name, value } = event.target;
+
+    let formattedValue = value;
+
+    if (name === 'cpf') {
+      formattedValue = formatCPF(value);
+    } else if (name === 'cnpj') {
+      formattedValue = formatCNPJ(value);
+    } else if (name === 'phone') {
+      formattedValue = formatPhone(value);
+    } else if (name === 'cep') {
+      formattedValue = formatCEP(value);
+    }
+
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: formattedValue,
+    }));
   };
 
   const setRating = (rating: number) => {
