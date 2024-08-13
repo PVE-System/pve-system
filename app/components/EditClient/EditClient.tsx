@@ -10,7 +10,12 @@ import {
 import { useForm, Controller } from 'react-hook-form';
 import { useRouter, useSearchParams } from 'next/navigation';
 import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
-/* import styles from '@/app/components/ClientPageTabInfos/styles'; */
+import {
+  formatCPF,
+  formatCNPJ,
+  formatPhone,
+  formatCEP,
+} from '@/app/components/FormFormatter/FormFormatter';
 import styles from '@/app/components/EditClient/styles';
 
 const fieldLabels: { [key: string]: string } = {
@@ -93,7 +98,15 @@ const selectOptions: { [key: string]: string[] } = {
   ],
 };
 
-const ClientEditPage: React.FC = () => {
+interface FormDataState {
+  [key: string]: string;
+}
+
+interface EditClientProps {
+  setFormData: React.Dispatch<React.SetStateAction<FormDataState>>;
+}
+
+const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
   const searchParams = useSearchParams();
   const clientId = searchParams.get('id');
 
@@ -105,7 +118,7 @@ const ClientEditPage: React.FC = () => {
   useEffect(() => {
     if (!clientId) return;
 
-    fetch(`/api/getClient/[id]?id=${clientId}`)
+    fetch(`/api/getClient/${clientId}`)
       .then((response) => response.json())
       .then((data) => {
         setClientData(data);
@@ -233,27 +246,53 @@ const ClientEditPage: React.FC = () => {
                       name={key}
                       control={control}
                       defaultValue={clientData[key] || ''}
-                      render={({ field }) => (
-                        <TextField
-                          {...field}
-                          variant="filled"
-                          sx={styles.inputsCol2}
-                          InputProps={{
-                            readOnly: false,
-                          }}
-                          select={key in selectOptions}
-                        >
-                          {key in selectOptions &&
-                            selectOptions[key].map((option) => (
-                              <MenuItem
-                                key={option}
-                                value={option.toLowerCase()}
-                              >
-                                {option}
-                              </MenuItem>
-                            ))}
-                        </TextField>
-                      )}
+                      render={({ field }) => {
+                        const handleFormattedChange = (
+                          event: React.ChangeEvent<
+                            HTMLInputElement | HTMLTextAreaElement
+                          >,
+                        ) => {
+                          const { name, value } = event.target;
+
+                          let formattedValue = value;
+
+                          if (name === 'cpf') {
+                            formattedValue = formatCPF(value);
+                          } else if (name === 'cnpj') {
+                            formattedValue = formatCNPJ(value);
+                          } else if (name === 'phone') {
+                            formattedValue = formatPhone(value);
+                          } else if (name === 'cep') {
+                            formattedValue = formatCEP(value);
+                          }
+
+                          // Atualiza o valor formatado no estado
+                          field.onChange(formattedValue);
+                        };
+
+                        return (
+                          <TextField
+                            {...field}
+                            variant="filled"
+                            sx={styles.inputsCol2}
+                            InputProps={{
+                              readOnly: false,
+                            }}
+                            onChange={handleFormattedChange} // Use a função que formata e atualiza o valor
+                            select={key in selectOptions}
+                          >
+                            {key in selectOptions &&
+                              selectOptions[key].map((option) => (
+                                <MenuItem
+                                  key={option}
+                                  value={option.toLowerCase()}
+                                >
+                                  {option}
+                                </MenuItem>
+                              ))}
+                          </TextField>
+                        );
+                      }}
                     />
                   </Box>
                 );
