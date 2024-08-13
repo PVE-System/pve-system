@@ -241,7 +241,7 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
             companyName={clientData?.companyName} // Pass companyName
             corfioCode={clientData?.corfioCode} // Pass corfioCode
             phone={clientData?.phone} // Pass phone
-            email={clientData?.email} // Pass email
+            emailCommercial={clientData?.emailCommercial} // Pass email
             onRatingChange={(rating) => setValue('rating', rating)}
             onConditionChange={(condition) =>
               setValue('clientCondition', condition)

@@ -202,7 +202,7 @@ const ClientPageTabAnnotation: React.FC<ClientPageTabAnnotationProps> = ({
           companyName={clientData?.companyName}
           corfioCode={clientData?.corfioCode}
           phone={clientData?.phone}
-          email={clientData?.email}
+          emailCommercial={clientData?.emailCommercial}
           onRatingChange={handleRatingChange}
           onConditionChange={handleConditionChange}
         />

@@ -213,7 +213,7 @@ const RegisterClient: React.FC = () => {
             corfioCode={''}
             onConditionChange={setClientCondition}
             readOnly={false}
-            email=""
+            emailCommercial=""
             phone=""
           />
           <Box sx={styles.boxCol2}>
