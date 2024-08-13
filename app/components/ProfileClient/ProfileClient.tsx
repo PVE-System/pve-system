@@ -12,7 +12,7 @@ interface ClientProfileProps {
   clientCondition: string;
   companyName: string;
   corfioCode: string;
-  email: string;
+  emailCommercial: string;
   phone: string;
   onRatingChange: (rating: number) => void;
   onConditionChange: (condition: string) => void;
@@ -35,7 +35,7 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
   clientCondition,
   companyName,
   corfioCode,
-  email,
+  emailCommercial,
   phone,
   onRatingChange,
   onConditionChange,
@@ -180,7 +180,7 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
           Telefone: {phone}
         </Typography>{' '}
         <Typography variant="subtitle2" sx={{ marginBottom: '5px' }}>
-          Email: {email}
+          Email: {emailCommercial}
         </Typography>{' '}
       </Box>
     </Box>

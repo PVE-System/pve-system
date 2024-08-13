@@ -193,7 +193,7 @@ const ClientEditPage: React.FC = () => {
             companyName={clientData?.companyName}
             corfioCode={clientData?.corfioCode}
             phone={clientData?.phone}
-            email={clientData?.email}
+            emailCommercial={clientData?.emailCommercial}
             onRatingChange={(rating) => setValue('rating', rating)}
             onConditionChange={(condition) =>
               setValue('clientCondition', condition)

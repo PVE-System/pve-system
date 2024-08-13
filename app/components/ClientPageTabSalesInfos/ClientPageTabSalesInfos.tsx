@@ -120,7 +120,7 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
           companyName={clientData?.companyName}
           corfioCode={clientData?.corfioCode}
           phone={clientData?.phone}
-          email={clientData?.email}
+          emailCommercial={clientData?.emailCommercial}
           onRatingChange={(rating) => setValue('rating', rating)}
           onConditionChange={(condition) =>
             setValue('clientCondition', condition)
