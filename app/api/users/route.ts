@@ -26,11 +26,13 @@ export async function POST(request: NextRequest) {
       .values({
         email: newUser.email,
         password: hashedPassword, // Usando a senha hasheada
+        name: newUser.name,
         createdAt: new Date(), // Adicionando a data de criação
       })
       .returning({
         id: users.id,
         email: users.email,
+        name: users.name,
         createdAt: users.createdAt,
       })
       .execute();
