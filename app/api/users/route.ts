@@ -26,11 +26,13 @@ export async function POST(request: NextRequest) {
       .values({
         email: newUser.email,
         password: hashedPassword, // Usando a senha hasheada
+        name: newUser.name,
         createdAt: new Date(), // Adicionando a data de criação
       })
       .returning({
         id: users.id,
         email: users.email,
+        name: users.name,
         createdAt: users.createdAt,
       })
       .execute();
@@ -51,6 +53,7 @@ export async function POST(request: NextRequest) {
 
 //METODO PUT:
 
+//METODO PUT:
 export async function PUT(request: NextRequest) {
   const userToUpdate: User = await request.json();
 
@@ -71,12 +74,14 @@ export async function PUT(request: NextRequest) {
       .set({
         email: userToUpdate.email,
         password: userToUpdate.password,
+        name: userToUpdate.name, // Adicionando a atualização do campo name
         createdAt: userToUpdate.createdAt,
       })
       .where(eq(users.id, userToUpdate.id))
       .returning({
         id: users.id,
         email: users.email,
+        name: users.name, // Incluindo name no retorno
         password: users.password,
         createdAt: users.createdAt,
       })
