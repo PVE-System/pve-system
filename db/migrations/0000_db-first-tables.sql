@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS "users" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"email" varchar(256) NOT NULL,
 	"password" varchar(256) NOT NULL,
-	"name" varchar NOT NULL,
+	"name" varchar,
 	"createdAt" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
