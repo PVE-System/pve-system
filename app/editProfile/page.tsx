@@ -1,13 +1,18 @@
+'use client';
+
 import * as React from 'react';
-import EditProfile from '@/app/components/ProfileEditor/ProfileEditor';
+import EditProfileUser from '@/app/components/EditProfileUser/EditProfileUser';
 import HeadApp from '../components/HeadApp/HeadApp';
 import { Box, Container, Typography } from '@mui/material';
 import sharedStyles from '../styles/sharedStyles';
+import { Suspense } from 'react'; // Importação necessária
+
+interface FormDataState {
+  [key: string]: string;
+}
 
 const ProfilePage: React.FC = () => {
-  // Suponha que você tenha esses dados do usuário
-  const userPhotoUrl = 'caminho/para/foto';
-  const userName = 'Nome do Usuário';
+  const [formData, setFormData] = React.useState<FormDataState>({});
 
   return (
     <>
@@ -18,7 +23,9 @@ const ProfilePage: React.FC = () => {
             <span>Editar </span>Perfil
           </Typography>
         </Box>
-        <EditProfile />
+        <Suspense>
+          <EditProfileUser setFormData={setFormData} />
+        </Suspense>
       </Container>
     </>
   );
