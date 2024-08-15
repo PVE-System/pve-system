@@ -56,9 +56,10 @@ export default function SignIn() {
       });
 
       if (response.ok) {
-        const { token } = await response.json();
+        const { token, userId } = await response.json(); // Capture o ID do usuário
         Cookies.set('token', token, { path: '/' });
-        router.push('/dashboard');
+        Cookies.set('userId', userId, { path: '/' }); // Salve o ID do usuário no cookie
+        window.location.reload(); // Força um refresh da página
       } else {
         const error = await response.json();
         setMessage(`${error.error}`);

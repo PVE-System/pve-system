@@ -36,16 +36,30 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useMediaQuery } from '@mui/material';
 import { useAuth } from '@/app/contex/authContext';
 
+// Exemplo de definição de tipo
+interface UserType {
+  id: string; // ou number, dependendo da implementação
+  token: string;
+  // Outras propriedades do usuário...
+}
+
+// Dentro do seu contexto de autenticação
+const user: UserType = {
+  id: '123', // Exemplo de ID
+  token: 'tokenString',
+  // Outras propriedades do usuário...
+};
+
 export default function TemporaryDrawer() {
   const [open, setOpen] = React.useState(false);
   const { theme, toggleTheme } = useTheme();
   const isMobile = useMediaQuery('(max-width:600px)');
-  const { logout } = useAuth();
+  const { user, logout } = useAuth(); // Obtenha o usuário do contexto de autenticação
 
   const handleToggleTheme = () => {
     const newTheme = theme === 'light' ? 'light' : 'dark';
     localStorage.setItem('theme', newTheme);
-    toggleTheme(); // Chame toggleTheme depois de salvar o tema no localStorage
+    toggleTheme();
   };
 
   const toggleDrawer = (newOpen: boolean) => () => {
@@ -59,6 +73,7 @@ export default function TemporaryDrawer() {
   const DrawerList = (
     <div role="presentation" onClick={toggleDrawer(false)}>
       <List sx={styles.textMenu}>
+        {/* Primeira seção do menu */}
         {[
           { name: 'Dashboard', icon: <DashboardIcon />, link: '/dashboard' },
           {
@@ -92,6 +107,7 @@ export default function TemporaryDrawer() {
       </List>
       <Divider sx={styles.dividerMenu} />
       <List sx={styles.textMenu}>
+        {/* Segunda seção do menu */}
         {[
           {
             name: 'Planilha Excel',
@@ -106,9 +122,8 @@ export default function TemporaryDrawer() {
           {
             name: 'Editar Perfil',
             icon: <ManageAccountsIcon />,
-            link: '/editProfile',
+            link: `/editProfile?id=${user?.id}`, // Use o ID do usuário do contexto de autenticação
           },
-          // Adicione mais itens conforme necessário
         ].map((item) => (
           <ListItem key={item.name} disablePadding>
             <ListItemButton component="a" href={item.link}>
@@ -151,7 +166,7 @@ export default function TemporaryDrawer() {
           <Box sx={styles.contentMenu}>
             <IconButton
               sx={styles.iconTheme}
-              onClick={handleToggleTheme} //função alternar o tema
+              onClick={handleToggleTheme}
               color="inherit"
             >
               {themeIcon}
@@ -179,7 +194,3 @@ export default function TemporaryDrawer() {
     </Box>
   );
 }
-/* function redirectTo(arg0: string) {
-  throw new Error('Function not implemented.');
-}
- */
