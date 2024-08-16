@@ -8,7 +8,7 @@ import { POSTGRES_URL } from '../config';
 async function runMigrations() {
   // Cria uma conexão com o banco de dados PostgreSQL usando a URL completa
   const migrationClient = postgres(POSTGRES_URL, { max: 1 });
-  
+
   // Log para verificar a URL de conexão
   console.log('Connecting to:', POSTGRES_URL);
 

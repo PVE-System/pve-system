@@ -2,7 +2,14 @@
 /*Neste arquivo que criamos outras tabelas, não precisa ser outro arquivo*/
 
 import { boolean, integer } from 'drizzle-orm/pg-core';
-import { pgTable, serial, text, varchar, timestamp, uniqueIndex } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  serial,
+  text,
+  varchar,
+  timestamp,
+  uniqueIndex,
+} from 'drizzle-orm/pg-core';
 
 // Definição da tabela users com índice único no email.
 // Nenhuma linha na tabela pode ter o mesmo valor para colunas que fazem parte do índice único.

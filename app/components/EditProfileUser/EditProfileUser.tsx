@@ -93,17 +93,22 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
     }
   };
 
-  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0];
     if (file) {
       const formData = new FormData();
       formData.append('file', file);
 
       // Realize o upload da imagem
-      const uploadResponse = await fetch(`/api/uploadImage?pathname=${file.name}&userId=${userId}`, {
-        method: 'POST',
-        body: formData,
-      });
+      const uploadResponse = await fetch(
+        `/api/uploadImage?pathname=${file.name}&userId=${userId}`,
+        {
+          method: 'POST',
+          body: formData,
+        },
+      );
 
       const uploadData = await uploadResponse.json();
       setImageUrl(uploadData.url); // Defina a URL da imagem do estado

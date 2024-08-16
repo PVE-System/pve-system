@@ -7,7 +7,10 @@ export async function POST(request: NextRequest) {
   const fileName = request.nextUrl.searchParams.get('pathname');
 
   if (!file || !fileName) {
-    return NextResponse.json({ error: 'File or pathname not provided' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'File or pathname not provided' },
+      { status: 400 },
+    );
   }
 
   const { url } = await put(fileName, file, {
