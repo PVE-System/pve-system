@@ -10,9 +10,14 @@ import React, {
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 
+interface User {
+  id: string; // Adicione o campo id
+  token: string;
+}
+
 interface AuthContextType {
-  user: { token: string } | null;
-  login: (token: string) => void;
+  user: User | null;
+  login: (user: User) => void; // Atualize para aceitar um objeto User
   logout: () => Promise<void>;
 }
 
@@ -23,20 +28,23 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [user, setUser] = useState<{ token: string } | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     const token = Cookies.get('token');
+    const userId = Cookies.get('userId'); // Obtém o id do usuário do cookie
     console.log('AuthProvider useEffect Token:', token);
-    if (token) {
-      setUser({ token });
+    console.log('AuthProvider useEffect User ID:', userId);
+    if (token && userId) {
+      setUser({ id: userId, token });
     }
   }, []);
 
-  const login = (token: string) => {
-    Cookies.set('token', token, { path: '/' });
-    setUser({ token });
+  const login = (user: User) => {
+    Cookies.set('token', user.token, { path: '/' });
+    Cookies.set('userId', user.id, { path: '/' }); // Salva o id do usuário no cookie
+    setUser(user);
     router.push('/dashboard');
   };
 
@@ -51,6 +59,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       if (response.ok) {
         Cookies.remove('token');
+        Cookies.remove('userId'); // Remove o id do usuário dos cookies
         setUser(null);
         router.push('/');
       } else {

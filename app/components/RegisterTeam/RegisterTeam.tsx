@@ -21,6 +21,7 @@ function RegisterTeamComponent() {
     email: '',
     password: '',
     confirmPassword: '',
+    name: '',
   });
 
   // Estado para armazenar mensagens de feedback
@@ -70,7 +71,7 @@ function RegisterTeamComponent() {
 
     // Enviar requisição POST para a API
     try {
-      const response = await fetch('/api/users', {
+      const response = await fetch('/api/registerUsers', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -78,6 +79,7 @@ function RegisterTeamComponent() {
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
+          name: formData.name,
         }),
       });
 
@@ -87,6 +89,7 @@ function RegisterTeamComponent() {
           email: '',
           password: '',
           confirmPassword: '',
+          name: '',
         });
         /* const result = await response.json(); */ // A variável result é declarada, mas não utilizada. Pode ser removida.
         setMessage('Usuário cadastrado com sucesso!');
@@ -189,8 +192,8 @@ function RegisterTeamComponent() {
           </Button>
           <Grid container>
             <Grid item xs>
-              <Link href="#" variant="body2">
-                Recuperar senha?
+              <Link href="/dashboard" variant="body2">
+                Voltar para Dashboard
               </Link>
             </Grid>
             <Grid item>
