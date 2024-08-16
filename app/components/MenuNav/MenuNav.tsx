@@ -32,7 +32,10 @@ import { useAuth } from '@/app/contex/authContext'; // Importe o contexto de aut
 
 export default function TemporaryDrawer() {
   const [open, setOpen] = React.useState(false);
-  const [userData, setUserData] = React.useState<{ name: string; imageUrl: string | null }>({ name: '', imageUrl: null });
+  const [userData, setUserData] = React.useState<{
+    name: string;
+    imageUrl: string | null;
+  }>({ name: '', imageUrl: null });
   const { theme, toggleTheme } = useTheme();
   const isMobile = useMediaQuery('(max-width:600px)');
   const { user, logout } = useAuth(); // Obtenha o usuário do contexto de autenticação
@@ -63,17 +66,34 @@ export default function TemporaryDrawer() {
     setOpen(newOpen);
   };
 
-  const themeIcon = theme === 'dark' ? <Brightness4Icon /> : <Brightness7Icon />;
+  const themeIcon =
+    theme === 'dark' ? <Brightness4Icon /> : <Brightness7Icon />;
 
   const DrawerList = (
     <div role="presentation" onClick={toggleDrawer(false)}>
       <List sx={styles.textMenu}>
         {[
           { name: 'Dashboard', icon: <DashboardIcon />, link: '/dashboard' },
-          { name: 'Clientes MS', icon: <LocationCityIcon />, link: '/clientsMsList' },
-          { name: 'Clientes MT', icon: <ApartmentIcon />, link: '/clientsMtList' },
-          { name: 'Outras UF', icon: <BusinessIcon />, link: '/clientsOtherUfList' },
-          { name: 'Cadastrar Cliente', icon: <AddBusinessIcon />, link: '/registerClient' },
+          {
+            name: 'Clientes MS',
+            icon: <LocationCityIcon />,
+            link: '/clientsMsList',
+          },
+          {
+            name: 'Clientes MT',
+            icon: <ApartmentIcon />,
+            link: '/clientsMtList',
+          },
+          {
+            name: 'Outras UF',
+            icon: <BusinessIcon />,
+            link: '/clientsOtherUfList',
+          },
+          {
+            name: 'Cadastrar Cliente',
+            icon: <AddBusinessIcon />,
+            link: '/registerClient',
+          },
         ].map((item) => (
           <ListItem key={item.name} disablePadding>
             <ListItemButton component="a" href={item.link}>
@@ -86,9 +106,21 @@ export default function TemporaryDrawer() {
       <Divider sx={styles.dividerMenu} />
       <List sx={styles.textMenu}>
         {[
-          { name: 'Planilha Excel', icon: <ArticleIcon />, link: '/excelDownloadFile' },
-          { name: 'Cadastrar Equipe', icon: <GroupAddIcon />, link: '/registerTeam' },
-          { name: 'Editar Perfil', icon: <ManageAccountsIcon />, link: `/editProfile?id=${user?.id}` },
+          {
+            name: 'Planilha Excel',
+            icon: <ArticleIcon />,
+            link: '/excelDownloadFile',
+          },
+          {
+            name: 'Cadastrar Equipe',
+            icon: <GroupAddIcon />,
+            link: '/registerTeam',
+          },
+          {
+            name: 'Editar Perfil',
+            icon: <ManageAccountsIcon />,
+            link: `/editProfile?id=${user?.id}`,
+          },
         ].map((item) => (
           <ListItem key={item.name} disablePadding>
             <ListItemButton component="a" href={item.link}>
@@ -118,12 +150,7 @@ export default function TemporaryDrawer() {
         </Box>
         <Box sx={styles.containerMenu}>
           <Box sx={styles.logoMenu}>
-            <Image
-              src="/logoPveMenu.png"
-              alt="Logo"
-              width={120}
-              height={120}
-            />
+            <Image src="/logoPveMenu.png" alt="Logo" width={120} height={120} />
           </Box>
           {DrawerList}
           <Box sx={styles.contentMenu}>
