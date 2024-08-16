@@ -40,7 +40,7 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
   const fetchUserData = React.useCallback(async () => {
     if (userId) {
       try {
-        const response = await fetch(`/api/getUsers/${userId}`);
+        const response = await fetch(`/api/getUser/${userId}`);
         const data = await response.json();
         console.log('Fetched User Data:', data); // Adicionado para verificar os dados
         setUserName(data.name || '');
@@ -63,7 +63,7 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
     if (!userId) return;
 
     try {
-      const response = await fetch(`/api/getUsers/${userId}`, {
+      const response = await fetch(`/api/updateUser/${userId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -146,7 +146,7 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
               />
             </Button>
           </Box>
-          <Typography variant="h6" sx={{ mt: 2 }}>
+          <Typography variant="h6" sx={{ mt: 2, textAlign: 'center' }}>
             Nome: {userName}
           </Typography>
           <Controller

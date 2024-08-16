@@ -71,7 +71,7 @@ function RegisterTeamComponent() {
 
     // Enviar requisição POST para a API
     try {
-      const response = await fetch('/api/getUsers', {
+      const response = await fetch('/api/registerUsers', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -192,8 +192,8 @@ function RegisterTeamComponent() {
           </Button>
           <Grid container>
             <Grid item xs>
-              <Link href="#" variant="body2">
-                Recuperar senha?
+              <Link href="/dashboard" variant="body2">
+                Voltar para Dashboard
               </Link>
             </Grid>
             <Grid item>
