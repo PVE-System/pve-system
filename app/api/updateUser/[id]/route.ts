@@ -39,7 +39,7 @@ import bcrypt from 'bcryptjs'; // Importando bcryptjs
 } */
 
 //METODO POST:
-/* 
+
 export async function POST(request: NextRequest) {
   const newUser: NewUser = await request.json();
 
@@ -76,12 +76,12 @@ export async function POST(request: NextRequest) {
       { status: 500 },
     );
   }
-} */
+}
 
 //METODO PUT:
 
 //METODO PUT:
-/* export async function PUT(request: NextRequest) {
+export async function PUT(request: NextRequest) {
   const userToUpdate: User = await request.json();
 
   try {
@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
       { status: 500 },
     );
   }
-} */
+}
 
 //METODO DELETE:
 

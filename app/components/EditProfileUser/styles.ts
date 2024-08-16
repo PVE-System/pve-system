@@ -16,12 +16,12 @@ const styles = {
   inputName: {
     width: '100%',
     marginTop: '10px',
-    padding: '8px',
   },
 
   formButtonSubmit: {
     width: '100%',
     marginTop: '10px',
+    alignItens: 'center',
   },
 };
 export default styles;
