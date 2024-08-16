@@ -32,6 +32,7 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
   const { register, handleSubmit, control, setValue } = useForm<MyFormValues>();
   const [previewImage, setPreviewImage] = React.useState<string | null>(null);
   const [userName, setUserName] = React.useState<string>('');
+  const [imageUrl, setImageUrl] = React.useState<string | null>(null); // Estado para armazenar a URL da imagem
   const [loading, setLoading] = React.useState(true);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -44,6 +45,7 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
         const data = await response.json();
         console.log('Fetched User Data:', data); // Adicionado para verificar os dados
         setUserName(data.name || '');
+        setImageUrl(data.imageUrl || null); // Defina a URL da imagem do estado do usuário
         setValue('name', data.name || '');
       } catch (error) {
         console.error('Error fetching user data:', error);
@@ -71,6 +73,7 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
         body: JSON.stringify({
           id: userId,
           name: data.name,
+          imageUrl, // Inclua a URL da imagem ao atualizar os dados do usuário
         }),
       });
 
@@ -90,9 +93,27 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
     }
   };
 
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0];
     if (file) {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      // Realize o upload da imagem
+      const uploadResponse = await fetch(
+        `/api/uploadImage?pathname=${file.name}&userId=${userId}`,
+        {
+          method: 'POST',
+          body: formData,
+        },
+      );
+
+      const uploadData = await uploadResponse.json();
+      setImageUrl(uploadData.url); // Defina a URL da imagem do estado
+
+      // Mostre uma prévia da imagem no frontend
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewImage(reader.result as string);
@@ -125,6 +146,14 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
                 <Image
                   src={previewImage}
                   alt="Preview"
+                  width={180}
+                  height={180}
+                  style={styles.formButtonImg}
+                />
+              ) : imageUrl ? (
+                <Image
+                  src={imageUrl}
+                  alt="Profile Image"
                   width={180}
                   height={180}
                   style={styles.formButtonImg}

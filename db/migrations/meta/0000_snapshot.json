@@ -235,12 +235,8 @@
           "name": "comments_client_id_clients_id_fk",
           "tableFrom": "comments",
           "tableTo": "clients",
-          "columnsFrom": [
-            "client_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["client_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -314,12 +310,8 @@
           "name": "sales_information_client_id_clients_id_fk",
           "tableFrom": "sales_information",
           "tableTo": "clients",
-          "columnsFrom": [
-            "client_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["client_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -366,9 +358,7 @@
       "indexes": {
         "unique_idx": {
           "name": "unique_idx",
-          "columns": [
-            "email"
-          ],
+          "columns": ["email"],
           "isUnique": true
         }
       },

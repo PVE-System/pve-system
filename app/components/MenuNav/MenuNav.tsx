@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import Image from 'next/image';
-
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import Button from '@mui/material/Button';
@@ -12,16 +11,10 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import { IconButton, Link, Typography } from '@mui/material';
-
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
-
-import { useTheme } from '@/app/theme/ThemeContext';
-import styles from '@/app/components/MenuNav/styles';
-
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import LocationCityIcon from '@mui/icons-material/LocationCity';
@@ -32,29 +25,36 @@ import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import BusinessIcon from '@mui/icons-material/Business';
 import LogoutIcon from '@mui/icons-material/Logout';
 import CloseIcon from '@mui/icons-material/Close';
-
 import { useMediaQuery } from '@mui/material';
-import { useAuth } from '@/app/contex/authContext';
-
-// Exemplo de definição de tipo
-interface UserType {
-  id: string; // ou number, dependendo da implementação
-  token: string;
-  // Outras propriedades do usuário...
-}
-
-// Dentro do seu contexto de autenticação
-const user: UserType = {
-  id: '123', // Exemplo de ID
-  token: 'tokenString',
-  // Outras propriedades do usuário...
-};
+import { useTheme } from '@/app/theme/ThemeContext';
+import styles from '@/app/components/MenuNav/styles';
+import { useAuth } from '@/app/contex/authContext'; // Importe o contexto de autenticação
 
 export default function TemporaryDrawer() {
   const [open, setOpen] = React.useState(false);
+  const [userData, setUserData] = React.useState<{
+    name: string;
+    imageUrl: string | null;
+  }>({ name: '', imageUrl: null });
   const { theme, toggleTheme } = useTheme();
   const isMobile = useMediaQuery('(max-width:600px)');
   const { user, logout } = useAuth(); // Obtenha o usuário do contexto de autenticação
+
+  React.useEffect(() => {
+    const fetchUserData = async () => {
+      if (user?.id) {
+        try {
+          const response = await fetch(`/api/getUser/${user.id}`);
+          const data = await response.json();
+          setUserData({ name: data.name, imageUrl: data.imageUrl });
+        } catch (error) {
+          console.error('Failed to fetch user data', error);
+        }
+      }
+    };
+
+    fetchUserData();
+  }, [user?.id]);
 
   const handleToggleTheme = () => {
     const newTheme = theme === 'light' ? 'light' : 'dark';
@@ -66,14 +66,12 @@ export default function TemporaryDrawer() {
     setOpen(newOpen);
   };
 
-  // Defina os ícones de tema com base no tema atual
   const themeIcon =
     theme === 'dark' ? <Brightness4Icon /> : <Brightness7Icon />;
 
   const DrawerList = (
     <div role="presentation" onClick={toggleDrawer(false)}>
       <List sx={styles.textMenu}>
-        {/* Primeira seção do menu */}
         {[
           { name: 'Dashboard', icon: <DashboardIcon />, link: '/dashboard' },
           {
@@ -107,7 +105,6 @@ export default function TemporaryDrawer() {
       </List>
       <Divider sx={styles.dividerMenu} />
       <List sx={styles.textMenu}>
-        {/* Segunda seção do menu */}
         {[
           {
             name: 'Planilha Excel',
@@ -122,7 +119,7 @@ export default function TemporaryDrawer() {
           {
             name: 'Editar Perfil',
             icon: <ManageAccountsIcon />,
-            link: `/editProfile?id=${user?.id}`, // Use o ID do usuário do contexto de autenticação
+            link: `/editProfile?id=${user?.id}`,
           },
         ].map((item) => (
           <ListItem key={item.name} disablePadding>
@@ -146,7 +143,6 @@ export default function TemporaryDrawer() {
         onClose={toggleDrawer(false)}
         anchor={isMobile ? 'top' : 'left'}
       >
-        {/* Ícone de fechar o menu */}
         <Box sx={styles.iconCloseMenu}>
           <IconButton onClick={toggleDrawer(false)}>
             <CloseIcon sx={styles.iconCloseMenuColor} />
@@ -154,15 +150,9 @@ export default function TemporaryDrawer() {
         </Box>
         <Box sx={styles.containerMenu}>
           <Box sx={styles.logoMenu}>
-            <Image
-              src="/logoPveMenu.png"
-              alt="Foto do usuário"
-              width={120}
-              height={120}
-            />
+            <Image src="/logoPveMenu.png" alt="Logo" width={120} height={120} />
           </Box>
           {DrawerList}
-          {/* Ícone que troca o tema */}
           <Box sx={styles.contentMenu}>
             <IconButton
               sx={styles.iconTheme}
@@ -172,14 +162,26 @@ export default function TemporaryDrawer() {
               {themeIcon}
             </IconButton>
             <Divider sx={styles.dividerMenu} />
-            <Image
-              src="/profile-placeholder.png"
-              alt="Foto do usuário"
-              width={80}
-              height={80}
-            />
+            {userData.imageUrl ? (
+              <Image
+                src={userData.imageUrl}
+                alt="Foto do usuário"
+                width={80}
+                height={80}
+                style={{ borderRadius: '50%' }}
+                priority
+              />
+            ) : (
+              <Image
+                src="/profile-placeholder.png"
+                alt="Placeholder"
+                width={80}
+                height={80}
+                priority
+              />
+            )}
             <Typography variant="subtitle2" component="h1">
-              Nome do Usuário
+              {userData.name || 'Nome do Usuário'}
             </Typography>
           </Box>
           <Box sx={styles.iconLogout}>

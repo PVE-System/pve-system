@@ -1,8 +1,15 @@
 /* Propósito: O arquivo schema.ts é usado para definir a estrutura inicial do seu banco de dados.  Permite definir a estrutura completa do db*/
 /*Neste arquivo que criamos outras tabelas, não precisa ser outro arquivo*/
 
-import { boolean, integer, uniqueIndex } from 'drizzle-orm/pg-core';
-import { pgTable, serial, text, varchar, timestamp } from 'drizzle-orm/pg-core';
+import { boolean, integer } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  serial,
+  text,
+  varchar,
+  timestamp,
+  uniqueIndex,
+} from 'drizzle-orm/pg-core';
 
 // Definição da tabela users com índice único no email.
 // Nenhuma linha na tabela pode ter o mesmo valor para colunas que fazem parte do índice único.
@@ -16,6 +23,7 @@ export const users = pgTable(
     email: varchar('email', { length: 256 }).notNull(),
     password: varchar('password', { length: 256 }).notNull(),
     name: varchar('name'),
+    imageUrl: varchar('imageUrl', { length: 512 }), // Adicionando o campo imageUrl
     createdAt: timestamp('createdAt').defaultNow().notNull(),
   },
   (table) => {

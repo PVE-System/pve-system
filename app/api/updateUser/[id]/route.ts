@@ -1,13 +1,11 @@
-//api/getUser/[id]/route.ts
-
 import { NextResponse, NextRequest } from 'next/server';
 import { db, users, User, NewUser } from '@/app/db';
 import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs'; // Importando bcryptjs
 
-//METODO GET:
+// METODO GET:
 
-/* export async function GET(
+export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } },
 ) {
@@ -36,25 +34,23 @@ import bcrypt from 'bcryptjs'; // Importando bcryptjs
       { status: 500 },
     );
   }
-} */
+}
 
-//METODO POST:
+// METODO POST:
 
 export async function POST(request: NextRequest) {
   const newUser: NewUser = await request.json();
 
   try {
-    // Hash da senha do usuário
-    const hashedPassword = await bcrypt.hash(newUser.password, 10); // Hash da senha com 10 rounds
+    const hashedPassword = await bcrypt.hash(newUser.password, 10);
 
-    // Inserindo o usuário no banco de dados com a senha hasheada
     const createdUser = await db
       .insert(users)
       .values({
         email: newUser.email,
-        password: hashedPassword, // Usando a senha hasheada
+        password: hashedPassword,
         name: newUser.name,
-        createdAt: new Date(), // Adicionando a data de criação
+        createdAt: new Date(),
       })
       .returning({
         id: users.id,
@@ -66,11 +62,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ users: createdUser });
   } catch (error: unknown) {
-    // Tipagem explícita do erro como um objeto com uma propriedade 'message'
     if (error instanceof Error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
-    // Tratamento de erro genérico se o erro não for uma instância de Error
     return NextResponse.json(
       { error: 'Unknown error occurred' },
       { status: 500 },
@@ -78,39 +72,39 @@ export async function POST(request: NextRequest) {
   }
 }
 
-//METODO PUT:
+// METODO PUT:
 
-//METODO PUT:
 export async function PUT(request: NextRequest) {
   const userToUpdate: User = await request.json();
 
   try {
-    // Verifica se o usuário existe
     const existingUser = await db
       .select()
       .from(users)
       .where(eq(users.id, userToUpdate.id))
       .limit(1);
+
     if (existingUser.length === 0) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Atualiza o usuário
     const updatedUser = await db
       .update(users)
       .set({
         email: userToUpdate.email,
         password: userToUpdate.password,
-        name: userToUpdate.name, // Adicionando a atualização do campo name
+        name: userToUpdate.name,
         createdAt: userToUpdate.createdAt,
+        imageUrl: userToUpdate.imageUrl, // Adicionando a URL da imagem ao update
       })
       .where(eq(users.id, userToUpdate.id))
       .returning({
         id: users.id,
         email: users.email,
-        name: users.name, // Incluindo name no retorno
+        name: users.name,
         password: users.password,
         createdAt: users.createdAt,
+        imageUrl: users.imageUrl, // Incluindo a URL da imagem no retorno
       })
       .execute();
 
@@ -126,7 +120,7 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-//METODO DELETE:
+// METODO DELETE:
 
 export async function DELETE(request: NextRequest) {
   const userToDelete = await request.json();
