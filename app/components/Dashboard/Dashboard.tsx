@@ -26,23 +26,23 @@ const DynamicChartComponent = dynamic(
 );
 
 interface Client {
-  clientCondition: 'normal' | 'especial' | 'suspenso';
+  clientCondition: 'Normal' | 'Especial' | 'Suspenso';
   rating: 1 | 2 | 3;
 }
 
 interface ClientTotals {
-  normal: number;
-  especial: number;
-  suspenso: number;
+  Normal: number;
+  Especial: number;
+  Suspenso: number;
 }
 
 const DashboardComponent = () => {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [clientData, setClientData] = useState<ClientTotals>({
-    normal: 0,
-    especial: 0,
-    suspenso: 0,
+    Normal: 0,
+    Especial: 0,
+    Suspenso: 0,
   });
   const [ratingCounts, setRatingCounts] = useState({
     active: 0,
@@ -64,12 +64,12 @@ const DashboardComponent = () => {
 
         const totals = clients.reduce<ClientTotals>(
           (acc: ClientTotals, client: Client) => {
-            if (client.clientCondition === 'especial') acc.especial += 1;
-            if (client.clientCondition === 'suspenso') acc.suspenso += 1;
-            if (client.clientCondition === 'normal') acc.normal += 1;
+            if (client.clientCondition === 'Especial') acc.Especial += 1;
+            if (client.clientCondition === 'Suspenso') acc.Suspenso += 1;
+            if (client.clientCondition === 'Normal') acc.Normal += 1;
             return acc;
           },
-          { especial: 0, suspenso: 0, normal: 0 },
+          { Especial: 0, Suspenso: 0, Normal: 0 },
         );
 
         const ratings = clients.reduce(
@@ -124,7 +124,7 @@ const DashboardComponent = () => {
                 sx={{ ...styles.cardsText, ...sharedStyles.subtitleSize }}
               >
                 Cliente Normal <br />
-                <span>{clientData.normal} </span>cadastrados
+                <span>{clientData.Normal} </span>cadastrados
               </Typography>
             </CardContent>
           </Card>
@@ -139,7 +139,7 @@ const DashboardComponent = () => {
                 sx={{ ...styles.cardsText, ...sharedStyles.subtitleSize }}
               >
                 Cliente Especial <br />
-                <span>{clientData.especial} </span>cadastrados
+                <span>{clientData.Especial} </span>cadastrados
               </Typography>
             </CardContent>
           </Card>
@@ -154,7 +154,7 @@ const DashboardComponent = () => {
                 sx={{ ...styles.cardsText, ...sharedStyles.subtitleSize }}
               >
                 Cliente Suspenso <br />
-                <span>{clientData.suspenso} </span>cadastrados
+                <span>{clientData.Suspenso} </span>cadastrados
               </Typography>
             </CardContent>
           </Card>

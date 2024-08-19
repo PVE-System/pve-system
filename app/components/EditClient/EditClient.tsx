@@ -54,7 +54,7 @@ const selectOptions: { [key: string]: string[] } = {
   includedByJSM: ['Sim', 'Não'],
   icmsContributor: ['Sim', 'Não'],
   transportationType: ['Carreta', 'Truck', 'Ambos', 'Nenhum'],
-  companyLocation: ['Área rural', 'Centro'],
+  companyLocation: ['Área Rural', 'Centro'],
   marketSegmentNature: [
     'Atacado',
     'Varejo',
@@ -236,7 +236,6 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
           <form>
             {Object.keys(clientData).map((key) => {
               if (key !== 'id' && key !== 'createdAt') {
-                // Ajuste aqui
                 return (
                   <Box key={key}>
                     <Typography variant="subtitle1">
@@ -283,10 +282,7 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
                           >
                             {key in selectOptions &&
                               selectOptions[key].map((option) => (
-                                <MenuItem
-                                  key={option}
-                                  value={option.toLowerCase()}
-                                >
+                                <MenuItem key={option} value={option}>
                                   {option}
                                 </MenuItem>
                               ))}
