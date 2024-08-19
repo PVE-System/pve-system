@@ -83,8 +83,6 @@ const RegisterClient: React.FC = () => {
   const selectOptions: { [key: string]: string[] } = {
     companySize: ['Pequeno', 'Médio', 'Grande'],
     hasOwnStore: ['Sim', 'Não'],
-    /*     isJSMClient: ['Sim', 'Não'],
-    includedByJSM: ['Sim', 'Não'], */
     icmsContributor: ['Sim', 'Não'],
     transportationType: ['Carreta', 'Truck', 'Ambos', 'Nenhum'],
     companyLocation: ['Área Rural', 'Centro'],
@@ -158,6 +156,39 @@ const RegisterClient: React.FC = () => {
     }));
   };
 
+  const normalizeData = (data: {
+    companyName?: string;
+    cnpj?: string;
+    cpf?: string;
+    cep?: string;
+    address?: string;
+    locationNumber?: string;
+    district?: string;
+    city?: string;
+    state: any;
+    corfioCode?: string;
+    phone?: string;
+    emailCommercial?: string;
+    emailFinancial?: string;
+    emailXml?: string;
+    socialMedia?: string;
+    contactAtCompany?: string;
+    financialContact?: string;
+    responsibleSeller?: string;
+    companySize: any;
+    hasOwnStore: any;
+    icmsContributor: any;
+    transportationType: any;
+    companyLocation: any;
+    marketSegmentNature: any;
+    rating: any;
+    clientCondition: any;
+  }) => {
+    return {
+      ...data,
+      rating: parseInt(data.rating, 10), // Apenas garantindo que rating seja um número
+    };
+  };
   const setRating = (rating: number) => {
     setFormData({ ...formData, rating });
   };
@@ -171,13 +202,15 @@ const RegisterClient: React.FC = () => {
     setLoading(true);
     setMessage(null);
 
+    const normalizedData = normalizeData(formData);
+
     try {
       const response = await fetch('/api/registerClients', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(normalizedData),
       });
 
       const result = await response.json();
@@ -208,8 +241,8 @@ const RegisterClient: React.FC = () => {
           transportationType: '',
           companyLocation: '',
           marketSegmentNature: '',
-          rating: 0,
-          clientCondition: '',
+          rating: 1,
+          clientCondition: 'normal',
         });
         const clientId = result.clientId;
         router.push(`/registerClientSuccess?clientId=${clientId}`);
@@ -240,6 +273,7 @@ const RegisterClient: React.FC = () => {
             phone=""
           />
           <Box sx={styles.boxCol2}>
+            {/* Inputs SEM select */}
             <form onSubmit={handleSubmit}>
               {Object.keys(formData).map((key) => (
                 <Box key={key}>
@@ -255,9 +289,10 @@ const RegisterClient: React.FC = () => {
                     fullWidth
                     select={key in selectOptions}
                   >
+                    {/* Inputs COM select */}
                     {key in selectOptions &&
                       selectOptions[key].map((option) => (
-                        <MenuItem key={option} value={option.toLowerCase()}>
+                        <MenuItem key={option} value={option}>
                           {option}
                         </MenuItem>
                       ))}

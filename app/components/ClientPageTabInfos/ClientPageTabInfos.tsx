@@ -98,34 +98,8 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
     clientCondition: 'Condição do Cliente',
   };
 
-  // Função para capitalizar a primeira letra de cada palavra em uma string e deixar maiscula
-  const capitalize = (str: string, isEmail: boolean = false) => {
-    if (typeof str !== 'string' || isEmail) {
-      return str;
-    }
-    return str
-      .split(' ')
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(' ');
-  };
-
   const handleChange = (name: string, value: string) => {
-    let formattedValue = value;
-
-    if (
-      name === 'emailCommercial' ||
-      name === 'emailFinancial' ||
-      name === 'emailXml'
-    ) {
-      // E-mails não serão formatados pela função capitalize
-      /* formattedValue = value.toLowerCase(); */
-      // Você pode remover essa linha se não quiser alterar o formato para minúsculas
-    } else {
-      // Capitaliza os outros campos
-      formattedValue = capitalize(value);
-    }
-
-    setValue(name, formattedValue);
+    setValue(name, value); // Armazena o valor sem modificações
   };
 
   //Start Export
@@ -140,7 +114,7 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
 
     let yPosition = 20;
 
-    // Adiciona os detalhes do cliente ao PDF, mas ignorando estes campos que nao sao necessarios
+    // Adiciona os detalhes do cliente ao PDF
     Object.keys(clientData).forEach((key) => {
       if (
         key === 'id' ||
@@ -154,7 +128,7 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
       const label = fieldLabels[key] || key;
       const value = clientData[key];
 
-      doc.text(`${label}: ${capitalize(value)}`, 10, yPosition);
+      doc.text(`${label}: ${value}`, 10, yPosition); // Mantém o valor original
       yPosition += 10;
     });
 
@@ -203,49 +177,26 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
     {
       label: 'Porte da Empresa',
       name: 'companySize',
-      type: 'select',
-      options: ['pequeno', 'médio', 'grande'],
     },
     {
       label: 'Possui Loja Própria',
       name: 'hasOwnStore',
-      type: 'select',
-      options: ['sim', 'não'],
     },
     {
       label: 'Contribuinte ICMS',
       name: 'icmsContributor',
-      type: 'select',
-      options: ['sim', 'não'],
     },
     {
       label: 'Transporte entra',
       name: 'transportationType',
-      type: 'select',
-      options: ['carreta', 'truck', 'ambos', 'nenhum'],
     },
     {
       label: 'Localização da empresa',
       name: 'companyLocation',
-      type: 'select',
-      options: ['área rural', 'centro'],
     },
     {
       label: 'Segmento de Mercado e Natureza Jurídica',
       name: 'marketSegmentNature',
-      type: 'select',
-      options: [
-        'atacado',
-        'varejo',
-        'industrialização',
-        'produtor rural',
-        'instaladora',
-        'pessoa jurídica cont',
-        'pessoa física não cont',
-        'construtora',
-        'pj não cont',
-        'atacarejo',
-      ],
     },
   ];
 
@@ -288,72 +239,29 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
         </Box>
         {/* Grupo 2 - formulário de cadastro */}
         <Box sx={styles.boxCol2}>
-          {formFields.map(({ label, name, type, options }) => (
+          {/* map dos inputs sem select*/}
+          {formFields.map(({ label, name }) => (
             <Box key={name}>
               <Typography variant="subtitle1">{label}</Typography>
               <Controller
                 name={name}
                 control={control}
-                defaultValue={clientData[name] || ''} // Certifique-se de que o valor padrão seja uma string vazia
-                render={({ field }) => {
-                  if (type === 'select' && options) {
-                    return (
-                      <TextField
-                        {...field}
-                        select
-                        variant="filled"
-                        sx={styles.inputsCol2}
-                        value={field.value || ''}
-                        InputProps={{
-                          readOnly: readOnly,
-                        }}
-                      >
-                        {options.map((option) => (
-                          <MenuItem key={option} value={option}>
-                            {capitalize(option)}
-                          </MenuItem>
-                        ))}
-                      </TextField>
-                    );
-                  }
-                  return (
-                    <TextField
-                      {...field}
-                      variant="filled"
-                      sx={styles.inputsCol2}
-                      value={
-                        name.startsWith('email')
-                          ? field.value
-                          : capitalize(field.value)
-                      }
-                      onChange={(e) => handleChange(name, e.target.value)}
-                      InputProps={{
-                        readOnly: true, // Desativei deixando verdadeiro
-                      }}
-                    />
-                  );
-                }}
+                defaultValue={clientData[name] || ''}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    variant="filled"
+                    sx={styles.inputsCol2}
+                    value={field.value || ''}
+                    onChange={(e) => handleChange(name, e.target.value)}
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                  />
+                )}
               />
             </Box>
           ))}
-          {/*           <Box sx={styles.boxButton}>
-            <Button
-              type="button"
-              variant="contained"
-              onClick={exportPDF}
-              sx={styles.exportButton}
-            >
-              Exportar PDF
-            </Button>
-            <Button
-              type="button"
-              variant="contained"
-              onClick={() => onSubmitEdit(clientId)}
-              sx={styles.editButton}
-            >
-              Editar
-            </Button>
-          </Box> */}
         </Box>
       </Box>
     </Box>
