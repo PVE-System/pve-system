@@ -19,15 +19,12 @@ interface ClientProfileProps {
   readOnly?: boolean;
 }
 
-// Função para capitalizar a primeira letra de cada palavra em uma string
-const capitalize = (str: any) => {
+// Função Renderizar o nome do cliente com tamnho menor
+const renderAsIs = (str: any) => {
   if (typeof str !== 'string') {
     return '';
   }
-  return str
-    .split(' ')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ');
+  return str;
 };
 
 const ClientProfile: React.FC<ClientProfileProps> = ({
@@ -57,11 +54,8 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
 
   return (
     <Box sx={styles.boxProfile}>
-      <Typography
-        variant="h6"
-        sx={{ marginBottom: '16px', textAlign: 'center' }}
-      >
-        {capitalize(companyName)}
+      <Typography variant="h6" sx={styles.companyName}>
+        {renderAsIs(companyName.slice(0, 35))} {/* Limita a 35 caracteres */}
       </Typography>{' '}
       <label htmlFor="profile-picture-input">
         <input
@@ -111,7 +105,7 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
             color="success"
             sx={{
               ...styles.clientConditionButton,
-              ...(clientCondition === 'normal' && {
+              ...(clientCondition === 'Normal' && {
                 backgroundColor: 'green',
                 border: 'none',
                 color: 'white',
@@ -120,7 +114,7 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
             disabled={readOnly}
             onClick={() => {
               if (!readOnly) {
-                onConditionChange('normal');
+                onConditionChange('Normal');
               }
             }}
           >
@@ -131,7 +125,7 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
             color="warning"
             sx={{
               ...styles.clientConditionButton,
-              ...(clientCondition === 'especial' && {
+              ...(clientCondition === 'Especial' && {
                 backgroundColor: '#FFD700',
                 border: 'none',
                 color: 'black',
@@ -140,7 +134,7 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
             disabled={readOnly}
             onClick={() => {
               if (!readOnly) {
-                onConditionChange('especial');
+                onConditionChange('Especial');
               }
             }}
           >
@@ -151,7 +145,7 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
             color="error"
             sx={{
               ...styles.clientConditionButton,
-              ...(clientCondition === 'suspenso' && {
+              ...(clientCondition === 'Suspenso' && {
                 backgroundColor: 'red',
                 border: 'none',
                 color: 'white',
@@ -160,7 +154,7 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
             disabled={readOnly}
             onClick={() => {
               if (!readOnly) {
-                onConditionChange('suspenso');
+                onConditionChange('Suspenso');
               }
             }}
           >

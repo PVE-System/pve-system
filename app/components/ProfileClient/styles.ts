@@ -15,11 +15,11 @@ const styles = {
     borderRadius: '10px',
     padding: '20px',
     width: '300px', //alterei aqui
-    height: '550px',
+    height: '600px',
 
     '@media (max-width: 800px)': {
       width: '200px', //alterei aqui
-      /* height: '600px', */
+      height: '550px',
       border: 'none',
       borderRadius: '0px',
       /* borderBottom: '1px solid', */
@@ -27,6 +27,15 @@ const styles = {
         theme.palette.mode === 'light'
           ? theme.palette.background.paper
           : theme.palette.background.alternative,
+    },
+  },
+
+  companyName: {
+    marginBottom: '16px',
+    textAlign: 'center',
+    fontSize: '20px',
+    '@media (max-width: 800px)': {
+      fontSize: '16px',
     },
   },
 

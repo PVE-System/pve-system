@@ -48,7 +48,7 @@ const RegisterClient: React.FC = () => {
     companyLocation: '',
     marketSegmentNature: '',
     rating: 1,
-    clientCondition: 'normal',
+    clientCondition: 'Normal',
   });
 
   const fieldLabels: { [key: string]: string } = {
@@ -242,7 +242,7 @@ const RegisterClient: React.FC = () => {
           companyLocation: '',
           marketSegmentNature: '',
           rating: 1,
-          clientCondition: 'normal',
+          clientCondition: 'Normal',
         });
         const clientId = result.clientId;
         router.push(`/registerClientSuccess?clientId=${clientId}`);

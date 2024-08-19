@@ -70,7 +70,7 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
 
   // Mapeamento dos nomes dos campos do banco de dados para nomes mais amigáveis
   const fieldLabels: { [key: string]: string } = {
-    companyName: 'Nome da empresa',
+    companyName: 'Nome da Empresa ou Pessoa',
     cnpj: 'CNPJ',
     cpf: 'CPF',
     cep: 'CEP',
@@ -110,7 +110,7 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
     doc.text('Detalhes sobre o cadastro do cliente:', 10, 10);
-    doc.setFont('helvetica', 'normal'); // Volta para o estilo de fonte normal
+    doc.setFont('helvetica', 'normal');
 
     let yPosition = 20;
 
