@@ -26,7 +26,7 @@ interface Client {
   state: string;
 }
 
-// Função Renderizar o nome do cliente com tamnho menor
+// Função Renderizar o nome do cliente com tamanho menor
 const renderAsIs = (str: any) => {
   if (typeof str !== 'string') {
     return '';
@@ -48,22 +48,28 @@ const ClientsOtherUfList = () => {
         }
         const data = await response.json();
 
-        // Limpar e normalizar os estados antes de filtrar
+        // Remover a conversão para minúsculas e apenas limpar os estados
         const cleanedClients = data.clients.map((client: Client) => ({
           ...client,
-          state: client.state.trim().toLowerCase(), // Remove espaços extras e converte para minúsculas
+          state: client.state.trim(), // Remove apenas espaços extras
         }));
 
         const filteredClients = cleanedClients.filter((client: Client) => {
           return !(
-            client.state === 'mato grosso' ||
-            client.state === 'mt' ||
-            client.state === 'mato grosso do sul' ||
-            client.state === 'ms'
+            client.state.toLowerCase() === 'mato grosso' ||
+            client.state.toLowerCase() === 'mt' ||
+            client.state.toLowerCase() === 'mato grosso do sul' ||
+            client.state.toLowerCase() === 'ms'
           );
         });
 
-        setClients(filteredClients);
+        // Ordenar os clientes pelo nome da empresa em ordem alfabética
+        const sortedClients = filteredClients.sort(
+          (a: { companyName: string }, b: { companyName: any }) =>
+            a.companyName.localeCompare(b.companyName),
+        );
+
+        setClients(sortedClients);
         setLoading(false);
       } catch (error) {
         console.error('Failed to fetch clients:', error);
