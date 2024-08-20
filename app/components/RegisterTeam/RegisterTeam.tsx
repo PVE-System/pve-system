@@ -14,8 +14,10 @@ import Image from 'next/image';
 import NextLink from 'next/link';
 import sharedStyles from '@/app/styles/sharedStyles';
 import styles from './styles';
+import { useAuth } from '@/app/contex/authContext'; // Importe o contexto de autenticação
 
 function RegisterTeamComponent() {
+  const { logout } = useAuth(); // Obtenha a função de logout do contexto
   // Estado para armazenar os dados do formulário
   const [formData, setFormData] = useState({
     email: '',
@@ -197,9 +199,11 @@ function RegisterTeamComponent() {
               </Link>
             </Grid>
             <Grid item>
-              <Link href="/" variant="body2">
-                {'Fazer Login'}
-              </Link>
+              <Grid item>
+                <Link href="#" onClick={logout} variant="body2">
+                  {'Página de Login'}
+                </Link>
+              </Grid>
             </Grid>
           </Grid>
         </Box>
