@@ -47,11 +47,18 @@ const ClientMsList = () => {
           throw new Error('Network response was not ok');
         }
         const data = await response.json();
+
         const filteredClients = data.clients.filter((client: Client) => {
-          const stateLower = client.state.toLowerCase();
-          return stateLower === 'mato grosso do sul' || stateLower === 'ms';
+          return client.state === 'Mato Grosso do Sul' || client.state === 'MS';
         });
-        setClients(filteredClients);
+
+        // Ordenar os clientes pelo nome da empresa em ordem alfabética
+        const sortedClients = filteredClients.sort(
+          (a: { companyName: string }, b: { companyName: string }) =>
+            a.companyName.localeCompare(b.companyName),
+        );
+
+        setClients(sortedClients);
         setLoading(false);
       } catch (error) {
         console.error('Failed to fetch clients:', error);

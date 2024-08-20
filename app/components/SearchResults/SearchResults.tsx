@@ -47,15 +47,12 @@ interface Client {
   marketSegmentNature: string;
 }
 
-// Função para capitalizar a primeira letra de cada palavra em uma string
-const capitalize = (str: any) => {
+// Função Renderizar o nome do cliente com tamanho menor
+const renderAsIs = (str: any) => {
   if (typeof str !== 'string') {
     return '';
   }
-  return str
-    .split(' ')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ');
+  return str;
 };
 
 const SearchResults = () => {
@@ -147,7 +144,7 @@ const SearchResults = () => {
                 onClick={() => handleRowClick(client.id)}
               >
                 <TableCell sx={styles.fontSize}>
-                  {capitalize(client.companyName)}
+                  {renderAsIs(client.companyName.slice(0, 50))}
                 </TableCell>
                 {!isSmallScreen && (
                   <>
@@ -161,20 +158,20 @@ const SearchResults = () => {
                           variant="contained"
                           size="small"
                           color={
-                            client.clientCondition === 'normal'
+                            client.clientCondition === 'Normal'
                               ? 'success'
-                              : client.clientCondition === 'especial'
+                              : client.clientCondition === 'Especial'
                                 ? 'warning'
-                                : client.clientCondition === 'suspenso'
+                                : client.clientCondition === 'Suspenso'
                                   ? 'error'
                                   : 'inherit'
                           }
                         >
-                          {client.clientCondition === 'normal'
+                          {client.clientCondition === 'Normal'
                             ? 'Normal'
-                            : client.clientCondition === 'especial'
+                            : client.clientCondition === 'Especial'
                               ? 'Especial'
-                              : client.clientCondition === 'suspenso'
+                              : client.clientCondition === 'Suspenso'
                                 ? 'Suspenso'
                                 : 'Unknown'}
                         </Button>

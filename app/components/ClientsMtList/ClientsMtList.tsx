@@ -48,17 +48,18 @@ const ClientMtList = () => {
         }
         const data = await response.json();
 
-        // Limpar e normalizar os estados antes de filtrar
-        const cleanedClients = data.clients.map((client: Client) => ({
-          ...client,
-          state: client.state.trim().toLowerCase(), // Remove espaços extras e converte para minúsculas
-        }));
-
-        const filteredClients = cleanedClients.filter((client: Client) => {
-          return client.state === 'mato grosso' || client.state === 'mt';
+        // Filtrar os clientes com base no estado sem converter para minúsculas
+        const filteredClients = data.clients.filter((client: Client) => {
+          return client.state === 'Mato Grosso' || client.state === 'MT';
         });
 
-        setClients(filteredClients);
+        // Ordenar os clientes pelo nome da empresa em ordem alfabética
+        const sortedClients = filteredClients.sort(
+          (a: { companyName: string }, b: { companyName: string }) =>
+            a.companyName.localeCompare(b.companyName),
+        );
+
+        setClients(sortedClients);
         setLoading(false);
       } catch (error) {
         console.error('Failed to fetch clients:', error);
