@@ -251,7 +251,7 @@ const DashboardComponent = () => {
             <Typography
               sx={{ ...styles.accordionText, ...sharedStyles.subtitleSize }}
             >
-              <span>{ratingCounts.inactive}</span> Clientes não ativos
+              <span>{ratingCounts.inactive}</span> Clientes menos ativos
             </Typography>
           </AccordionSummary>
           <AccordionDetails>

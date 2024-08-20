@@ -69,6 +69,14 @@ export default function TemporaryDrawer() {
   const themeIcon =
     theme === 'dark' ? <Brightness4Icon /> : <Brightness7Icon />;
 
+  // Função Renderizar o nome do cliente com tamnho menor
+  const renderAsIs = (str: any) => {
+    if (typeof str !== 'string') {
+      return '';
+    }
+    return str;
+  };
+
   const DrawerList = (
     <div role="presentation" onClick={toggleDrawer(false)}>
       <List sx={styles.textMenu}>
@@ -181,7 +189,8 @@ export default function TemporaryDrawer() {
               />
             )}
             <Typography variant="subtitle2" component="h1">
-              {userData.name || 'Nome do Usuário'}
+              {renderAsIs(userData.name.slice(0, 25)) || 'Nome do Usuário'}
+              {/* {userData.name || 'Nome do Usuário'} */}
             </Typography>
           </Box>
           <Box sx={styles.iconLogout}>

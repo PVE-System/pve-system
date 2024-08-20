@@ -88,6 +88,8 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
         ...prevFormData,
         name: data.name,
       }));
+      // Redirecionar para o Dashboard
+      router.push('/dashboard');
     } catch (error) {
       console.error('Error updating user name:', error);
     }
@@ -175,8 +177,11 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
               />
             </Button>
           </Box>
-          <Typography variant="h6" sx={{ mt: 2, textAlign: 'center' }}>
-            Nome: {userName}
+          <Typography
+            variant="h6"
+            sx={{ mt: 2, textAlign: 'center', fontSize: '16px' }}
+          >
+            Escolha nome e foto para seu perfil: {/* {userName} */}
           </Typography>
           <Controller
             name="name"
