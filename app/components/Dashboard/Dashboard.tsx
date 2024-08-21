@@ -116,7 +116,7 @@ const DashboardComponent = () => {
           <Card
             variant="outlined"
             sx={styles.cards}
-            onClick={() => handleCardClick('normal')}
+            onClick={() => (window.location.href = '/clientsNormalList')}
           >
             <CardContent>
               <Typography
@@ -131,7 +131,7 @@ const DashboardComponent = () => {
           <Card
             variant="outlined"
             sx={styles.cards}
-            onClick={() => handleCardClick('especial')}
+            onClick={() => (window.location.href = '/clientsEspecialList')}
           >
             <CardContent>
               <Typography
@@ -146,7 +146,7 @@ const DashboardComponent = () => {
           <Card
             variant="outlined"
             sx={styles.cards}
-            onClick={() => handleCardClick('suspenso')}
+            onClick={() => (window.location.href = '/clientsSuspendedList')}
           >
             <CardContent>
               <Typography
