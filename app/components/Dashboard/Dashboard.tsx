@@ -15,6 +15,7 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import sharedStyles from '@/app/styles/sharedStyles';
 import styles from './styles';
 import { Rating } from '@mui/material';
@@ -194,6 +195,13 @@ const DashboardComponent = () => {
               <br />
               São clientes fidelizados que temos um bom relacionamento.
             </Typography>
+            <FormatListBulletedIcon
+              sx={{ marginLeft: 'auto', cursor: 'pointer', fontSize: 'medium' }} // Estilização do ícone
+              onClick={(e) => {
+                e.stopPropagation(); // Evita que o clique no ícone expanda/colapse o Accordion
+                window.location.href = '/clientsRating3List'; // Redireciona o usuário
+              }}
+            />
           </AccordionDetails>
         </Accordion>
         <Accordion
@@ -228,6 +236,13 @@ const DashboardComponent = () => {
               <br />
               Compensa analisar os motivos e tentar fechar mais pedidos.
             </Typography>
+            <FormatListBulletedIcon
+              sx={{ marginLeft: 'auto', cursor: 'pointer', fontSize: 'medium' }} // Estilização do ícone
+              onClick={(e) => {
+                e.stopPropagation(); // Evita que o clique no ícone expanda/colapse o Accordion
+                window.location.href = '/clientsRating2List'; // Redireciona o usuário
+              }}
+            />
           </AccordionDetails>
         </Accordion>
         <Accordion
@@ -263,6 +278,13 @@ const DashboardComponent = () => {
               Importante fazer uma análise, entender os motivos e conversar com
               o cliente.
             </Typography>
+            <FormatListBulletedIcon
+              sx={{ marginLeft: 'auto', cursor: 'pointer', fontSize: 'medium' }} // Estilização do ícone
+              onClick={(e) => {
+                e.stopPropagation(); // Evita que o clique no ícone expanda/colapse o Accordion
+                window.location.href = '/clientsRating1List'; // Redireciona o usuário
+              }}
+            />
           </AccordionDetails>
         </Accordion>
       </Box>
