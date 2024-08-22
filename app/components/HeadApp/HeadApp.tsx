@@ -54,10 +54,11 @@ export default function HeadApp() {
         route = '/clientsOtherUfList';
         break;
       case 'CNPJ':
-      case 'CPF':
-        route = `/searchResults?query=${encodeURIComponent(value)}`;
+        route = '/clientsCNPJList';
         break;
-      // Adicione outras opções de redirecionamento conforme necessário
+      case 'CPF':
+        route = '/clientsCPFList';
+        break;
     }
     if (route) {
       window.location.href = route;
