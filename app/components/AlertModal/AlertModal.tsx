@@ -1,5 +1,6 @@
 import React from 'react';
 import { Modal, Box, Typography, Button } from '@mui/material';
+import sharedStyles from '@/app/styles/sharedStyles';
 
 interface SimpleModalProps {
   open: boolean;
@@ -28,10 +29,10 @@ const AlertModal: React.FC<SimpleModalProps> = ({
           textAlign: 'center',
         }}
       >
-        <Typography variant="h6" sx={{ mb: 2, color: 'white' }}>
+        <Typography sx={{ ...sharedStyles.titlePage, fontSize: '24px' }}>
           Acesso Restrito
         </Typography>
-        <Typography sx={{ mb: 4, color: 'white' }}>
+        <Typography sx={sharedStyles.subtitleSize}>
           Por favor, faça o login para ter acesso ao sistema.
         </Typography>
         <Button variant="contained" onClick={onConfirm}>
