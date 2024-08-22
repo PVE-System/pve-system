@@ -1,44 +1,9 @@
 'use client';
 
-import { ReactNode, useEffect } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Cookies from 'js-cookie';
-
-interface ProtectedRouteProps {
-  children: ReactNode;
-  route: string;
-  unprotectedRoutes?: string[];
-}
-
-const ProtectedRoute = ({
-  children,
-  route,
-  unprotectedRoutes = ['/login', '/'],
-}: ProtectedRouteProps) => {
-  const router = useRouter();
-  const pathname = usePathname();
-
-  // useEffect(() => {
-  //   const token = Cookies.get('token');
-  //   console.log('ProtectedRoute useEffect Token:', token);
-  //   console.log('ProtectedRoute Pathname:', pathname);
-
-  //   if (!token && !unprotectedRoutes.includes(pathname)) {
-  //     router.push(route);
-  //   } else if (token && pathname === '/') {
-  //     router.push('/dashboard');
-  //   }
-  // }, [pathname, route, router, unprotectedRoutes]);
-
-  return <>{children}</>;
-};
-
-export default ProtectedRoute;
-
-/* import { ReactNode, useEffect, useState } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import Cookies from 'js-cookie';
-import Loading from '../MenuNav/Loading/Loading';
+import AlertModal from '../AlertModal/AlertModal';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -55,29 +20,41 @@ const ProtectedRoute = ({
   const pathname = usePathname();
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const token = Cookies.get('token');
-    console.log('ProtectedRoute useEffect Token:', token);
-    console.log('ProtectedRoute Pathname:', pathname);
 
-    if (token) {
+    if (unprotectedRoutes.includes(pathname)) {
       setIsAuthenticated(true);
-    } else if (!unprotectedRoutes.includes(pathname)) {
-      router.push(route);
+      setLoading(false);
+    } else if (token) {
+      setIsAuthenticated(true);
+      setLoading(false);
+    } else {
+      router.push(route); // Redireciona o usuário
+      setShowModal(true); // Exibe o modal após o redirecionamento
+      setLoading(false);
     }
-    setLoading(false);
   }, [pathname, route, router, unprotectedRoutes]);
 
+  const handleModalClose = () => {
+    setShowModal(false);
+  };
+
   if (loading) {
-    return <Loading />; // Ou uma tela de carregamento se preferir
+    return null; // Retorna null para não renderizar nada enquanto está carregando
   }
-
-  if (!isAuthenticated && !unprotectedRoutes.includes(pathname)) {
-    return <Loading />; // Ou uma tela de carregamento se preferir
-  }
-
-  return <>{children}</>;
+  return (
+    <>
+      <AlertModal
+        open={showModal}
+        onClose={handleModalClose}
+        onConfirm={handleModalClose}
+      />
+      {isAuthenticated && children}
+    </>
+  );
 };
 
-export default ProtectedRoute; */
+export default ProtectedRoute;
