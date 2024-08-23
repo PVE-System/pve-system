@@ -114,6 +114,9 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
   const { handleSubmit, control, setValue, watch } = useForm();
   const [clientData, setClientData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null); // Estado para armazenar a URL da imagem
+  const [previewImage, setPreviewImage] = useState<string | null>(null); // Estado para armazenar a pré-visualização da imagem
 
   useEffect(() => {
     if (!clientId) return;
@@ -122,6 +125,7 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
       .then((response) => response.json())
       .then((data) => {
         setClientData(data);
+        setImageUrl(data.imageUrl || null); // Define a URL da imagem inicial
         setLoading(false);
 
         Object.keys(data).forEach((key) => {
@@ -135,16 +139,24 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
   }, [clientId, setValue]);
 
   const onSubmit = async (data: any) => {
+    if (!clientId) return;
+
     try {
       delete data.id;
       delete data.createdAt;
+
+      // Verifica se imageUrl foi corretamente atualizado
+      const updatedData = {
+        ...data,
+        imageUrl: imageUrl || clientData?.imageUrl,
+      }; // Garante que imageUrl seja incluído
 
       const response = await fetch(`/api/updateClient?id=${clientId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(updatedData),
       });
 
       if (!response.ok) {
@@ -155,6 +167,40 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
       router.push(`/clientPage?id=${clientId}`);
     } catch (error) {
       console.error('Error updating client data:', error);
+    }
+  };
+
+  const handleImageChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      console.log('Iniciando upload da imagem...');
+
+      const uploadResponse = await fetch(
+        `/api/uploadImageClient?pathname=clients/${clientId}/profile.jpg`,
+        {
+          method: 'POST',
+          body: formData,
+        },
+      );
+
+      if (uploadResponse.ok) {
+        const uploadResult = await uploadResponse.json();
+        setImageUrl(uploadResult.url); // Atualiza a URL da imagem
+
+        // Mostra uma prévia da imagem no frontend
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPreviewImage(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        console.error('Erro ao fazer upload da imagem');
+      }
     }
   };
 
@@ -212,6 +258,7 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
               setValue('clientCondition', condition)
             }
             readOnly={false}
+            imageUrl={previewImage || imageUrl || undefined}
           />
           <Box sx={styles.boxButton}>
             <Button
@@ -226,7 +273,7 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
               type="button"
               variant="contained"
               sx={styles.editButton}
-              onClick={handleSubmit(onSubmit)} // Use handleSubmit directly
+              onClick={handleSubmit(onSubmit)}
             >
               Salvar
             </Button>
@@ -295,6 +342,15 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
               }
               return null;
             })}
+            <Box sx={{ marginTop: 2 }}>
+              <Typography variant="subtitle1">Imagem do Cliente</Typography>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                style={{ marginTop: 10 }}
+              />
+            </Box>
           </form>
         </Box>
       </Box>

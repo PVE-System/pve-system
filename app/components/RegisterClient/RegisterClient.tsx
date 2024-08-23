@@ -131,6 +131,8 @@ const RegisterClient: React.FC = () => {
     clientCondition: ['Normal', 'Especial', 'Suspenso'],
   };
 
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -154,6 +156,32 @@ const RegisterClient: React.FC = () => {
       ...prevFormData,
       [name]: formattedValue,
     }));
+  };
+
+  const handleImageChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const uploadResponse = await fetch(
+        `/api/uploadImage?pathname=clients/temp-profile.jpg`,
+        {
+          method: 'POST',
+          body: formData,
+        },
+      );
+
+      if (uploadResponse.ok) {
+        const uploadResult = await uploadResponse.json();
+        setImageUrl(uploadResult.url); // Salva a URL da imagem
+      } else {
+        setMessage('Erro ao fazer upload da imagem');
+      }
+    }
   };
 
   const normalizeData = (data: {
@@ -187,6 +215,7 @@ const RegisterClient: React.FC = () => {
     return {
       ...data,
       rating: parseInt(data.rating, 10), // Apenas garantindo que rating seja um número
+      imageUrl: imageUrl || '', // Inclui o imageUrl no envio dos dados
     };
   };
   const setRating = (rating: number) => {
@@ -271,6 +300,7 @@ const RegisterClient: React.FC = () => {
             readOnly={false}
             emailCommercial=""
             phone=""
+            imageUrl={imageUrl} // Passa a URL da imagem para o perfil
           />
           <Box sx={styles.boxCol2}>
             {/* Inputs SEM select */}

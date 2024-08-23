@@ -17,6 +17,7 @@ interface ClientProfileProps {
   onRatingChange: (rating: number) => void;
   onConditionChange: (condition: string) => void;
   readOnly?: boolean;
+  imageUrl?: any; // Adiciona a propriedade imageUrl como opcional
 }
 
 // Função Renderizar o nome do cliente com tamnho menor
@@ -37,6 +38,7 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
   onRatingChange,
   onConditionChange,
   readOnly,
+  imageUrl,
 }) => {
   const { control } = useForm();
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -67,8 +69,8 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
           disabled={readOnly}
         />
         <Image
-          src={previewImage || '/profile-placeholder.png'}
-          alt="Placeholder"
+          src={imageUrl || previewImage || '/profile-placeholder.png'} // Usa a URL da imagem se disponível
+          alt="Profile Picture"
           width={180}
           height={180}
           style={styles.imgProfile}
