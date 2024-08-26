@@ -298,6 +298,7 @@ const RegisterClient: React.FC = () => {
             emailCommercial=""
             phone=""
             imageUrl={imageUrl || undefined}
+            onImageChange={() => {}}
           />
           <Box sx={styles.boxCol2}>
             {/* Inputs SEM select */}
