@@ -19,6 +19,7 @@ export async function POST(request: NextRequest) {
       state: newClient.state,
       clientCondition: newClient.clientCondition,
       rating: newClient.rating, // Mantém o valor do rating como está
+      imageUrl: newClient.imageUrl,
     };
 
     // Inserir novo cliente no banco de dados
@@ -27,6 +28,7 @@ export async function POST(request: NextRequest) {
       .values(clientData)
       .returning({
         id: clients.id,
+        imageUrl: clients.imageUrl,
       })
       .execute();
 

@@ -131,6 +131,8 @@ const RegisterClient: React.FC = () => {
     clientCondition: ['Normal', 'Especial', 'Suspenso'],
   };
 
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -156,7 +158,7 @@ const RegisterClient: React.FC = () => {
     }));
   };
 
-  const normalizeData = (data: {
+  function normalizeData(data: {
     companyName?: string;
     cnpj?: string;
     cpf?: string;
@@ -183,12 +185,14 @@ const RegisterClient: React.FC = () => {
     marketSegmentNature: any;
     rating: any;
     clientCondition: any;
-  }) => {
+    imageUrl: any;
+  }) {
     return {
       ...data,
       rating: parseInt(data.rating, 10), // Apenas garantindo que rating seja um número
+      imageUrl: imageUrl || '', // Inclui o imageUrl no envio dos dados
     };
-  };
+  }
   const setRating = (rating: number) => {
     setFormData({ ...formData, rating });
   };
@@ -202,9 +206,31 @@ const RegisterClient: React.FC = () => {
     setLoading(true);
     setMessage(null);
 
-    const normalizedData = normalizeData(formData);
-
     try {
+      let imageUploadUrl = '';
+      // Upload da imagem ao Blob Storage
+      if (imageFile) {
+        const formDataImage = new FormData();
+        formDataImage.append('file', imageFile);
+
+        const uploadResponse = await fetch('/api/uploadImage', {
+          method: 'POST',
+          body: formDataImage,
+        });
+
+        if (uploadResponse.ok) {
+          const uploadResult = await uploadResponse.json();
+          imageUploadUrl = uploadResult.url; // Define a URL da imagem carregada
+          setImageUrl(imageUploadUrl); // Atualiza a URL da imagem no estado
+        } else {
+          throw new Error('Erro ao fazer upload da imagem');
+        }
+      }
+      const normalizedData = normalizeData({
+        ...formData,
+        imageUrl: imageUploadUrl || '', // Garante que a URL da imagem seja definida
+      });
+
       const response = await fetch('/api/registerClients', {
         method: 'POST',
         headers: {
@@ -271,6 +297,8 @@ const RegisterClient: React.FC = () => {
             readOnly={false}
             emailCommercial=""
             phone=""
+            imageUrl={imageUrl || undefined}
+            onImageChange={() => {}}
           />
           <Box sx={styles.boxCol2}>
             {/* Inputs SEM select */}

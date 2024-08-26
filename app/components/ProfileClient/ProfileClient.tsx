@@ -1,13 +1,12 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Box, Button, Rating, Typography } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import Image from 'next/image';
 import styles from '@/app/components/ProfileClient/styles';
 
 interface ClientProfileProps {
-  // New props
   rating: number;
   clientCondition: string;
   companyName: string;
@@ -17,9 +16,11 @@ interface ClientProfileProps {
   onRatingChange: (rating: number) => void;
   onConditionChange: (condition: string) => void;
   readOnly?: boolean;
+  imageUrl?: string | null; // Adiciona a propriedade imageUrl como opcional
+  onImageChange: (file: File) => void; // Callback para quando a imagem for alterada
 }
 
-// Função Renderizar o nome do cliente com tamnho menor
+// Função Renderizar o nome do cliente com tamanho menor
 const renderAsIs = (str: any) => {
   if (typeof str !== 'string') {
     return '';
@@ -37,11 +38,13 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
   onRatingChange,
   onConditionChange,
   readOnly,
+  imageUrl,
+  onImageChange, // Recebe o callback do componente pai
 }) => {
   const { control } = useForm();
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -49,6 +52,8 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
         setPreviewImage(reader.result as string);
       };
       reader.readAsDataURL(file);
+
+      onImageChange(file); // Passa o arquivo para o componente pai
     }
   };
 
@@ -63,12 +68,12 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
           type="file"
           accept="image/*"
           style={{ display: 'none' }}
-          onChange={handleImageChange}
+          onChange={handleFileChange}
           disabled={readOnly}
         />
         <Image
-          src={previewImage || '/profile-placeholder.png'}
-          alt="Placeholder"
+          src={previewImage || imageUrl || '/profile-placeholder.png'} // Usa a URL da imagem se disponível
+          alt="Profile Picture"
           width={180}
           height={180}
           style={styles.imgProfile}

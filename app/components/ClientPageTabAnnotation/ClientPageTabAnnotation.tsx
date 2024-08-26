@@ -205,6 +205,8 @@ const ClientPageTabAnnotation: React.FC<ClientPageTabAnnotationProps> = ({
           emailCommercial={clientData?.emailCommercial}
           onRatingChange={handleRatingChange}
           onConditionChange={handleConditionChange}
+          imageUrl={clientData?.imageUrl}
+          onImageChange={() => {}}
         />
         <Box sx={styles.boxCol2}>
           <form onSubmit={handleSubmit(onSubmit)}>

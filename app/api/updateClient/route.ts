@@ -25,19 +25,36 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
     console.log('Request body:', body);
 
-    const { rating, clientCondition, ...otherData } = body;
+    // Verifique se o cliente existe antes de atualizar
+    const existingClient = await db
+      .select()
+      .from(clients)
+      .where(eq(clients.id, idNumber))
+      .limit(1);
 
-    await db
+    if (existingClient.length === 0) {
+      return NextResponse.json({ error: 'Client not found' }, { status: 404 });
+    }
+
+    const updatedClient = await db
       .update(clients)
       .set({
-        ...otherData,
-        rating: rating !== undefined ? rating : undefined,
-        clientCondition:
-          clientCondition !== undefined ? clientCondition : undefined,
+        ...body,
+        imageUrl: body.imageUrl, // Certifique-se de incluir imageUrl
       })
-      .where(eq(clients.id, idNumber));
+      .where(eq(clients.id, idNumber))
+      .returning({
+        id: clients.id,
+        companyName: clients.companyName,
+        emailCommercial: clients.emailCommercial,
+        phone: clients.phone,
+        rating: clients.rating,
+        clientCondition: clients.clientCondition,
+        imageUrl: clients.imageUrl, // Inclua imageUrl no retorno
+      })
+      .execute();
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ client: updatedClient });
   } catch (error) {
     console.error('Error updating client:', error);
     return NextResponse.json(
