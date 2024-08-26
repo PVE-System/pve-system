@@ -170,10 +170,7 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
     }
   };
 
-  const handleImageChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const file = event.target.files?.[0];
+  const handleImageChange = async (file: File) => {
     if (file) {
       const formData = new FormData();
       formData.append('file', file);
@@ -181,7 +178,7 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
       console.log('Iniciando upload da imagem...');
 
       const uploadResponse = await fetch(
-        `/api/uploadImageClient?pathname=clients/${clientId}/profile.jpg`,
+        `/api/uploadImageClient?pathname=clients/id=${clientId}/url=${imageUrl}`,
         {
           method: 'POST',
           body: formData,
@@ -191,13 +188,6 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
       if (uploadResponse.ok) {
         const uploadResult = await uploadResponse.json();
         setImageUrl(uploadResult.url); // Atualiza a URL da imagem
-
-        // Mostra uma prévia da imagem no frontend
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setPreviewImage(reader.result as string);
-        };
-        reader.readAsDataURL(file);
       } else {
         console.error('Erro ao fazer upload da imagem');
       }
@@ -259,6 +249,7 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
             }
             readOnly={false}
             imageUrl={previewImage || imageUrl || undefined}
+            onImageChange={handleImageChange}
           />
           <Box sx={styles.boxButton}>
             <Button
@@ -342,7 +333,7 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
               }
               return null;
             })}
-            <Box sx={{ marginTop: 2 }}>
+            {/*             <Box sx={{ marginTop: 2 }}>
               <Typography variant="subtitle1">Imagem do Cliente</Typography>
               <input
                 type="file"
@@ -350,7 +341,7 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
                 onChange={handleImageChange}
                 style={{ marginTop: 10 }}
               />
-            </Box>
+            </Box> */}
           </form>
         </Box>
       </Box>

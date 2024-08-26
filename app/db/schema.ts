@@ -66,6 +66,7 @@ export const clients = pgTable('clients', {
   rating: integer('rating').notNull().default(0),
   clientCondition: text('client_condition').notNull().default('normal'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
+  imageUrl: varchar('imageUrl', { length: 512 }),
 });
 
 export type Client = typeof clients.$inferSelect;

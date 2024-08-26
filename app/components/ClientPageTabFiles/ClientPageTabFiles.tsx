@@ -88,6 +88,7 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
           corfioCode={clientData?.corfioCode}
           phone={clientData?.phone}
           emailCommercial={clientData?.emailCommercial}
+          imageUrl={clientData?.imageUrl}
         />
         {/* Grupo 2 - Anexar e baixar arquivos. Col2 */}
         <Box sx={styles.boxCol2}>
