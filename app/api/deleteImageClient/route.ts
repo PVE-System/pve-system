@@ -1,4 +1,4 @@
-/* import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { del } from '@vercel/blob';
 
 export async function DELETE(request: NextRequest) {
@@ -26,4 +26,3 @@ export async function DELETE(request: NextRequest) {
     );
   }
 }
- */

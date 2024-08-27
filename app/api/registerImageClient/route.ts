@@ -1,4 +1,4 @@
-/* import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { put } from '@vercel/blob';
 import { clients } from '@/app/db/schema';
 import { db } from '@/app/db';
@@ -37,4 +37,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
- */
