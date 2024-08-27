@@ -2,7 +2,7 @@
 
 <h2>🐱‍👤Features:</h2>
 
-- Client management system built with Next.js, hosted on Vercel, and utilizing AWS services.
+- Customer management system built with Next.js, hosted on Vercel, and utilizing AWS services.
 - This project is currently under development.
 
 <h2>🤖Tech:</h2>
