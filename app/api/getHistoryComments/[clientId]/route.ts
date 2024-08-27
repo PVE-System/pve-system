@@ -2,7 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/app/db';
-import { comments } from '@/app/db/schema';
+import { comments, users } from '@/app/db/schema';
 import { eq, desc } from 'drizzle-orm';
 
 export async function GET(
@@ -20,8 +20,16 @@ export async function GET(
 
   try {
     const commentsData = await db
-      .select()
+      .select({
+        id: comments.id, // Certifique-se de selecionar o ID do comentário
+        comment: comments.comment,
+        date: comments.date,
+        favorite: comments.favorite,
+        userId: comments.userId,
+        userName: users.name, // Assumindo que você faz um join com a tabela de usuários para obter o nome do usuário
+      })
       .from(comments)
+      .leftJoin(users, eq(comments.userId, users.id)) // Junte com a tabela de usuários
       .where(eq(comments.clientId, Number(clientId)))
       .orderBy(desc(comments.favorite), desc(comments.date))
       .execute();

@@ -79,6 +79,9 @@ export const salesInformation = pgTable('sales_information', {
   clientId: integer('client_id')
     .references(() => clients.id)
     .notNull(),
+  userId: integer('user_id')
+    .references(() => users.id) // Referência à tabela de usuários
+    .notNull(),
   commercial: text('commercial').notNull(),
   marketing: text('marketing').notNull(),
   invoicing: text('invoicing').notNull(),
@@ -97,6 +100,9 @@ export const comments = pgTable('comments', {
   id: serial('id').primaryKey(),
   clientId: integer('client_id')
     .references(() => clients.id)
+    .notNull(),
+  userId: integer('user_id')
+    .references(() => users.id) // Referência à tabela de usuários
     .notNull(),
   comment: text('comment').notNull(),
   date: timestamp('date').defaultNow().notNull(),
