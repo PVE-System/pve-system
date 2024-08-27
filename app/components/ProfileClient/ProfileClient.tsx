@@ -1,7 +1,15 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Box, Button, Rating, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogContent,
+  Rating,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import Image from 'next/image';
 import styles from '@/app/components/ProfileClient/styles';
@@ -17,7 +25,9 @@ interface ClientProfileProps {
   onConditionChange: (condition: string) => void;
   readOnly?: boolean;
   imageUrl?: string | null; // Adiciona a propriedade imageUrl como opcional
-  onImageChange: (file: File) => void; // Callback para quando a imagem for alterada
+  onImageChange?: (file: File) => void; // Callback para quando a imagem for alterada
+  showTooltip?: boolean;
+  enableImageUpload?: boolean;
 }
 
 // Função Renderizar o nome do cliente com tamanho menor
@@ -40,9 +50,12 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
   readOnly,
   imageUrl,
   onImageChange, // Recebe o callback do componente pai
+  showTooltip = false, // Valor padrão é false
+  enableImageUpload = false,
 }) => {
   const { control } = useForm();
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [openDialog, setOpenDialog] = useState(false);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -53,7 +66,15 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
       };
       reader.readAsDataURL(file);
 
-      onImageChange(file); // Passa o arquivo para o componente pai
+      if (onImageChange) {
+        onImageChange(file);
+      }
+    }
+  };
+
+  const handleImageClick = () => {
+    if (!readOnly) {
+      setOpenDialog(true);
     }
   };
 
@@ -63,21 +84,38 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
         {renderAsIs(companyName.slice(0, 35))} {/* Limita a 35 caracteres */}
       </Typography>{' '}
       <label htmlFor="profile-picture-input">
-        <input
-          id="profile-picture-input"
-          type="file"
-          accept="image/*"
-          style={{ display: 'none' }}
-          onChange={handleFileChange}
-          disabled={readOnly}
-        />
-        <Image
-          src={previewImage || imageUrl || '/profile-placeholder.png'} // Usa a URL da imagem se disponível
-          alt="Profile Picture"
-          width={180}
-          height={180}
-          style={styles.imgProfile}
-        />
+        {/* Exibe o input apenas se enableImageUpload for true */}
+        {enableImageUpload && (
+          <input
+            id="profile-picture-input"
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={handleFileChange}
+            disabled={readOnly}
+          />
+        )}
+        {showTooltip ? (
+          <Tooltip title="Por favor, primeiro conclua o cadastro do cliente e depois escolha a foto de perfil">
+            <Image
+              src={previewImage || imageUrl || '/profile-placeholder.png'}
+              alt="Profile Picture"
+              width={180}
+              height={180}
+              style={styles.imgProfile}
+              onClick={handleImageClick}
+            />
+          </Tooltip>
+        ) : (
+          <Image
+            src={previewImage || imageUrl || '/profile-placeholder.png'}
+            alt="Profile Picture"
+            width={180}
+            height={180}
+            style={styles.imgProfile}
+            onClick={handleImageClick}
+          />
+        )}
       </label>
       <Box sx={styles.statusRating}>
         <Typography variant="subtitle2">Status de Atividade:</Typography>
@@ -182,6 +220,34 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
           Email: {emailCommercial}
         </Typography>{' '}
       </Box>
+      {/* Dialog para exibir a imagem em tamanho maior */}
+      <Dialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          style: {
+            borderRadius: 10,
+          },
+        }}
+      >
+        <DialogContent
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Image
+            src={previewImage || imageUrl || '/profile-placeholder.png'}
+            alt="Profile Picture"
+            width={500}
+            height={500}
+            style={{ borderRadius: '10px' }}
+          />
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 };

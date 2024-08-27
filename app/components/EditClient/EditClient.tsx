@@ -250,6 +250,7 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
             readOnly={false}
             imageUrl={previewImage || imageUrl || undefined}
             onImageChange={handleImageChange}
+            enableImageUpload={true}
           />
           <Box sx={styles.boxButton}>
             <Button
