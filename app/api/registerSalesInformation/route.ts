@@ -3,6 +3,14 @@ import { salesInformation } from '@/app/db/schema';
 import { db } from '@/app/db';
 import { eq } from 'drizzle-orm';
 
+// Função para extrair o userId dos cookies
+const getUserIdFromCookies = (request: NextRequest): number | null => {
+  const cookies = request.cookies;
+  const userId = cookies.get('userId')?.value;
+
+  return userId ? Number(userId) : null;
+};
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -16,9 +24,11 @@ export async function POST(request: NextRequest) {
       invoice,
     } = body;
 
-    if (!clientId) {
+    const userId = getUserIdFromCookies(request); // Extrai o userId dos cookies
+
+    if (!clientId || !userId) {
       return NextResponse.json(
-        { error: 'Client ID is required' },
+        { error: 'Client ID and user ID are required' },
         { status: 400 },
       );
     }
@@ -40,6 +50,7 @@ export async function POST(request: NextRequest) {
       .insert(salesInformation)
       .values({
         clientId: Number(clientId), // Garantir que clientId está sendo registrado corretamente
+        userId: userId, // Usando userId extraído dos cookies
         commercial,
         marketing,
         invoicing,

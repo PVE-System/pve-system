@@ -20,6 +20,7 @@ interface Comment {
   comment: string;
   date: string;
   favorite: boolean;
+  userName: string; // Adicionado para armazenar o nome do usuário
 }
 
 const ClientPageTabAnnotation: React.FC<ClientPageTabAnnotationProps> = ({
@@ -38,6 +39,7 @@ const ClientPageTabAnnotation: React.FC<ClientPageTabAnnotationProps> = ({
       );
       if (commentsResponse.ok) {
         const commentsData = await commentsResponse.json();
+        console.log('Fetched comments:', commentsData); // Verifique se o `id` está presente em cada comentário
         setComments(Array.isArray(commentsData) ? commentsData : []);
       } else if (commentsResponse.status === 404) {
         console.warn('Comments not found, proceeding with empty data.');
@@ -89,6 +91,7 @@ const ClientPageTabAnnotation: React.FC<ClientPageTabAnnotationProps> = ({
     const formattedDate = format(currentDate, 'yyyy-MM-dd'); // Formato ISO para armazenar no BD
 
     const newComment = {
+      clientId, // Inclua o clientId aqui
       comment: data.comment,
       date: formattedDate,
       favorite: false,
@@ -98,7 +101,7 @@ const ClientPageTabAnnotation: React.FC<ClientPageTabAnnotationProps> = ({
       const response = await fetch('/api/postHistoryComments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ clientId, ...newComment }),
+        body: JSON.stringify(newComment), // Agora o clientId é incluído corretamente
       });
 
       if (!response.ok) {
@@ -116,6 +119,12 @@ const ClientPageTabAnnotation: React.FC<ClientPageTabAnnotationProps> = ({
   const handleFavorite = async (index: number) => {
     const updatedComments = [...comments];
     const targetComment = updatedComments[index];
+
+    if (!targetComment || !targetComment.id) {
+      console.error('Comment ID is missing or undefined', targetComment); // Log detalhado
+      return;
+    }
+
     targetComment.favorite = !targetComment.favorite;
 
     try {
@@ -134,7 +143,6 @@ const ClientPageTabAnnotation: React.FC<ClientPageTabAnnotationProps> = ({
 
       const updatedComment = await response.json();
 
-      // Garantir que o comentário atualizado tenha a data correta
       const formattedUpdatedComment = {
         ...updatedComment,
         date: updatedComment.date
@@ -246,7 +254,7 @@ const ClientPageTabAnnotation: React.FC<ClientPageTabAnnotationProps> = ({
                   <Box>
                     <Typography variant="body1">{comment.comment}</Typography>
                     <Typography variant="caption" sx={styles.commentsData}>
-                      {formatCommentDate(comment.date)}
+                      {formatCommentDate(comment.date)} - {comment.userName}
                     </Typography>
                   </Box>
                   <Box sx={styles.commentsContent}>

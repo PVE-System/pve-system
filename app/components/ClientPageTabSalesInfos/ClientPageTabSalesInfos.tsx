@@ -6,6 +6,7 @@ import { useForm, Controller } from 'react-hook-form';
 import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
 import styles from '@/app/components/ClientPageTabSalesInfos/styles';
 import { useRouter } from 'next/navigation';
+import Cookies from 'js-cookie'; // Biblioteca para manipulação de cookies no frontend
 
 interface ClientPageTabSalesInfosProps {
   clientId: string;
@@ -74,7 +75,12 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
 
   const onSubmit = async (data: any) => {
     try {
-      const requestData = { ...data, clientId };
+      const userId = Cookies.get('userId'); // Extrai o userId dos cookies
+      if (!userId) {
+        throw new Error('User ID is missing');
+      }
+
+      const requestData = { ...data, clientId, userId: Number(userId) };
 
       let response;
       if (salesData) {
