@@ -178,7 +178,7 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
       console.log('Iniciando upload da imagem...');
 
       const uploadResponse = await fetch(
-        `/api/uploadImageClient?pathname=clients/id=${clientId}/url=${imageUrl}`,
+        `/api/uploadImageClient?pathname=clients/id=${clientId}/image-${Date.now()}&clientId=${clientId}`,
         {
           method: 'POST',
           body: formData,
@@ -187,7 +187,7 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
 
       if (uploadResponse.ok) {
         const uploadResult = await uploadResponse.json();
-        setImageUrl(uploadResult.url); // Atualiza a URL da imagem
+        setImageUrl(uploadResult.url); // Atualiza a URL da imagem na interface
       } else {
         console.error('Erro ao fazer upload da imagem');
       }
@@ -250,6 +250,7 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
             readOnly={false}
             imageUrl={previewImage || imageUrl || undefined}
             onImageChange={handleImageChange}
+            enableImageUpload={true}
           />
           <Box sx={styles.boxButton}>
             <Button

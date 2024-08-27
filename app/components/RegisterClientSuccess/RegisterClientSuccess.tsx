@@ -39,6 +39,17 @@ const RegisterClientSuccessContent = () => {
           </CardContent>
           <CardContent sx={styles.cardContent}>
             <Typography variant="h6" sx={sharedStyles.subtitleSize}>
+              <span>Foto do </span>Cliente
+            </Typography>
+            <Box
+              component={NextLink}
+              href={`/clientPage/editClient?id=${clientId}`}
+            >
+              <DashboardIcon sx={styles.icon} />
+            </Box>
+          </CardContent>
+          <CardContent sx={styles.cardContent}>
+            <Typography variant="h6" sx={sharedStyles.subtitleSize}>
               <span>Dash</span>board
             </Typography>
             <Box component={NextLink} href="/dashboard">

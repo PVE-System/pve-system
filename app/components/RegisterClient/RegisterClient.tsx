@@ -294,11 +294,13 @@ const RegisterClient: React.FC = () => {
             companyName={''}
             corfioCode={''}
             onConditionChange={setClientCondition}
-            readOnly={false}
             emailCommercial=""
             phone=""
+            readOnly={false}
             imageUrl={imageUrl || undefined}
             onImageChange={() => {}}
+            showTooltip={true} // Mostra o Tooltip
+            enableImageUpload={false}
           />
           <Box sx={styles.boxCol2}>
             {/* Inputs SEM select */}

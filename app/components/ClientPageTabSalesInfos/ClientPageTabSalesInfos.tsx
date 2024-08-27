@@ -125,9 +125,9 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
           onConditionChange={(condition) =>
             setValue('clientCondition', condition)
           }
-          readOnly={readOnly}
+          readOnly={false}
           imageUrl={clientData?.imageUrl}
-          onImageChange={() => {}}
+          enableImageUpload={false}
         />
         {!readOnly && (
           <Box sx={styles.boxButton}>
