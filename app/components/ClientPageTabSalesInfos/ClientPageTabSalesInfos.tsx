@@ -1,7 +1,13 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Box, Button, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  CircularProgress,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
 import styles from '@/app/components/ClientPageTabSalesInfos/styles';
@@ -29,6 +35,7 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
 }) => {
   const { handleSubmit, control, setValue } = useForm();
   const [loading, setLoading] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [salesData, setSalesData] = useState<any>(null);
   const [clientData, setClientData] = useState<any>(null);
   const router = useRouter();
@@ -67,6 +74,7 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
   }, [clientId, setValue]);
 
   const onSubmit = async (data: any) => {
+    setIsUpdating(true); // Inicia o carregamento
     try {
       const userId = Cookies.get('userId');
       if (!userId) {
@@ -97,9 +105,20 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
       const result = await response.json();
       console.log('Sales information processed:', result);
 
-      router.push(`/clientPage?id=${clientId}`);
+      // Atualiza o estado salesData com os dados mais recentes, incluindo updatedAt e userName
+      setSalesData((prevData: any) => ({
+        ...prevData,
+        ...requestData,
+        updatedAt: new Date(), // Atualiza o estado com a data e hora atual
+        userName: result.userName, // Nome do usuário retornado da API
+      }));
+
+      setIsUpdating(false); // Finaliza o carregamento
+      // Você pode decidir não redirecionar, ou apenas fornecer um feedback visual ao usuário
     } catch (error) {
       console.error('Error processing sales information:', error);
+      setIsUpdating(false); // Finaliza o carregamento mesmo em caso de erro
+      // Adicionar uma mensagem de erro aqui, se desejar
     }
   };
 
@@ -112,7 +131,11 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
   };
 
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center">
+        <CircularProgress />
+      </Box>
+    );
   }
 
   return (
@@ -140,11 +163,25 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
               variant="contained"
               sx={styles.editButton}
               onClick={handleSubmit(onSubmit)}
+              disabled={isUpdating} // Desabilitar o botão enquanto está carregando
             >
-              Atualizar Informações
+              {isUpdating ? (
+                <CircularProgress size={24} sx={{ color: 'white' }} />
+              ) : (
+                'Atualizar Informações'
+              )}
             </Button>
           </Box>
         )}
+        <Box sx={{ marginTop: '30px' }}>
+          <Typography variant="caption">
+            {
+              salesData && salesData.updatedAt && salesData.userName
+                ? `Última atualização: ${formatDate(salesData.updatedAt)} por ${salesData.userName}`
+                : '' /* ' Informações sobre pedidos ainda não foram atualizadas' */
+            }
+          </Typography>
+        </Box>
       </Box>
       <Box sx={styles.boxCol2}>
         <form>
@@ -168,12 +205,6 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
                   />
                 )}
               />
-              <Box sx={{ marginTop: '0px', marginBottom: '30px' }}>
-                <Typography variant="caption">
-                  Última atualização: {formatDate(salesData.updatedAt)} por{' '}
-                  {salesData.userName}
-                </Typography>
-              </Box>
             </Box>
           ))}
         </form>
