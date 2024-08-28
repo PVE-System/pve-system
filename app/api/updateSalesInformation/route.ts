@@ -54,15 +54,27 @@ export async function PUT(request: NextRequest) {
     };
 
     // Atualizar salesInformation
-    await db
+    const updatedSalesInfo = await db
       .update(salesInformation)
       .set(updateData)
       .where(eq(salesInformation.clientId, clientIdNumber))
+      .returning({
+        updatedAt: salesInformation.updatedAt,
+        userId: salesInformation.userId,
+      })
       .execute();
+
+    if (updatedSalesInfo.length === 0) {
+      return NextResponse.json(
+        { error: 'Failed to update sales information' },
+        { status: 500 },
+      );
+    }
 
     return NextResponse.json({
       success: true,
-      userName: user[0].userName, // Retorna o nome do usuário para renderizar no frontend
+      updatedAt: updatedSalesInfo[0].updatedAt, // Data atualizada
+      userName: user[0].userName, // Nome do usuário para renderizar no frontend
     });
   } catch (error) {
     console.error('Error updating client:', error);

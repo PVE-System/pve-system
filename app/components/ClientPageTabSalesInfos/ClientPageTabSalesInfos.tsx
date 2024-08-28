@@ -105,9 +105,16 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
       const result = await response.json();
       console.log('Sales information processed:', result);
 
-      // Você pode adicionar uma mensagem de sucesso aqui, se desejar
+      // Atualiza o estado salesData com os dados mais recentes, incluindo updatedAt e userName
+      setSalesData((prevData: any) => ({
+        ...prevData,
+        ...requestData,
+        updatedAt: new Date(), // Atualiza o estado com a data e hora atual
+        userName: result.userName, // Nome do usuário retornado da API
+      }));
+
       setIsUpdating(false); // Finaliza o carregamento
-      router.push(`/clientPage?id=${clientId}`);
+      // Você pode decidir não redirecionar, ou apenas fornecer um feedback visual ao usuário
     } catch (error) {
       console.error('Error processing sales information:', error);
       setIsUpdating(false); // Finaliza o carregamento mesmo em caso de erro
@@ -130,6 +137,7 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
       </Box>
     );
   }
+
   return (
     <Box sx={styles.boxContent}>
       <Box>
