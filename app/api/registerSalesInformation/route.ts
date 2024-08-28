@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { salesInformation } from '@/app/db/schema';
+import { salesInformation, users } from '@/app/db/schema';
 import { db } from '@/app/db';
-import { eq } from 'drizzle-orm';
 
 // Função para extrair o userId dos cookies
 const getUserIdFromCookies = (request: NextRequest): number | null => {
@@ -24,47 +23,34 @@ export async function POST(request: NextRequest) {
       invoice,
     } = body;
 
-    const userId = getUserIdFromCookies(request); // Extrai o userId dos cookies
+    const userId = getUserIdFromCookies(request);
 
     if (!clientId || !userId) {
       return NextResponse.json(
-        { error: 'Client ID and user ID are required' },
+        { error: 'Client ID and User ID are required' },
         { status: 400 },
       );
     }
 
-    const existingSalesInfo = await db
-      .select()
-      .from(salesInformation)
-      .where(eq(salesInformation.clientId, Number(clientId)))
-      .execute();
-
-    if (existingSalesInfo.length > 0) {
-      return NextResponse.json(
-        { error: 'Sales information for this client already exists' },
-        { status: 400 },
-      );
-    }
-
-    const createdSalesInformation = await db
+    const newSalesInformation = await db
       .insert(salesInformation)
       .values({
-        clientId: Number(clientId), // Garantir que clientId está sendo registrado corretamente
-        userId: userId, // Usando userId extraído dos cookies
+        clientId: Number(clientId),
+        userId,
         commercial,
         marketing,
         invoicing,
         cables,
         financial,
         invoice,
+        updatedAt: new Date(), // Definindo o updatedAt
       })
       .returning({
         id: salesInformation.id,
         clientId: salesInformation.clientId,
-      })
-      .execute();
+      });
 
-    return NextResponse.json({ salesInformation: createdSalesInformation });
+    return NextResponse.json(newSalesInformation, { status: 200 });
   } catch (error) {
     console.error('Error registering sales information:', error);
     return NextResponse.json(

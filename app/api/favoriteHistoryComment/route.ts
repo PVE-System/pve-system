@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/app/db';
-import { comments } from '@/app/db/schema';
+import { comments, users } from '@/app/db/schema'; // Certifique-se de importar a tabela users
 import { eq } from 'drizzle-orm';
 
 export async function PUT(request: NextRequest) {
@@ -23,34 +23,44 @@ export async function PUT(request: NextRequest) {
 
   try {
     const body = await request.json();
-    console.log('Request body:', body);
-
     const { favorite } = body;
-
-    console.log('Updating comment with favorite status:', favorite);
 
     const updateResult = await db
       .update(comments)
-      .set({ favorite, date: new Date() }) // Atualiza também a data no formato correto
+      .set({ favorite, date: new Date() })
       .where(eq(comments.id, commentIdNumber))
       .returning({
         id: comments.id,
         clientId: comments.clientId,
         comment: comments.comment,
         favorite: comments.favorite,
-        date: comments.date, // Incluir a data no retorno
+        date: comments.date,
+        userId: comments.userId,
       });
 
     if (updateResult.length === 0) {
       return NextResponse.json({ error: 'Comment not found' }, { status: 404 });
     }
 
-    console.log('Comment update result:', updateResult);
+    const updatedComment = updateResult[0];
 
-    // Formata a data para ISO 8601 antes de retornar
+    // Buscar o nome do usuário associado ao comentário
+    const user = await db
+      .select({
+        userName: users.name,
+      })
+      .from(users)
+      .where(eq(users.id, updatedComment.userId))
+      .execute();
+
+    if (user.length === 0) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
     const formattedComment = {
-      ...updateResult[0],
-      date: updateResult[0].date.toISOString(), // Garante que a data está em formato ISO 8601
+      ...updatedComment,
+      date: updatedComment.date.toISOString(),
+      userName: user[0].userName, // Adiciona o userName à resposta
     };
 
     return NextResponse.json(formattedComment, { status: 200 });

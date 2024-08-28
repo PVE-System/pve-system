@@ -89,6 +89,7 @@ export const salesInformation = pgTable('sales_information', {
   financial: text('financial').notNull(),
   invoice: text('invoice').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
 export type SalesInformation = typeof salesInformation.$inferSelect;

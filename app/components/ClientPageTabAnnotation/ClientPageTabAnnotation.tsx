@@ -121,7 +121,7 @@ const ClientPageTabAnnotation: React.FC<ClientPageTabAnnotationProps> = ({
     const targetComment = updatedComments[index];
 
     if (!targetComment || !targetComment.id) {
-      console.error('Comment ID is missing or undefined', targetComment); // Log detalhado
+      console.error('Comment ID is missing or undefined', targetComment);
       return;
     }
 
@@ -148,6 +148,7 @@ const ClientPageTabAnnotation: React.FC<ClientPageTabAnnotationProps> = ({
         date: updatedComment.date
           ? format(parseISO(updatedComment.date), 'yyyy-MM-dd')
           : 'Data não disponível',
+        userName: targetComment.userName, // Garante que o userName seja mantido
       };
 
       updatedComments.splice(index, 1);
