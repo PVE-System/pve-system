@@ -50,7 +50,7 @@ export async function PUT(request: NextRequest) {
     const updateData = {
       ...otherData,
       userId,
-      updatedAt: new Date(), // Atualizar o timestamp para o momento atual como objeto Date
+      updatedAt: new Date(), // Atualizar o timestamp para o momento atual
     };
 
     // Atualizar salesInformation
