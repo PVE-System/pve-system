@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/app/db';
-import { salesInformation, clients } from '@/app/db/schema';
+import { salesInformation, clients, users } from '@/app/db/schema';
 import { eq } from 'drizzle-orm';
 
 export async function GET(
@@ -21,8 +21,20 @@ export async function GET(
     console.log('Fetching sales information for client ID:', id);
 
     const salesInfo = await db
-      .select()
+      .select({
+        clientId: salesInformation.clientId,
+        userId: salesInformation.userId,
+        commercial: salesInformation.commercial,
+        marketing: salesInformation.marketing,
+        invoicing: salesInformation.invoicing,
+        cables: salesInformation.cables,
+        financial: salesInformation.financial,
+        invoice: salesInformation.invoice,
+        updatedAt: salesInformation.updatedAt,
+        userName: users.name, // Pega o nome do usuário da tabela de usuários
+      })
       .from(salesInformation)
+      .innerJoin(users, eq(salesInformation.userId, users.id))
       .where(eq(salesInformation.clientId, Number(id)))
       .execute();
 

@@ -7,6 +7,7 @@ import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
 import styles from '@/app/components/ClientPageTabSalesInfos/styles';
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie'; // Biblioteca para manipulação de cookies no frontend
+import { mt } from 'date-fns/locale';
 
 interface ClientPageTabSalesInfosProps {
   clientId: string;
@@ -35,8 +36,6 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
   useEffect(() => {
     if (!clientId) return;
 
-    console.log('Fetching client data for ID:', clientId);
-
     const fetchClientData = async () => {
       try {
         const clientResponse = await fetch(`/api/getClient/${clientId}`);
@@ -56,12 +55,6 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
           Object.keys(salesData).forEach((key) => {
             setValue(key, salesData[key]);
           });
-        } else if (salesResponse.status === 404) {
-          console.warn(
-            'Sales information not found, proceeding with empty data.',
-          );
-        } else {
-          throw new Error('Network response was not ok');
         }
       } catch (error) {
         console.error('Error fetching client or sales data:', error);
@@ -75,7 +68,7 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
 
   const onSubmit = async (data: any) => {
     try {
-      const userId = Cookies.get('userId'); // Extrai o userId dos cookies
+      const userId = Cookies.get('userId');
       if (!userId) {
         throw new Error('User ID is missing');
       }
@@ -84,14 +77,12 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
 
       let response;
       if (salesData) {
-        // Atualizar se os dados de vendas já existem
         response = await fetch(`/api/updateSalesInformation?id=${clientId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(requestData),
         });
       } else {
-        // Criar se os dados de vendas não existem
         response = await fetch(`/api/registerSalesInformation`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -106,11 +97,18 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
       const result = await response.json();
       console.log('Sales information processed:', result);
 
-      // Redirecionar o usuário após o sucesso
       router.push(`/clientPage?id=${clientId}`);
     } catch (error) {
       console.error('Error processing sales information:', error);
     }
+  };
+
+  const formatDate = (date: string) => {
+    return new Date(date).toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    });
   };
 
   if (loading) {
@@ -170,6 +168,12 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
                   />
                 )}
               />
+              <Box sx={{ marginTop: '0px', marginBottom: '30px' }}>
+                <Typography variant="caption">
+                  Última atualização: {formatDate(salesData.updatedAt)} por{' '}
+                  {salesData.userName}
+                </Typography>
+              </Box>
             </Box>
           ))}
         </form>
