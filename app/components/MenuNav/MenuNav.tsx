@@ -170,24 +170,26 @@ export default function TemporaryDrawer() {
               {themeIcon}
             </IconButton>
             <Divider sx={styles.dividerMenu} />
-            {userData.imageUrl ? (
-              <Image
-                src={userData.imageUrl}
-                alt="Foto do usuário"
-                width={80}
-                height={80}
-                style={{ borderRadius: '50%' }}
-                priority
-              />
-            ) : (
-              <Image
-                src="/profile-placeholder.png"
-                alt="Placeholder"
-                width={80}
-                height={80}
-                priority
-              />
-            )}
+            <Box>
+              {userData.imageUrl ? (
+                <Image
+                  src={userData.imageUrl}
+                  alt="Foto do usuário"
+                  width={80}
+                  height={80}
+                  style={{ borderRadius: '50%' }}
+                  priority
+                />
+              ) : (
+                <Image
+                  src="/profile-placeholder.png"
+                  alt="Placeholder"
+                  width={80}
+                  height={80}
+                  priority
+                />
+              )}
+            </Box>
             <Typography variant="subtitle2" component="h1">
               {renderAsIs(userData.name.slice(0, 25)) || 'Nome do Usuário'}
               {/* {userData.name || 'Nome do Usuário'} */}
