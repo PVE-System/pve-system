@@ -103,9 +103,9 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
       const formData = new FormData();
       formData.append('file', file);
 
-      // Realize o upload da imagem
+      // Ajuste o caminho do upload para incluir o ID do usuário na subpasta
       const uploadResponse = await fetch(
-        `/api/uploadImage?pathname=${file.name}&userId=${userId}`,
+        `/api/uploadImage?pathname=users/id=${userId}/image-${Date.now()}&userId=${userId}`,
         {
           method: 'POST',
           body: formData,
@@ -113,7 +113,7 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
       );
 
       const uploadData = await uploadResponse.json();
-      setImageUrl(uploadData.url); // Defina a URL da imagem do estado
+      setImageUrl(uploadData.url); // Defina a URL da imagem no estado
 
       // Mostre uma prévia da imagem no frontend
       const reader = new FileReader();
