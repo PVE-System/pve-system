@@ -70,10 +70,13 @@ export default function ExcelDownloadFileComponent() {
           const newFileWithDate = {
             ...newFile,
             date: new Date().toISOString(), // Adiciona a data atual
-            /* name: file.name, */ // Preserva o nome do arquivo
+            name: file.name, // Preserva o nome do arquivo
           };
 
           setFiles([...files, newFileWithDate]); // Adiciona o arquivo com a data ao estado
+
+          // Resetar o valor do input de arquivo para permitir novos uploads
+          event.target.value = '';
         } else {
           console.error('Error uploading file');
         }
@@ -175,16 +178,29 @@ export default function ExcelDownloadFileComponent() {
             {files.map((file) => {
               console.log('Rendering file:', file); // Adicionando log para depuração
               return (
-                <Card variant="outlined" sx={styles.card} key={file.url}>
-                  <CardContent sx={styles.cardContent}>
-                    <Typography variant="body1" sx={{ flex: 1 }}>
-                      <InsertDriveFileIcon sx={{ marginRight: 1 }} />
-                      {file.name}{' '}
-                      {/* Certifique-se de que 'name' seja o nome do arquivo exibido */}
+                <Card variant="outlined" sx={styles.fileList} key={file.url}>
+                  <CardContent
+                    sx={{
+                      display: 'flex', // Define o layout como flexbox
+                      alignItems: 'center', // Alinha os itens ao centro verticalmente
+                      justifyContent: 'space-between', // Espaça os itens uniformemente
+                      gap: 1, // Define um espaço entre os itens
+                    }}
+                  >
+                    <InsertDriveFileIcon
+                      color="secondary"
+                      sx={{ marginRight: 1 }}
+                    />
+                    <Typography
+                      variant="body1"
+                      sx={{ ...styles.textFileList, flex: 1 }}
+                    >
+                      {/* {file.name} */} Planilha Excel Atualizada em:{' '}
+                      <span>
+                        {new Date(file.date).toLocaleDateString('pt-BR')}
+                      </span>
                     </Typography>
-                    <Typography variant="body2" sx={{ flex: 1 }}>
-                      {new Date(file.date).toLocaleDateString('pt-BR')}
-                    </Typography>
+
                     <IconButton
                       color="primary"
                       onClick={() => handleDownload(file.url)}

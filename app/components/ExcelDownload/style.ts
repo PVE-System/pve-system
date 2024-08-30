@@ -33,6 +33,55 @@ const styles = {
     },
   },
 
+  fileList: {
+    background: (theme: Theme) =>
+      theme.palette.mode === 'light'
+        ? theme.palette.background.paper
+        : theme.palette.background.alternative,
+
+    /*     justifyContent: 'center',
+    alignItens: 'center', */
+
+    width: '100%',
+
+    '@media (max-width:450px)': {
+      flexDirection: 'column',
+      height: 'auto',
+    },
+  },
+
+  textFileList: {
+    // FontSize Desktop
+    fontSize: '16px',
+    // FontSize Notebook
+    '@media (max-width:1050px)': {
+      fontSize: '14px',
+    },
+    // FontSize Tablet
+    '@media (max-width:800px)': {
+      fontSize: '12px',
+    },
+    // FontSize Mobile
+    '@media (max-width:450px)': {
+      fontSize: '10px',
+    },
+    span: {
+      color: orange[800],
+      fontSize: '18px',
+      '@media (max-width:1050px)': {
+        fontSize: '16px',
+      },
+      // FontSize Tablet
+      '@media (max-width:800px)': {
+        fontSize: '14px',
+      },
+      // FontSize Mobile
+      '@media (max-width:450px)': {
+        fontSize: '12px',
+      },
+    },
+  },
+
   icon: {
     width: '50px',
     height: '50px',
