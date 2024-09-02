@@ -2,6 +2,37 @@ import { orange } from '@mui/material/colors';
 import { Theme } from '@mui/material/styles/createTheme';
 
 const styles = {
+  card: {
+    background: (theme: Theme) =>
+      theme.palette.mode === 'light'
+        ? theme.palette.background.paper
+        : theme.palette.background.alternative,
+    display: 'flex',
+    justifyContent: 'center',
+    textAlign: 'center',
+    width: '100%',
+    height: '300px',
+    /*     borderRadius: 4,
+    border: '3px solid',
+    borderColor: (theme: Theme) =>
+      theme.palette.mode === 'light' ? orange[500] : orange[800], */
+
+    '@media (max-width:450px)': {
+      flexDirection: 'column',
+      height: 'auto',
+    },
+  },
+
+  cardContent: {
+    width: '300px',
+    margin: '80px',
+
+    '@media (max-width:450px)': {
+      width: '100%',
+      margin: '0',
+    },
+  },
+
   boxContent: {
     display: 'flex',
     flexDirection: { xs: 'column', md: 'row' },
@@ -34,8 +65,8 @@ const styles = {
   icon: {
     cursor: 'pointer',
     alignSelf: 'center',
-    width: '50px',
-    height: '50px',
+    width: '30px',
+    height: '30px',
     transition: 'color 0.3s',
     color: (theme: Theme) =>
       theme.palette.mode === 'light'
