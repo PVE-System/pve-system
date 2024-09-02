@@ -126,32 +126,10 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
     }
   };
 
-  const handleDownloadFile = async (fileUrl: string) => {
-    try {
-      const response = await fetch(
-        `/api/downloadFilesClient?fileUrl=${encodeURIComponent(fileUrl)}&clientId=${clientId}`,
-      );
-      if (response.ok) {
-        const blob = await response.blob();
-        const downloadUrl = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = downloadUrl;
-        a.download = fileUrl.split('/').pop() || 'file';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      } else {
-        console.error('Error downloading file');
-      }
-    } catch (error) {
-      console.error('Error downloading file:', error);
-    }
-  };
-
   const handleDeleteFile = async (fileUrl: string) => {
     try {
       const response = await fetch(
-        `/api/deleteFilesClient?fileUrl=${encodeURIComponent(fileUrl)}&clientId=${clientId}`,
+        `/api/deleteFilesClient?fileUrl=${encodeURIComponent(fileUrl)}`,
         {
           method: 'DELETE',
         },
@@ -161,12 +139,21 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
         setFiles((prevFiles) =>
           prevFiles.filter((file) => file.url !== fileUrl),
         );
+        console.log(`File deleted: ${fileUrl}`);
       } else {
-        console.error('Error deleting file');
+        const errorResponse = await response.json();
+        console.error(
+          'Error deleting file:',
+          errorResponse.error || 'Unknown error',
+        );
       }
     } catch (error) {
       console.error('Error deleting file:', error);
     }
+  };
+
+  const handleDownloadFile = (fileUrl: string) => {
+    window.location.href = fileUrl;
   };
 
   if (loading) {
@@ -235,7 +222,7 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
                 <CloudUploadIcon sx={styles.icon} />
                 <input
                   type="file"
-                  accept=".xlsx, .xls"
+                  accept=".xlsx, .xls. .pdf"
                   onChange={handleFileChange}
                   hidden
                 />
@@ -247,12 +234,14 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
                   <ListItem key={file.url}>
                     <AttachFileIcon sx={{ marginRight: 1 }} />
                     <ListItemText
-                      primary={file.name}
+                      primary={file.name} // Exibe o nome completo com hash
                       secondary={new Date(file.date).toLocaleDateString(
                         'pt-BR',
                       )}
                     />
-                    <IconButton onClick={() => handleDownloadFile(file.url)}>
+                    <IconButton
+                      onClick={() => handleDownloadFile(file.url)} // Este pode continuar como está
+                    >
                       <GetAppIcon />
                     </IconButton>
                     <IconButton onClick={() => handleDeleteFile(file.url)}>
