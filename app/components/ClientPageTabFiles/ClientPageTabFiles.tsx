@@ -1,13 +1,25 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { Box, Typography, IconButton } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Tabs,
+  Tab,
+  List,
+  ListItem,
+  ListItemText,
+  IconButton,
+  CircularProgress,
+  Container,
+} from '@mui/material';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import GetAppIcon from '@mui/icons-material/GetApp';
+import DeleteIcon from '@mui/icons-material/Delete';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
 import styles from '@/app/components/ClientPageTabFiles/styles';
 import sharedStyles from '@/app/styles/sharedStyles';
-import { useRouter } from 'next/navigation';
 
 interface ClientPageTabFilesProps {
   clientId: string;
@@ -18,7 +30,8 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
 }) => {
   const [clientData, setClientData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
+  const [tabIndex, setTabIndex] = useState(0);
+  const [files, setFiles] = useState<any[]>([]);
 
   const fetchClientData = useCallback(async () => {
     try {
@@ -33,57 +46,141 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
     }
   }, [clientId]);
 
+  const fetchFiles = useCallback(
+    async (folder: string) => {
+      try {
+        const response = await fetch(
+          `/api/getFilesClient?folder=${encodeURIComponent(folder)}&clientId=${clientId}`,
+        );
+        const data = await response.json();
+        setFiles(data.files || []);
+      } catch (error) {
+        console.error('Error fetching files:', error);
+      }
+    },
+    [clientId],
+  );
+
   useEffect(() => {
     if (!clientId) return;
 
     const fetchData = async () => {
       setLoading(true);
       await fetchClientData();
+      const folder =
+        tabIndex === 0
+          ? `BalanceSheet/id=${clientId}`
+          : `ShipmentReport/id=${clientId}`;
+      await fetchFiles(folder);
       setLoading(false);
     };
 
     fetchData();
-  }, [clientId, fetchClientData]);
+  }, [clientId, fetchClientData, fetchFiles, tabIndex]);
 
-  const handleAttachFiles = () => {
-    // Trigger the file input click event
-    document.getElementById('file-upload')?.click();
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setTabIndex(newValue);
+    const folder =
+      newValue === 0
+        ? `BalanceSheet/id=${clientId}`
+        : `ShipmentReport/id=${clientId}`;
+    fetchFiles(folder);
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const files = event.target.files;
     if (files) {
-      console.log('Arquivos selecionados:', files);
-      // Placeholder para lógica de upload de arquivos
+      const formData = new FormData();
+      formData.append('file', files[0]);
+      const folder =
+        tabIndex === 0
+          ? `BalanceSheet/id=${clientId}`
+          : `ShipmentReport/id=${clientId}`;
+
+      try {
+        const response = await fetch(
+          `/api/uploadFilesClient?folder=${encodeURIComponent(folder)}&clientId=${clientId}`,
+          {
+            method: 'POST',
+            body: formData,
+          },
+        );
+
+        if (response.ok) {
+          const newFile = await response.json();
+          // Adiciona o arquivo recém-enviado à lista de arquivos
+          const newFileWithDate = {
+            ...newFile,
+            date: new Date().toISOString(),
+            name: files[0].name,
+          };
+          setFiles((prevFiles) => [...prevFiles, newFileWithDate]);
+        } else {
+          console.error('Error uploading file');
+        }
+      } catch (error) {
+        console.error('Error uploading file:', error);
+      }
     }
   };
 
-  const handleDownloadFiles = () => {
-    // Placeholder para lógica de baixar arquivos
-    console.log('Baixar arquivos');
+  const handleDeleteFile = async (fileUrl: string) => {
+    try {
+      const response = await fetch(
+        `/api/deleteFilesClient?fileUrl=${encodeURIComponent(fileUrl)}`,
+        {
+          method: 'DELETE',
+        },
+      );
+
+      if (response.ok) {
+        setFiles((prevFiles) =>
+          prevFiles.filter((file) => file.url !== fileUrl),
+        );
+        console.log(`File deleted: ${fileUrl}`);
+      } else {
+        const errorResponse = await response.json();
+        console.error(
+          'Error deleting file:',
+          errorResponse.error || 'Unknown error',
+        );
+      }
+    } catch (error) {
+      console.error('Error deleting file:', error);
+    }
   };
 
-  const handleRatingChange = (rating: number) => {
-    console.log('Rating:', rating);
-  };
-
-  const handleConditionChange = (condition: string) => {
-    console.log('Condition:', condition);
+  const handleDownloadFile = (fileUrl: string) => {
+    window.location.href = fileUrl;
   };
 
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
   }
 
   return (
-    <Box>
+    <Container fixed>
       <Box sx={styles.boxContent}>
-        {/* Grupo 1 - Imagem e status do cliente. Col1 */}
         <ClientProfile
           rating={clientData?.rating}
           clientCondition={clientData?.clientCondition}
-          onRatingChange={handleRatingChange}
-          onConditionChange={handleConditionChange}
+          onRatingChange={(rating) => console.log('Rating:', rating)}
+          onConditionChange={(condition) =>
+            console.log('Condition:', condition)
+          }
           companyName={clientData?.companyName}
           corfioCode={clientData?.corfioCode}
           phone={clientData?.phone}
@@ -92,33 +189,72 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
           imageUrl={clientData?.imageUrl}
           enableImageUpload={false}
         />
-        {/* Grupo 2 - Anexar e baixar arquivos. Col2 */}
         <Box sx={styles.boxCol2}>
-          <Box sx={styles.boxIcon}>
-            <Typography variant="h6" sx={sharedStyles.subtitleSize}>
-              <span>Anexar</span> Arquivos
-            </Typography>
-            <IconButton onClick={handleAttachFiles}>
-              <AttachFileIcon sx={styles.icon} />
-            </IconButton>
-            <input
-              id="file-upload"
-              type="file"
-              style={{ display: 'none' }}
-              onChange={handleFileChange}
-            />
-          </Box>
-          <Box sx={styles.boxIcon}>
-            <Typography variant="h6" sx={sharedStyles.subtitleSize}>
-              <span>Baixar</span> Arquivos
-            </Typography>
-            <IconButton onClick={handleDownloadFiles}>
-              <GetAppIcon sx={styles.icon} />
-            </IconButton>
+          <Box>
+            <Tabs
+              value={tabIndex}
+              onChange={handleTabChange}
+              centered
+              sx={{
+                indicator: {
+                  height: '4px',
+                  borderRadius: '4px',
+                },
+              }}
+            >
+              <Tab
+                label="Balanço Patrimonial"
+                sx={{
+                  textTransform: 'none',
+                }}
+              />
+              <Tab
+                label="Relatório de Embarque"
+                sx={{
+                  textTransform: 'none',
+                }}
+              />
+            </Tabs>
+            <Box
+              sx={{ display: 'flex', justifyContent: 'center', marginTop: 2 }}
+            >
+              <IconButton component="label">
+                <CloudUploadIcon sx={styles.icon} />
+                <input
+                  type="file"
+                  accept=".xlsx, .xls. .pdf"
+                  onChange={handleFileChange}
+                  hidden
+                />
+              </IconButton>
+            </Box>
+            <Box sx={{ marginTop: 2 }}>
+              <List>
+                {files.map((file) => (
+                  <ListItem key={file.url}>
+                    <AttachFileIcon sx={{ marginRight: 1 }} />
+                    <ListItemText
+                      primary={file.name} // Exibe o nome completo com hash
+                      secondary={new Date(file.date).toLocaleDateString(
+                        'pt-BR',
+                      )}
+                    />
+                    <IconButton
+                      onClick={() => handleDownloadFile(file.url)} // Este pode continuar como está
+                    >
+                      <GetAppIcon />
+                    </IconButton>
+                    <IconButton onClick={() => handleDeleteFile(file.url)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </ListItem>
+                ))}
+              </List>
+            </Box>
           </Box>
         </Box>
       </Box>
-    </Box>
+    </Container>
   );
 };
 
