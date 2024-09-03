@@ -1,4 +1,4 @@
-import { orange } from '@mui/material/colors';
+import { orange, red } from '@mui/material/colors';
 import { Theme } from '@mui/material/styles/createTheme';
 
 const styles = {
@@ -56,17 +56,17 @@ const styles = {
     },
   },
 
-  boxIcon: {
-    alignSelf: 'center',
+  boxIconUpload: {
     display: 'flex',
-    flexDirection: 'column',
+    justifyContent: 'center',
+    marginTop: 2,
   },
 
-  icon: {
+  iconDownload: {
     cursor: 'pointer',
     alignSelf: 'center',
-    width: '30px',
-    height: '30px',
+    width: '25px',
+    height: '25px',
     transition: 'color 0.3s',
     color: (theme: Theme) =>
       theme.palette.mode === 'light'
@@ -74,6 +74,41 @@ const styles = {
         : theme.palette.secondary.main,
     '&:hover': {
       color: orange[800],
+    },
+  },
+
+  iconDelete: {
+    cursor: 'pointer',
+    alignSelf: 'center',
+    width: '25px',
+    height: '25px',
+    transition: 'color 0.3s',
+    color: (theme: Theme) =>
+      theme.palette.mode === 'light'
+        ? theme.palette.secondary.main
+        : theme.palette.secondary.main,
+    '&:hover': {
+      color: red[600],
+    },
+  },
+
+  fileList: {
+    width: '600px',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: (theme: Theme) =>
+      theme.palette.mode === 'light'
+        ? theme.palette.background.default
+        : theme.palette.background.default, // Azul claro
+    padding: '8px 16px',
+    borderRadius: '4px',
+    marginBottom: '8px',
+
+    '@media (max-width:450px)': {
+      flexDirection: 'column',
+      width: '100%',
+      height: 'auto',
     },
   },
 };

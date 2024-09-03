@@ -16,7 +16,7 @@ import {
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import DeleteIcon from '@mui/icons-material/Delete';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+
 import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
 import styles from '@/app/components/ClientPageTabFiles/styles';
 import sharedStyles from '@/app/styles/sharedStyles';
@@ -53,7 +53,13 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
           `/api/getFilesClient?folder=${encodeURIComponent(folder)}&clientId=${clientId}`,
         );
         const data = await response.json();
-        setFiles(data.files || []);
+
+        // Ordena os arquivos por data (mais recente primeiro)
+        const sortedFiles = data.files.sort((b: any, a: any) => {
+          return new Date(b.date).getTime() - new Date(a.date).getTime();
+        });
+
+        setFiles(sortedFiles || []);
       } catch (error) {
         console.error('Error fetching files:', error);
       }
@@ -110,13 +116,18 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
 
         if (response.ok) {
           const newFile = await response.json();
-          // Adiciona o arquivo recém-enviado à lista de arquivos
+
+          // Adiciona o arquivo recém-enviado à lista de arquivos com nome formatado
           const newFileWithDate = {
             ...newFile,
             date: new Date().toISOString(),
-            name: files[0].name,
+            name: files[0].name, // Use o nome do arquivo que o usuário selecionou
           };
+
           setFiles((prevFiles) => [...prevFiles, newFileWithDate]);
+
+          // Reiniciar o campo de input de arquivo
+          event.target.value = '';
         } else {
           console.error('Error uploading file');
         }
@@ -139,7 +150,13 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
         setFiles((prevFiles) =>
           prevFiles.filter((file) => file.url !== fileUrl),
         );
-        console.log(`File deleted: ${fileUrl}`);
+
+        // Após deletar, reatualiza a lista de arquivos para garantir que tudo esteja sincronizado
+        const folder =
+          tabIndex === 0
+            ? `BalanceSheet/id=${clientId}`
+            : `ShipmentReport/id=${clientId}`;
+        await fetchFiles(folder);
       } else {
         const errorResponse = await response.json();
         console.error(
@@ -203,26 +220,43 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
               }}
             >
               <Tab
-                label="Balanço Patrimonial"
+                label={
+                  {
+                    xs: 'Balanço P.', // Texto reduzido para telas menores
+                    md: 'Balanço Patrimonial', // Texto completo para tablets e maiores
+                  }[window.innerWidth < 600 ? 'xs' : 'md']
+                }
                 sx={{
                   textTransform: 'none',
+                  fontSize: {
+                    xs: '12px', // Tamanho menor para celular
+                    md: '14px', // Tamanho maior para tablets e desktops
+                  },
                 }}
               />
               <Tab
-                label="Relatório de Embarque"
+                label={
+                  {
+                    xs: 'Relatório E.', // Texto reduzido para telas menores
+                    md: 'Relatório de Embarque', // Texto completo para tablets e maiores
+                  }[window.innerWidth < 600 ? 'xs' : 'md']
+                }
                 sx={{
                   textTransform: 'none',
+                  fontSize: {
+                    xs: '12px', // Tamanho menor para celular
+                    md: '14px', // Tamanho maior para tablets e desktops
+                  },
                 }}
               />
             </Tabs>
-            <Box
-              sx={{ display: 'flex', justifyContent: 'center', marginTop: 2 }}
-            >
+
+            <Box sx={{ ...styles.boxIconUpload }}>
               <IconButton component="label">
-                <CloudUploadIcon sx={styles.icon} />
+                <AttachFileIcon sx={styles.iconDownload} />
                 <input
                   type="file"
-                  accept=".xlsx, .xls. .pdf"
+                  accept="*"
                   onChange={handleFileChange}
                   hidden
                 />
@@ -231,22 +265,56 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
             <Box sx={{ marginTop: 2 }}>
               <List>
                 {files.map((file) => (
-                  <ListItem key={file.url}>
-                    <AttachFileIcon sx={{ marginRight: 1 }} />
-                    <ListItemText
-                      primary={file.name} // Exibe o nome completo com hash
-                      secondary={new Date(file.date).toLocaleDateString(
-                        'pt-BR',
-                      )}
-                    />
-                    <IconButton
-                      onClick={() => handleDownloadFile(file.url)} // Este pode continuar como está
+                  <ListItem key={file.url} sx={styles.fileList}>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        flex: 1,
+                      }}
                     >
-                      <GetAppIcon />
-                    </IconButton>
-                    <IconButton onClick={() => handleDeleteFile(file.url)}>
-                      <DeleteIcon />
-                    </IconButton>
+                      <AttachFileIcon
+                        sx={{ marginRight: 1, color: 'darkOrange' }}
+                      />
+                      <ListItemText
+                        primary={
+                          file.name && file.name.includes('-')
+                            ? decodeURIComponent(
+                                file.name.split('-')[0],
+                              ).substring(0, 40) +
+                              (file.name.split('-')[0].length > 40
+                                ? '...'
+                                : '') +
+                              file.name
+                                .split('-')
+                                .pop()
+                                .match(/\.[0-9a-z]+$/i)[0]
+                            : file.name // Fallback para exibir o nome como está, caso não seja possível dividir
+                        }
+                        secondary={new Date(file.date).toLocaleDateString(
+                          'pt-BR',
+                        )}
+                        primaryTypographyProps={{
+                          sx: {
+                            fontSize: {
+                              xs: '12px', // Tamanho do texto para telas menores
+                              md: '16px', // Tamanho do texto para telas maiores
+                            },
+                          },
+                        }}
+                        secondaryTypographyProps={{
+                          style: { color: 'darkOrange' },
+                        }}
+                      />
+                    </Box>
+                    <Box>
+                      <IconButton onClick={() => handleDownloadFile(file.url)}>
+                        <GetAppIcon sx={styles.iconDownload} />
+                      </IconButton>
+                      <IconButton onClick={() => handleDeleteFile(file.url)}>
+                        <DeleteIcon sx={styles.iconDelete} />
+                      </IconButton>
+                    </Box>
                   </ListItem>
                 ))}
               </List>
