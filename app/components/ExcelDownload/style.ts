@@ -1,5 +1,5 @@
 import { Theme } from '@mui/material';
-import { orange } from '@mui/material/colors';
+import { orange, red } from '@mui/material/colors';
 
 const styles = {
   card: {
@@ -82,9 +82,9 @@ const styles = {
     },
   },
 
-  icon: {
-    width: '50px',
-    height: '50px',
+  iconUpload: {
+    width: '40px',
+    height: '40px',
     transition: 'color 0.3s',
     cursor: 'pointer',
     color: (theme: Theme) =>
@@ -93,6 +93,47 @@ const styles = {
         : theme.palette.secondary.main,
     '&:hover': {
       color: orange[800],
+    },
+    '@media (max-width:450px)': {
+      width: '30px',
+      height: '30px',
+    },
+  },
+  iconDownload: {
+    cursor: 'pointer',
+    alignSelf: 'center',
+    width: '25px',
+    height: '25px',
+    transition: 'color 0.3s',
+    color: (theme: Theme) =>
+      theme.palette.mode === 'light'
+        ? theme.palette.secondary.main
+        : theme.palette.secondary.main,
+    '&:hover': {
+      color: orange[800],
+    },
+    '@media (max-width:450px)': {
+      width: '20px',
+      height: '20px',
+    },
+  },
+
+  iconDelete: {
+    cursor: 'pointer',
+    alignSelf: 'center',
+    width: '25px',
+    height: '25px',
+    transition: 'color 0.3s',
+    color: (theme: Theme) =>
+      theme.palette.mode === 'light'
+        ? theme.palette.secondary.main
+        : theme.palette.secondary.main,
+    '&:hover': {
+      color: red[600],
+    },
+    '@media (max-width:450px)': {
+      width: '20px',
+      height: '20px',
     },
   },
 };

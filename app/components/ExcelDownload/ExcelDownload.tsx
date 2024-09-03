@@ -28,15 +28,25 @@ export default function ExcelDownloadFileComponent() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch the list of files from the server
     const fetchFiles = async () => {
       try {
         const response = await fetch(
           `/api/getExcelFile?folder=ExcelSalesSpreadsheet`,
         );
         const data = await response.json();
-        console.log('Fetched files:', data.files); // Adicionando log para depuração
-        setFiles(data.files || []);
+
+        // Adicionando log para verificar as datas recebidas
+        console.log('Fetched files:', data.files);
+
+        // Verifique se as datas são válidas e se não, substitua por uma data padrão (ou trate conforme necessário)
+        const filesWithCorrectDates = data.files.map((file: any) => ({
+          ...file,
+          date: file.date
+            ? new Date(file.date).toISOString()
+            : new Date().toISOString(),
+        }));
+
+        setFiles(filesWithCorrectDates || []);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching files:', error);
@@ -64,9 +74,8 @@ export default function ExcelDownloadFileComponent() {
 
         if (response.ok) {
           const newFile = await response.json();
-          console.log('Uploaded file:', newFile); // Adicionando log para depuração
 
-          // Adicionar a data atual ao novo arquivo
+          // Adicionar a data correta do novo arquivo
           const newFileWithDate = {
             ...newFile,
             date: new Date().toISOString(), // Adiciona a data atual
@@ -158,19 +167,18 @@ export default function ExcelDownloadFileComponent() {
               <span>Inserir </span>Planilha
             </Typography>
             <IconButton component="label">
-              <AttachFileIcon sx={styles.icon} />
-              <input
-                type="file"
-                accept=".xlsx, .xls"
-                onChange={handleUpload}
-                hidden
-              />
+              <AttachFileIcon sx={styles.iconUpload} />
+              <input type="file" accept="*" onChange={handleUpload} hidden />
             </IconButton>
           </CardContent>
         </Card>
-
         {loading ? (
-          <Box display="flex" justifyContent="center" alignItems="center">
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            marginTop="50px"
+          >
             <CircularProgress />
           </Box>
         ) : (
@@ -187,10 +195,7 @@ export default function ExcelDownloadFileComponent() {
                       gap: 1, // Define um espaço entre os itens
                     }}
                   >
-                    <InsertDriveFileIcon
-                      color="secondary"
-                      sx={{ marginRight: 1 }}
-                    />
+                    <InsertDriveFileIcon />
                     <Typography
                       variant="body1"
                       sx={{ ...styles.textFileList, flex: 1 }}
@@ -205,13 +210,13 @@ export default function ExcelDownloadFileComponent() {
                       color="primary"
                       onClick={() => handleDownload(file.url)}
                     >
-                      <CloudDownloadIcon />
+                      <CloudDownloadIcon sx={styles.iconDownload} />
                     </IconButton>
                     <IconButton
                       color="secondary"
                       onClick={() => handleDelete(file.url)}
                     >
-                      <DeleteIcon />
+                      <DeleteIcon sx={styles.iconDelete} />
                     </IconButton>
                   </CardContent>
                 </Card>

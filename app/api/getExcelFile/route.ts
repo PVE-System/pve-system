@@ -16,11 +16,11 @@ export async function GET(request: NextRequest) {
     }
 
     const fileData = blobs.map((file) => {
-      const lastModified = new Date().toISOString(); // Use uma data genérica, já que lastModified não está disponível
-
+      const lastModified = file.uploadedAt ? new Date(file.uploadedAt) : null;
       return {
         url: file.url,
-        date: lastModified,
+        name: file.url.split('/').pop(), // Assume o nome do arquivo baseado na URL
+        date: lastModified ? lastModified.toISOString() : null, // Use a data correta, se disponível
       };
     });
 

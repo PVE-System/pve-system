@@ -170,7 +170,14 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
   };
 
   const handleDownloadFile = (fileUrl: string) => {
-    window.location.href = fileUrl;
+    const link = document.createElement('a');
+    link.href = fileUrl;
+    link.target = '_blank'; // Abre em uma nova aba
+    link.download = ''; // Inicia o download automaticamente
+
+    document.body.appendChild(link); // Adiciona o link temporariamente ao DOM
+    link.click(); // Simula o clique para abrir a nova aba e iniciar o download
+    document.body.removeChild(link); // Remove o link após o clique
   };
 
   if (loading) {
