@@ -19,7 +19,10 @@ export async function POST(request: NextRequest) {
       access: 'public',
     });
 
-    return NextResponse.json({ url });
+    // Capturar a data de upload
+    const uploadDate = new Date().toISOString();
+
+    return NextResponse.json({ url, date: uploadDate });
   } catch (error) {
     console.error('Error uploading file:', error);
     return NextResponse.json(

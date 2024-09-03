@@ -15,11 +15,15 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ files: [] }, { status: 200 });
     }
 
-    const fileData = blobs.map((file) => ({
-      url: file.url,
-      name: file.url.split('/').pop(), // Pegue o nome do arquivo
-      date: new Date().toISOString(), // Use uma data genérica
-    }));
+    const fileData = blobs.map((file) => {
+      const fileName = file.url.split('/').pop();
+      const uploadDate = new Date(file.uploadedAt).toISOString(); // Exemplo, assuma que pode haver uma maneira de obter a data real
+      return {
+        url: file.url,
+        name: fileName,
+        date: uploadDate, // Aqui você deve retornar a data associada ao arquivo
+      };
+    });
 
     return NextResponse.json({ files: fileData });
   } catch (error) {

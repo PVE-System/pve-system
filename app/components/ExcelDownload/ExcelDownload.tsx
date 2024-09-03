@@ -11,7 +11,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
 import DeleteIcon from '@mui/icons-material/Delete';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import styles from '@/app/components/ExcelDownload/style';
@@ -158,7 +158,7 @@ export default function ExcelDownloadFileComponent() {
               <span>Inserir </span>Planilha
             </Typography>
             <IconButton component="label">
-              <CloudUploadIcon sx={styles.icon} />
+              <AttachFileIcon sx={styles.icon} />
               <input
                 type="file"
                 accept=".xlsx, .xls"
