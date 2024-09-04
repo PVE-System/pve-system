@@ -7,7 +7,6 @@ import { eq } from 'drizzle-orm';
 const getUserIdFromCookies = (request: NextRequest): number | null => {
   const cookies = request.cookies;
   const userId = cookies.get('userId')?.value;
-
   return userId ? Number(userId) : null;
 };
 
@@ -16,12 +15,12 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const {
       clientId,
-      commercial,
-      marketing,
-      invoicing,
-      cables,
-      financial,
-      invoice,
+      commercial = '...', // Use '...' como valor padrão simbólico
+      marketing = '...',
+      invoicing = '...',
+      cables = '...',
+      financial = '...',
+      invoice = '...',
     } = body;
 
     const userId = getUserIdFromCookies(request);
@@ -44,27 +43,40 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
+    const currentTime = new Date(); // Para garantir consistência
+
+    // Inserir as informações no banco de dados
     const newSalesInformation = await db
       .insert(salesInformation)
       .values({
         clientId: Number(clientId),
-        userId,
+        userId: Number(userId),
         commercial,
+        commercialUpdatedBy: userId,
+        commercialUpdatedAt: currentTime,
         marketing,
+        marketingUpdatedBy: userId,
+        marketingUpdatedAt: currentTime,
         invoicing,
+        invoicingUpdatedBy: userId,
+        invoicingUpdatedAt: currentTime,
         cables,
+        cablesUpdatedBy: userId,
+        cablesUpdatedAt: currentTime,
         financial,
+        financialUpdatedBy: userId,
+        financialUpdatedAt: currentTime,
         invoice,
-        updatedAt: new Date(), // Define a data de atualização
+        invoiceUpdatedBy: userId,
+        invoiceUpdatedAt: currentTime,
+        updatedAt: currentTime,
       })
-      .returning({
-        id: salesInformation.id,
-        clientId: salesInformation.clientId,
-        updatedAt: salesInformation.updatedAt,
-      });
+      .returning()
+      .execute();
 
+    // Inclua todos os campos na resposta
     return NextResponse.json({
-      ...newSalesInformation[0], // Certifique-se de que está retornando o objeto criado corretamente
+      ...newSalesInformation[0],
       userName: user[0].userName, // Retorne também o nome do usuário
     });
   } catch (error) {

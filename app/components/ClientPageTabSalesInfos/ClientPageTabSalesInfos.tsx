@@ -11,9 +11,7 @@ import {
 import { useForm, Controller } from 'react-hook-form';
 import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
 import styles from '@/app/components/ClientPageTabSalesInfos/styles';
-import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie'; // Biblioteca para manipulação de cookies no frontend
-import { mt } from 'date-fns/locale';
 
 interface ClientPageTabSalesInfosProps {
   clientId: string;
@@ -33,92 +31,94 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
   clientId,
   readOnly = false,
 }) => {
-  const { handleSubmit, control, setValue } = useForm();
+  const { handleSubmit, control, setValue, getValues } = useForm();
+  const [updatingFields, setUpdatingFields] = useState<{
+    [key: string]: boolean;
+  }>({});
   const [loading, setLoading] = useState(true);
-  const [isUpdating, setIsUpdating] = useState(false);
   const [salesData, setSalesData] = useState<any>(null);
   const [clientData, setClientData] = useState<any>(null);
-  const router = useRouter();
+
+  const fetchClientData = async () => {
+    try {
+      const clientResponse = await fetch(`/api/getClient/${clientId}`);
+      if (!clientResponse.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const clientData = await clientResponse.json();
+      setClientData(clientData);
+
+      const salesResponse = await fetch(`/api/getSalesInformation/${clientId}`);
+      if (salesResponse.ok) {
+        const salesData = await salesResponse.json();
+        setSalesData(salesData);
+
+        Object.keys(salesData).forEach((key) => {
+          setValue(key, salesData[key]);
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching client or sales data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!clientId) return;
-
-    const fetchClientData = async () => {
-      try {
-        const clientResponse = await fetch(`/api/getClient/${clientId}`);
-        if (!clientResponse.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const clientData = await clientResponse.json();
-        setClientData(clientData);
-
-        const salesResponse = await fetch(
-          `/api/getSalesInformation/${clientId}`,
-        );
-        if (salesResponse.ok) {
-          const salesData = await salesResponse.json();
-          setSalesData(salesData);
-
-          Object.keys(salesData).forEach((key) => {
-            setValue(key, salesData[key]);
-          });
-        }
-      } catch (error) {
-        console.error('Error fetching client or sales data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchClientData();
   }, [clientId, setValue]);
 
-  const onSubmit = async (data: any) => {
-    setIsUpdating(true); // Inicia o carregamento
+  const handleFieldUpdate = async (fieldName: string) => {
+    setUpdatingFields((prev) => ({ ...prev, [fieldName]: true }));
+
     try {
       const userId = Cookies.get('userId');
       if (!userId) {
         throw new Error('User ID is missing');
       }
 
-      const requestData = { ...data, clientId, userId: Number(userId) };
+      const fieldValue = getValues(fieldName);
 
-      let response;
-      if (salesData) {
-        response = await fetch(`/api/updateSalesInformation?id=${clientId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(requestData),
-        });
-      } else {
-        response = await fetch(`/api/registerSalesInformation`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(requestData),
-        });
-      }
+      const requestData = {
+        [fieldName]: fieldValue || '...',
+        clientId,
+        userId: Number(userId),
+      };
+
+      const method = salesData && salesData[fieldName] ? 'PUT' : 'POST';
+      const url =
+        method === 'PUT'
+          ? `/api/updateSalesInformation?id=${clientId}`
+          : `/api/registerSalesInformation?id=${clientId}`;
+
+      const response = await fetch(url, {
+        method: method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestData),
+      });
 
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
 
       const result = await response.json();
-      console.log('Sales information processed:', result);
 
-      // Atualiza o estado salesData com os dados mais recentes, incluindo updatedAt e userName
       setSalesData((prevData: any) => ({
         ...prevData,
-        ...requestData,
-        updatedAt: new Date(), // Atualiza o estado com a data e hora atual
-        userName: result.userName, // Nome do usuário retornado da API
+        [fieldName]: fieldValue || '...', // Atualiza o campo que foi modificado
+        [`${fieldName}UpdatedAt`]: result.updatedAt,
+        [`${fieldName}UpdatedBy`]: result.userName,
       }));
 
-      setIsUpdating(false); // Finaliza o carregamento
-      // Você pode decidir não redirecionar, ou apenas fornecer um feedback visual ao usuário
+      // Chama a função para atualizar os dados após o POST ou PUT
+      if (method === 'POST') {
+        await fetchClientData(); // Atualiza os dados chamando o fetchClientData
+      }
     } catch (error) {
       console.error('Error processing sales information:', error);
-      setIsUpdating(false); // Finaliza o carregamento mesmo em caso de erro
-      // Adicionar uma mensagem de erro aqui, se desejar
+    } finally {
+      setUpdatingFields((prev) => ({ ...prev, [fieldName]: false }));
     }
   };
 
@@ -156,37 +156,11 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
           imageUrl={clientData?.imageUrl}
           enableImageUpload={false}
         />
-        {!readOnly && (
-          <Box sx={styles.boxButton}>
-            <Button
-              type="button"
-              variant="contained"
-              sx={styles.editButton}
-              onClick={handleSubmit(onSubmit)}
-              disabled={isUpdating} // Desabilitar o botão enquanto está carregando
-            >
-              {isUpdating ? (
-                <CircularProgress size={24} sx={{ color: 'white' }} />
-              ) : (
-                'Atualizar Informações'
-              )}
-            </Button>
-          </Box>
-        )}
-        <Box sx={{ marginTop: '30px' }}>
-          <Typography variant="caption">
-            {
-              salesData && salesData.updatedAt && salesData.userName
-                ? `Última atualização: ${formatDate(salesData.updatedAt)} por ${salesData.userName}`
-                : '' /* ' Informações sobre pedidos ainda não foram atualizadas' */
-            }
-          </Typography>
-        </Box>
       </Box>
       <Box sx={styles.boxCol2}>
         <form>
           {Object.keys(fieldLabels).map((key) => (
-            <Box key={key}>
+            <Box key={key} sx={{ marginBottom: 4 }}>
               <Typography variant="subtitle1">{fieldLabels[key]}</Typography>
               <Controller
                 name={key}
@@ -199,12 +173,43 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
                     minRows={3}
                     maxRows={6}
                     variant="filled"
-                    sx={styles.inputsCol2}
-                    InputProps={{ style: { minHeight: '150px' } }}
                     disabled={readOnly}
+                    sx={{ width: '100%' }}
                   />
                 )}
               />
+              {!readOnly && (
+                <Box
+                  mt={1}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <Button
+                    variant="contained"
+                    onClick={() => handleFieldUpdate(key)}
+                    disabled={updatingFields[key]}
+                  >
+                    {updatingFields[key] ? (
+                      <CircularProgress size={24} />
+                    ) : (
+                      'Atualizar'
+                    )}
+                  </Button>
+
+                  {salesData &&
+                    salesData[key] !== '...' &&
+                    salesData[`${key}UpdatedBy`] && (
+                      <Typography variant="caption">
+                        Última atualização:{' '}
+                        {formatDate(salesData[`${key}UpdatedAt`])} por{' '}
+                        {salesData[`${key}UpdatedBy`] || 'Desconhecido'}
+                      </Typography>
+                    )}
+                </Box>
+              )}
             </Box>
           ))}
         </form>
