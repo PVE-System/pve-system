@@ -11,9 +11,19 @@ const getUserIdFromCookies = (request: NextRequest): number | null => {
   return userId ? Number(userId) : null;
 };
 
+// Mapear os nomes dos campos para suas colunas no banco de dados
+const fieldMapping: { [key: string]: keyof typeof salesInformation } = {
+  commercial: 'commercial',
+  marketing: 'marketing',
+  invoicing: 'invoicing',
+  cables: 'cables',
+  financial: 'financial',
+  invoice: 'invoice',
+};
+
 export async function PUT(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const clientId = searchParams.get('id'); // Usar clientId
+  const clientId = searchParams.get('id');
 
   if (!clientId) {
     return NextResponse.json(
@@ -34,7 +44,25 @@ export async function PUT(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { rating, clientCondition, ...otherData } = body;
+    const fieldName = Object.keys(body)[0] as string; // O nome do campo que está sendo atualizado
+    const fieldValue = body[fieldName]?.trim(); // Remover espaços em branco
+
+    // Verificar se o valor é válido (não vazio)
+    if (!fieldValue) {
+      return NextResponse.json(
+        { error: 'Field value is required' },
+        { status: 400 },
+      );
+    }
+
+    // Verificar se o campo é válido
+    const dbColumn = fieldMapping[fieldName];
+    if (!dbColumn) {
+      return NextResponse.json(
+        { error: 'Invalid field name' },
+        { status: 400 },
+      );
+    }
 
     // Obter o nome do usuário
     const user = await db
@@ -47,13 +75,15 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const updateData = {
-      ...otherData,
-      userId,
-      updatedAt: new Date(), // Atualizar o timestamp para o momento atual
+    const updateData: any = {
+      [dbColumn]: fieldValue || '', // Se o campo estiver em branco, definir uma string vazia
     };
 
-    // Atualizar salesInformation
+    // Definir as chaves para `UpdatedBy` e `UpdatedAt` dinamicamente
+    updateData[`${fieldName}UpdatedBy`] = userId;
+    updateData[`${fieldName}UpdatedAt`] = new Date();
+
+    // Atualizar o campo específico
     const updatedSalesInfo = await db
       .update(salesInformation)
       .set(updateData)
@@ -73,13 +103,13 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      updatedAt: updatedSalesInfo[0].updatedAt, // Data atualizada
+      updatedAt: updatedSalesInfo[0].updatedAt, // Retornar a data de atualização
       userName: user[0].userName, // Nome do usuário para renderizar no frontend
     });
   } catch (error) {
-    console.error('Error updating client:', error);
+    console.error('Error updating field:', error);
     return NextResponse.json(
-      { error: 'Failed to update client data' },
+      { error: 'Failed to update field' },
       { status: 500 },
     );
   }
