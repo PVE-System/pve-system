@@ -1,3 +1,4 @@
+import { green, orange, red } from '@mui/material/colors';
 import { Theme } from '@mui/material/styles/createTheme';
 
 const styles = {
@@ -39,14 +40,41 @@ const styles = {
     },
   },
 
-  editButton: {
-    marginTop: '20px',
-    backgroundColor: 'green',
+  IconUpdate: {
+    cursor: 'pointer',
+    /* alignSelf: 'center', */
+    width: '25px',
+    height: '25px',
+    transition: 'color 0.3s',
+    color: (theme: Theme) =>
+      theme.palette.mode === 'light'
+        ? theme.palette.secondary.main
+        : theme.palette.secondary.main,
     '&:hover': {
-      backgroundColor: 'darkgreen',
-      '@media (max-width: 800px)': {
-        alignSelf: 'center',
-      },
+      color: orange[700],
+    },
+    '@media (max-width:450px)': {
+      width: '20px',
+      height: '20px',
+    },
+  },
+
+  iconDelete: {
+    cursor: 'pointer',
+    /* alignSelf: 'center', */
+    width: '25px',
+    height: '25px',
+    transition: 'color 0.3s',
+    color: (theme: Theme) =>
+      theme.palette.mode === 'light'
+        ? theme.palette.secondary.main
+        : theme.palette.secondary.main,
+    '&:hover': {
+      color: red[600],
+    },
+    '@media (max-width:450px)': {
+      width: '20px',
+      height: '20px',
     },
   },
 };

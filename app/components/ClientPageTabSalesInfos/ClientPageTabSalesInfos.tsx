@@ -1,17 +1,21 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Box,
   Button,
   CircularProgress,
+  IconButton,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
 import styles from '@/app/components/ClientPageTabSalesInfos/styles';
 import Cookies from 'js-cookie'; // Biblioteca para manipulação de cookies no frontend
+import DeleteIcon from '@mui/icons-material/Delete';
+import UpdateIcon from '@mui/icons-material/Update';
 
 interface ClientPageTabSalesInfosProps {
   clientId: string;
@@ -35,11 +39,15 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
   const [updatingFields, setUpdatingFields] = useState<{
     [key: string]: boolean;
   }>({});
+  const [deletingFields, setDeletingFields] = useState<{
+    [key: string]: boolean;
+  }>({});
+
   const [loading, setLoading] = useState(true);
   const [salesData, setSalesData] = useState<any>(null);
   const [clientData, setClientData] = useState<any>(null);
 
-  const fetchClientData = async () => {
+  const fetchClientData = useCallback(async () => {
     try {
       const clientResponse = await fetch(`/api/getClient/${clientId}`);
       if (!clientResponse.ok) {
@@ -62,12 +70,12 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [clientId, setValue]);
 
   useEffect(() => {
     if (!clientId) return;
     fetchClientData();
-  }, [clientId, setValue]);
+  }, [clientId, fetchClientData]);
 
   const handleFieldUpdate = async (fieldName: string) => {
     setUpdatingFields((prev) => ({ ...prev, [fieldName]: true }));
@@ -81,7 +89,7 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
       const fieldValue = getValues(fieldName);
 
       const requestData = {
-        [fieldName]: fieldValue || '...',
+        [fieldName]: fieldValue || '*',
         clientId,
         userId: Number(userId),
       };
@@ -106,7 +114,7 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
 
       setSalesData((prevData: any) => ({
         ...prevData,
-        [fieldName]: fieldValue || '...', // Atualiza o campo que foi modificado
+        [fieldName]: fieldValue || '*', // Atualiza o campo que foi modificado
         [`${fieldName}UpdatedAt`]: result.updatedAt,
         [`${fieldName}UpdatedBy`]: result.userName,
       }));
@@ -119,6 +127,40 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
       console.error('Error processing sales information:', error);
     } finally {
       setUpdatingFields((prev) => ({ ...prev, [fieldName]: false }));
+    }
+  };
+
+  const handleDeleteField = async (fieldName: string) => {
+    setDeletingFields((prev) => ({ ...prev, [fieldName]: true })); // Indica que o campo está em processo de deleção
+
+    try {
+      const userId = Cookies.get('userId');
+      if (!userId) {
+        throw new Error('User ID is missing');
+      }
+
+      const requestData = {
+        clientId,
+        userId: Number(userId),
+        fieldName, // Nome do campo a ser excluído
+      };
+
+      const response = await fetch('/api/deleteSalesInformation', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      // Atualiza os dados após a exclusão
+      await fetchClientData();
+    } catch (error) {
+      console.error('Error deleting field:', error);
+    } finally {
+      setDeletingFields((prev) => ({ ...prev, [fieldName]: false })); // Remove o estado de carregamento
     }
   };
 
@@ -187,20 +229,44 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
                     justifyContent: 'space-between',
                   }}
                 >
-                  <Button
-                    variant="contained"
-                    onClick={() => handleFieldUpdate(key)}
-                    disabled={updatingFields[key]}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 2, // Espaço entre o botão e o ícone
+                    }}
                   >
-                    {updatingFields[key] ? (
-                      <CircularProgress size={24} />
-                    ) : (
-                      'Atualizar'
-                    )}
-                  </Button>
+                    <Tooltip title="Atualizar Campo">
+                      <IconButton
+                        sx={styles.IconUpdate}
+                        onClick={() => handleFieldUpdate(key)}
+                        disabled={updatingFields[key]}
+                      >
+                        {updatingFields[key] ? (
+                          <CircularProgress size={24} />
+                        ) : (
+                          <UpdateIcon />
+                        )}
+                      </IconButton>
+                    </Tooltip>
+
+                    <Tooltip title="Limpar Campo">
+                      <IconButton
+                        sx={styles.iconDelete}
+                        onClick={() => handleDeleteField(key)}
+                        disabled={deletingFields[key]}
+                      >
+                        {deletingFields[key] ? (
+                          <CircularProgress size={24} />
+                        ) : (
+                          <DeleteIcon />
+                        )}
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
 
                   {salesData &&
-                    salesData[key] !== '...' &&
+                    salesData[key] !== '*' &&
                     salesData[`${key}UpdatedBy`] && (
                       <Typography variant="caption">
                         Última atualização:{' '}
