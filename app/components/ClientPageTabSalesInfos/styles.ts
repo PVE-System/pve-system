@@ -51,7 +51,7 @@ const styles = {
         ? theme.palette.secondary.main
         : theme.palette.secondary.main,
     '&:hover': {
-      color: orange[700],
+      color: orange[800],
     },
     '@media (max-width:450px)': {
       width: '20px',
