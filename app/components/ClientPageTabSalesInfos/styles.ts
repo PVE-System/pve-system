@@ -25,19 +25,19 @@ const styles = {
   inputsCol2: {
     width: '100%',
     marginBottom: '20px',
-    /*     '& .MuiInputBaseInput': {
-      height: '10px',
-    }, */
   },
 
-  boxButton: {
+  boxIconsAndName: {
     display: 'flex',
-    justifyContent: 'center',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: '10px',
+  },
+
+  boxIcons: {
+    display: 'flex',
+    alignItems: 'center',
     gap: 2,
-    '@media (max-width: 800px)': {
-      flexDirection: 'column',
-      gap: 0,
-    },
   },
 
   IconUpdate: {

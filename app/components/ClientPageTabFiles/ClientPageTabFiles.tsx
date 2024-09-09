@@ -258,9 +258,9 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
               />
             </Tabs>
 
-            <Box sx={{ ...styles.boxIconUpload }}>
+            <Box sx={styles.boxIconUpload}>
               <IconButton component="label">
-                <AttachFileIcon sx={styles.iconDownload} />
+                <AttachFileIcon sx={styles.iconUpload} />
                 <input
                   type="file"
                   accept="*"
@@ -269,17 +269,11 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
                 />
               </IconButton>
             </Box>
-            <Box sx={{ marginTop: 2 }}>
+            <Box /* sx={{ marginTop: 2 }} */>
               <List>
                 {files.map((file) => (
                   <ListItem key={file.url} sx={styles.fileList}>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        flex: 1,
-                      }}
-                    >
+                    <Box sx={styles.boxListItens}>
                       <AttachFileIcon
                         sx={{ marginRight: 1, color: 'darkOrange' }}
                       />

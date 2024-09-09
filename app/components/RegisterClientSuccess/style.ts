@@ -26,8 +26,9 @@ const styles = {
   cardContent: {
     width: '300px',
     margin: '80px',
+    whiteSpace: 'nowrap',
 
-    '@media (max-width:450px)': {
+    '@media (max-width:800px)': {
       width: '100%',
       margin: '0',
     },

@@ -221,21 +221,8 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
                 )}
               />
               {!readOnly && (
-                <Box
-                  mt={1}
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 2, // Espaço entre o botão e o ícone
-                    }}
-                  >
+                <Box sx={styles.boxIconsAndName}>
+                  <Box sx={styles.boxIcons}>
                     <Tooltip title="Atualizar Campo">
                       <IconButton
                         sx={styles.IconUpdate}
