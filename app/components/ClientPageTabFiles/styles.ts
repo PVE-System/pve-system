@@ -62,6 +62,21 @@ const styles = {
     marginTop: 2,
   },
 
+  iconUpload: {
+    cursor: 'pointer',
+    alignSelf: 'center',
+    width: '25px',
+    height: '25px',
+    transition: 'color 0.3s',
+    color: (theme: Theme) =>
+      theme.palette.mode === 'light'
+        ? theme.palette.secondary.main
+        : theme.palette.secondary.main,
+    '&:hover': {
+      color: orange[800],
+    },
+  },
+
   iconDownload: {
     cursor: 'pointer',
     alignSelf: 'center',
@@ -110,6 +125,12 @@ const styles = {
       width: '100%',
       height: 'auto',
     },
+  },
+
+  boxListItens: {
+    display: 'flex',
+    alignItems: 'center',
+    flex: 1,
   },
 };
 export default styles;

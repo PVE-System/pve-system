@@ -145,11 +145,34 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
       delete data.id;
       delete data.createdAt;
 
-      // Verifica se imageUrl foi corretamente atualizado
+      let finalImageUrl = imageUrl || clientData?.imageUrl;
+
+      // Verifica se uma nova imagem foi selecionada para upload
+      if (imageFile) {
+        const formData = new FormData();
+        formData.append('file', imageFile);
+
+        const uploadResponse = await fetch(
+          `/api/uploadImageClient?pathname=clients/id=${clientId}/image-${Date.now()}&clientId=${clientId}`,
+          {
+            method: 'POST',
+            body: formData,
+          },
+        );
+
+        if (uploadResponse.ok) {
+          const uploadResult = await uploadResponse.json();
+          finalImageUrl = uploadResult.url; // Atualiza o URL final da imagem
+        } else {
+          console.error('Erro ao fazer upload da imagem');
+        }
+      }
+
+      // Atualiza os dados do cliente incluindo a URL final da imagem (se houver)
       const updatedData = {
         ...data,
-        imageUrl: imageUrl || clientData?.imageUrl,
-      }; // Garante que imageUrl seja incluído
+        imageUrl: finalImageUrl,
+      };
 
       const response = await fetch(`/api/updateClient?id=${clientId}`, {
         method: 'PUT',
@@ -170,7 +193,15 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
     }
   };
 
-  const handleImageChange = async (file: File) => {
+  const handleImageChange = (file: File) => {
+    if (file) {
+      setImageFile(file); // Armazena o arquivo da imagem no estado local
+      const previewUrl = URL.createObjectURL(file); // Cria uma URL de pré-visualização
+      setPreviewImage(previewUrl); // Atualiza a pré-visualização da imagem
+    }
+  };
+
+  /*   const handleImageChange = async (file: File) => {
     if (file) {
       const formData = new FormData();
       formData.append('file', file);
@@ -192,7 +223,7 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
         console.error('Erro ao fazer upload da imagem');
       }
     }
-  };
+  }; */
 
   const onDelete = async () => {
     try {
@@ -274,7 +305,7 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
         <Box sx={styles.boxCol2}>
           <form>
             {Object.keys(clientData).map((key) => {
-              if (key !== 'id' && key !== 'createdAt') {
+              if (key !== 'id' && key !== 'createdAt' && key !== 'imageUrl') {
                 return (
                   <Box key={key}>
                     <Typography variant="subtitle1">
