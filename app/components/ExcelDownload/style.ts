@@ -23,6 +23,13 @@ const styles = {
     },
   },
 
+  boxCircularProgress: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: '50px',
+  },
+
   cardContent: {
     width: '300px',
     margin: '80px',
@@ -48,6 +55,13 @@ const styles = {
       flexDirection: 'column',
       height: 'auto',
     },
+  },
+
+  contentFileList: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 1,
   },
 
   textFileList: {

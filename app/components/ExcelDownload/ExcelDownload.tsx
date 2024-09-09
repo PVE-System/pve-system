@@ -26,6 +26,9 @@ interface ExcelFile {
 export default function ExcelDownloadFileComponent() {
   const [files, setFiles] = useState<ExcelFile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingDownload, setLoadingDownload] = useState<string | null>(null);
+  const [loadingDelete, setLoadingDelete] = useState<string | null>(null);
+  const [loadingUpload, setLoadingUpload] = useState(false);
 
   useEffect(() => {
     const fetchFiles = async () => {
@@ -35,10 +38,6 @@ export default function ExcelDownloadFileComponent() {
         );
         const data = await response.json();
 
-        // Adicionando log para verificar as datas recebidas
-        console.log('Fetched files:', data.files);
-
-        // Verifique se as datas são válidas e se não, substitua por uma data padrão (ou trate conforme necessário)
         const filesWithCorrectDates = data.files.map((file: any) => ({
           ...file,
           date: file.date
@@ -60,6 +59,7 @@ export default function ExcelDownloadFileComponent() {
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      setLoadingUpload(true); // Inicia o carregamento
       const formData = new FormData();
       formData.append('file', file);
 
@@ -74,23 +74,21 @@ export default function ExcelDownloadFileComponent() {
 
         if (response.ok) {
           const newFile = await response.json();
-
-          // Adicionar a data correta do novo arquivo
           const newFileWithDate = {
             ...newFile,
-            date: new Date().toISOString(), // Adiciona a data atual
-            name: file.name, // Preserva o nome do arquivo
+            date: new Date().toISOString(),
+            name: file.name,
           };
 
-          setFiles([...files, newFileWithDate]); // Adiciona o arquivo com a data ao estado
-
-          // Resetar o valor do input de arquivo para permitir novos uploads
+          setFiles([...files, newFileWithDate]);
           event.target.value = '';
         } else {
           console.error('Error uploading file');
         }
       } catch (error) {
         console.error('Error uploading file:', error);
+      } finally {
+        setLoadingUpload(false); // Termina o carregamento
       }
     }
   };
@@ -101,8 +99,9 @@ export default function ExcelDownloadFileComponent() {
       return;
     }
 
+    setLoadingDownload(fileName); // Inicia o carregamento
+
     try {
-      // Solicita a URL do arquivo com base no nome
       const response = await fetch(
         `/api/downloadExcelFile?folder=ExcelSalesSpreadsheet&fileName=${encodeURIComponent(fileName)}`,
       );
@@ -126,6 +125,8 @@ export default function ExcelDownloadFileComponent() {
       }
     } catch (error) {
       console.error('Error downloading file:', error);
+    } finally {
+      setLoadingDownload(null); // Termina o carregamento
     }
   };
 
@@ -134,6 +135,8 @@ export default function ExcelDownloadFileComponent() {
       console.error('File URL is missing');
       return;
     }
+
+    setLoadingDelete(fileUrl); // Inicia o carregamento
 
     try {
       const response = await fetch(
@@ -144,12 +147,14 @@ export default function ExcelDownloadFileComponent() {
       );
 
       if (response.ok) {
-        setFiles(files.filter((file) => file.url !== fileUrl)); // Filtra pelo URL completo
+        setFiles(files.filter((file) => file.url !== fileUrl)); // Remove o arquivo da lista
       } else {
         console.error('Error deleting file');
       }
     } catch (error) {
       console.error('Error deleting file:', error);
+    } finally {
+      setLoadingDelete(null); // Termina o carregamento
     }
   };
 
@@ -164,64 +169,74 @@ export default function ExcelDownloadFileComponent() {
         <Card variant="outlined" sx={styles.card}>
           <CardContent sx={styles.cardContent}>
             <Typography variant="h6" sx={sharedStyles.subtitleSize}>
-              <span>Inserir </span>Planilha
+              <span>Anexar </span>Planilha
             </Typography>
             <IconButton component="label">
-              <AttachFileIcon sx={styles.iconUpload} />
+              {loadingUpload ? (
+                <CircularProgress size={24} /> // Exibe o CircularProgress durante o upload
+              ) : (
+                <AttachFileIcon sx={styles.iconUpload} /> // Exibe o ícone normal se não estiver carregando
+              )}
               <input type="file" accept="*" onChange={handleUpload} hidden />
             </IconButton>
           </CardContent>
         </Card>
         {loading ? (
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            marginTop="50px"
-          >
+          <Box sx={styles.boxCircularProgress}>
             <CircularProgress />
           </Box>
         ) : (
           <Box sx={{ marginTop: 4 }}>
-            {files.map((file) => {
-              console.log('Rendering file:', file); // Adicionando log para depuração
-              return (
-                <Card variant="outlined" sx={styles.fileList} key={file.url}>
-                  <CardContent
-                    sx={{
-                      display: 'flex', // Define o layout como flexbox
-                      alignItems: 'center', // Alinha os itens ao centro verticalmente
-                      justifyContent: 'space-between', // Espaça os itens uniformemente
-                      gap: 1, // Define um espaço entre os itens
-                    }}
-                  >
-                    <InsertDriveFileIcon />
-                    <Typography
-                      variant="body1"
-                      sx={{ ...styles.textFileList, flex: 1 }}
-                    >
-                      {/* {file.name} */} Planilha Excel Atualizada em:{' '}
-                      <span>
-                        {new Date(file.date).toLocaleDateString('pt-BR')}
-                      </span>
-                    </Typography>
+            {files
+              .sort(
+                (a, b) =>
+                  new Date(b.date).getTime() - new Date(a.date).getTime(),
+              ) // Ordena pela data em ordem crescente
+              .map((file) => {
+                const isDownloading = loadingDownload === file.url;
+                const isDeleting = loadingDelete === file.url;
 
-                    <IconButton
-                      color="primary"
-                      onClick={() => handleDownload(file.url)}
-                    >
-                      <CloudDownloadIcon sx={styles.iconDownload} />
-                    </IconButton>
-                    <IconButton
-                      color="secondary"
-                      onClick={() => handleDelete(file.url)}
-                    >
-                      <DeleteIcon sx={styles.iconDelete} />
-                    </IconButton>
-                  </CardContent>
-                </Card>
-              );
-            })}
+                return (
+                  <Card variant="outlined" sx={styles.fileList} key={file.url}>
+                    <CardContent sx={styles.contentFileList}>
+                      <InsertDriveFileIcon />
+                      <Typography
+                        variant="body1"
+                        sx={{ ...styles.textFileList, flex: 1 }}
+                      >
+                        Planilha Excel Atualizada em:{' '}
+                        <span>
+                          {new Date(file.date).toLocaleDateString('pt-BR')}
+                        </span>
+                      </Typography>
+
+                      <IconButton
+                        color="primary"
+                        onClick={() => handleDownload(file.url)}
+                        disabled={isDownloading}
+                      >
+                        {isDownloading ? (
+                          <CircularProgress size={24} />
+                        ) : (
+                          <CloudDownloadIcon sx={styles.iconDownload} />
+                        )}
+                      </IconButton>
+
+                      <IconButton
+                        color="secondary"
+                        onClick={() => handleDelete(file.url)}
+                        disabled={isDeleting}
+                      >
+                        {isDeleting ? (
+                          <CircularProgress size={24} />
+                        ) : (
+                          <DeleteIcon sx={styles.iconDelete} />
+                        )}
+                      </IconButton>
+                    </CardContent>
+                  </Card>
+                );
+              })}
           </Box>
         )}
       </Box>
