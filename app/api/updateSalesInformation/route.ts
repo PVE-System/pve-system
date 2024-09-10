@@ -80,31 +80,24 @@ export async function PUT(request: NextRequest) {
     };
 
     // Definir as chaves para `UpdatedBy` e `UpdatedAt` dinamicamente
-    updateData[`${fieldName}UpdatedBy`] = userId;
-    updateData[`${fieldName}UpdatedAt`] = new Date();
+    const updatedAtField = `${fieldName}UpdatedAt`; // Campo dinâmico para UpdatedAt
+    const updatedByField = `${fieldName}UpdatedBy`; // Campo dinâmico para UpdatedBy
+
+    updateData[updatedByField] = userId;
+    updateData[updatedAtField] = new Date();
 
     // Atualizar o campo específico
-    const updatedSalesInfo = await db
+    await db
       .update(salesInformation)
       .set(updateData)
       .where(eq(salesInformation.clientId, clientIdNumber))
-      .returning({
-        updatedAt: salesInformation.updatedAt,
-        userId: salesInformation.userId,
-      })
       .execute();
 
-    if (updatedSalesInfo.length === 0) {
-      return NextResponse.json(
-        { error: 'Failed to update sales information' },
-        { status: 500 },
-      );
-    }
-
+    // Retorna os dados diretamente da variável updateData, já que não podemos acessar o campo dinamicamente no ORM
     return NextResponse.json({
       success: true,
-      updatedAt: updatedSalesInfo[0].updatedAt, // Retornar a data de atualização
-      userName: user[0].userName, // Nome do usuário para renderizar no frontend
+      updatedAt: updateData[updatedAtField], // Retornar a data correta que foi atualizada
+      userName: user[0].userName, // Nome do usuário
     });
   } catch (error) {
     console.error('Error updating field:', error);
