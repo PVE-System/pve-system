@@ -227,18 +227,42 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
 
   const onDelete = async () => {
     try {
-      const response = await fetch(`/api/deleteClient?id=${clientId}`, {
-        method: 'DELETE',
-      });
+      // 1. Buscar todas as URLs dos arquivos relacionados ao cliente
+      const filesResponse = await fetch(
+        `/api/getAllFilesBlobByClient?clientId=${clientId}`,
+      );
+      const filesData = await filesResponse.json();
 
-      if (!response.ok) {
-        const errorResponse = await response.json();
+      if (filesResponse.ok && filesData.files.length > 0) {
+        // 2. Deletar os arquivos relacionados ao cliente
+        await fetch(`/api/deleteAllFilesBlobByClient`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            fileUrls: filesData.files.map((file: { url: any }) => file.url),
+          }),
+        });
+      }
+
+      // 3. Agora, deletar o cliente do banco de dados
+      const deleteClientResponse = await fetch(
+        `/api/deleteClient?id=${clientId}`,
+        {
+          method: 'DELETE',
+        },
+      );
+
+      if (!deleteClientResponse.ok) {
+        const errorResponse = await deleteClientResponse.json();
         throw new Error(errorResponse.error || 'Failed to delete client');
       }
 
+      // Redireciona o usuário após a exclusão bem-sucedida
       router.push(`/dashboard`);
     } catch (error) {
-      console.error('Error deleting client:', error);
+      console.error('Error deleting client or files:', error);
     }
   };
 
