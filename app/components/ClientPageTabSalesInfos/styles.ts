@@ -77,6 +77,11 @@ const styles = {
       height: '20px',
     },
   },
+  loadComponent: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 };
 
 export default styles;

@@ -141,10 +141,10 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center">
+      <Box sx={styles.loadComponent}>
         <CircularProgress />
       </Box>
-    ); // mensagem de carregamento
+    );
   }
 
   if (!clientData) {

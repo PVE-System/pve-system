@@ -78,6 +78,11 @@ const styles = {
       },
     },
   },
+  loadComponent: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 };
 
 export default styles;

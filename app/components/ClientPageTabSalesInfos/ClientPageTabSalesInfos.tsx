@@ -174,7 +174,7 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center">
+      <Box sx={styles.loadComponent}>
         <CircularProgress />
       </Box>
     );
