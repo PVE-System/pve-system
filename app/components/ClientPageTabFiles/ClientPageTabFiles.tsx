@@ -182,14 +182,7 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
 
   if (loading) {
     return (
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
-        }}
-      >
+      <Box sx={styles.loadComponent}>
         <CircularProgress />
       </Box>
     );
@@ -236,23 +229,23 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
                 sx={{
                   textTransform: 'none',
                   fontSize: {
-                    xs: '12px', // Tamanho menor para celular
-                    md: '14px', // Tamanho maior para tablets e desktops
+                    xs: '12px',
+                    md: '14px',
                   },
                 }}
               />
               <Tab
                 label={
                   {
-                    xs: 'Relatório E.', // Texto reduzido para telas menores
-                    md: 'Relatório de Embarque', // Texto completo para tablets e maiores
+                    xs: 'Relatório E.',
+                    md: 'Relatório de Embarque',
                   }[window.innerWidth < 600 ? 'xs' : 'md']
                 }
                 sx={{
                   textTransform: 'none',
                   fontSize: {
-                    xs: '12px', // Tamanho menor para celular
-                    md: '14px', // Tamanho maior para tablets e desktops
+                    xs: '12px',
+                    md: '14px',
                   },
                 }}
               />
@@ -269,7 +262,7 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
                 />
               </IconButton>
             </Box>
-            <Box /* sx={{ marginTop: 2 }} */>
+            <Box>
               <List>
                 {files.map((file) => (
                   <ListItem key={file.url} sx={styles.fileList}>

@@ -76,6 +76,12 @@ const styles = {
   commentsIcons: {
     width: 20,
   },
+
+  loadComponent: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 };
 
 export default styles;

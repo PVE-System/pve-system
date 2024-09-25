@@ -1,7 +1,14 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { Box, Button, IconButton, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  CircularProgress,
+  IconButton,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import { format, parseISO } from 'date-fns';
 import FlagIcon from '@mui/icons-material/Flag';
@@ -199,7 +206,11 @@ const ClientPageTabAnnotation: React.FC<ClientPageTabAnnotationProps> = ({
   };
 
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+      <Box sx={styles.loadComponent}>
+        <CircularProgress />
+      </Box>
+    );
   }
 
   return (

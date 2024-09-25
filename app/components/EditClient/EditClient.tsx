@@ -201,30 +201,6 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
     }
   };
 
-  /*   const handleImageChange = async (file: File) => {
-    if (file) {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      console.log('Iniciando upload da imagem...');
-
-      const uploadResponse = await fetch(
-        `/api/uploadImageClient?pathname=clients/id=${clientId}/image-${Date.now()}&clientId=${clientId}`,
-        {
-          method: 'POST',
-          body: formData,
-        },
-      );
-
-      if (uploadResponse.ok) {
-        const uploadResult = await uploadResponse.json();
-        setImageUrl(uploadResult.url); // Atualiza a URL da imagem na interface
-      } else {
-        console.error('Erro ao fazer upload da imagem');
-      }
-    }
-  }; */
-
   const onDelete = async () => {
     try {
       // 1. Buscar todas as URLs dos arquivos relacionados ao cliente
@@ -275,14 +251,14 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
   }
 
   if (!clientId) {
-    return <div>Client ID not provided</div>;
+    return <div>ID do cliente não fornecido</div>;
   }
 
   if (!clientData) {
     return (
       <p>
-        Client not found. Please check if the client ID is correct and the API
-        is returning the expected data.
+        Cliente não encontrado. Verifique se o ID do cliente está correto e a
+        API está retornando os dados esperados.
       </p>
     );
   }
@@ -389,15 +365,6 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
               }
               return null;
             })}
-            {/*             <Box sx={{ marginTop: 2 }}>
-              <Typography variant="subtitle1">Imagem do Cliente</Typography>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                style={{ marginTop: 10 }}
-              />
-            </Box> */}
           </form>
         </Box>
       </Box>

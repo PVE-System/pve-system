@@ -120,7 +120,11 @@ const styles = {
     borderRadius: '4px',
     marginBottom: '8px',
 
-    '@media (max-width:450px)': {
+    '@media (max-width:1025px)': {
+      width: '500px',
+    },
+
+    '@media (max-width:770px)': {
       flexDirection: 'column',
       width: '100%',
       height: 'auto',
@@ -131,6 +135,12 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     flex: 1,
+  },
+
+  loadComponent: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 };
 export default styles;
