@@ -135,3 +135,19 @@ export type Comment = typeof comments.$inferSelect;
 export type NewComment = typeof comments.$inferInsert;
 
 // Tipos inferidos para ser importados nas operações(route handlers(manipuladores))
+
+// Tabela que armazena quando cada usuário visualizou uma aba pela última vez.
+export const tabsViewed = pgTable('tabs_viewed', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id')
+    .references(() => users.id)
+    .notNull(),
+  clientId: integer('client_id')
+    .references(() => clients.id)
+    .notNull(),
+  salesTabViewedAt: timestamp('sales_tab_viewed_at'), // Última vez que o usuário viu a aba de vendas
+  commentsTabViewedAt: timestamp('comments_tab_viewed_at'), // Última vez que o usuário viu a aba de comentários
+});
+
+export type TabsViewed = typeof tabsViewed.$inferSelect;
+export type NewTabsViewed = typeof tabsViewed.$inferInsert;
