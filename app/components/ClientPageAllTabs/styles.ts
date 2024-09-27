@@ -40,6 +40,9 @@ const styles = {
       padding: '0px',
     },
   },
+  notificationIcon: {
+    display: 'block',
+  },
 };
 
 export default styles;
