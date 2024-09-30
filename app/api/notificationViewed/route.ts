@@ -1,6 +1,3 @@
-//Marcar Aba como Visualizada. Rota para atualizar a visualização feita nas abas notificadas, escondendo o icone.
-//notificationViewed
-
 import { db } from '@/app/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { tabsViewed } from '@/app/db/schema';
@@ -32,13 +29,18 @@ export async function POST(request: NextRequest) {
       )
       .execute();
 
+    // Log para depuração
+    console.log('Tab viewed request:', { clientId, tabName, userId });
+
     // Defina o campo de atualização com base na aba visualizada
     const updateData =
       tabName === 'sales'
         ? { salesTabViewedAt: new Date() }
         : tabName === 'comments'
           ? { commentsTabViewedAt: new Date() }
-          : null;
+          : tabName === 'files'
+            ? { filesTabViewedAt: new Date() }
+            : null;
 
     if (!updateData) {
       return NextResponse.json({ error: 'Invalid tab name' }, { status: 400 });
@@ -56,6 +58,8 @@ export async function POST(request: NextRequest) {
           ),
         )
         .execute();
+
+      console.log(`Updated viewed time for tab ${tabName} for user ${userId}`);
     } else {
       // Se não existe, insira um novo registro
       await db
@@ -66,6 +70,10 @@ export async function POST(request: NextRequest) {
           ...updateData,
         })
         .execute();
+
+      console.log(
+        `Inserted new viewed time for tab ${tabName} for user ${userId}`,
+      );
     }
 
     return NextResponse.json({ success: true });
