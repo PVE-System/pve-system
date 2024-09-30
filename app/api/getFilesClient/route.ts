@@ -17,7 +17,10 @@ export async function GET(request: NextRequest) {
 
     const fileData = blobs.map((file) => {
       const fileName = file.url.split('/').pop();
-      const uploadDate = new Date(file.uploadedAt).toISOString(); // Exemplo, assuma que pode haver uma maneira de obter a data real
+      const uploadDate = file.uploadedAt
+        ? new Date(file.uploadedAt).toISOString()
+        : new Date().toISOString(); // fallback para a data atual
+
       return {
         url: file.url,
         name: fileName,

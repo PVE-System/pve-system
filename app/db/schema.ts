@@ -147,6 +147,7 @@ export const tabsViewed = pgTable('tabs_viewed', {
     .notNull(),
   salesTabViewedAt: timestamp('sales_tab_viewed_at'), // Última vez que o usuário viu a aba de vendas
   commentsTabViewedAt: timestamp('comments_tab_viewed_at'), // Última vez que o usuário viu a aba de comentários
+  filesTabViewedAt: timestamp('files_tab_viewed_at'), // Última vez que o usuário viu a aba de arquivos
 });
 
 export type TabsViewed = typeof tabsViewed.$inferSelect;

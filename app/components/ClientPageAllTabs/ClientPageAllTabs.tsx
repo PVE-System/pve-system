@@ -12,6 +12,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import NotesIcon from '@mui/icons-material/Notes';
 import AttachmentIcon from '@mui/icons-material/Attachment';
+import NotificationsIcon from '@mui/icons-material/Notifications'; // Ícone de exclamação
 
 import ClientPageTabInfos from '@/app/components/ClientPageTabInfos/ClientPageTabInfos';
 import ClientPageTabSalesInfos from '@/app/components/ClientPageTabSalesInfos/ClientPageTabSalesInfos';
@@ -63,6 +64,7 @@ export default function BasicTabs() {
   const [salesTabNotification, setSalesTabNotification] = React.useState(false);
   const [commentsTabNotification, setCommentsTabNotification] =
     React.useState(false);
+  const [filesTabNotification, setFilesTabNotification] = React.useState(false); // Estado para arquivos
 
   // Função para buscar o status das abas
   const checkForNotifications = React.useCallback(async () => {
@@ -73,57 +75,37 @@ export default function BasicTabs() {
     }
 
     try {
-      console.log('Verificando notificações para clientId e userId:', {
-        clientId,
-        userId,
-      });
-
       const response = await fetch(
         `/api/notificationCheckUpdate?clientId=${clientId}&userId=${userId}`,
       );
+
       const data = await response.json();
 
-      console.log('Resposta da API:', data);
-
       if (response.ok) {
-        console.log('Resposta de notificações recebida:', data);
-        setSalesTabNotification(data.salesTabChanged); // Aqui ele espera um boolean
-        setCommentsTabNotification(data.commentsTabChanged); // Aqui também
+        console.log('Dados recebidos da API:', data);
+
+        // Verificando se o backend está retornando corretamente os valores
+        console.log('Files Tab Changed:', data.filesTabChanged);
+        setSalesTabNotification(data.salesTabChanged);
+        setCommentsTabNotification(data.commentsTabChanged);
+        setFilesTabNotification(data.filesTabChanged); // Verificando aba de arquivos
       } else {
-        console.error('Erro ao verificar notificações:', data.error);
+        console.error('Erro ao buscar notificações:', data.error);
       }
     } catch (error) {
-      console.error('Error fetching notification status:', error);
+      console.error('Erro ao buscar status de notificação:', error);
     }
   }, [clientId]);
 
   // Efeito para verificar as notificações na montagem do componente
   React.useEffect(() => {
     if (clientId) {
-      // Verifica as notificações apenas uma vez na montagem do componente
-      checkForNotifications().then(() => {
-        console.log('Verificação única das notificações feita');
-      });
+      // Chama a função que verifica as notificações
+      checkForNotifications(); // Aqui estamos chamando a função
+
+      console.log('Verificação das notificações foi chamada!');
     }
-  }, [clientId, checkForNotifications]); // O useEffect será acionado quando o clientId mudar
-
-  // Efeito para verificar as notificações na montagem do componente
-  /* React.useEffect(() => {
-    if (clientId) {
-      // Verifica as notificações na montagem do componente
-      checkForNotifications().then(() => {
-        console.log('Verificação inicial das notificações feita');
-      });
-
-      // Opcional: adicionar um intervalo para verificar periodicamente as notificações
-      const intervalId = setInterval(() => {
-        checkForNotifications();
-      }, 60000); // verifica a cada 60 segundos
-
-      // Limpa o intervalo quando o componente desmonta
-      return () => clearInterval(intervalId);
-    } 
-  }, [clientId, checkForNotifications]);*/
+  }, [clientId, checkForNotifications]); // O useEffect será acionado quando o clientId ou checkForNotifications mudar
 
   // Função para marcar a aba como visualizada
   const markTabAsViewed = async (tabName: string) => {
@@ -136,9 +118,7 @@ export default function BasicTabs() {
     try {
       await fetch(
         `/api/notificationViewed?clientId=${clientId}&userId=${userId}&tabName=${tabName}`,
-        {
-          method: 'POST',
-        },
+        { method: 'POST' },
       );
 
       // Atualiza o estado removendo a notificação
@@ -146,9 +126,11 @@ export default function BasicTabs() {
         setSalesTabNotification(false);
       } else if (tabName === 'comments') {
         setCommentsTabNotification(false);
+      } else if (tabName === 'files') {
+        setFilesTabNotification(false); // Para arquivos
       }
     } catch (error) {
-      console.error('Error marking tab as viewed:', error);
+      console.error('Erro ao marcar aba como visualizada:', error);
     }
   };
 
@@ -161,6 +143,8 @@ export default function BasicTabs() {
       markTabAsViewed('sales');
     } else if (newValue === 2) {
       markTabAsViewed('comments');
+    } else if (newValue === 3) {
+      markTabAsViewed('files'); // Para arquivos
     }
   };
 
@@ -200,8 +184,10 @@ export default function BasicTabs() {
               label={isSmallScreen ? null : 'Informações de pedidos'}
               icon={
                 <Badge
-                  color="secondary"
-                  variant="dot"
+                  color="warning"
+                  badgeContent={
+                    <NotificationsIcon style={{ fontSize: '12px' }} />
+                  } // Ícone de exclamação
                   invisible={!salesTabNotification}
                 >
                   <ShoppingCartIcon />
@@ -220,8 +206,10 @@ export default function BasicTabs() {
               label={isSmallScreen ? null : 'Histórico de anotações'}
               icon={
                 <Badge
-                  color="secondary"
-                  variant="dot"
+                  color="warning"
+                  badgeContent={
+                    <NotificationsIcon style={{ fontSize: '12px' }} />
+                  } // Ícone de exclamação
                   invisible={!commentsTabNotification}
                 >
                   <NotesIcon />
@@ -238,7 +226,17 @@ export default function BasicTabs() {
                 },
               }}
               label={isSmallScreen ? null : 'Arquivos e anexos'}
-              icon={<AttachmentIcon />}
+              icon={
+                <Badge
+                  color="warning"
+                  badgeContent={
+                    <NotificationsIcon style={{ fontSize: '12px' }} />
+                  } // Ícone de notificação
+                  invisible={!filesTabNotification} // Estado da notificação para a aba de arquivos
+                >
+                  <AttachmentIcon />
+                </Badge>
+              }
               {...a11yProps(3)}
             />
           </Tabs>
