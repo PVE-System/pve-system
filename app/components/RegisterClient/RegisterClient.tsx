@@ -16,10 +16,22 @@ import {
   formatCPF,
   formatCNPJ,
   formatPhone,
-  formatCEP,
-} from '@/app/components/FormFormatter/FormFormatter';
+} from '@/app/components/FormFormatter/FormFormatter'; // Funções de formatação
 import sharedStyles from '@/app/styles/sharedStyles';
 import styles from './styles';
+
+// Tipagem para as opções de select
+type SelectOptionsType = {
+  companySize: string[];
+  hasOwnStore: string[];
+  icmsContributor: string[];
+  transportationType: string[];
+  companyLocation: string[];
+  marketSegmentNature: string[];
+  state: string[];
+  rating: string[];
+  clientCondition: string[];
+};
 
 const RegisterClient: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -80,7 +92,7 @@ const RegisterClient: React.FC = () => {
     clientCondition: 'Condição do Cliente',
   };
 
-  const selectOptions: { [key: string]: string[] } = {
+  const selectOptions: SelectOptionsType = {
     companySize: ['Pequeno', 'Médio', 'Grande'],
     hasOwnStore: ['Sim', 'Não'],
     icmsContributor: ['Sim', 'Não'],
@@ -99,49 +111,97 @@ const RegisterClient: React.FC = () => {
       'Atacarejo',
     ],
     state: [
-      'Acre',
-      'Alagoas',
-      'Amapá',
-      'Amazonas',
-      'Bahia',
-      'Ceará',
-      'Distrito Federal',
-      'Espírito Santo',
-      'Goiás',
-      'Maranhão',
-      'Mato Grosso',
-      'Mato Grosso do Sul',
-      'Minas Gerais',
-      'Pará',
-      'Paraíba',
-      'Paraná',
-      'Pernambuco',
-      'Piauí',
-      'Rio de Janeiro',
-      'Rio Grande do Norte',
-      'Rio Grande do Sul',
-      'Rondônia',
-      'Roraima',
-      'Santa Catarina',
-      'São Paulo',
-      'Sergipe',
-      'Tocantins',
-    ],
+      'AC',
+      'AL',
+      'AP',
+      'AM',
+      'BA',
+      'CE',
+      'DF',
+      'ES',
+      'GO',
+      'MA',
+      'MT',
+      'MS',
+      'MG',
+      'PA',
+      'PB',
+      'PR',
+      'PE',
+      'PI',
+      'RJ',
+      'RN',
+      'RS',
+      'RO',
+      'RR',
+      'SC',
+      'SP',
+      'SE',
+      'TO',
+    ], // Siglas para estados
     rating: ['1', '2', '3'],
     clientCondition: ['Normal', 'Especial', 'Suspenso'],
   };
 
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
+  const [states, setStates] = useState<string[]>(selectOptions.state);
+  const [cities, setCities] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
   const router = useRouter();
+
+  // Função para buscar cidades com base no estado selecionado
+  const fetchCities = async (state: string) => {
+    try {
+      const response = await fetch(
+        `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${state}/municipios`,
+      );
+      const data = await response.json();
+      const cityNames = data.map((city: any) => city.nome);
+      setCities(cityNames);
+    } catch (error) {
+      console.error('Erro ao buscar cidades:', error);
+    }
+  };
+
+  // Função para buscar o endereço pelo CEP via ViaCEP
+  const handleCEPChange = async (cep: string) => {
+    const cleanedCEP = cep.replace(/\D/g, ''); // Remove qualquer caractere não numérico
+    if (cleanedCEP.length === 8) {
+      try {
+        const response = await fetch(
+          `https://viacep.com.br/ws/${cleanedCEP}/json/`,
+        );
+        const data = await response.json();
+
+        if (!data.erro) {
+          console.log('Dados retornados pela API ViaCEP:', data); // Log para depuração
+
+          setFormData((prevFormData) => ({
+            ...prevFormData,
+            address: data.logradouro || '', // Rua
+            district: data.bairro || '', // Bairro
+            city: data.localidade || '', // Atualiza a cidade
+            state: data.uf || '', // Atualiza o estado
+          }));
+
+          // Atualiza as cidades ao alterar o estado
+          if (data.uf) {
+            fetchCities(data.uf);
+          }
+        } else {
+          console.error('CEP inválido');
+        }
+      } catch (error) {
+        console.error('Erro ao buscar endereço pelo CEP:', error);
+      }
+    }
+  };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-
     let formattedValue = value;
 
+    // Aplicar formatação nos campos de CPF, CNPJ, Telefone e CEP
     if (name === 'cpf') {
       formattedValue = formatCPF(value);
     } else if (name === 'cnpj') {
@@ -149,56 +209,23 @@ const RegisterClient: React.FC = () => {
     } else if (name === 'phone') {
       formattedValue = formatPhone(value);
     } else if (name === 'cep') {
-      formattedValue = formatCEP(value);
+      formattedValue = value; // Não aplicar formatação ao CEP para evitar conflito com API
+      handleCEPChange(formattedValue);
     }
 
     setFormData((prevFormData) => ({
       ...prevFormData,
       [name]: formattedValue,
     }));
-  };
 
-  function normalizeData(data: {
-    companyName?: string;
-    cnpj?: string;
-    cpf?: string;
-    cep?: string;
-    address?: string;
-    locationNumber?: string;
-    district?: string;
-    city?: string;
-    state: any;
-    corfioCode?: string;
-    phone?: string;
-    emailCommercial?: string;
-    emailFinancial?: string;
-    emailXml?: string;
-    socialMedia?: string;
-    contactAtCompany?: string;
-    financialContact?: string;
-    responsibleSeller?: string;
-    companySize: any;
-    hasOwnStore: any;
-    icmsContributor: any;
-    transportationType: any;
-    companyLocation: any;
-    marketSegmentNature: any;
-    rating: any;
-    clientCondition: any;
-    imageUrl: any;
-  }) {
-    return {
-      ...data,
-      rating: parseInt(data.rating, 10), // Apenas garantindo que rating seja um número
-      imageUrl: imageUrl || '', // Inclui o imageUrl no envio dos dados
-    };
-  }
-  const setRating = (rating: number) => {
-    setFormData({ ...formData, rating });
-  };
-
-  const setClientCondition = (condition: string) => {
-    setFormData({ ...formData, clientCondition: condition });
+    // Sempre que o estado for alterado manualmente, reiniciar a cidade e carregar as cidades do estado
+    if (name === 'state') {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        city: '', // Limpa o campo cidade quando o estado muda
+      }));
+      fetchCities(value);
+    }
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -207,36 +234,12 @@ const RegisterClient: React.FC = () => {
     setMessage(null);
 
     try {
-      let imageUploadUrl = '';
-      // Upload da imagem ao Blob Storage
-      if (imageFile) {
-        const formDataImage = new FormData();
-        formDataImage.append('file', imageFile);
-
-        const uploadResponse = await fetch('/api/uploadImage', {
-          method: 'POST',
-          body: formDataImage,
-        });
-
-        if (uploadResponse.ok) {
-          const uploadResult = await uploadResponse.json();
-          imageUploadUrl = uploadResult.url; // Define a URL da imagem carregada
-          setImageUrl(imageUploadUrl); // Atualiza a URL da imagem no estado
-        } else {
-          throw new Error('Erro ao fazer upload da imagem');
-        }
-      }
-      const normalizedData = normalizeData({
-        ...formData,
-        imageUrl: imageUploadUrl || '', // Garante que a URL da imagem seja definida
-      });
-
       const response = await fetch('/api/registerClients', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(normalizedData),
+        body: JSON.stringify(formData),
       });
 
       const result = await response.json();
@@ -290,20 +293,21 @@ const RegisterClient: React.FC = () => {
           <ClientProfile
             rating={formData.rating}
             clientCondition={formData.clientCondition}
-            onRatingChange={setRating}
-            companyName={''}
-            corfioCode={''}
-            onConditionChange={setClientCondition}
-            emailCommercial=""
-            phone=""
+            onRatingChange={(rating) => setFormData({ ...formData, rating })}
+            companyName={formData.companyName}
+            corfioCode={formData.corfioCode}
+            onConditionChange={(condition) =>
+              setFormData({ ...formData, clientCondition: condition })
+            }
+            emailCommercial={formData.emailCommercial}
+            phone={formData.phone}
             readOnly={false}
-            imageUrl={imageUrl || undefined}
+            imageUrl={null}
             onImageChange={() => {}}
-            showTooltip={true} // Mostra o Tooltip
+            showTooltip={true}
             enableImageUpload={false}
           />
           <Box sx={styles.boxCol2}>
-            {/* Inputs SEM select */}
             <form onSubmit={handleSubmit}>
               {Object.keys(formData).map((key) => (
                 <Box key={key}>
@@ -317,15 +321,30 @@ const RegisterClient: React.FC = () => {
                     variant="filled"
                     sx={styles.inputsCol2}
                     fullWidth
-                    select={key in selectOptions}
+                    select={
+                      key === 'state' || key === 'city' || key in selectOptions
+                    }
                   >
-                    {/* Inputs COM select */}
-                    {key in selectOptions &&
-                      selectOptions[key].map((option) => (
-                        <MenuItem key={option} value={option}>
-                          {option}
+                    {key === 'state' &&
+                      states.map((state) => (
+                        <MenuItem key={state} value={state}>
+                          {state}
                         </MenuItem>
                       ))}
+                    {key === 'city' &&
+                      cities.map((city) => (
+                        <MenuItem key={city} value={city}>
+                          {city}
+                        </MenuItem>
+                      ))}
+                    {key in selectOptions &&
+                      selectOptions[key as keyof SelectOptionsType].map(
+                        (option) => (
+                          <MenuItem key={option} value={option}>
+                            {option}
+                          </MenuItem>
+                        ),
+                      )}
                   </TextField>
                 </Box>
               ))}
