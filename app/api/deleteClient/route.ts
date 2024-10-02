@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { clients, comments, salesInformation } from '@/app/db/schema';
+import {
+  clients,
+  comments,
+  salesInformation,
+  tabsViewed,
+} from '@/app/db/schema'; // Adicione a tabela tabs_viewed
 import { db } from '@/app/db';
 import { eq } from 'drizzle-orm';
 
@@ -16,28 +21,43 @@ export async function DELETE(request: NextRequest) {
   }
 
   try {
-    // Deletar primeiro os dados da tabela salesInformation
+    console.log(`Attempting to delete client with id: ${id}`);
+
+    // Verifique se há registros na tabela `tabs_viewed`
+    const tabsViewedCheck = await db
+      .select()
+      .from(tabsViewed)
+      .where(eq(tabsViewed.clientId, Number(id)));
+    console.log(`Tabs viewed found: `, tabsViewedCheck);
+
+    // Se houver registros em `tabs_viewed`, deletá-los
+    if (tabsViewedCheck.length > 0) {
+      const deletedTabsViewed = await db
+        .delete(tabsViewed)
+        .where(eq(tabsViewed.clientId, Number(id)))
+        .returning();
+      console.log('Deleted tabs viewed data:', deletedTabsViewed);
+    }
+
+    // Deletar as informações de vendas
     const deletedSalesInformation = await db
       .delete(salesInformation)
       .where(eq(salesInformation.clientId, Number(id)))
       .returning();
-
     console.log('Deleted sales information data:', deletedSalesInformation);
 
-    // Deletar primeiro os dados da tabela salesInformation
+    // Deletar os comentários
     const deletedComments = await db
       .delete(comments)
       .where(eq(comments.clientId, Number(id)))
       .returning();
-
     console.log('Deleted comments data:', deletedComments);
 
-    // Deletar o cliente da tabela clients
+    // Deletar o cliente
     const deletedClient = await db
       .delete(clients)
       .where(eq(clients.id, Number(id)))
       .returning();
-
     console.log('Deleted client data:', deletedClient);
 
     if (!deletedClient.length) {

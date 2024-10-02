@@ -309,12 +309,17 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
 
   const onDelete = async () => {
     try {
+      console.log('Fetching files related to client:', clientId);
+
       const filesResponse = await fetch(
         `/api/getAllFilesBlobByClient?clientId=${clientId}`,
       );
       const filesData = await filesResponse.json();
 
+      console.log('Files found for client:', filesData.files);
+
       if (filesResponse.ok && filesData.files.length > 0) {
+        console.log('Deleting associated files');
         await fetch(`/api/deleteAllFilesBlobByClient`, {
           method: 'DELETE',
           headers: {
@@ -324,8 +329,10 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
             fileUrls: filesData.files.map((file: { url: any }) => file.url),
           }),
         });
+        console.log('Files deleted successfully');
       }
 
+      console.log('Attempting to delete client from the database');
       const deleteClientResponse = await fetch(
         `/api/deleteClient?id=${clientId}`,
         {
@@ -338,6 +345,7 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
         throw new Error(errorResponse.error || 'Failed to delete client');
       }
 
+      console.log('Client deleted successfully');
       router.push(`/dashboard`);
     } catch (error) {
       console.error('Error deleting client or files:', error);
