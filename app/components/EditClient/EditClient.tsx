@@ -150,6 +150,8 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [loadingDelete, setLoadingDelete] = useState(false);
+  const [loadingSave, setLoadingSave] = useState(false);
 
   // Função para buscar cidades com base no estado selecionado
   const fetchCities = async (state: string) => {
@@ -248,6 +250,7 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
   const onSubmit = async (data: any) => {
     if (!clientId) return;
 
+    setLoadingSave(true); // Inicia o estado de loading ao salvar
     try {
       delete data.id;
       delete data.createdAt;
@@ -296,6 +299,8 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
       router.push(`/clientPage?id=${clientId}`);
     } catch (error) {
       console.error('Error updating client data:', error);
+    } finally {
+      setLoadingSave(false); // Finaliza o estado de loading
     }
   };
 
@@ -308,6 +313,7 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
   };
 
   const onDelete = async () => {
+    setLoadingDelete(true); // Inicia o estado de loading ao deletar
     try {
       console.log('Fetching files related to client:', clientId);
 
@@ -349,6 +355,8 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
       router.push(`/dashboard`);
     } catch (error) {
       console.error('Error deleting client or files:', error);
+    } finally {
+      setLoadingDelete(false); // Finaliza o estado de loading
     }
   };
 
@@ -399,16 +407,18 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
               variant="contained"
               sx={styles.deleteButton}
               onClick={onDelete}
+              disabled={loadingDelete} // Desativa o botão enquanto carrega
             >
-              Deletar
+              {loadingDelete ? <CircularProgress size={24} /> : 'Deletar'}
             </Button>
             <Button
               type="button"
               variant="contained"
               sx={styles.editButton}
-              onClick={handleSubmit(onSubmit)}
+              onClick={() => handleSubmit(onSubmit)()}
+              disabled={loadingSave} // Desativa o botão enquanto está carregando
             >
-              Salvar
+              {loadingSave ? <CircularProgress size={24} /> : 'Salvar'}
             </Button>
           </Box>
         </Box>

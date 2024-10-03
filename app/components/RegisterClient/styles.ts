@@ -116,10 +116,18 @@ const styles = {
     }, */
   },
 
+  boxRegisterButton: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    '@media (max-width: 800px)': {
+      justifyContent: 'center',
+    },
+  },
+
   registerButton: {
     background: (theme: Theme) => theme.palette.primary.main,
     marginTop: '20px',
-    alignSelf: 'flex-end',
+
     '@media (max-width: 800px)': {
       alignSelf: 'center',
     },
