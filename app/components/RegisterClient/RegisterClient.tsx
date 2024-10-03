@@ -5,6 +5,7 @@ import { useState } from 'react';
 import {
   Box,
   Button,
+  CircularProgress,
   Container,
   MenuItem,
   TextField,
@@ -348,14 +349,20 @@ const RegisterClient: React.FC = () => {
                   </TextField>
                 </Box>
               ))}
-              <Button
-                type="submit"
-                variant="contained"
-                disabled={loading}
-                sx={styles.registerButton}
-              >
-                {loading ? 'Carregando...' : 'Concluir Cadastro'}
-              </Button>
+              <Box sx={styles.boxRegisterButton}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  disabled={loading}
+                  sx={styles.registerButton}
+                >
+                  {loading ? (
+                    <CircularProgress size={24} />
+                  ) : (
+                    'Concluir Cadastro'
+                  )}
+                </Button>
+              </Box>
             </form>
           </Box>
         </Box>

@@ -34,6 +34,7 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
   const [userName, setUserName] = React.useState<string>('');
   const [imageUrl, setImageUrl] = React.useState<string | null>(null); // Estado para armazenar a URL da imagem
   const [loading, setLoading] = React.useState(true);
+  const [loadingSave, setLoadingSave] = React.useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
   const userId = searchParams.get('id'); // Captura o ID do usuário dos parâmetros da URL
@@ -64,6 +65,8 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
   const onSubmit = async (data: MyFormValues) => {
     if (!userId) return;
 
+    setLoadingSave(true); // Inicia o estado de carregamento
+
     try {
       const response = await fetch(`/api/updateUser/${userId}`, {
         method: 'PUT',
@@ -73,7 +76,7 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
         body: JSON.stringify({
           id: userId,
           name: data.name,
-          imageUrl, // Inclua a URL da imagem ao atualizar os dados do usuário
+          imageUrl,
         }),
       });
 
@@ -88,10 +91,13 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
         ...prevFormData,
         name: data.name,
       }));
+
       // Redirecionar para o Dashboard
       router.push('/dashboard');
     } catch (error) {
       console.error('Error updating user name:', error);
+    } finally {
+      setLoadingSave(false); // Finaliza o estado de carregamento
     }
   };
 
@@ -140,9 +146,9 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
 
   return (
     <Container maxWidth="sm">
-      <Box sx={{ ...sharedStyles.container, ...styles.formBox }}>
+      <Box sx={sharedStyles.container}>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Box sx={styles.formBox}>
+          <Box sx={styles.formBoxImg}>
             <Button component="label" sx={styles.formButtonImg}>
               {previewImage ? (
                 <Image
@@ -177,31 +183,35 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
               />
             </Button>
           </Box>
-          <Typography
-            variant="h6"
-            sx={{ mt: 2, textAlign: 'center', fontSize: '16px' }}
-          >
-            Escolha nome e foto para seu perfil: {/* {userName} */}
-          </Typography>
-          <Controller
-            name="name"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                type="text"
-                placeholder="Nome"
-                sx={styles.inputName}
-              />
-            )}
-          />
-          <Button
-            type="submit"
-            variant="contained"
-            sx={styles.formButtonSubmit}
-          >
-            Salvar Alterações
-          </Button>
+          <Box sx={styles.formBoxInput}>
+            <Typography variant="h6" sx={styles.formSubTitle}>
+              Escolha o nome e foto para seu perfil: {/* {userName} */}
+            </Typography>
+            <Controller
+              name="name"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  type="text"
+                  placeholder="Nome"
+                  sx={styles.inputName}
+                />
+              )}
+            />
+            <Button
+              type="submit"
+              variant="contained"
+              sx={styles.formButtonSubmit}
+              disabled={loadingSave} // Desativa o botão enquanto está carregando
+            >
+              {loadingSave ? (
+                <CircularProgress size={24} />
+              ) : (
+                'Salvar Alterações'
+              )}
+            </Button>
+          </Box>
         </form>
       </Box>
     </Container>
