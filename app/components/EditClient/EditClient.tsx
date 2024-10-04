@@ -251,13 +251,41 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
     if (!clientId) return;
 
     setLoadingSave(true); // Inicia o estado de loading ao salvar
+
     try {
       delete data.id;
       delete data.createdAt;
 
       let finalImageUrl = imageUrl || clientData?.imageUrl;
 
-      // Verifica se uma nova imagem foi selecionada para upload
+      // Se houver uma nova imagem, deletar a imagem antiga primeiro
+      if (imageFile && imageUrl) {
+        try {
+          console.log(
+            'Deletando a imagem anterior associada ao cliente:',
+            clientId,
+          );
+          const deleteImageResponse = await fetch(
+            `/api/deleteImageClient?clientId=${clientId}&imageUrl=${encodeURIComponent(imageUrl)}`,
+            {
+              method: 'DELETE',
+            },
+          );
+
+          if (!deleteImageResponse.ok) {
+            const errorResponse = await deleteImageResponse.json();
+            throw new Error(
+              errorResponse.error || 'Erro ao deletar a imagem anterior',
+            );
+          }
+
+          console.log('Imagem anterior deletada com sucesso.');
+        } catch (error) {
+          console.error('Erro ao deletar a imagem anterior:', error);
+        }
+      }
+
+      // Faz o upload da nova imagem (se houver)
       if (imageFile) {
         const formData = new FormData();
         formData.append('file', imageFile);
@@ -274,10 +302,11 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
           const uploadResult = await uploadResponse.json();
           finalImageUrl = uploadResult.url;
         } else {
-          console.error('Erro ao fazer upload da imagem');
+          console.error('Erro ao fazer upload da nova imagem');
         }
       }
 
+      // Atualiza os dados do cliente no banco de dados
       const updatedData = {
         ...data,
         imageUrl: finalImageUrl,
@@ -293,12 +322,15 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
 
       if (!response.ok) {
         const errorResponse = await response.json();
-        throw new Error(errorResponse.error || 'Failed to update client data');
+        throw new Error(
+          errorResponse.error || 'Erro ao atualizar os dados do cliente',
+        );
       }
 
+      console.log('Dados do cliente atualizados com sucesso.');
       router.push(`/clientPage?id=${clientId}`);
     } catch (error) {
-      console.error('Error updating client data:', error);
+      console.error('Erro ao atualizar os dados do cliente:', error);
     } finally {
       setLoadingSave(false); // Finaliza o estado de loading
     }

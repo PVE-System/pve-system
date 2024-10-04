@@ -2,19 +2,20 @@ import { NextRequest, NextResponse } from 'next/server';
 import { del } from '@vercel/blob';
 
 export async function DELETE(request: NextRequest) {
-  const clientId = request.nextUrl.searchParams.get('clientId');
-  const imageUrl = request.nextUrl.searchParams.get('imageUrl'); // Pegando o imageUrl da query
+  const { searchParams } = new URL(request.url);
+  const userId = searchParams.get('userId');
+  const { imageUrl } = await request.json(); // Recebe a URL da imagem a ser deletada
 
-  if (!clientId || !imageUrl) {
+  if (!userId || !imageUrl) {
     return NextResponse.json(
-      { error: 'Client ID or Image URL not provided' },
+      { error: 'User ID or image URL not provided' },
       { status: 400 },
     );
   }
 
   try {
-    // Deletar a imagem existente usando a URL completa
-    await del(imageUrl); // Usando a URL completa para deletar a imagem
+    // Deletar a imagem existente
+    await del(imageUrl); // Deleta a imagem do storage pelo URL
 
     return NextResponse.json({ message: 'Image deleted successfully' });
   } catch (error) {

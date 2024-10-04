@@ -35,6 +35,7 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
   const [imageUrl, setImageUrl] = React.useState<string | null>(null); // Estado para armazenar a URL da imagem
   const [loading, setLoading] = React.useState(true);
   const [loadingSave, setLoadingSave] = React.useState(false);
+  const [imageFile, setImageFile] = React.useState<File | null>(null); // Armazena o arquivo da imagem sem fazer upload imediato
   const router = useRouter();
   const searchParams = useSearchParams();
   const userId = searchParams.get('id'); // Captura o ID do usuário dos parâmetros da URL
@@ -68,6 +69,40 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
     setLoadingSave(true); // Inicia o estado de carregamento
 
     try {
+      let finalImageUrl = imageUrl;
+
+      // Se o usuário selecionou uma nova imagem
+      if (imageFile) {
+        // Deleta a imagem anterior, se houver
+        if (imageUrl) {
+          await fetch(`/api/deleteImageUser?userId=${userId}`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              imageUrl: imageUrl, // Deletar a imagem anterior
+            }),
+          });
+        }
+
+        // Faz o upload da nova imagem
+        const formData = new FormData();
+        formData.append('file', imageFile);
+
+        const uploadResponse = await fetch(
+          `/api/uploadImage?pathname=users/id=${userId}/image-${Date.now()}&userId=${userId}`,
+          {
+            method: 'POST',
+            body: formData,
+          },
+        );
+
+        const uploadData = await uploadResponse.json();
+        finalImageUrl = uploadData.url; // Atualiza a URL final da nova imagem
+      }
+
+      // Atualiza os dados do usuário, incluindo a URL da nova imagem
       const response = await fetch(`/api/updateUser/${userId}`, {
         method: 'PUT',
         headers: {
@@ -76,7 +111,7 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
         body: JSON.stringify({
           id: userId,
           name: data.name,
-          imageUrl,
+          imageUrl: finalImageUrl, // Salva a URL da nova imagem
         }),
       });
 
@@ -101,25 +136,12 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
     }
   };
 
-  const handleImageChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+
     if (file) {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      // Ajuste o caminho do upload para incluir o ID do usuário na subpasta
-      const uploadResponse = await fetch(
-        `/api/uploadImage?pathname=users/id=${userId}/image-${Date.now()}&userId=${userId}`,
-        {
-          method: 'POST',
-          body: formData,
-        },
-      );
-
-      const uploadData = await uploadResponse.json();
-      setImageUrl(uploadData.url); // Defina a URL da imagem no estado
+      // Armazena o arquivo da imagem sem fazer upload imediatamente
+      setImageFile(file);
 
       // Mostre uma prévia da imagem no frontend
       const reader = new FileReader();
@@ -185,7 +207,7 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
           </Box>
           <Box sx={styles.formBoxInput}>
             <Typography variant="h6" sx={styles.formSubTitle}>
-              Escolha o nome e foto para seu perfil: {/* {userName} */}
+              Escolha o nome e foto para seu perfil:
             </Typography>
             <Controller
               name="name"
