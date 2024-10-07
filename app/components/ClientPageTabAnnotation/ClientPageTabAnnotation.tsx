@@ -37,6 +37,12 @@ const ClientPageTabAnnotation: React.FC<ClientPageTabAnnotationProps> = ({
   const [loading, setLoading] = useState(true);
   const [comments, setComments] = useState<Comment[]>([]);
   const [clientData, setClientData] = useState<any>(null);
+  const [loadingPost, setLoadingPost] = React.useState(false);
+  const [loadingDelete, setLoadingDelete] = React.useState<number | null>(null);
+  const [loadingFavorite, setLoadingFavorite] = React.useState<number | null>(
+    null,
+  );
+
   const router = useRouter();
 
   const fetchComments = useCallback(async () => {
@@ -94,11 +100,12 @@ const ClientPageTabAnnotation: React.FC<ClientPageTabAnnotationProps> = ({
   }, [clientId, fetchClientData, fetchComments]);
 
   const onSubmit = async (data: any) => {
+    setLoadingPost(true); // Ativa o loading do botão "Publicar"
     const currentDate = new Date();
-    const formattedDate = format(currentDate, 'yyyy-MM-dd'); // Formato ISO para armazenar no BD
+    const formattedDate = format(currentDate, 'yyyy-MM-dd');
 
     const newComment = {
-      clientId, // Inclua o clientId aqui
+      clientId,
       comment: data.comment,
       date: formattedDate,
       favorite: false,
@@ -108,27 +115,31 @@ const ClientPageTabAnnotation: React.FC<ClientPageTabAnnotationProps> = ({
       const response = await fetch('/api/postHistoryComments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newComment), // Agora o clientId é incluído corretamente
+        body: JSON.stringify(newComment),
       });
 
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
 
-      // Comentário salvo com sucesso, recarregar comentários
       fetchComments();
       reset();
     } catch (error) {
       console.error('Error posting comment:', error);
+    } finally {
+      setLoadingPost(false); // Desativa o loading ao final
     }
   };
 
-  const handleFavorite = async (index: number) => {
+  const handleFavorite = async (commentId: number) => {
+    setLoadingFavorite(commentId); // Ativa o loading para o comentário específico
     const updatedComments = [...comments];
-    const targetComment = updatedComments[index];
+    const targetComment = updatedComments.find(
+      (comment) => comment.id === commentId,
+    );
 
-    if (!targetComment || !targetComment.id) {
-      console.error('Comment ID is missing or undefined', targetComment);
+    if (!targetComment) {
+      console.error('Comment ID is missing or undefined');
       return;
     }
 
@@ -155,21 +166,29 @@ const ClientPageTabAnnotation: React.FC<ClientPageTabAnnotationProps> = ({
         date: updatedComment.date
           ? format(parseISO(updatedComment.date), 'yyyy-MM-dd')
           : 'Data não disponível',
-        userName: targetComment.userName, // Garante que o userName seja mantido
+        userName: targetComment.userName,
       };
 
-      updatedComments.splice(index, 1);
-      if (formattedUpdatedComment.favorite) {
-        setComments([formattedUpdatedComment, ...updatedComments]);
-      } else {
-        setComments([...updatedComments, formattedUpdatedComment]);
-      }
+      // Remove o comentário atualizado da lista
+      const remainingComments = updatedComments.filter(
+        (comment) => comment.id !== commentId,
+      );
+
+      // Adiciona o comentário atualizado ao topo se favoritado, ou ao final se não favoritado
+      const reorderedComments = formattedUpdatedComment.favorite
+        ? [formattedUpdatedComment, ...remainingComments]
+        : [...remainingComments, formattedUpdatedComment];
+
+      setComments(reorderedComments);
     } catch (error) {
       console.error('Error updating favorite status:', error);
+    } finally {
+      setLoadingFavorite(null); // Desativa o loading ao final
     }
   };
 
   const handleDelete = async (commentId: number) => {
+    setLoadingDelete(commentId); // Ativa o loading para o comentário específico
     try {
       const response = await fetch(
         `/api/deleteHistoryComment?id=${commentId}`,
@@ -189,6 +208,8 @@ const ClientPageTabAnnotation: React.FC<ClientPageTabAnnotationProps> = ({
       setComments(updatedComments);
     } catch (error) {
       console.error('Error deleting comment:', error);
+    } finally {
+      setLoadingDelete(null); // Desativa o loading ao final
     }
   };
 
@@ -255,7 +276,7 @@ const ClientPageTabAnnotation: React.FC<ClientPageTabAnnotationProps> = ({
                 variant="contained"
                 sx={styles.postCommentsButton}
               >
-                Publicar
+                {loadingPost ? <CircularProgress size={24} /> : 'Publicar'}
               </Button>
             </Box>
           </form>
@@ -270,16 +291,30 @@ const ClientPageTabAnnotation: React.FC<ClientPageTabAnnotationProps> = ({
                     </Typography>
                   </Box>
                   <Box sx={styles.commentsContent}>
-                    <IconButton onClick={() => handleFavorite(index)}>
-                      <FlagIcon
-                        sx={{
-                          color: comment.favorite ? 'orange' : 'darkgrey',
-                          ...styles.commentsIcons,
-                        }}
-                      />
+                    <IconButton
+                      onClick={() => handleFavorite(comment.id)}
+                      disabled={loadingFavorite === comment.id}
+                    >
+                      {loadingFavorite === comment.id ? (
+                        <CircularProgress size={24} />
+                      ) : (
+                        <FlagIcon
+                          sx={{
+                            color: comment.favorite ? 'orange' : 'darkgrey',
+                            ...styles.commentsIcons,
+                          }}
+                        />
+                      )}
                     </IconButton>
-                    <IconButton onClick={() => handleDelete(comment.id)}>
-                      <DeleteIcon sx={styles.commentsIcons} />
+                    <IconButton
+                      onClick={() => handleDelete(comment.id)}
+                      disabled={loadingDelete === comment.id}
+                    >
+                      {loadingDelete === comment.id ? (
+                        <CircularProgress size={24} />
+                      ) : (
+                        <DeleteIcon sx={styles.commentsIcons} />
+                      )}
                     </IconButton>
                   </Box>
                 </Box>

@@ -17,6 +17,7 @@ import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import sharedStyles from '@/app/styles/sharedStyles';
 import styles from './styles';
+import { CircularProgress } from '@mui/material';
 
 function Copyright(props: any) {
   return (
@@ -38,10 +39,13 @@ function Copyright(props: any) {
 
 export default function SignIn() {
   const [message, setMessage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setLoading(true); // Inicia o loading
+
     const formData = new FormData(event.currentTarget);
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
@@ -56,16 +60,18 @@ export default function SignIn() {
       });
 
       if (response.ok) {
-        const { token, userId } = await response.json(); // Capture o ID do usuário
+        const { token, userId } = await response.json();
         Cookies.set('token', token, { path: '/' });
-        Cookies.set('userId', userId, { path: '/' }); // Salve o ID do usuário no cookie
-        window.location.reload(); // Força um refresh da página
+        Cookies.set('userId', userId, { path: '/' });
+        await router.push('/dashboard'); // Usa o router para redirecionar
       } else {
         const error = await response.json();
         setMessage(`${error.error}`);
       }
     } catch (error) {
       setMessage('Erro ao conectar com o servidor');
+    } finally {
+      setLoading(false); // Finaliza o estado de carregamento apenas se houver um erro
     }
   };
 
@@ -128,8 +134,9 @@ export default function SignIn() {
             fullWidth
             variant="contained"
             sx={styles.button}
+            disabled={loading}
           >
-            Entrar
+            {loading ? <CircularProgress size={24} /> : 'Entrar'}
           </Button>
           <Grid container>
             <Grid item xs>
@@ -137,21 +144,9 @@ export default function SignIn() {
                 Esqueceu a senha?
               </Link>
             </Grid>
-            <Grid item>
-              {/* 
-              <NextLink href="/register" passHref>
-                <Link variant="body2">
-                  {'Não tem uma conta?'}
-                  <br />
-                  {'Inscrever-se'}
-                </Link>
-              </NextLink> 
-              */}
-            </Grid>
           </Grid>
         </Box>
       </Box>
-      <Copyright sx={styles.copyright} />
     </Container>
   );
 }
