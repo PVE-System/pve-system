@@ -6,19 +6,22 @@ import {
   Button,
   CircularProgress,
   IconButton,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   TextField,
-  Typography,
+  Container,
 } from '@mui/material';
 import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
-import React from 'react';
+import styles from './style';
 
 export interface User {
   id: number;
   name: string;
   email: string;
-  password: string;
-  imageUrl?: string;
-  createdAt?: string;
 }
 
 export default function UsersTeamList() {
@@ -37,17 +40,9 @@ export default function UsersTeamList() {
     try {
       const response = await fetch('/api/getAllUsers');
       const data = await response.json();
-
-      // Se `data.users` for um array, use-o; caso contrário, defina como vazio
-      if (Array.isArray(data.users)) {
-        setUsers(data.users);
-      } else {
-        console.error('Data is not an array:', data);
-        setUsers([]); // Define users como array vazio se `data.users` não for um array
-      }
+      setUsers(data.users);
     } catch (error) {
       console.error('Error fetching users:', error);
-      setUsers([]); // Define users como array vazio em caso de erro
     } finally {
       setLoading(false);
     }
@@ -56,9 +51,14 @@ export default function UsersTeamList() {
   const handleDelete = async (id: number) => {
     setDeleteLoading(id);
     try {
-      const response = await fetch(`/api/deleteUser?id=${id}`, {
+      const response = await fetch('/api/deleteUserByAdmin', {
         method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id }),
       });
+
       if (response.ok) {
         setUsers(users.filter((user) => user.id !== id));
       }
@@ -71,20 +71,26 @@ export default function UsersTeamList() {
 
   const handleEdit = (user: User) => {
     setEditingUser(user.id);
-    setEditFormData({ ...user });
+    setEditFormData({ id: user.id, name: user.name, email: user.email });
   };
 
   const handleSave = async () => {
-    if (!editFormData) return;
+    if (!editFormData || !editFormData.id) return;
+
     setLoading(true);
     try {
-      const response = await fetch('/api/updateUser', {
+      const response = await fetch('/api/updateUserByAdmin', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(editFormData),
+        body: JSON.stringify({
+          id: editFormData.id, // Passa o `id` no corpo da requisição
+          name: editFormData.name,
+          email: editFormData.email,
+        }),
       });
+
       if (response.ok) {
         setUsers((prevUsers) =>
           prevUsers.map((user) =>
@@ -93,6 +99,9 @@ export default function UsersTeamList() {
         );
         setEditingUser(null);
         setEditFormData(null);
+      } else {
+        const errorResponse = await response.json();
+        throw new Error(errorResponse.error || 'Failed to update user');
       }
     } catch (error) {
       console.error('Error updating user:', error);
@@ -101,77 +110,88 @@ export default function UsersTeamList() {
     }
   };
 
-  if (loading) {
-    return <CircularProgress />;
-  }
-
   return (
-    <Box>
-      {Array.isArray(users) &&
-        users.map((user) => (
-          <Box key={user.id} display="flex" alignItems="center" gap={2}>
-            {editingUser === user.id ? (
-              <>
-                <TextField
-                  label="Nome"
-                  value={editFormData?.name || ''}
-                  onChange={(e) =>
-                    setEditFormData({
-                      ...editFormData,
-                      name: e.target.value,
-                      id: editFormData?.id || user.id,
-                    } as User)
-                  }
-                />
-                <TextField
-                  label="Email"
-                  value={editFormData?.email || ''}
-                  onChange={(e) =>
-                    setEditFormData({
-                      ...editFormData,
-                      email: e.target.value,
-                      id: editFormData?.id || user.id,
-                    } as User)
-                  }
-                />
-                <TextField
-                  label="Senha"
-                  type="password"
-                  value={editFormData?.password || ''}
-                  onChange={(e) =>
-                    setEditFormData({
-                      ...editFormData,
-                      password: e.target.value,
-                      id: editFormData?.id || user.id,
-                    } as User)
-                  }
-                />
-                <Button onClick={handleSave} disabled={loading}>
-                  {loading ? <CircularProgress size={20} /> : 'Salvar'}
-                </Button>
-              </>
-            ) : (
-              <>
-                <Typography>{user.name}</Typography>
-                <Typography>{user.email}</Typography>
-                <Typography>******</Typography>
-                <IconButton onClick={() => handleEdit(user)}>
-                  <EditIcon />
-                </IconButton>
-                <IconButton
-                  onClick={() => handleDelete(user.id)}
-                  disabled={deleteLoading === user.id}
-                >
-                  {deleteLoading === user.id ? (
-                    <CircularProgress size={24} />
+    <Container maxWidth="lg" sx={styles.container}>
+      <TableContainer>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell sx={styles.fontSize}>Nome</TableCell>
+              <TableCell sx={styles.fontSize}>Email</TableCell>
+              <TableCell sx={styles.fontSize}>Ações</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {Array.isArray(users) && users.length > 0 ? (
+              users.map((user) => (
+                <TableRow key={user.id} sx={styles.rowHover}>
+                  {editingUser === user.id ? (
+                    <>
+                      <TableCell sx={styles.fontSize}>
+                        <TextField
+                          label="Nome"
+                          value={editFormData?.name || ''}
+                          onChange={(e) =>
+                            setEditFormData({
+                              ...editFormData!,
+                              name: e.target.value,
+                            })
+                          }
+                          fullWidth
+                        />
+                      </TableCell>
+                      <TableCell sx={styles.fontSize}>
+                        <TextField
+                          label="Email"
+                          value={editFormData?.email || ''}
+                          onChange={(e) =>
+                            setEditFormData({
+                              ...editFormData!,
+                              email: e.target.value,
+                            })
+                          }
+                          fullWidth
+                        />
+                      </TableCell>
+                      <TableCell sx={styles.fontSize}>
+                        <Button onClick={handleSave} disabled={loading}>
+                          {loading ? <CircularProgress size={20} /> : 'Salvar'}
+                        </Button>
+                      </TableCell>
+                    </>
                   ) : (
-                    <DeleteIcon />
+                    <>
+                      <TableCell sx={styles.fontSize}>{user.name}</TableCell>
+                      <TableCell sx={styles.fontSize}>{user.email}</TableCell>
+                      <TableCell sx={styles.fontSize}>
+                        <IconButton onClick={() => handleEdit(user)}>
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton
+                          onClick={() => handleDelete(user.id)}
+                          disabled={deleteLoading === user.id}
+                        >
+                          {deleteLoading === user.id ? (
+                            <CircularProgress size={24} />
+                          ) : (
+                            <DeleteIcon />
+                          )}
+                        </IconButton>
+                      </TableCell>
+                    </>
                   )}
-                </IconButton>
-              </>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={3} align="center">
+                  Nenhum usuário encontrado
+                </TableCell>
+              </TableRow>
             )}
-          </Box>
-        ))}
-    </Box>
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Container>
   );
 }
