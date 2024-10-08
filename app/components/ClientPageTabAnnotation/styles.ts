@@ -50,10 +50,9 @@ const styles = {
     background: (theme: Theme) =>
       theme.palette.mode === 'light'
         ? theme.palette.background.default
-        : theme.palette.background.alternative,
+        : theme.palette.background.default,
 
     marginBottom: '16px',
-    border: '1px solid #ffffff',
     padding: '8px',
     borderRadius: '8px',
     display: 'flex',
@@ -71,6 +70,7 @@ const styles = {
   commentsData: {
     display: 'block',
     marginTop: '50px',
+    fontWeight: 'bold',
   },
 
   commentsIcons: {

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Tooltip from '@mui/material/Tooltip';
 import {
   Box,
   Card,
@@ -162,54 +163,67 @@ export default function ExcelDownloadFileComponent() {
     <Container fixed>
       <Box sx={sharedStyles.container}>
         <Typography variant="h4" component="h1" sx={sharedStyles.titlePage}>
-          <span>Planilha </span>Excel
+          <span>Planilha </span> de vendas
         </Typography>
+        <Box>
+          <Typography sx={sharedStyles.subtitleSize}>
+            Faça o <span>Download </span> da planilha Excel na versão mais
+            atual.
+          </Typography>
+        </Box>
       </Box>
-      <Box>
-        <Card variant="outlined" sx={styles.card}>
-          <CardContent sx={styles.cardContent}>
-            <Typography variant="h6" sx={sharedStyles.subtitleSize}>
-              <span>Anexar </span>Planilha
-            </Typography>
-            <IconButton component="label">
-              {loadingUpload ? (
-                <CircularProgress size={24} /> // Exibe o CircularProgress durante o upload
-              ) : (
-                <AttachFileIcon sx={styles.iconUpload} /> // Exibe o ícone normal se não estiver carregando
-              )}
-              <input type="file" accept="*" onChange={handleUpload} hidden />
-            </IconButton>
-          </CardContent>
-        </Card>
-        {loading ? (
-          <Box sx={styles.boxCircularProgress}>
-            <CircularProgress />
-          </Box>
-        ) : (
-          <Box sx={{ marginTop: 4 }}>
-            {files
-              .sort(
-                (a, b) =>
-                  new Date(b.date).getTime() - new Date(a.date).getTime(),
-              ) // Ordena pela data em ordem crescente
-              .map((file) => {
-                const isDownloading = loadingDownload === file.url;
-                const isDeleting = loadingDelete === file.url;
+      <Box sx={styles.boxUploadIcon}>
+        <Typography
+          variant="h6"
+          sx={{ ...sharedStyles.subtitleSize, fontSize: '14px' }}
+        >
+          Anexar Planilha
+        </Typography>
+        <Tooltip title="Inserir nova planilha" arrow>
+          <IconButton component="label">
+            {loadingUpload ? (
+              <CircularProgress size={24} /> // Exibe o CircularProgress durante o upload
+            ) : (
+              <AttachFileIcon sx={styles.iconUpload} /> // Exibe o ícone normal se não estiver carregando
+            )}
+            <input type="file" accept="*" onChange={handleUpload} hidden />
+          </IconButton>
+        </Tooltip>
+      </Box>
 
-                return (
-                  <Card variant="outlined" sx={styles.fileList} key={file.url}>
-                    <CardContent sx={styles.contentFileList}>
-                      <InsertDriveFileIcon />
-                      <Typography
-                        variant="body1"
-                        sx={{ ...styles.textFileList, flex: 1 }}
-                      >
-                        Planilha Excel Atualizada em:{' '}
-                        <span>
-                          {new Date(file.date).toLocaleDateString('pt-BR')}
-                        </span>
-                      </Typography>
+      {loading ? (
+        <Box sx={styles.boxCircularProgress}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <Box sx={{ marginTop: 4 }}>
+          {files
+            .sort(
+              (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+            ) // Ordena pela data em ordem crescente
+            .map((file) => {
+              const isDownloading = loadingDownload === file.url;
+              const isDeleting = loadingDelete === file.url;
 
+              return (
+                <Card variant="outlined" sx={styles.fileList} key={file.url}>
+                  <CardContent sx={styles.contentFileList}>
+                    <InsertDriveFileIcon />
+
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        ...styles.textFileList,
+                        ...sharedStyles.subTitleFontFamily,
+                        flex: 1,
+                      }}
+                    >
+                      Planilha Excel Atualizada em:{' '}
+                      <span>
+                        {new Date(file.date).toLocaleDateString('pt-BR')}
+                      </span>
+                    </Typography>
+                    <Tooltip title="Baixar Planilha" arrow>
                       <IconButton
                         color="primary"
                         onClick={() => handleDownload(file.url)}
@@ -221,7 +235,8 @@ export default function ExcelDownloadFileComponent() {
                           <CloudDownloadIcon sx={styles.iconDownload} />
                         )}
                       </IconButton>
-
+                    </Tooltip>
+                    <Tooltip title="Deletar Planilha" arrow>
                       <IconButton
                         color="secondary"
                         onClick={() => handleDelete(file.url)}
@@ -233,13 +248,13 @@ export default function ExcelDownloadFileComponent() {
                           <DeleteIcon sx={styles.iconDelete} />
                         )}
                       </IconButton>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-          </Box>
-        )}
-      </Box>
+                    </Tooltip>
+                  </CardContent>
+                </Card>
+              );
+            })}
+        </Box>
+      )}
     </Container>
   );
 }

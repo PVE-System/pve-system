@@ -312,7 +312,10 @@ const RegisterClient: React.FC = () => {
             <form onSubmit={handleSubmit}>
               {Object.keys(formData).map((key) => (
                 <Box key={key}>
-                  <Typography variant="subtitle1">
+                  <Typography
+                    variant="subtitle1"
+                    sx={sharedStyles.subTitleFontFamily}
+                  >
                     {fieldLabels[key] || key}
                   </Typography>
                   <TextField
@@ -354,7 +357,10 @@ const RegisterClient: React.FC = () => {
                   type="submit"
                   variant="contained"
                   disabled={loading}
-                  sx={styles.registerButton}
+                  sx={{
+                    ...styles.registerButton,
+                    ...sharedStyles.buttonFontFamily,
+                  }}
                 >
                   {loading ? (
                     <CircularProgress size={24} />
