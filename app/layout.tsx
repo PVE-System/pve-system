@@ -4,6 +4,7 @@ import * as React from 'react';
 import { ThemeProvider, ThemedComponent } from '@/app/theme';
 import { AuthProvider } from '@/app/contex/authContext';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
+import '../app/styles/globals.css';
 
 export default function RootLayout(props: { children: React.ReactNode }) {
   return (

@@ -5,17 +5,18 @@ const styles = {
   card: {
     background: (theme: Theme) =>
       theme.palette.mode === 'light'
-        ? theme.palette.background.paper
-        : theme.palette.background.alternative,
+        ? theme.palette.background.default
+        : theme.palette.background.default,
+    border: 'none',
     display: 'flex',
     justifyContent: 'center',
     textAlign: 'center',
     width: '100%',
     height: '300px',
-    borderRadius: 4,
+    /*     borderRadius: 4,
     border: '3px solid',
     borderColor: (theme: Theme) =>
-      theme.palette.mode === 'light' ? orange[500] : orange[800],
+      theme.palette.mode === 'light' ? orange[500] : orange[800], */
 
     '@media (max-width:450px)': {
       flexDirection: 'column',
@@ -43,12 +44,13 @@ const styles = {
   fileList: {
     background: (theme: Theme) =>
       theme.palette.mode === 'light'
-        ? theme.palette.background.paper
+        ? theme.palette.background.alternative
         : theme.palette.background.alternative,
 
     /*     justifyContent: 'center',
     alignItens: 'center', */
-
+    border: 'none',
+    marginBottom: '10px',
     width: '100%',
 
     '@media (max-width:450px)': {
@@ -96,9 +98,22 @@ const styles = {
     },
   },
 
+  boxUploadIcon: {
+    my: 4,
+    display: 'flex',
+    /*  flexDirection: 'column', */
+    justifyContent: 'center',
+    alignItems: 'center',
+    /* background: 'grey', */
+
+    '@media (max-width: 600px)': {
+      width: '100%',
+    },
+  },
+
   iconUpload: {
-    width: '40px',
-    height: '40px',
+    width: '25px',
+    height: '25px',
     transition: 'color 0.3s',
     cursor: 'pointer',
     color: (theme: Theme) =>

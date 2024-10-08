@@ -285,8 +285,8 @@ const ClientPageTabAnnotation: React.FC<ClientPageTabAnnotationProps> = ({
               comments.map((comment, index) => (
                 <Box key={comment.id} sx={styles.boxComments}>
                   <Box>
-                    <Typography variant="body1">{comment.comment}</Typography>
-                    <Typography variant="caption" sx={styles.commentsData}>
+                    <Typography variant="body2">{comment.comment}</Typography>
+                    <Typography variant="overline" sx={styles.commentsData}>
                       {formatCommentDate(comment.date)} - {comment.userName}
                     </Typography>
                   </Box>

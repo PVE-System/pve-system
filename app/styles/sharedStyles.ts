@@ -14,6 +14,8 @@ const sharedStyles = {
   },
 
   titlePage: {
+    /* fontFamily: `'Montserrat', sans-serif`, */
+    fontFamily: `'Raleway', sans-serif`,
     fontSize: '32px',
     margin: '8px',
     textAlign: 'center',
@@ -33,6 +35,14 @@ const sharedStyles = {
     '@media (max-width:450px)': {
       fontSize: '26px',
     },
+  },
+
+  subTitleFontFamily: {
+    fontFamily: `'Montserrat', sans-serif`,
+  },
+
+  buttonFontFamily: {
+    fontFamily: `'Open Sans', sans-serif`,
   },
 
   titleForm: {
@@ -58,6 +68,7 @@ const sharedStyles = {
   },
 
   subtitleSize: {
+    fontFamily: `'Montserrat', sans-serif`,
     // FontSize Desktop
     fontSize: '18px',
     // FontSize Notebook
