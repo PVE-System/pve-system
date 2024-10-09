@@ -23,7 +23,7 @@ const lightTheme = createTheme({
       styleOverrides: {
         // Estilos para a barra de rolagem
         '::-webkit-scrollbar': {
-          width: '12px',
+          width: '6px',
           height: '200px',
         },
         '::-webkit-scrollbar-thumb': {
@@ -34,7 +34,11 @@ const lightTheme = createTheme({
           backgroundColor: orange[800],
         },
         '::-webkit-scrollbar-track': {
-          backgroundColor: '#B1C7D6',
+          backgroundColor: '#dedfe1',
+        },
+        // Garante que a barra de rolagem esteja sempre presente
+        body: {
+          overflowY: 'scroll',
         },
       },
     },
@@ -70,7 +74,7 @@ const darkTheme = createTheme({
       styleOverrides: {
         // Estilos para a barra de rolagem
         '::-webkit-scrollbar': {
-          width: '12px',
+          width: '6px',
         },
         '::-webkit-scrollbar-thumb': {
           backgroundColor: '#888',
@@ -81,6 +85,10 @@ const darkTheme = createTheme({
         },
         '::-webkit-scrollbar-track': {
           backgroundColor: '#303030',
+        },
+        // Garante que a barra de rolagem esteja sempre presente
+        body: {
+          overflowY: 'scroll',
         },
       },
     },
