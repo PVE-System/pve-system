@@ -8,6 +8,7 @@ import {
   Container,
   Box,
   CircularProgress,
+  Button,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import Accordion from '@mui/material/Accordion';
@@ -106,62 +107,125 @@ const DashboardComponent = () => {
     );
   }
 
-  const handleCardClick = (query: string) => {
+  /*   const handleCardClick = (query: string) => {
     window.location.href = `/searchResults?query=${query}`;
-  };
+  }; */
 
   return (
-    <Container maxWidth="lg" sx={sharedStyles.container}>
-      <Box sx={styles.cardsContainer}>
-        <Box sx={styles.cardsBoxCol1}>
-          <Card
-            variant="outlined"
-            sx={styles.cards}
-            onClick={() => (window.location.href = '/clientsNormalList')}
-          >
-            <CardContent>
+    <Container
+      maxWidth="lg"
+      sx={{
+        ...sharedStyles.container,
+      }}
+    >
+      <Box sx={styles.cardsAndPiaChartContainer}>
+        {/* Contêiner de Cards */}
+        <Box sx={styles.cardsBox}>
+          {/* Card Cliente Normal */}
+          <Card variant="outlined" sx={styles.cardsDashboard}>
+            <CardContent sx={styles.cardContent}>
               <Typography
                 variant="h6"
-                sx={{ ...styles.cardsText, ...sharedStyles.subtitleSize }}
+                sx={{
+                  ...styles.cardTitle,
+                  ...sharedStyles.subTitleFontFamily,
+                  color: 'green',
+                }}
               >
-                Cliente Normal <br />
-                <span>{clientData.Normal} </span>cadastrados
+                Cliente Normal
               </Typography>
+              <Typography variant="h4" sx={styles.cardNumber}>
+                {clientData.Normal}
+              </Typography>
+              <Button
+                title="Confira estes clientes"
+                onClick={() => (window.location.href = '/clientsNormalList')}
+                sx={{
+                  ...styles.cardButton,
+                  backgroundColor: 'green',
+                  '&:hover': {
+                    backgroundColor: 'green',
+                  },
+                }}
+              >
+                Normal
+              </Button>
             </CardContent>
           </Card>
-          <Card
-            variant="outlined"
-            sx={styles.cards}
-            onClick={() => (window.location.href = '/clientsEspecialList')}
-          >
-            <CardContent>
+
+          {/* Repetição para os outros cards */}
+          {/* Card Cliente Especial */}
+          <Card variant="outlined" sx={styles.cardsDashboard}>
+            <CardContent sx={styles.cardContent}>
               <Typography
                 variant="h6"
-                sx={{ ...styles.cardsText, ...sharedStyles.subtitleSize }}
+                sx={{
+                  ...styles.cardTitle,
+                  ...sharedStyles.subTitleFontFamily,
+                  color: 'orange',
+                }}
               >
-                Cliente Especial <br />
-                <span>{clientData.Especial} </span>cadastrados
+                Cliente Especial
               </Typography>
+              <Typography variant="h4" sx={styles.cardNumber}>
+                {clientData.Especial}
+              </Typography>
+              <Button
+                title="Confira estes clientes"
+                onClick={() => (window.location.href = '/clientsEspecialList')}
+                sx={{
+                  ...styles.cardButton,
+                  backgroundColor: 'orange',
+                  '&:hover': {
+                    backgroundColor: 'orange',
+                  },
+                }}
+              >
+                Especial
+              </Button>
             </CardContent>
           </Card>
-          <Card
-            variant="outlined"
-            sx={styles.cards}
-            onClick={() => (window.location.href = '/clientsSuspendedList')}
-          >
-            <CardContent>
+
+          {/* Card Cliente Suspenso */}
+          <Card variant="outlined" sx={styles.cardsDashboard}>
+            <CardContent sx={styles.cardContent}>
               <Typography
                 variant="h6"
-                sx={{ ...styles.cardsText, ...sharedStyles.subtitleSize }}
+                sx={{
+                  ...styles.cardTitle,
+                  ...sharedStyles.subTitleFontFamily,
+                  color: 'red',
+                }}
               >
-                Cliente Suspenso <br />
-                <span>{clientData.Suspenso} </span>cadastrados
+                Cliente Suspenso
               </Typography>
+              <Typography variant="h4" sx={styles.cardNumber}>
+                {clientData.Suspenso}
+              </Typography>
+              <Button
+                title="Confira estes clientes"
+                sx={{
+                  ...styles.cardButton,
+                  backgroundColor: 'red',
+
+                  '&:hover': {
+                    backgroundColor: 'red',
+                  },
+                }}
+                onClick={() => (window.location.href = '/clientsSuspendedList')}
+              >
+                Suspenso
+              </Button>
             </CardContent>
           </Card>
         </Box>
-        <DynamicChartComponent />
+
+        {/* Componente do Gráfico */}
+        <Box sx={{ flex: 1 }}>
+          <DynamicChartComponent />
+        </Box>
       </Box>
+
       <Box sx={styles.accordionContainer}>
         <Accordion
           sx={styles.accordionBg}
@@ -181,26 +245,28 @@ const DashboardComponent = () => {
               emptyIcon={<StarBorderIcon sx={styles.emptyIcon} />}
               sx={styles.ratingStars}
             />
-            <Typography
-              sx={{ ...styles.accordionText, ...sharedStyles.subtitleSize }}
-            >
+            <Typography sx={styles.accordionTitle}>
               <span>{ratingCounts.active}</span> Clientes ativos
             </Typography>
           </AccordionSummary>
           <AccordionDetails>
             <Typography
-              sx={{ ...styles.accordionText, ...sharedStyles.subtitleSize }}
+              sx={{
+                ...styles.accordionContentText,
+                ...sharedStyles.subTitleFontFamily,
+              }}
             >
               Fazem pedidos com frequência e confiam em nosso trabalho.
               <br />
               São clientes fidelizados que temos um bom relacionamento.
             </Typography>
             <FormatListBulletedIcon
-              sx={{ marginLeft: 'auto', cursor: 'pointer', fontSize: 'medium' }} // Estilização do ícone
+              sx={styles.accordionIconList}
               onClick={(e) => {
                 e.stopPropagation(); // Evita que o clique no ícone expanda/colapse o Accordion
                 window.location.href = '/clientsRating3List'; // Redireciona o usuário
               }}
+              titleAccess="Confira a lista de clientes" // Texto que aparece ao passar o mouse por cima
             />
           </AccordionDetails>
         </Accordion>
@@ -222,22 +288,23 @@ const DashboardComponent = () => {
               emptyIcon={<StarBorderIcon sx={styles.emptyIcon} />}
               sx={styles.ratingStars}
             />
-            <Typography
-              sx={{ ...styles.accordionText, ...sharedStyles.subtitleSize }}
-            >
+            <Typography sx={styles.accordionTitle}>
               <span>{ratingCounts.moderate}</span> Clientes moderado
             </Typography>
           </AccordionSummary>
           <AccordionDetails>
             <Typography
-              sx={{ ...styles.accordionText, ...sharedStyles.subtitleSize }}
+              sx={{
+                ...styles.accordionContentText,
+                ...sharedStyles.subTitleFontFamily,
+              }}
             >
               Fazem pedidos com uma certa frequência, mas poderia melhorar.
               <br />
               Compensa analisar os motivos e tentar fechar mais pedidos.
             </Typography>
             <FormatListBulletedIcon
-              sx={{ marginLeft: 'auto', cursor: 'pointer', fontSize: 'medium' }} // Estilização do ícone
+              sx={styles.accordionIconList}
               onClick={(e) => {
                 e.stopPropagation(); // Evita que o clique no ícone expanda/colapse o Accordion
                 window.location.href = '/clientsRating2List'; // Redireciona o usuário
@@ -263,15 +330,16 @@ const DashboardComponent = () => {
               emptyIcon={<StarBorderIcon sx={styles.emptyIcon} />}
               sx={styles.ratingStars}
             />
-            <Typography
-              sx={{ ...styles.accordionText, ...sharedStyles.subtitleSize }}
-            >
+            <Typography sx={styles.accordionTitle}>
               <span>{ratingCounts.inactive}</span> Clientes menos ativos
             </Typography>
           </AccordionSummary>
           <AccordionDetails>
             <Typography
-              sx={{ ...styles.accordionText, ...sharedStyles.subtitleSize }}
+              sx={{
+                ...styles.accordionContentText,
+                ...sharedStyles.subTitleFontFamily,
+              }}
             >
               Fazem pedidos com pouca frequência ou apenas uma única vez.
               <br />
@@ -279,7 +347,7 @@ const DashboardComponent = () => {
               o cliente.
             </Typography>
             <FormatListBulletedIcon
-              sx={{ marginLeft: 'auto', cursor: 'pointer', fontSize: 'medium' }} // Estilização do ícone
+              sx={styles.accordionIconList}
               onClick={(e) => {
                 e.stopPropagation(); // Evita que o clique no ícone expanda/colapse o Accordion
                 window.location.href = '/clientsRating1List'; // Redireciona o usuário

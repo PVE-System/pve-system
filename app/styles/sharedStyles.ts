@@ -14,7 +14,6 @@ const sharedStyles = {
   },
 
   titlePage: {
-    /* fontFamily: `'Montserrat', sans-serif`, */
     fontFamily: `'Raleway', sans-serif`,
     fontSize: '32px',
     margin: '8px',
@@ -34,36 +33,6 @@ const sharedStyles = {
     // FontSize Mobile
     '@media (max-width:450px)': {
       fontSize: '26px',
-    },
-  },
-
-  subTitleFontFamily: {
-    fontFamily: `'Montserrat', sans-serif`,
-  },
-
-  buttonFontFamily: {
-    fontFamily: `'Open Sans', sans-serif`,
-  },
-
-  titleForm: {
-    fontSize: '18px',
-    // FontSize Notebook
-    '@media (max-width:1050px)': {
-      fontSize: '18px',
-    },
-    // FontSize Tablet
-    '@media (max-width:800px)': {
-      fontSize: '16px',
-    },
-    // FontSize Mobile
-    '@media (max-width:450px)': {
-      fontSize: '14px',
-      '& .mui-1mxgcu1-MuiFormLabel-root-MuiInputLabel-root': {
-        fontSize: '14px',
-      },
-      '& .mui-11lg7ig-MuiTypography-root': {
-        fontSize: '14px',
-      },
     },
   },
 
@@ -95,6 +64,36 @@ const sharedStyles = {
       },
       // FontSize Mobile
       '@media (max-width:450px)': {
+        fontSize: '14px',
+      },
+    },
+  },
+
+  subTitleFontFamily: {
+    fontFamily: `'Montserrat', sans-serif`,
+  },
+
+  buttonFontFamily: {
+    fontFamily: `'Open Sans', sans-serif`,
+  },
+
+  titleForm: {
+    fontSize: '18px',
+    // FontSize Notebook
+    '@media (max-width:1050px)': {
+      fontSize: '18px',
+    },
+    // FontSize Tablet
+    '@media (max-width:800px)': {
+      fontSize: '16px',
+    },
+    // FontSize Mobile
+    '@media (max-width:450px)': {
+      fontSize: '14px',
+      '& .mui-1mxgcu1-MuiFormLabel-root-MuiInputLabel-root': {
+        fontSize: '14px',
+      },
+      '& .mui-11lg7ig-MuiTypography-root': {
         fontSize: '14px',
       },
     },
