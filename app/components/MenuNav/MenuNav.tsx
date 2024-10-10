@@ -12,7 +12,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
-import { IconButton, Link, Typography } from '@mui/material';
+import { IconButton, Link, Tooltip, Typography } from '@mui/material';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -29,27 +29,35 @@ import { useMediaQuery } from '@mui/material';
 import { useTheme } from '@/app/theme/ThemeContext';
 import styles from '@/app/components/MenuNav/styles';
 import { useAuth } from '@/app/contex/authContext'; // Importe o contexto de autenticação
+import Cookies from 'js-cookie';
+import { useEffect, useState } from 'react';
 
 export default function TemporaryDrawer() {
   const [open, setOpen] = React.useState(false);
-  const [userData, setUserData] = React.useState<{
+  const [userData, setUserData] = useState<{
     name: string;
     imageUrl: string | null;
   }>({ name: '', imageUrl: null });
+  const [loading, setLoading] = useState(true);
   const { theme, toggleTheme } = useTheme();
   const isMobile = useMediaQuery('(max-width:600px)');
   const { user, logout } = useAuth(); // Obtenha o usuário do contexto de autenticação
 
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchUserData = async () => {
-      if (user?.id) {
+      const userId = Cookies.get('userId'); // Pega o ID do usuário do cookie
+      if (userId) {
         try {
-          const response = await fetch(`/api/getUser/${user.id}`);
+          const response = await fetch(`/api/getUser/${userId}`);
           const data = await response.json();
           setUserData({ name: data.name, imageUrl: data.imageUrl });
         } catch (error) {
           console.error('Failed to fetch user data', error);
+        } finally {
+          setLoading(false); // Finaliza o estado de carregamento
         }
+      } else {
+        setLoading(false); // Finaliza o estado de carregamento
       }
     };
 
@@ -162,13 +170,15 @@ export default function TemporaryDrawer() {
           </Box>
           {DrawerList}
           <Box sx={styles.contentMenu}>
-            <IconButton
-              sx={styles.iconTheme}
-              onClick={handleToggleTheme}
-              color="inherit"
-            >
-              {themeIcon}
-            </IconButton>
+            <Tooltip title={'Trocar de tema'}>
+              <IconButton
+                sx={styles.iconTheme}
+                onClick={handleToggleTheme}
+                color="inherit"
+              >
+                {themeIcon}
+              </IconButton>
+            </Tooltip>
             <Divider sx={styles.dividerMenu} />
             <Box>
               {userData.imageUrl ? (

@@ -2,7 +2,7 @@ import { orange } from '@mui/material/colors';
 import { Theme } from '@mui/material/styles/createTheme';
 
 const styles = {
-  container: {
+  /*   container: {
     background: (theme: Theme) =>
       theme.palette.mode === 'light'
         ? theme.palette.background.paper
@@ -15,7 +15,7 @@ const styles = {
     padding: '20px',
     display: 'flex',
     flexDirection: 'column',
-  },
+  }, */
 
   containerTabs: {
     paddingLeft: '0px',
@@ -41,13 +41,15 @@ const styles = {
   contentTabs: {
     background: (theme: Theme) =>
       theme.palette.mode === 'light'
-        ? theme.palette.background.paper
+        ? theme.palette.background.default
         : theme.palette.background.alternative,
 
-    border: '3px solid',
-    borderColor: (theme: Theme) =>
-      theme.palette.mode === 'light' ? orange[500] : orange[800],
-    borderRadius: '10px',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
+    borderRadius: '16px',
+
+    /* borderColor: (theme: Theme) =>
+      theme.palette.mode === 'light' ? orange[500] : orange[800], */
+
     padding: '20px',
     display: 'flex',
     flexDirection: 'column',

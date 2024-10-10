@@ -8,13 +8,14 @@ const styles = {
         ? theme.palette.background.paper
         : theme.palette.background.alternative,
 
-    border: '3px solid',
-    borderColor: (theme: Theme) =>
-      theme.palette.mode === 'light' ? orange[500] : orange[800],
-    borderRadius: '10px',
+    /* borderColor: (theme: Theme) =>
+      theme.palette.mode === 'light' ? orange[500] : orange[800], */
+    borderRadius: '16px',
     padding: '20px',
     display: 'flex',
     flexDirection: 'column',
+
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
   },
 
   boxContent: {
@@ -37,6 +38,7 @@ const styles = {
   buttonTagCondition: {
     minWidth: '80px',
     fontSize: '10px',
+    fontWeight: '600',
   },
 
   rowHover: {
