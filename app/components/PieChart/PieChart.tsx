@@ -15,7 +15,7 @@ const SimpleChart = () => {
   const [data, setData] = useState([
     { name: 'MS', value: 0 },
     { name: 'MT', value: 0 },
-    { name: 'Outros', value: 0 },
+    { name: 'Outras UF', value: 0 },
     { name: 'Total', value: 0 },
   ]);
   const [loading, setLoading] = useState(true);
@@ -48,7 +48,7 @@ const SimpleChart = () => {
         const chartData = [
           { name: 'MS', value: msCount },
           { name: 'MT', value: mtCount },
-          { name: 'Outros', value: otherCount },
+          { name: 'Outras UF', value: otherCount },
           { name: 'Total', value: totalCount },
         ];
 
@@ -63,13 +63,13 @@ const SimpleChart = () => {
     fetchData();
   }, []);
 
-  if (loading) {
+  /*   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center">
         <CircularProgress />
       </Box>
     );
-  }
+  } */
 
   const COLORS = ['#FFC107', '#FF5722', '#2196F3', '#4CAF50'];
 

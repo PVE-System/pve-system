@@ -16,7 +16,7 @@ declare module '@mui/material/styles' {
 
 const lightTheme = createTheme({
   typography: {
-    fontFamily: 'Roboto, sans-serif',
+    fontFamily: 'MontSerrat, sans-serif',
   },
   components: {
     MuiCssBaseline: {
@@ -67,7 +67,7 @@ const lightTheme = createTheme({
 
 const darkTheme = createTheme({
   typography: {
-    fontFamily: 'Roboto, sans-serif',
+    fontFamily: 'MontSerrat, sans-serif',
   },
   components: {
     MuiCssBaseline: {
