@@ -1,3 +1,4 @@
+import { grey, orange } from '@mui/material/colors';
 import { Theme } from '@mui/material/styles/createTheme';
 
 const styles = {
@@ -8,17 +9,20 @@ const styles = {
 
     background: (theme: Theme) =>
       theme.palette.mode === 'light'
-        ? theme.palette.background.default
+        ? grey[300]
         : theme.palette.background.alternative,
 
     border: '2px solid',
+    borderColor: orange[700],
     borderRadius: '10px',
     padding: '20px',
-    width: '300px', //alterei aqui
+    width: '300px',
     height: '600px',
 
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
+
     '@media (max-width: 800px)': {
-      width: '200px', //alterei aqui
+      width: '200px',
       height: '550px',
       border: 'none',
       borderRadius: '0px',
@@ -81,6 +85,7 @@ const styles = {
 
   clientConditionButton: {
     fontSize: '12px',
+    fontWeight: '600',
     '@media (max-width: 1050px)': {
       fontSize: '10px',
     },

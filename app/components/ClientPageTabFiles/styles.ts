@@ -115,10 +115,12 @@ const styles = {
     backgroundColor: (theme: Theme) =>
       theme.palette.mode === 'light'
         ? theme.palette.background.default
-        : theme.palette.background.default, // Azul claro
+        : theme.palette.background.default,
     padding: '8px 16px',
-    borderRadius: '4px',
+    borderRadius: '10px',
     marginBottom: '8px',
+
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
 
     '@media (max-width:1025px)': {
       width: '500px',

@@ -171,24 +171,27 @@ export default function ExcelDownloadFileComponent() {
             atual.
           </Typography>
         </Box>
-      </Box>
-      <Box sx={styles.boxUploadIcon}>
-        <Typography
-          variant="h6"
-          sx={{ ...sharedStyles.subtitleSize, fontSize: '14px' }}
-        >
-          Anexar Planilha
-        </Typography>
-        <Tooltip title="Inserir nova planilha" arrow>
-          <IconButton component="label">
-            {loadingUpload ? (
-              <CircularProgress size={24} /> // Exibe o CircularProgress durante o upload
-            ) : (
-              <AttachFileIcon sx={styles.iconUpload} /> // Exibe o ícone normal se não estiver carregando
-            )}
-            <input type="file" accept="*" onChange={handleUpload} hidden />
-          </IconButton>
-        </Tooltip>
+        <Box sx={styles.boxUploadIcon}>
+          <Typography
+            variant="h6"
+            sx={{
+              ...sharedStyles.subtitleSize,
+              fontSize: '14px',
+            }}
+          >
+            Anexar Planilha
+          </Typography>
+          <Tooltip title="Inserir nova planilha" arrow>
+            <IconButton component="label">
+              {loadingUpload ? (
+                <CircularProgress size={24} /> // Exibe o CircularProgress durante o upload
+              ) : (
+                <AttachFileIcon sx={styles.iconUpload} /> // Exibe o ícone normal se não estiver carregando
+              )}
+              <input type="file" accept="*" onChange={handleUpload} hidden />
+            </IconButton>
+          </Tooltip>
+        </Box>
       </Box>
 
       {loading ? (

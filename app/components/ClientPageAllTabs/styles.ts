@@ -26,13 +26,15 @@ const styles = {
   contentTabs: {
     background: (theme: Theme) =>
       theme.palette.mode === 'light'
-        ? theme.palette.background.paper
+        ? theme.palette.background.default
         : theme.palette.background.alternative,
 
-    border: '3px solid',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
+    borderRadius: '16px',
+
+    /* Borda orange     border: '3px solid', 
     borderColor: (theme: Theme) =>
-      theme.palette.mode === 'light' ? orange[500] : orange[800],
-    borderRadius: '10px',
+      theme.palette.mode === 'light' ? orange[500] : orange[800], */
     padding: '20px',
     display: 'flex',
     flexDirection: 'column',

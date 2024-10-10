@@ -13,6 +13,7 @@ const styles = {
     textAlign: 'center',
     width: '100%',
     height: '300px',
+
     /*     borderRadius: 4,
     border: '3px solid',
     borderColor: (theme: Theme) =>
@@ -44,12 +45,17 @@ const styles = {
   fileList: {
     background: (theme: Theme) =>
       theme.palette.mode === 'light'
-        ? theme.palette.background.alternative
-        : theme.palette.background.alternative,
+        ? theme.palette.background.default
+        : theme.palette.background.default,
 
-    /*     justifyContent: 'center',
-    alignItens: 'center', */
     border: 'none',
+    borderRadius: '12px',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+    transition: 'transform 0.1s ease',
+    '&:hover': {
+      transform: 'scale(1.05)',
+    },
+
     marginBottom: '10px',
     width: '100%',
 
@@ -99,12 +105,24 @@ const styles = {
   },
 
   boxUploadIcon: {
+    background: (theme: Theme) =>
+      theme.palette.mode === 'light'
+        ? theme.palette.background.alternative
+        : theme.palette.background.alternative,
     my: 4,
     display: 'flex',
-    /*  flexDirection: 'column', */
+    flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    /* background: 'grey', */
+    borderRadius: '12px',
+    border: 'none',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+    width: '200px',
+
+    transition: 'transform 0.1s ease',
+    '&:hover': {
+      transform: 'scale(1.10)',
+    },
 
     '@media (max-width: 600px)': {
       width: '100%',

@@ -216,7 +216,7 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
                     maxRows={6}
                     variant="filled"
                     disabled={readOnly}
-                    sx={{ width: '100%' }}
+                    sx={styles.inputsBg}
                   />
                 )}
               />

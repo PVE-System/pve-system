@@ -17,6 +17,7 @@ const styles = {
     flexDirection: 'column',
     gap: '20px',
     width: '70%',
+
     '@media (max-width: 800px)': {
       width: '100%',
     },
@@ -25,6 +26,15 @@ const styles = {
   inputsCol2: {
     width: '100%',
     marginBottom: '20px',
+  },
+
+  inputsBg: {
+    width: '100%',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+    backgroundColor: (theme: Theme) =>
+      theme.palette.mode === 'light'
+        ? theme.palette.background.default
+        : theme.palette.background.default,
   },
 
   boxIconsAndName: {

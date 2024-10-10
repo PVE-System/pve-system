@@ -12,6 +12,7 @@ import {
   IconButton,
   CircularProgress,
   Container,
+  Tooltip,
 } from '@mui/material';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import GetAppIcon from '@mui/icons-material/GetApp';
@@ -32,6 +33,9 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
   const [loading, setLoading] = useState(true);
   const [tabIndex, setTabIndex] = useState(0);
   const [files, setFiles] = useState<any[]>([]);
+  const [loadingUpload, setLoadingUpload] = useState(false);
+  const [loadingDownload, setLoadingDownload] = useState<string | null>(null);
+  const [loadingDelete, setLoadingDelete] = useState<string | null>(null);
 
   const fetchClientData = useCallback(async () => {
     try {
@@ -98,6 +102,7 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
   ) => {
     const files = event.target.files;
     if (files) {
+      setLoadingUpload(true);
       const formData = new FormData();
       formData.append('file', files[0]);
       const folder =
@@ -133,11 +138,14 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
         }
       } catch (error) {
         console.error('Error uploading file:', error);
+      } finally {
+        setLoadingUpload(false);
       }
     }
   };
 
   const handleDeleteFile = async (fileUrl: string) => {
+    setLoadingDelete(fileUrl);
     try {
       const response = await fetch(
         `/api/deleteFilesClient?fileUrl=${encodeURIComponent(fileUrl)}`,
@@ -166,10 +174,13 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
       }
     } catch (error) {
       console.error('Error deleting file:', error);
+    } finally {
+      setLoadingDelete(null);
     }
   };
 
   const handleDownloadFile = (fileUrl: string) => {
+    setLoadingDownload(fileUrl);
     const link = document.createElement('a');
     link.href = fileUrl;
     link.target = '_blank'; // Abre em uma nova aba
@@ -178,6 +189,7 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
     document.body.appendChild(link); // Adiciona o link temporariamente ao DOM
     link.click(); // Simula o clique para abrir a nova aba e iniciar o download
     document.body.removeChild(link); // Remove o link após o clique
+    setLoadingDownload(null);
   };
 
   if (loading) {
@@ -252,15 +264,21 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
             </Tabs>
 
             <Box sx={styles.boxIconUpload}>
-              <IconButton component="label">
-                <AttachFileIcon sx={styles.iconUpload} />
-                <input
-                  type="file"
-                  accept="*"
-                  onChange={handleFileChange}
-                  hidden
-                />
-              </IconButton>
+              <Tooltip title={'Insira um novo arquivo'}>
+                <IconButton component="label" disabled={loadingUpload}>
+                  {loadingUpload ? (
+                    <CircularProgress size={24} />
+                  ) : (
+                    <AttachFileIcon sx={styles.iconUpload} />
+                  )}
+                  <input
+                    type="file"
+                    accept="*"
+                    onChange={handleFileChange}
+                    hidden
+                  />
+                </IconButton>
+              </Tooltip>
             </Box>
             <Box>
               <List>
@@ -283,7 +301,7 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
                                 .split('-')
                                 .pop()
                                 .match(/\.[0-9a-z]+$/i)[0]
-                            : file.name // Fallback para exibir o nome como está, caso não seja possível dividir
+                            : file.name
                         }
                         secondary={new Date(file.date).toLocaleDateString(
                           'pt-BR',
@@ -291,22 +309,40 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
                         primaryTypographyProps={{
                           sx: {
                             fontSize: {
-                              xs: '12px', // Tamanho do texto para telas menores
-                              md: '16px', // Tamanho do texto para telas maiores
+                              xs: '10px',
+                              md: '14px',
                             },
                           },
                         }}
                         secondaryTypographyProps={{
+                          fontSize: {
+                            xs: '12px',
+                            md: '14px',
+                          },
                           style: { color: 'darkOrange' },
                         }}
                       />
                     </Box>
                     <Box>
-                      <IconButton onClick={() => handleDownloadFile(file.url)}>
-                        <GetAppIcon sx={styles.iconDownload} />
+                      <IconButton
+                        onClick={() => handleDownloadFile(file.url)}
+                        disabled={loadingDownload === file.url}
+                      >
+                        {loadingDownload === file.url ? (
+                          <CircularProgress size={24} />
+                        ) : (
+                          <GetAppIcon sx={styles.iconDownload} />
+                        )}
                       </IconButton>
-                      <IconButton onClick={() => handleDeleteFile(file.url)}>
-                        <DeleteIcon sx={styles.iconDelete} />
+                      <IconButton
+                        onClick={() => handleDeleteFile(file.url)}
+                        disabled={loadingDelete === file.url}
+                      >
+                        {loadingDelete === file.url ? (
+                          <CircularProgress size={24} />
+                        ) : (
+                          <DeleteIcon sx={styles.iconDelete} />
+                        )}
                       </IconButton>
                     </Box>
                   </ListItem>
