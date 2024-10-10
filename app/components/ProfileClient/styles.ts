@@ -22,10 +22,9 @@ const styles = {
     boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
 
     '@media (max-width: 800px)': {
-      width: '200px',
-      height: '550px',
-      border: 'none',
-      borderRadius: '0px',
+      width: '240px',
+      height: 'autopx',
+
       /* borderBottom: '1px solid', */
       background: (theme: Theme) =>
         theme.palette.mode === 'light'

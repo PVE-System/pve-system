@@ -5,16 +5,17 @@ const styles = {
   container: {
     background: (theme: Theme) =>
       theme.palette.mode === 'light'
-        ? theme.palette.background.paper
+        ? theme.palette.background.default
         : theme.palette.background.alternative,
 
-    border: '3px solid',
-    borderColor: (theme: Theme) =>
-      theme.palette.mode === 'light' ? orange[500] : orange[800], //ORANGE mais claro
-    borderRadius: '10px',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
+    borderRadius: '16px',
     padding: '20px',
     display: 'flex',
     flexDirection: 'column',
+
+    /* borderColor: (theme: Theme) =>
+      theme.palette.mode === 'light' ? orange[500] : orange[800], */
   },
 
   boxContent: {
@@ -104,6 +105,7 @@ const styles = {
     flexDirection: 'column',
     gap: '20px',
     width: '70%',
+
     '@media (max-width: 800px)': {
       width: '100%',
     },

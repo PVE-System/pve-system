@@ -41,6 +41,7 @@ interface ClientTotals {
 const DashboardComponent = () => {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+
   const [clientData, setClientData] = useState<ClientTotals>({
     Normal: 0,
     Especial: 0,

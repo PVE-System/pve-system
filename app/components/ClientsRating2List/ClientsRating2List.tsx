@@ -15,7 +15,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { Rating } from '@mui/material';
-import styles from '../ClientsNormalList/styles';
+import styles from '../ClientsMsList/styles';
 
 interface Client {
   id: string;
