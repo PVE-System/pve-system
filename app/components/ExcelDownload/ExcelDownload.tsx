@@ -221,14 +221,14 @@ export default function ExcelDownloadFileComponent() {
                         flex: 1,
                       }}
                     >
-                      Planilha Excel Atualizada em:{' '}
+                      Planilha atualizada no dia:{' '}
                       <span>
                         {new Date(file.date).toLocaleDateString('pt-BR')}
                       </span>
                     </Typography>
                     <Tooltip title="Baixar Planilha" arrow>
                       <IconButton
-                        color="primary"
+                        color="secondary"
                         onClick={() => handleDownload(file.url)}
                         disabled={isDownloading}
                       >

@@ -11,6 +11,7 @@ import {
   Typography,
   Container,
   CircularProgress,
+  Tooltip,
 } from '@mui/material';
 import { useState } from 'react';
 import Image from 'next/image';
@@ -184,9 +185,11 @@ function RegisterTeamComponent() {
           </Button>
           <Grid container>
             <Grid item xs>
-              <Link href="/administerUsersTeam" variant="body2">
-                Administrar Equipe
-              </Link>
+              <Tooltip title={'Gerenciar todos os usuários'}>
+                <Link href="/administerUsersTeam" variant="body2">
+                  Gerenciar Equipe
+                </Link>
+              </Tooltip>
             </Grid>
             <Grid item>
               <Link href="#" onClick={logout} variant="body2">

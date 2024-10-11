@@ -1,5 +1,5 @@
 import { Theme } from '@mui/material';
-import { orange, red } from '@mui/material/colors';
+import { grey, orange, red } from '@mui/material/colors';
 
 const styles = {
   card: {
@@ -45,12 +45,12 @@ const styles = {
   fileList: {
     background: (theme: Theme) =>
       theme.palette.mode === 'light'
-        ? theme.palette.background.default
+        ? theme.palette.background.paper
         : theme.palette.background.default,
 
     border: 'none',
     borderRadius: '12px',
-    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
     transition: 'transform 0.1s ease',
     '&:hover': {
       transform: 'scale(1.05)',
@@ -107,7 +107,7 @@ const styles = {
   boxUploadIcon: {
     background: (theme: Theme) =>
       theme.palette.mode === 'light'
-        ? theme.palette.background.alternative
+        ? grey[300]
         : theme.palette.background.alternative,
     my: 4,
     display: 'flex',

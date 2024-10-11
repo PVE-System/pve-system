@@ -207,9 +207,11 @@ export default function TemporaryDrawer() {
           </Box>
           <Box sx={styles.iconLogout}>
             <Link onClick={logout}>
-              <IconButton>
-                <LogoutIcon />
-              </IconButton>
+              <Tooltip title={'Sair do sistema'}>
+                <IconButton>
+                  <LogoutIcon />
+                </IconButton>
+              </Tooltip>
             </Link>
           </Box>
         </Box>

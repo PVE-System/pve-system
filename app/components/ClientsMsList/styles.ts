@@ -44,7 +44,11 @@ const styles = {
   rowHover: {
     cursor: 'pointer',
     '&:hover': {
-      backgroundColor: grey[500],
+      /* backgroundColor: grey[500], */
+      backgroundColor: (theme: Theme) =>
+        theme.palette.mode === 'light'
+          ? theme.palette.background.default
+          : grey[700],
     },
   },
   textLink: {

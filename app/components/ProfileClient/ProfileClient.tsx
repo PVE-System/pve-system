@@ -13,6 +13,7 @@ import {
 import { Controller, useForm } from 'react-hook-form';
 import Image from 'next/image';
 import styles from '@/app/components/ProfileClient/styles';
+import { orange } from '@mui/material/colors';
 
 interface ClientProfileProps {
   rating: number;
@@ -96,7 +97,7 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
           />
         )}
         {showTooltip ? (
-          <Tooltip title="Por favor, primeiro conclua o cadastro do cliente e depois escolha a foto de perfil">
+          <Tooltip title="Primeiro conclua o cadastro do cliente e depois escolha a foto do perfil">
             <Image
               src={previewImage || imageUrl || '/profile-placeholder.png'}
               alt="Profile Picture"
@@ -118,7 +119,9 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
         )}
       </label>
       <Box sx={styles.statusRating}>
-        <Typography variant="subtitle2">Status de Atividade:</Typography>
+        <Tooltip title="Relacionado ao faturamento e frequência de pedidos deste cliente">
+          <Typography variant="subtitle2">Status de Atividade:</Typography>
+        </Tooltip>
         <Controller
           name="rating"
           control={control}
@@ -141,7 +144,9 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
         />
       </Box>
       <Box sx={styles.clientCondition}>
-        <Typography variant="subtitle2">Condição do Cliente:</Typography>
+        <Tooltip title="Relacionado a condição deste cliente">
+          <Typography variant="subtitle2">Condição do Cliente:</Typography>
+        </Tooltip>
         <Box sx={styles.clientConditionButtonBox}>
           <Button
             variant="outlined"
@@ -169,7 +174,7 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
             sx={{
               ...styles.clientConditionButton,
               ...(clientCondition === 'Especial' && {
-                backgroundColor: '#FFD700',
+                backgroundColor: 'orange',
                 border: 'none',
                 color: 'black',
               }),

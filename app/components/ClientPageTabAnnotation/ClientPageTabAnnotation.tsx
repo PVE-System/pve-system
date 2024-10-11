@@ -7,6 +7,7 @@ import {
   CircularProgress,
   IconButton,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
@@ -17,6 +18,7 @@ import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
 import styles from '@/app/components/ClientPageTabAnnotation/styles';
 import { useRouter } from 'next/navigation';
 import { ptBR } from 'date-fns/locale';
+import { orange } from '@mui/material/colors';
 
 interface ClientPageTabAnnotationProps {
   clientId: string;
@@ -291,31 +293,37 @@ const ClientPageTabAnnotation: React.FC<ClientPageTabAnnotationProps> = ({
                     </Typography>
                   </Box>
                   <Box sx={styles.commentsContent}>
-                    <IconButton
-                      onClick={() => handleFavorite(comment.id)}
-                      disabled={loadingFavorite === comment.id}
-                    >
-                      {loadingFavorite === comment.id ? (
-                        <CircularProgress size={24} />
-                      ) : (
-                        <FlagIcon
-                          sx={{
-                            color: comment.favorite ? 'orange' : 'darkgrey',
-                            ...styles.commentsIcons,
-                          }}
-                        />
-                      )}
-                    </IconButton>
-                    <IconButton
-                      onClick={() => handleDelete(comment.id)}
-                      disabled={loadingDelete === comment.id}
-                    >
-                      {loadingDelete === comment.id ? (
-                        <CircularProgress size={24} />
-                      ) : (
-                        <DeleteIcon sx={styles.commentsIcons} />
-                      )}
-                    </IconButton>
+                    <Tooltip title={'Favoritar ou desfavoritar comentário'}>
+                      <IconButton
+                        onClick={() => handleFavorite(comment.id)}
+                        disabled={loadingFavorite === comment.id}
+                      >
+                        {loadingFavorite === comment.id ? (
+                          <CircularProgress size={24} />
+                        ) : (
+                          <FlagIcon
+                            sx={{
+                              color: comment.favorite
+                                ? orange[800]
+                                : 'darkgrey',
+                              width: 20,
+                            }}
+                          />
+                        )}
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title={'Deletar comentário'}>
+                      <IconButton
+                        onClick={() => handleDelete(comment.id)}
+                        disabled={loadingDelete === comment.id}
+                      >
+                        {loadingDelete === comment.id ? (
+                          <CircularProgress size={24} />
+                        ) : (
+                          <DeleteIcon sx={styles.commentsIcons} />
+                        )}
+                      </IconButton>
+                    </Tooltip>
                   </Box>
                 </Box>
               ))}

@@ -1,4 +1,4 @@
-import { grey, orange } from '@mui/material/colors';
+import { grey, orange, red } from '@mui/material/colors';
 import { Theme } from '@mui/material/styles/createTheme';
 
 const styles = {
@@ -8,23 +8,16 @@ const styles = {
         ? theme.palette.background.paper
         : theme.palette.background.alternative,
 
-    border: '3px solid',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
+
+    /*     border: '3px solid',
     borderColor: (theme: Theme) =>
-      theme.palette.mode === 'light' ? orange[500] : orange[800],
-    borderRadius: '10px',
+      theme.palette.mode === 'light' ? orange[500] : orange[800], */
+    borderRadius: '16px',
     padding: '20px',
     display: 'flex',
     flexDirection: 'column',
   },
-
-  /*  boxContent: {
-    display: 'flex',
-    flexDirection: { xs: 'column', md: 'row' },
-    gap: '20px',
-    '@media (max-width: 800px)': {
-      alignItems: 'center',
-    },
-  }, */
 
   fontSize: {
     fontSize: '16px',
@@ -34,20 +27,41 @@ const styles = {
     },
   },
 
-  /*  buttonTagCondition: {
-    minWidth: '80px',
-    fontSize: '10px',
-  }, */
-
   rowHover: {
     cursor: 'pointer',
     '&:hover': {
-      backgroundColor: grey[500],
+      /* backgroundColor: grey[500], */
+      backgroundColor: (theme: Theme) =>
+        theme.palette.mode === 'light'
+          ? theme.palette.background.default
+          : grey[700],
     },
   },
-  /* textLink: {
-    color: (theme: Theme) => theme.palette.text.primary,
-  }, */
+  /*ICONES*/
+  iconDelete: {
+    cursor: 'pointer',
+
+    transition: 'color 0.3s',
+    color: (theme: Theme) =>
+      theme.palette.mode === 'light'
+        ? theme.palette.secondary.main
+        : theme.palette.secondary.main,
+    '&:hover': {
+      color: red[600],
+    },
+  },
+
+  iconEdit: {
+    cursor: 'pointer',
+    transition: 'color 0.3s',
+    color: (theme: Theme) =>
+      theme.palette.mode === 'light'
+        ? theme.palette.secondary.main
+        : theme.palette.secondary.main,
+    '&:hover': {
+      color: orange[800],
+    },
+  },
 };
 
 export default styles;

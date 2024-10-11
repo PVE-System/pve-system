@@ -114,10 +114,12 @@ const ClientSuspendedList = () => {
                     </TableCell>
                     <TableCell sx={styles.fontSize}>
                       <Button
-                        sx={styles.buttonTagCondition}
+                        sx={{
+                          ...styles.buttonTagCondition,
+                          backgroundColor: 'red',
+                        }}
                         variant="contained"
                         size="small"
-                        color="error"
                       >
                         Suspenso
                       </Button>

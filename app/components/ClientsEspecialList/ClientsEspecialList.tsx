@@ -114,10 +114,13 @@ const ClientEspecialList = () => {
                     </TableCell>
                     <TableCell sx={styles.fontSize}>
                       <Button
-                        sx={styles.buttonTagCondition}
+                        sx={{
+                          ...styles.buttonTagCondition,
+                          backgroundColor: 'orange',
+                          color: 'black',
+                        }}
                         variant="contained"
                         size="small"
-                        color="warning"
                       >
                         Especial
                       </Button>

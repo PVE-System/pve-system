@@ -324,26 +324,30 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
                       />
                     </Box>
                     <Box>
-                      <IconButton
-                        onClick={() => handleDownloadFile(file.url)}
-                        disabled={loadingDownload === file.url}
-                      >
-                        {loadingDownload === file.url ? (
-                          <CircularProgress size={24} />
-                        ) : (
-                          <GetAppIcon sx={styles.iconDownload} />
-                        )}
-                      </IconButton>
-                      <IconButton
-                        onClick={() => handleDeleteFile(file.url)}
-                        disabled={loadingDelete === file.url}
-                      >
-                        {loadingDelete === file.url ? (
-                          <CircularProgress size={24} />
-                        ) : (
-                          <DeleteIcon sx={styles.iconDelete} />
-                        )}
-                      </IconButton>
+                      <Tooltip title={'Arquivo para download'}>
+                        <IconButton
+                          onClick={() => handleDownloadFile(file.url)}
+                          disabled={loadingDownload === file.url}
+                        >
+                          {loadingDownload === file.url ? (
+                            <CircularProgress size={24} />
+                          ) : (
+                            <GetAppIcon sx={styles.iconDownload} />
+                          )}
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title={'Deletar Arquivo'}>
+                        <IconButton
+                          onClick={() => handleDeleteFile(file.url)}
+                          disabled={loadingDelete === file.url}
+                        >
+                          {loadingDelete === file.url ? (
+                            <CircularProgress size={24} />
+                          ) : (
+                            <DeleteIcon sx={styles.iconDelete} />
+                          )}
+                        </IconButton>
+                      </Tooltip>
                     </Box>
                   </ListItem>
                 ))}
