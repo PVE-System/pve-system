@@ -114,10 +114,12 @@ const ClientNormalList = () => {
                     </TableCell>
                     <TableCell sx={styles.fontSize}>
                       <Button
-                        sx={styles.buttonTagCondition}
+                        sx={{
+                          ...styles.buttonTagCondition,
+                          backgroundColor: 'green',
+                        }}
                         variant="contained"
                         size="small"
-                        color="success"
                       >
                         Normal
                       </Button>

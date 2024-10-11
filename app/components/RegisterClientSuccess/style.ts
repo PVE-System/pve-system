@@ -12,10 +12,11 @@ const styles = {
     textAlign: 'center',
     width: '100%',
     height: '300px',
-    borderRadius: 4,
-    border: '3px solid',
-    borderColor: (theme: Theme) =>
-      theme.palette.mode === 'light' ? orange[500] : orange[800],
+    borderRadius: '16px',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
+
+    /*   borderColor: (theme: Theme) =>
+      theme.palette.mode === 'light' ? orange[500] : orange[800], */
 
     '@media (max-width:450px)': {
       flexDirection: 'column',

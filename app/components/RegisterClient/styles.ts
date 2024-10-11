@@ -127,9 +127,14 @@ const styles = {
   },
 
   registerButton: {
-    background: (theme: Theme) => theme.palette.primary.main,
     marginTop: '20px',
-
+    backgroundColor: 'green',
+    '&:hover': {
+      backgroundColor: 'darkgreen',
+      '@media (max-width: 800px)': {
+        alignSelf: 'center',
+      },
+    },
     '@media (max-width: 800px)': {
       alignSelf: 'center',
     },

@@ -114,18 +114,33 @@ const ClientsRating3List = () => {
                     </TableCell>
                     <TableCell sx={styles.fontSize}>
                       <Button
-                        sx={styles.buttonTagCondition}
+                        sx={{
+                          ...styles.buttonTagCondition,
+                          backgroundColor:
+                            client.clientCondition === 'Normal'
+                              ? 'green'
+                              : client.clientCondition === 'Especial'
+                                ? 'orange'
+                                : client.clientCondition === 'Suspenso'
+                                  ? 'red'
+                                  : 'grey',
+                          color:
+                            client.clientCondition === 'Especial'
+                              ? 'black'
+                              : 'white',
+                          '&:hover': {
+                            backgroundColor:
+                              client.clientCondition === 'Normal'
+                                ? ' green' // Cor de fundo do hover para 'Normal'
+                                : client.clientCondition === 'Especial'
+                                  ? ' orange' // Cor de fundo do hover para 'Especial'
+                                  : client.clientCondition === 'Suspenso'
+                                    ? ' red' // Cor de fundo do hover para 'Suspenso'
+                                    : 'grey',
+                          },
+                        }}
                         variant="contained"
                         size="small"
-                        color={
-                          client.clientCondition === 'Normal'
-                            ? 'success'
-                            : client.clientCondition === 'Especial'
-                              ? 'warning'
-                              : client.clientCondition === 'Suspenso'
-                                ? 'error'
-                                : 'inherit'
-                        }
                       >
                         {client.clientCondition}
                       </Button>

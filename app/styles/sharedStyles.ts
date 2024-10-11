@@ -1,4 +1,5 @@
-import { orange } from '@mui/material/colors';
+import { orange, red } from '@mui/material/colors';
+import { Theme } from '@mui/material/styles/createTheme';
 
 const sharedStyles = {
   container: {
@@ -16,6 +17,7 @@ const sharedStyles = {
   titlePage: {
     fontFamily: `'Raleway', sans-serif`,
     fontSize: '32px',
+    fontWeight: '600',
     margin: '8px',
     textAlign: 'center',
     '& span': {
@@ -38,6 +40,7 @@ const sharedStyles = {
 
   subtitleSize: {
     fontFamily: `'Montserrat', sans-serif`,
+
     // FontSize Desktop
     fontSize: '18px',
     // FontSize Notebook

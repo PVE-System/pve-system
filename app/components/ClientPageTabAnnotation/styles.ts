@@ -1,3 +1,4 @@
+import { green, red } from '@mui/material/colors';
 import { Theme } from '@mui/material/styles/createTheme';
 
 const styles = {
@@ -77,6 +78,9 @@ const styles = {
 
   commentsIcons: {
     width: 20,
+    '&:hover': {
+      color: red[600],
+    },
   },
 
   loadComponent: {

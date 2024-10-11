@@ -359,7 +359,7 @@ const RegisterClient: React.FC = () => {
                   disabled={loading}
                   sx={{
                     ...styles.registerButton,
-                    ...sharedStyles.buttonFontFamily,
+                    /* ...sharedStyles.buttonFontFamily, */
                   }}
                 >
                   {loading ? (

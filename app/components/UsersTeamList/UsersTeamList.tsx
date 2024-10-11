@@ -14,9 +14,11 @@ import {
   TableRow,
   TextField,
   Container,
+  Tooltip,
 } from '@mui/material';
 import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
 import styles from './style';
+import sharedStyles from '@/app/styles/sharedStyles';
 
 export interface User {
   id: number;
@@ -116,9 +118,9 @@ export default function UsersTeamList() {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell sx={styles.fontSize}>Nome</TableCell>
-              <TableCell sx={styles.fontSize}>Email</TableCell>
-              <TableCell sx={styles.fontSize}>Ações</TableCell>
+              <TableCell sx={styles.fontSize}>Nome:</TableCell>
+              <TableCell sx={styles.fontSize}>Email:</TableCell>
+              <TableCell sx={styles.fontSize}>Ações:</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -154,7 +156,18 @@ export default function UsersTeamList() {
                         />
                       </TableCell>
                       <TableCell sx={styles.fontSize}>
-                        <Button onClick={handleSave} disabled={loading}>
+                        <Button
+                          onClick={handleSave}
+                          disabled={loading}
+                          sx={{
+                            backgroundColor: 'green',
+                            color: 'white', // Define a cor do texto para branco
+                            width: '80%',
+                            '&:hover': {
+                              backgroundColor: 'darkgreen', // Cor para o estado de hover
+                            },
+                          }}
+                        >
                           {loading ? <CircularProgress size={20} /> : 'Salvar'}
                         </Button>
                       </TableCell>
@@ -164,19 +177,27 @@ export default function UsersTeamList() {
                       <TableCell sx={styles.fontSize}>{user.name}</TableCell>
                       <TableCell sx={styles.fontSize}>{user.email}</TableCell>
                       <TableCell sx={styles.fontSize}>
-                        <IconButton onClick={() => handleEdit(user)}>
-                          <EditIcon />
-                        </IconButton>
-                        <IconButton
-                          onClick={() => handleDelete(user.id)}
-                          disabled={deleteLoading === user.id}
-                        >
-                          {deleteLoading === user.id ? (
-                            <CircularProgress size={24} />
-                          ) : (
-                            <DeleteIcon />
-                          )}
-                        </IconButton>
+                        <Tooltip title={'Editar usuário'}>
+                          <IconButton
+                            onClick={() => handleEdit(user)}
+                            sx={styles.iconEdit}
+                          >
+                            <EditIcon />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title={'Deletar usuário'}>
+                          <IconButton
+                            sx={styles.iconDelete}
+                            onClick={() => handleDelete(user.id)}
+                            disabled={deleteLoading === user.id}
+                          >
+                            {deleteLoading === user.id ? (
+                              <CircularProgress size={24} />
+                            ) : (
+                              <DeleteIcon />
+                            )}
+                          </IconButton>
+                        </Tooltip>
                       </TableCell>
                     </>
                   )}

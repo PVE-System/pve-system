@@ -21,6 +21,7 @@ import sharedStyles from '@/app/styles/sharedStyles';
 import styles from './styles';
 import { Rating } from '@mui/material';
 import dynamic from 'next/dynamic';
+import { red } from '@mui/material/colors';
 
 const DynamicChartComponent = dynamic(
   () => import('@/app/components/PieChart/PieChart'),
@@ -144,8 +145,10 @@ const DashboardComponent = () => {
                 sx={{
                   ...styles.cardButton,
                   backgroundColor: 'green',
+                  fontWeight: '600',
+                  color: 'white',
                   '&:hover': {
-                    backgroundColor: 'green',
+                    backgroundColor: 'darkgreen',
                   },
                 }}
               >
@@ -177,8 +180,10 @@ const DashboardComponent = () => {
                 sx={{
                   ...styles.cardButton,
                   backgroundColor: 'orange',
+                  fontWeight: '600',
+                  color: 'black',
                   '&:hover': {
-                    backgroundColor: 'orange',
+                    backgroundColor: 'darkorange',
                   },
                 }}
               >
@@ -208,9 +213,11 @@ const DashboardComponent = () => {
                 sx={{
                   ...styles.cardButton,
                   backgroundColor: 'red',
+                  fontWeight: '600',
+                  color: 'white',
 
                   '&:hover': {
-                    backgroundColor: 'red',
+                    backgroundColor: red[600],
                   },
                 }}
                 onClick={() => (window.location.href = '/clientsSuspendedList')}
