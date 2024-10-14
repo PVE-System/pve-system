@@ -12,6 +12,7 @@ import {
   Container,
   CircularProgress,
   Tooltip,
+  MenuItem,
 } from '@mui/material';
 import { useState } from 'react';
 import Image from 'next/image';
@@ -27,6 +28,7 @@ function RegisterTeamComponent() {
     password: '',
     confirmPassword: '',
     name: '',
+    role: 'vendedor', // Valor padrão
   });
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false); // Estado de carregamento
@@ -79,6 +81,7 @@ function RegisterTeamComponent() {
           email: formData.email,
           password: formData.password,
           name: formData.name,
+          role: formData.role,
         }),
       });
 
@@ -88,6 +91,7 @@ function RegisterTeamComponent() {
           password: '',
           confirmPassword: '',
           name: '',
+          role: 'vendedor',
         });
         setMessage('Usuário cadastrado com sucesso!');
       } else {
@@ -159,6 +163,22 @@ function RegisterTeamComponent() {
               pattern: '(?=.*[A-Z])(?=.*[0-9]).{6,}',
             }}
           />
+
+          <TextField
+            select
+            margin="normal"
+            required
+            fullWidth
+            name="role"
+            label="Função"
+            id="role"
+            value={formData.role}
+            onChange={handleChange}
+          >
+            <MenuItem value="vendedor">Vendedor</MenuItem>
+            <MenuItem value="admin">Admin</MenuItem>
+          </TextField>
+
           <TextField
             margin="normal"
             required

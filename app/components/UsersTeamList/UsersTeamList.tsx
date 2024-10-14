@@ -15,6 +15,7 @@ import {
   TextField,
   Container,
   Tooltip,
+  MenuItem,
 } from '@mui/material';
 import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
 import styles from './style';
@@ -24,6 +25,7 @@ export interface User {
   id: number;
   name: string;
   email: string;
+  role: string;
 }
 
 export default function UsersTeamList() {
@@ -73,7 +75,12 @@ export default function UsersTeamList() {
 
   const handleEdit = (user: User) => {
     setEditingUser(user.id);
-    setEditFormData({ id: user.id, name: user.name, email: user.email });
+    setEditFormData({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    });
   };
 
   const handleSave = async () => {
@@ -90,6 +97,7 @@ export default function UsersTeamList() {
           id: editFormData.id, // Passa o `id` no corpo da requisição
           name: editFormData.name,
           email: editFormData.email,
+          role: editFormData.role,
         }),
       });
 
@@ -118,9 +126,10 @@ export default function UsersTeamList() {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell sx={styles.fontSize}>Nome:</TableCell>
-              <TableCell sx={styles.fontSize}>Email:</TableCell>
-              <TableCell sx={styles.fontSize}>Ações:</TableCell>
+              <TableCell sx={styles.fontSize}>Nome</TableCell>
+              <TableCell sx={styles.fontSize}>Email</TableCell>
+              <TableCell sx={styles.fontSize}>Função</TableCell>
+              <TableCell sx={styles.fontSize}>Ações</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -156,15 +165,32 @@ export default function UsersTeamList() {
                         />
                       </TableCell>
                       <TableCell sx={styles.fontSize}>
+                        <TextField
+                          select
+                          label="Função"
+                          value={editFormData?.role || ''}
+                          onChange={(e) =>
+                            setEditFormData({
+                              ...editFormData!,
+                              role: e.target.value,
+                            })
+                          }
+                          fullWidth
+                        >
+                          <MenuItem value="vendedor">vendedor</MenuItem>
+                          <MenuItem value="admin">admin</MenuItem>
+                        </TextField>
+                      </TableCell>
+                      <TableCell sx={styles.fontSize}>
                         <Button
                           onClick={handleSave}
                           disabled={loading}
                           sx={{
                             backgroundColor: 'green',
-                            color: 'white', // Define a cor do texto para branco
+                            color: 'white',
                             width: '80%',
                             '&:hover': {
-                              backgroundColor: 'darkgreen', // Cor para o estado de hover
+                              backgroundColor: 'darkgreen',
                             },
                           }}
                         >
@@ -176,6 +202,7 @@ export default function UsersTeamList() {
                     <>
                       <TableCell sx={styles.fontSize}>{user.name}</TableCell>
                       <TableCell sx={styles.fontSize}>{user.email}</TableCell>
+                      <TableCell sx={styles.fontSize}>{user.role}</TableCell>
                       <TableCell sx={styles.fontSize}>
                         <Tooltip title={'Editar usuário'}>
                           <IconButton
@@ -205,7 +232,7 @@ export default function UsersTeamList() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={3} align="center">
+                <TableCell colSpan={4} align="center">
                   Nenhum usuário encontrado
                 </TableCell>
               </TableRow>
