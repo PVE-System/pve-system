@@ -25,6 +25,7 @@ export const users = pgTable(
     name: varchar('name'),
     imageUrl: varchar('imageUrl', { length: 512 }), // Adicionando o campo imageUrl
     createdAt: timestamp('createdAt').defaultNow().notNull(),
+    role: varchar('role', { length: 50 }).notNull().default('vendedor'),
   },
   (table) => {
     return {

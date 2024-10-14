@@ -37,7 +37,8 @@ export default function TemporaryDrawer() {
   const [userData, setUserData] = useState<{
     name: string;
     imageUrl: string | null;
-  }>({ name: '', imageUrl: null });
+    role: string;
+  }>({ name: '', imageUrl: null, role: '' });
   const [loading, setLoading] = useState(true);
   const { theme, toggleTheme } = useTheme();
   const isMobile = useMediaQuery('(max-width:600px)');
@@ -50,7 +51,11 @@ export default function TemporaryDrawer() {
         try {
           const response = await fetch(`/api/getUser/${userId}`);
           const data = await response.json();
-          setUserData({ name: data.name, imageUrl: data.imageUrl });
+          setUserData({
+            name: data.name,
+            imageUrl: data.imageUrl,
+            role: data.role,
+          });
         } catch (error) {
           console.error('Failed to fetch user data', error);
         } finally {
@@ -127,7 +132,8 @@ export default function TemporaryDrawer() {
             icon: <ArticleIcon />,
             link: '/excelDownloadFile',
           },
-          {
+          userData.role === 'admin' && {
+            // Verifica se o usuário é admin
             name: 'Cadastrar Equipe',
             icon: <GroupAddIcon />,
             link: '/registerTeam',
@@ -137,14 +143,19 @@ export default function TemporaryDrawer() {
             icon: <ManageAccountsIcon />,
             link: `/editProfile?id=${user?.id}`,
           },
-        ].map((item) => (
-          <ListItem key={item.name} disablePadding>
-            <ListItemButton component="a" href={item.link}>
-              <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.name} />
-            </ListItemButton>
-          </ListItem>
-        ))}
+        ]
+          .filter(
+            (item): item is { name: string; icon: JSX.Element; link: string } =>
+              Boolean(item),
+          ) // Filtra apenas itens válidos e assegura o tipo
+          .map((item) => (
+            <ListItem key={item.name} disablePadding>
+              <ListItemButton component="a" href={item.link}>
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.name} />
+              </ListItemButton>
+            </ListItem>
+          ))}
       </List>
     </div>
   );

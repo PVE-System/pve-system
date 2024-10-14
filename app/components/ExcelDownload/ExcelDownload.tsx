@@ -17,6 +17,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import styles from '@/app/components/ExcelDownload/style';
 import sharedStyles from '@/app/styles/sharedStyles';
+import Cookies from 'js-cookie';
+import AlertModal from '../AlertModalDelete/AlertModalDelete';
 
 interface ExcelFile {
   url: string;
@@ -30,6 +32,7 @@ export default function ExcelDownloadFileComponent() {
   const [loadingDownload, setLoadingDownload] = useState<string | null>(null);
   const [loadingDelete, setLoadingDelete] = useState<string | null>(null);
   const [loadingUpload, setLoadingUpload] = useState(false);
+  const [showAlertModal, setShowAlertModal] = useState(false);
 
   useEffect(() => {
     const fetchFiles = async () => {
@@ -131,7 +134,34 @@ export default function ExcelDownloadFileComponent() {
     }
   };
 
+  const fetchUserRole = async (userId: string): Promise<string | null> => {
+    try {
+      const response = await fetch(`/api/getUser/${userId}`);
+      if (!response.ok) {
+        console.error('Failed to fetch user role');
+        return null;
+      }
+      const data = await response.json();
+      return data.role;
+    } catch (error) {
+      console.error('Error fetching user role:', error);
+      return null;
+    }
+  };
+
   const handleDelete = async (fileUrl: string) => {
+    const userId = Cookies.get('userId'); // Pega o ID do usuário dos cookies
+    if (!userId) {
+      console.error('User ID is missing');
+      return;
+    }
+
+    const role = await fetchUserRole(userId);
+    if (role !== 'admin') {
+      setShowAlertModal(true); // Mostra o alerta se não for admin
+      return;
+    }
+
     if (!fileUrl) {
       console.error('File URL is missing');
       return;
@@ -158,7 +188,6 @@ export default function ExcelDownloadFileComponent() {
       setLoadingDelete(null); // Termina o carregamento
     }
   };
-
   return (
     <Container fixed>
       <Box sx={sharedStyles.container}>
@@ -256,6 +285,14 @@ export default function ExcelDownloadFileComponent() {
                 </Card>
               );
             })}
+          {showAlertModal && (
+            <AlertModal
+              open={showAlertModal} // Usar o estado `showAlertModal` aqui
+              onClose={() => setShowAlertModal(false)}
+              onConfirm={() => setShowAlertModal(false)} // Fechar o modal ao confirmar
+              message="Somente para usuários admin" // Mensagem para o usuário
+            />
+          )}
         </Box>
       )}
     </Container>

@@ -4,7 +4,7 @@ import { users } from '@/app/db/schema';
 import { eq } from 'drizzle-orm';
 
 export async function PUT(request: NextRequest) {
-  const { id, name, email } = await request.json(); // Recebendo `id`, `name` e `email` no corpo
+  const { id, name, email, role } = await request.json(); // Recebendo `id`, `name` e `email` no corpo
 
   if (!id) {
     return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
@@ -26,12 +26,14 @@ export async function PUT(request: NextRequest) {
       .set({
         name,
         email,
+        role,
       })
       .where(eq(users.id, id))
       .returning({
         id: users.id,
         name: users.name,
         email: users.email,
+        role: users.role,
       })
       .execute();
 
