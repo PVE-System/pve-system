@@ -26,6 +26,12 @@ export const users = pgTable(
     imageUrl: varchar('imageUrl', { length: 512 }), // Adicionando o campo imageUrl
     createdAt: timestamp('createdAt').defaultNow().notNull(),
     role: varchar('role', { length: 50 }).notNull().default('vendedor'),
+
+    // Colunas para recuperação de senha
+    resetToken: varchar('resetToken', { length: 256 }).default(''),
+    resetTokenExpiration: timestamp('resetTokenExpiration').default(
+      new Date(0),
+    ), // ou outro valor inicial de sua escolha
   },
   (table) => {
     return {
