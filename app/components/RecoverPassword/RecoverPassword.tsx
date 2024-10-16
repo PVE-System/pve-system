@@ -16,28 +16,11 @@ import Image from 'next/image';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import sharedStyles from '@/app/styles/sharedStyles';
-import styles from './styles';
+
 import { CircularProgress } from '@mui/material';
+import styles from './styles';
 
-function Copyright(props: any) {
-  return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}
-    >
-      {'Copyright © '}
-      <Link color="inherit" href="/">
-        PVE System
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
-
-export default function SignIn() {
+export default function RecoverPassword() {
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -48,30 +31,30 @@ export default function SignIn() {
 
     const formData = new FormData(event.currentTarget);
     const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
 
     try {
-      const response = await fetch('/api/loginAuth', {
+      const response = await fetch('/api/recoverPassword', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email }), // Só precisamos enviar o e-mail
       });
 
       if (response.ok) {
-        const { token, userId } = await response.json();
-        Cookies.set('token', token, { path: '/' });
-        Cookies.set('userId', userId, { path: '/' });
-        await router.push('/dashboard'); // Usa o router para redirecionar
+        // Exibe uma mensagem confirmando o envio do e-mail
+        setMessage('Um link de recuperação foi enviado para o seu e-mail.');
       } else {
         const error = await response.json();
-        setMessage(`${error.error}`);
+        setMessage(
+          error.error || 'Ocorreu um erro ao solicitar a recuperação de senha.',
+        );
       }
     } catch (error) {
+      console.error('Erro ao solicitar recuperação de senha:', error);
       setMessage('Erro ao conectar com o servidor');
     } finally {
-      setLoading(false); // Finaliza o estado de carregamento apenas se houver um erro
+      setLoading(false); // Finaliza o estado de carregamento
     }
   };
 
@@ -88,7 +71,7 @@ export default function SignIn() {
           />
         </Box>
         <Typography variant="subtitle1" sx={sharedStyles.titleForm}>
-          PVE Representações Ltda.
+          Insira o seu email de login para receber um link para alterar a senha.
         </Typography>
 
         {message && (
@@ -112,23 +95,9 @@ export default function SignIn() {
             name="email"
             autoComplete="email"
             autoFocus
+            sx={{ width: '400px', textAlign: 'center' }}
           />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-          />
-          <Box sx={sharedStyles.titleForm}>
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Lembrar-me"
-            />
-          </Box>
+
           <Button
             type="submit"
             fullWidth
@@ -136,15 +105,12 @@ export default function SignIn() {
             sx={styles.button}
             disabled={loading}
           >
-            {loading ? <CircularProgress size={24} /> : 'Entrar'}
+            {loading ? (
+              <CircularProgress size={24} />
+            ) : (
+              'Enviar link de recuperação'
+            )}
           </Button>
-          <Grid container>
-            <Grid item xs>
-              <Link href="recoverPassword" variant="body2">
-                Esqueceu a senha?
-              </Link>
-            </Grid>
-          </Grid>
         </Box>
       </Box>
     </Container>

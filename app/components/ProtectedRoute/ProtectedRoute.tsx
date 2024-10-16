@@ -14,7 +14,7 @@ interface ProtectedRouteProps {
 const ProtectedRoute = ({
   children,
   route,
-  unprotectedRoutes = ['/login', '/'],
+  unprotectedRoutes = ['/login', '/', '/recoverPassword'],
 }: ProtectedRouteProps) => {
   const router = useRouter();
   const pathname = usePathname();
