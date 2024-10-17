@@ -37,7 +37,8 @@
     "react-dom": "^18",
     "react-hook-form": "^7.52.2",
     "react-input-mask": "^2.0.4",
-    "recharts": "^2.12.4"
+    "recharts": "^2.12.4",
+    "resend": "^4.0.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
