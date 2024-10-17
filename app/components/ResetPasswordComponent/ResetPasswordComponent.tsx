@@ -29,9 +29,7 @@ export default function ResetPasswordComponent() {
     const formData = new FormData(event.currentTarget);
     const password = formData.get('password') as string;
     const confirmPassword = formData.get('confirmPassword') as string;
-    const token = searchParams.get('token'); // Captura o token da URL
-
-    console.log('Token capturado:', token); // Adicione isso para verificar o token
+    const token = searchParams.get('token');
 
     if (!token) {
       setMessage('Token de redefinição de senha inválido ou ausente.');
@@ -51,15 +49,17 @@ export default function ResetPasswordComponent() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ token, password }), // Envia o token e a nova senha
+        body: JSON.stringify({ token, password }),
       });
 
       if (response.ok) {
         setMessage('Senha redefinida com sucesso!');
-        setTimeout(() => router.push('/login'), 3000); // Redireciona para a página de login
+        router.push('/login');
       } else {
-        const error = await response.json();
-        setMessage(error.error || 'Erro ao redefinir a senha.');
+        const errorData = await response.json();
+        setMessage(
+          errorData.error || 'Ocorreu um erro na redefinição da senha.',
+        );
       }
     } catch (error) {
       console.error('Erro ao redefinir a senha:', error);
