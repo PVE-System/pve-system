@@ -5,10 +5,7 @@ import { useState } from 'react';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
-import Grid from '@mui/material/Grid';
+
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
@@ -33,7 +30,7 @@ export default function RecoverPassword() {
     const email = formData.get('email') as string;
 
     try {
-      const response = await fetch('/api/recoverPassword', {
+      const response = await fetch('/api/recoverPasswordResend', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -42,8 +39,10 @@ export default function RecoverPassword() {
       });
 
       if (response.ok) {
-        // Exibe uma mensagem confirmando o envio do e-mail
         setMessage('Um link de recuperação foi enviado para o seu e-mail.');
+        setTimeout(() => {
+          router.push('/');
+        }, 5000);
       } else {
         const error = await response.json();
         setMessage(
