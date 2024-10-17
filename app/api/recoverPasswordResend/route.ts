@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const response = await resend.emails.send({
-      from: 'PVE System <onboarding@resend.dev>',
+      from: 'PVE <onboarding@resend.dev>',
       to: email,
       subject: 'Recuperação de Senha',
       html: `<p>Clique aqui para redefinir sua senha: <a href="https://pve-system.vercel.app/resetPassword?token=${token}">Redefinir Senha</a></p>`,
