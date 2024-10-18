@@ -63,7 +63,8 @@ export default function SignIn() {
         const { token, userId } = await response.json();
         Cookies.set('token', token, { path: '/' });
         Cookies.set('userId', userId, { path: '/' });
-        await router.push('/dashboard'); // Usa o router para redirecionar
+        router.push('/dashboard'); // Redireciona sem necessidade de await
+        /* window.location.reload(); */ // Força a atualização da página
       } else {
         const error = await response.json();
         setMessage(`${error.error}`);
