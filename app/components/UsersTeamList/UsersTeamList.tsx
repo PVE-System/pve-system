@@ -16,6 +16,7 @@ import {
   Container,
   Tooltip,
   MenuItem,
+  useMediaQuery,
 } from '@mui/material';
 import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
 import styles from './style';
@@ -34,6 +35,7 @@ export default function UsersTeamList() {
   const [editingUser, setEditingUser] = useState<number | null>(null);
   const [deleteLoading, setDeleteLoading] = useState<number | null>(null);
   const [editFormData, setEditFormData] = useState<User | null>(null);
+  const isSmallScreen = useMediaQuery('(max-width:600px)');
 
   useEffect(() => {
     fetchUsers();
@@ -55,6 +57,28 @@ export default function UsersTeamList() {
   const handleDelete = async (id: number) => {
     setDeleteLoading(id);
     try {
+      // 1. Buscar arquivos associados ao usuário
+      const filesResponse = await fetch(
+        `/api/getAllFilesBlobByUser?userId=${id}`,
+      );
+      const filesData = await filesResponse.json();
+
+      if (filesResponse.ok && filesData.files.length > 0) {
+        // 2. Deletar os arquivos associados
+        console.log('Deleting associated files');
+        await fetch(`/api/deleteAllFilesBlobByUser`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            fileUrls: filesData.files.map((file: { url: any }) => file.url),
+          }),
+        });
+        console.log('Files deleted successfully');
+      }
+
+      // 3. Deletar o usuário do banco de dados
       const response = await fetch('/api/deleteUserByAdmin', {
         method: 'DELETE',
         headers: {
@@ -64,12 +88,17 @@ export default function UsersTeamList() {
       });
 
       if (response.ok) {
-        setUsers(users.filter((user) => user.id !== id));
+        // 4. Atualizar a lista de usuários
+        setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
+        console.log('User deleted successfully');
+      } else {
+        const errorResponse = await response.json();
+        throw new Error(errorResponse.error || 'Failed to delete user');
       }
     } catch (error) {
-      console.error('Error deleting user:', error);
+      console.error('Error deleting user or files:', error);
     } finally {
-      setDeleteLoading(null);
+      setDeleteLoading(null); // Finaliza o estado de carregamento
     }
   };
 
@@ -127,114 +156,62 @@ export default function UsersTeamList() {
           <TableHead>
             <TableRow>
               <TableCell sx={styles.fontSize}>Nome</TableCell>
-              <TableCell sx={styles.fontSize}>Email</TableCell>
-              <TableCell sx={styles.fontSize}>Função</TableCell>
+              {!isSmallScreen && (
+                <TableCell sx={styles.fontSize}>Email</TableCell>
+              )}
+              {!isSmallScreen && (
+                <TableCell sx={styles.fontSize}>Função</TableCell>
+              )}
               <TableCell sx={styles.fontSize}>Ações</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {Array.isArray(users) && users.length > 0 ? (
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={isSmallScreen ? 2 : 4} align="center">
+                  <CircularProgress />
+                </TableCell>
+              </TableRow>
+            ) : Array.isArray(users) && users.length > 0 ? (
               users.map((user) => (
                 <TableRow key={user.id} sx={styles.rowHover}>
-                  {editingUser === user.id ? (
-                    <>
-                      <TableCell sx={styles.fontSize}>
-                        <TextField
-                          label="Nome"
-                          value={editFormData?.name || ''}
-                          onChange={(e) =>
-                            setEditFormData({
-                              ...editFormData!,
-                              name: e.target.value,
-                            })
-                          }
-                          fullWidth
-                        />
-                      </TableCell>
-                      <TableCell sx={styles.fontSize}>
-                        <TextField
-                          label="Email"
-                          value={editFormData?.email || ''}
-                          onChange={(e) =>
-                            setEditFormData({
-                              ...editFormData!,
-                              email: e.target.value,
-                            })
-                          }
-                          fullWidth
-                        />
-                      </TableCell>
-                      <TableCell sx={styles.fontSize}>
-                        <TextField
-                          select
-                          label="Função"
-                          value={editFormData?.role || ''}
-                          onChange={(e) =>
-                            setEditFormData({
-                              ...editFormData!,
-                              role: e.target.value,
-                            })
-                          }
-                          fullWidth
-                        >
-                          <MenuItem value="vendedor">vendedor</MenuItem>
-                          <MenuItem value="admin">admin</MenuItem>
-                        </TextField>
-                      </TableCell>
-                      <TableCell sx={styles.fontSize}>
-                        <Button
-                          onClick={handleSave}
-                          disabled={loading}
-                          sx={{
-                            backgroundColor: 'green',
-                            color: 'white',
-                            width: '80%',
-                            '&:hover': {
-                              backgroundColor: 'darkgreen',
-                            },
-                          }}
-                        >
-                          {loading ? <CircularProgress size={20} /> : 'Salvar'}
-                        </Button>
-                      </TableCell>
-                    </>
-                  ) : (
-                    <>
-                      <TableCell sx={styles.fontSize}>{user.name}</TableCell>
-                      <TableCell sx={styles.fontSize}>{user.email}</TableCell>
-                      <TableCell sx={styles.fontSize}>{user.role}</TableCell>
-                      <TableCell sx={styles.fontSize}>
-                        <Tooltip title={'Editar usuário'}>
-                          <IconButton
-                            onClick={() => handleEdit(user)}
-                            sx={styles.iconEdit}
-                          >
-                            <EditIcon />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title={'Deletar usuário'}>
-                          <IconButton
-                            sx={styles.iconDelete}
-                            onClick={() => handleDelete(user.id)}
-                            disabled={deleteLoading === user.id}
-                          >
-                            {deleteLoading === user.id ? (
-                              <CircularProgress size={24} />
-                            ) : (
-                              <DeleteIcon />
-                            )}
-                          </IconButton>
-                        </Tooltip>
-                      </TableCell>
-                    </>
+                  <TableCell sx={styles.fontSize}>{user.name}</TableCell>
+                  {!isSmallScreen && (
+                    <TableCell sx={styles.fontSize}>{user.email}</TableCell>
                   )}
+                  {!isSmallScreen && (
+                    <TableCell sx={styles.fontSize}>{user.role}</TableCell>
+                  )}
+                  <TableCell sx={styles.fontSize}>
+                    <Tooltip title={'Editar usuário'}>
+                      <IconButton
+                        onClick={() => handleEdit(user)}
+                        sx={styles.iconEdit}
+                      >
+                        <EditIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title={'Deletar usuário'}>
+                      <IconButton
+                        sx={styles.iconDelete}
+                        onClick={() => handleDelete(user.id)}
+                        disabled={deleteLoading === user.id}
+                      >
+                        {deleteLoading === user.id ? (
+                          <CircularProgress size={24} />
+                        ) : (
+                          <DeleteIcon />
+                        )}
+                      </IconButton>
+                    </Tooltip>
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={4} align="center">
+                {/*                 <TableCell colSpan={isSmallScreen ? 2 : 4} align="center">
                   Nenhum usuário encontrado
-                </TableCell>
+                </TableCell> */}
               </TableRow>
             )}
           </TableBody>
