@@ -148,21 +148,6 @@ function RegisterTeamComponent() {
               pattern: '^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$',
             }}
           />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            id="password"
-            autoComplete="new-password"
-            value={formData.password}
-            onChange={handleChange}
-            inputProps={{
-              pattern: '(?=.*[A-Z])(?=.*[0-9]).{6,}',
-            }}
-          />
 
           <TextField
             select
@@ -178,6 +163,22 @@ function RegisterTeamComponent() {
             <MenuItem value="vendedor">Vendedor</MenuItem>
             <MenuItem value="admin">Admin</MenuItem>
           </TextField>
+
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            name="password"
+            label="Password"
+            type="password"
+            id="password"
+            autoComplete="new-password"
+            value={formData.password}
+            onChange={handleChange}
+            inputProps={{
+              pattern: '(?=.*[A-Z])(?=.*[0-9]).{6,}',
+            }}
+          />
 
           <TextField
             margin="normal"
