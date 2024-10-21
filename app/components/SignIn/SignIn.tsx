@@ -18,6 +18,7 @@ import { useRouter } from 'next/navigation';
 import sharedStyles from '@/app/styles/sharedStyles';
 import styles from './styles';
 import { CircularProgress } from '@mui/material';
+import { useAuth } from '@/app/contex/authContext';
 
 function Copyright(props: any) {
   return (
@@ -41,10 +42,11 @@ export default function SignIn() {
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { login, user, loading: authLoading } = useAuth(); // Corrigido: agora usamos o loading do contexto
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setLoading(true); // Inicia o loading
+    setLoading(true);
 
     const formData = new FormData(event.currentTarget);
     const email = formData.get('email') as string;
@@ -61,10 +63,9 @@ export default function SignIn() {
 
       if (response.ok) {
         const { token, userId } = await response.json();
-        Cookies.set('token', token, { path: '/' });
-        Cookies.set('userId', userId, { path: '/' });
-        router.push('/dashboard'); // Redireciona sem necessidade de await
-        /* window.location.reload(); */ // Força a atualização da página
+        login({ id: userId, token }); // Faz o login via contexto
+
+        setLoading(false);
       } else {
         const error = await response.json();
         setMessage(`${error.error}`);
@@ -72,9 +73,14 @@ export default function SignIn() {
     } catch (error) {
       setMessage('Erro ao conectar com o servidor');
     } finally {
-      setLoading(false); // Finaliza o estado de carregamento apenas se houver um erro
+      setLoading(false);
     }
   };
+
+  // Exibe um loader enquanto o auth está carregando
+  if (authLoading) {
+    return <div>Carregando...</div>;
+  }
 
   return (
     <Container component="main" maxWidth="xs">
@@ -139,13 +145,6 @@ export default function SignIn() {
           >
             {loading ? <CircularProgress size={24} /> : 'Entrar'}
           </Button>
-          <Grid container>
-            <Grid item xs>
-              <Link href="recoverPassword" variant="body2">
-                Esqueceu a senha?
-              </Link>
-            </Grid>
-          </Grid>
         </Box>
       </Box>
     </Container>

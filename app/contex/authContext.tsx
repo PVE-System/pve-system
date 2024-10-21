@@ -17,6 +17,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
+  loading: boolean;
   login: (user: User) => void; // Atualize para aceitar um objeto User
   logout: () => Promise<void>;
 }
@@ -29,22 +30,26 @@ interface AuthProviderProps {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true); // Estado de carregamento inicial
   const router = useRouter();
 
   useEffect(() => {
     const token = Cookies.get('token');
     const userId = Cookies.get('userId'); // Obtém o id do usuário do cookie
+
     console.log('AuthProvider useEffect Token:', token);
     console.log('AuthProvider useEffect User ID:', userId);
     if (token && userId) {
       setUser({ id: userId, token });
     }
+    setLoading(false); // Dados carregados, desativa o loading
   }, []);
 
   const login = (user: User) => {
     Cookies.set('token', user.token, { path: '/' });
     Cookies.set('userId', user.id, { path: '/' }); // Salva o id do usuário no cookie
     setUser(user);
+    setLoading(false); // Login concluído, desativa o loading
     router.push('/dashboard');
   };
 
@@ -71,7 +76,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

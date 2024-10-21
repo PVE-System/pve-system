@@ -1,18 +1,19 @@
 import { NextResponse, NextRequest } from 'next/server';
-import { db, users, User, NewUser } from '@/app/db';
+import { db, users } from '@/app/db';
 import { eq } from 'drizzle-orm';
-import bcrypt from 'bcryptjs'; // Importando bcryptjs
 
-//METODO GET:
-
+// Método GET
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } },
 ) {
   const { id } = params;
 
-  if (!id) {
-    return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
+  if (!id || isNaN(Number(id))) {
+    return NextResponse.json(
+      { error: 'User ID is required and must be valid' },
+      { status: 400 },
+    );
   }
 
   try {
