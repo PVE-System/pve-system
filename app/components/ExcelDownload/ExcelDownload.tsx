@@ -251,7 +251,7 @@ export default function ExcelDownloadFileComponent() {
                       }}
                     >
                       Planilha atualizada no dia:{' '}
-                      <span>
+                      <span style={{ fontWeight: 'bold' }}>
                         {new Date(file.date).toLocaleDateString('pt-BR')}
                       </span>
                     </Typography>

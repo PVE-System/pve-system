@@ -257,8 +257,13 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
                     salesData[`${key}UpdatedBy`] && (
                       <Typography variant="caption">
                         Última atualização:{' '}
-                        {formatDate(salesData[`${key}UpdatedAt`])} por{' '}
-                        {salesData[`${key}UpdatedBy`] || 'Desconhecido'}
+                        <strong>
+                          {formatDate(salesData[`${key}UpdatedAt`])}
+                        </strong>{' '}
+                        por{' '}
+                        <strong>
+                          {salesData[`${key}UpdatedBy`] || 'Desconhecido'}
+                        </strong>
                       </Typography>
                     )}
                 </Box>
