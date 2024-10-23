@@ -155,8 +155,14 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
               ...styles.clientConditionButton,
               ...(clientCondition === 'Normal' && {
                 backgroundColor: 'green',
-                border: 'none',
+                borderColor: 'green',
+                /* border: 'none', */
                 color: 'white',
+
+                '&:hover': {
+                  backgroundColor: 'green', // Manter a cor verde no hover se estiver selecionado
+                  borderColor: 'green',
+                },
               }),
             }}
             disabled={readOnly}
@@ -175,8 +181,12 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
               ...styles.clientConditionButton,
               ...(clientCondition === 'Especial' && {
                 backgroundColor: 'orange',
-                border: 'none',
+                /* border: 'none', */
                 color: 'black',
+                '&:hover': {
+                  backgroundColor: 'orange', // Manter a cor verde no hover se estiver selecionado
+                  borderColor: 'orange',
+                },
               }),
             }}
             disabled={readOnly}
@@ -195,8 +205,12 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
               ...styles.clientConditionButton,
               ...(clientCondition === 'Suspenso' && {
                 backgroundColor: 'red',
-                border: 'none',
+                /* border: 'none', */
                 color: 'white',
+                '&:hover': {
+                  backgroundColor: 'red', // Manter a cor verde no hover se estiver selecionado
+                  borderColor: 'red',
+                },
               }),
             }}
             disabled={readOnly}
