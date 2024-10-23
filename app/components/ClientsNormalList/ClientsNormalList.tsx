@@ -117,6 +117,9 @@ const ClientNormalList = () => {
                         sx={{
                           ...styles.buttonTagCondition,
                           backgroundColor: 'green',
+                          '&:hover': {
+                            backgroundColor: 'green',
+                          },
                         }}
                         variant="contained"
                         size="small"

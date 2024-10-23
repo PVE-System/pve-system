@@ -118,6 +118,9 @@ const ClientEspecialList = () => {
                           ...styles.buttonTagCondition,
                           backgroundColor: 'orange',
                           color: 'black',
+                          '&:hover': {
+                            backgroundColor: 'orange',
+                          },
                         }}
                         variant="contained"
                         size="small"

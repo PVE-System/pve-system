@@ -87,6 +87,11 @@ const styles = {
       height: '20px',
     },
   },
+
+  dataAndName: {
+    fontWeight: 600,
+  },
+
   loadComponent: {
     display: 'flex',
     justifyContent: 'center',

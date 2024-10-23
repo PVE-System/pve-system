@@ -39,8 +39,12 @@ const styles = {
 
   formButtonSubmit: {
     width: '500px',
-    /* width: '100%', */
     marginTop: '10px',
+    backgroundColor: 'green',
+    '&:hover': {
+      backgroundColor: 'darkGreen',
+    },
+    /* width: '100%', */
     /*  alignItens: 'center', */
     '@media (max-width: 800px)': {
       width: '300px',

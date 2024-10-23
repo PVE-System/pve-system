@@ -117,6 +117,9 @@ const ClientSuspendedList = () => {
                         sx={{
                           ...styles.buttonTagCondition,
                           backgroundColor: 'red',
+                          '&:hover': {
+                            backgroundColor: 'red',
+                          },
                         }}
                         variant="contained"
                         size="small"

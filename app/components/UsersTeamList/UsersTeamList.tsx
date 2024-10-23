@@ -57,15 +57,12 @@ export default function UsersTeamList() {
   const handleDelete = async (id: number) => {
     setDeleteLoading(id);
     try {
-      // 1. Buscar arquivos associados ao usuário
       const filesResponse = await fetch(
         `/api/getAllFilesBlobByUser?userId=${id}`,
       );
       const filesData = await filesResponse.json();
 
       if (filesResponse.ok && filesData.files.length > 0) {
-        // 2. Deletar os arquivos associados
-        console.log('Deleting associated files');
         await fetch(`/api/deleteAllFilesBlobByUser`, {
           method: 'DELETE',
           headers: {
@@ -75,10 +72,8 @@ export default function UsersTeamList() {
             fileUrls: filesData.files.map((file: { url: any }) => file.url),
           }),
         });
-        console.log('Files deleted successfully');
       }
 
-      // 3. Deletar o usuário do banco de dados
       const response = await fetch('/api/deleteUserByAdmin', {
         method: 'DELETE',
         headers: {
@@ -88,9 +83,7 @@ export default function UsersTeamList() {
       });
 
       if (response.ok) {
-        // 4. Atualizar a lista de usuários
         setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
-        console.log('User deleted successfully');
       } else {
         const errorResponse = await response.json();
         throw new Error(errorResponse.error || 'Failed to delete user');
@@ -98,7 +91,7 @@ export default function UsersTeamList() {
     } catch (error) {
       console.error('Error deleting user or files:', error);
     } finally {
-      setDeleteLoading(null); // Finaliza o estado de carregamento
+      setDeleteLoading(null);
     }
   };
 
@@ -123,7 +116,7 @@ export default function UsersTeamList() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          id: editFormData.id, // Passa o `id` no corpo da requisição
+          id: editFormData.id,
           name: editFormData.name,
           email: editFormData.email,
           role: editFormData.role,
@@ -175,43 +168,112 @@ export default function UsersTeamList() {
             ) : Array.isArray(users) && users.length > 0 ? (
               users.map((user) => (
                 <TableRow key={user.id} sx={styles.rowHover}>
-                  <TableCell sx={styles.fontSize}>{user.name}</TableCell>
-                  {!isSmallScreen && (
-                    <TableCell sx={styles.fontSize}>{user.email}</TableCell>
+                  {editingUser === user.id ? (
+                    <>
+                      <TableCell sx={styles.fontSize}>
+                        <TextField
+                          label="Nome"
+                          value={editFormData?.name || ''}
+                          onChange={(e) =>
+                            setEditFormData({
+                              ...editFormData!,
+                              name: e.target.value,
+                            })
+                          }
+                          fullWidth
+                        />
+                      </TableCell>
+                      {!isSmallScreen && (
+                        <TableCell sx={styles.fontSize}>
+                          <TextField
+                            label="Email"
+                            value={editFormData?.email || ''}
+                            onChange={(e) =>
+                              setEditFormData({
+                                ...editFormData!,
+                                email: e.target.value,
+                              })
+                            }
+                            fullWidth
+                          />
+                        </TableCell>
+                      )}
+                      {!isSmallScreen && (
+                        <TableCell sx={styles.fontSize}>
+                          <TextField
+                            select
+                            label="Função"
+                            value={editFormData?.role || ''}
+                            onChange={(e) =>
+                              setEditFormData({
+                                ...editFormData!,
+                                role: e.target.value,
+                              })
+                            }
+                            fullWidth
+                          >
+                            <MenuItem value="vendedor">Vendedor</MenuItem>
+                            <MenuItem value="admin">Admin</MenuItem>
+                          </TextField>
+                        </TableCell>
+                      )}
+                      <TableCell sx={styles.fontSize}>
+                        <Button
+                          onClick={handleSave}
+                          disabled={loading}
+                          sx={{
+                            backgroundColor: 'green', // Cor verde para o botão
+                            color: 'white', // Cor do texto branco
+                            '&:hover': {
+                              backgroundColor: 'darkgreen', // Cor verde escuro no hover
+                            },
+                          }}
+                        >
+                          {loading ? <CircularProgress size={20} /> : 'Salvar'}
+                        </Button>
+                      </TableCell>
+                    </>
+                  ) : (
+                    <>
+                      <TableCell sx={styles.fontSize}>{user.name}</TableCell>
+                      {!isSmallScreen && (
+                        <TableCell sx={styles.fontSize}>{user.email}</TableCell>
+                      )}
+                      {!isSmallScreen && (
+                        <TableCell sx={styles.fontSize}>{user.role}</TableCell>
+                      )}
+                      <TableCell sx={styles.fontSize}>
+                        <Tooltip title={'Editar usuário'}>
+                          <IconButton
+                            onClick={() => handleEdit(user)}
+                            sx={styles.iconEdit}
+                          >
+                            <EditIcon />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title={'Deletar usuário'}>
+                          <IconButton
+                            sx={styles.iconDelete}
+                            onClick={() => handleDelete(user.id)}
+                            disabled={deleteLoading === user.id}
+                          >
+                            {deleteLoading === user.id ? (
+                              <CircularProgress size={24} />
+                            ) : (
+                              <DeleteIcon />
+                            )}
+                          </IconButton>
+                        </Tooltip>
+                      </TableCell>
+                    </>
                   )}
-                  {!isSmallScreen && (
-                    <TableCell sx={styles.fontSize}>{user.role}</TableCell>
-                  )}
-                  <TableCell sx={styles.fontSize}>
-                    <Tooltip title={'Editar usuário'}>
-                      <IconButton
-                        onClick={() => handleEdit(user)}
-                        sx={styles.iconEdit}
-                      >
-                        <EditIcon />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title={'Deletar usuário'}>
-                      <IconButton
-                        sx={styles.iconDelete}
-                        onClick={() => handleDelete(user.id)}
-                        disabled={deleteLoading === user.id}
-                      >
-                        {deleteLoading === user.id ? (
-                          <CircularProgress size={24} />
-                        ) : (
-                          <DeleteIcon />
-                        )}
-                      </IconButton>
-                    </Tooltip>
-                  </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                {/*                 <TableCell colSpan={isSmallScreen ? 2 : 4} align="center">
+                <TableCell colSpan={isSmallScreen ? 2 : 4} align="center">
                   Nenhum usuário encontrado
-                </TableCell> */}
+                </TableCell>
               </TableRow>
             )}
           </TableBody>

@@ -319,7 +319,7 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
                             xs: '12px',
                             md: '14px',
                           },
-                          style: { color: 'darkOrange' },
+                          style: { color: 'darkOrange', fontWeight: 'bold' },
                         }}
                       />
                     </Box>
