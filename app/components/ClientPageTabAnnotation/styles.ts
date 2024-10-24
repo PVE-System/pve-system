@@ -74,6 +74,7 @@ const styles = {
     display: 'block',
     marginTop: '50px',
     fontWeight: 'bold',
+    textTransform: 'none',
   },
 
   commentsIcons: {
