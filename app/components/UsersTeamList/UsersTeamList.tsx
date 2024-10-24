@@ -18,11 +18,16 @@ import {
   MenuItem,
   useMediaQuery,
 } from '@mui/material';
-import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
+import {
+  Delete as DeleteIcon,
+  Edit as EditIcon,
+  Block as BlockIcon,
+} from '@mui/icons-material';
 import styles from './style';
 import sharedStyles from '@/app/styles/sharedStyles';
 
 export interface User {
+  [x: string]: any;
   id: number;
   name: string;
   email: string;
@@ -34,6 +39,9 @@ export default function UsersTeamList() {
   const [loading, setLoading] = useState(false);
   const [editingUser, setEditingUser] = useState<number | null>(null);
   const [deleteLoading, setDeleteLoading] = useState<number | null>(null);
+  const [deactivateLoading, setDeactivateLoading] = useState<number | null>(
+    null,
+  );
   const [editFormData, setEditFormData] = useState<User | null>(null);
   const isSmallScreen = useMediaQuery('(max-width:600px)');
 
@@ -46,7 +54,14 @@ export default function UsersTeamList() {
     try {
       const response = await fetch('/api/getAllUsers');
       const data = await response.json();
-      setUsers(data.users);
+
+      // Filtra os usuários que estão ativos
+      const activeUsers = data.users.filter(
+        (user: User) => user.is_active === true,
+      );
+
+      // Atualiza o estado com apenas os usuários ativos
+      setUsers(activeUsers);
     } catch (error) {
       console.error('Error fetching users:', error);
     } finally {
@@ -74,8 +89,9 @@ export default function UsersTeamList() {
         });
       }
 
-      const response = await fetch('/api/deleteUserByAdmin', {
-        method: 'DELETE',
+      // 2. Desativar o usuário após deletar os arquivos
+      const response = await fetch('/api/deactivateUserByAdmin', {
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -83,10 +99,11 @@ export default function UsersTeamList() {
       });
 
       if (response.ok) {
+        // Remove o usuário da lista local para não exibi-lo mais
         setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
       } else {
         const errorResponse = await response.json();
-        throw new Error(errorResponse.error || 'Failed to delete user');
+        throw new Error(errorResponse.error || 'Failed to deactivate user');
       }
     } catch (error) {
       console.error('Error deleting user or files:', error);
@@ -264,6 +281,25 @@ export default function UsersTeamList() {
                             )}
                           </IconButton>
                         </Tooltip>
+                        {/* <Tooltip
+                          title={
+                            'Desativar usuário, mantendo registro de sua colaboração'
+                          }
+                        >
+                          <IconButton
+                            sx={styles.iconBlock}
+                            onClick={() => handleDeactivate(user.id)}
+                            disabled={
+                              deactivateLoading === user.id || !user.is_active
+                            }
+                          >
+                            {deactivateLoading === user.id ? (
+                              <CircularProgress size={24} />
+                            ) : (
+                              <BlockIcon />
+                            )}
+                          </IconButton>
+                        </Tooltip> */}
                       </TableCell>
                     </>
                   )}

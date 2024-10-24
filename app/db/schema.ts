@@ -31,7 +31,9 @@ export const users = pgTable(
     resetToken: varchar('resetToken', { length: 256 }).default(''),
     resetTokenExpiration: timestamp('resetTokenExpiration').default(
       new Date(0),
-    ), // ou outro valor inicial de sua escolha
+    ),
+    // Nova coluna para desativar o usuário
+    is_active: boolean('is_active').notNull().default(true),
   },
   (table) => {
     return {
