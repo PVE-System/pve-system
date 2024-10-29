@@ -317,6 +317,7 @@ const DashboardComponent = () => {
                 e.stopPropagation(); // Evita que o clique no ícone expanda/colapse o Accordion
                 window.location.href = '/clientsRating2List'; // Redireciona o usuário
               }}
+              titleAccess="Confira a lista de clientes"
             />
           </AccordionDetails>
         </Accordion>
@@ -339,7 +340,7 @@ const DashboardComponent = () => {
               sx={styles.ratingStars}
             />
             <Typography sx={styles.accordionTitle}>
-              <span>{ratingCounts.inactive}</span> Clientes menos ativos
+              <span>{ratingCounts.inactive}</span> Clientes pouco ativo
             </Typography>
           </AccordionSummary>
           <AccordionDetails>
@@ -351,8 +352,8 @@ const DashboardComponent = () => {
             >
               Fazem pedidos com pouca frequência ou apenas uma única vez.
               <br />
-              Importante fazer uma análise, entender os motivos e conversar com
-              o cliente.
+              Importante fazer uma análise, entender os motivos, e se necessário
+              elaborar alguma estratégia.
             </Typography>
             <FormatListBulletedIcon
               sx={styles.accordionIconList}
@@ -360,6 +361,7 @@ const DashboardComponent = () => {
                 e.stopPropagation(); // Evita que o clique no ícone expanda/colapse o Accordion
                 window.location.href = '/clientsRating1List'; // Redireciona o usuário
               }}
+              titleAccess="Confira a lista de clientes"
             />
           </AccordionDetails>
         </Accordion>

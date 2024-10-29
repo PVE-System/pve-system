@@ -1,12 +1,15 @@
-import { orange } from '@mui/material/colors';
+import { blueGrey, orange } from '@mui/material/colors';
 import { Theme } from '@mui/material/styles/createTheme';
 
 const styles = {
   cardPieChart: {
     backgroundColor: (theme: Theme) =>
       theme.palette.mode === 'light'
-        ? theme.palette.background.paper
+        ? blueGrey[100]
         : theme.palette.background.alternative,
+    /*       theme.palette.mode === 'light'
+        ? theme.palette.background.paper
+        : theme.palette.background.alternative, */
     color: (theme: Theme) =>
       theme.palette.mode === 'light'
         ? theme.palette.text.primary

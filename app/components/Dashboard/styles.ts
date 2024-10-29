@@ -1,3 +1,4 @@
+import { BorderColor } from '@mui/icons-material';
 import { Theme } from '@mui/material';
 import { orange } from '@mui/material/colors';
 
@@ -87,12 +88,14 @@ const styles = {
 
   //Styles accordion
   accordionContainer: {
+    borderRadius: '15px',
+
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
     overflowY: 'hidden',
     width: '600px',
-    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+    boxShadow: '0 0 20px rgba(0, 0, 0, 0.5)',
     '@media (max-width: 800px)': {
       width: '400px',
     },
@@ -102,10 +105,14 @@ const styles = {
   },
   accordionBg: {
     /* backgroundColor: '#001F3F', */
+
     background: (theme: Theme) =>
       theme.palette.mode === 'light'
-        ? theme.palette.background.default
+        ? '#dedfe1'
         : theme.palette.background.default,
+    /*       theme.palette.mode === 'light'
+        ? theme.palette.background.default
+        : theme.palette.background.default, */
   },
   accordionTitle: {
     /* color: '#ffffff', */

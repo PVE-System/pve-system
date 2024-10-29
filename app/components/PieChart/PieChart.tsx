@@ -71,7 +71,7 @@ const SimpleChart = () => {
     );
   } */
 
-  const COLORS = ['#FFC107', '#FF5722', '#2196F3', '#4CAF50'];
+  const COLORS = ['#2196F3', '#FF5722', '#985afc', '#4CAF50'];
 
   return (
     <Box sx={{ textAlign: 'center' }}>
