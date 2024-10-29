@@ -11,7 +11,7 @@ const SearchResultsPage: React.FC = () => {
       <HeadApp />
       <Box sx={sharedStyles.container}>
         <Typography variant="h4" component="h1" sx={sharedStyles.titlePage}>
-          Resultados da sua <span>Busca</span>
+          Resultado da sua <span>Busca</span>
         </Typography>
       </Box>
       <SearchResults />

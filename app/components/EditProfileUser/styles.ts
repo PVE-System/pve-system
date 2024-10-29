@@ -1,3 +1,5 @@
+import { orange } from '@mui/material/colors';
+
 const styles = {
   formBoxImg: {
     display: 'flex',
@@ -40,10 +42,7 @@ const styles = {
   formButtonSubmit: {
     width: '500px',
     marginTop: '10px',
-    backgroundColor: 'green',
-    '&:hover': {
-      backgroundColor: 'darkGreen',
-    },
+
     /* width: '100%', */
     /*  alignItens: 'center', */
     '@media (max-width: 800px)': {
