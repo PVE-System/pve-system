@@ -17,6 +17,7 @@ import {
   formatCPF,
   formatCNPJ,
   formatPhone,
+  formatCEP,
 } from '@/app/components/FormFormatter/FormFormatter'; // Funções de formatação
 import sharedStyles from '@/app/styles/sharedStyles';
 import styles from './styles';
@@ -321,7 +322,34 @@ const RegisterClient: React.FC = () => {
                   <TextField
                     name={key}
                     value={formData[key as keyof typeof formData]}
-                    onChange={handleChange}
+                    onChange={(event) => {
+                      const target = event.target as HTMLInputElement; // Força o tipo para evitar conflitos
+                      const { value } = target;
+                      let formattedValue = value;
+
+                      if (key === 'cep') {
+                        // Formatação específica para CEP
+                        formattedValue = formatCEP(value);
+                        handleCEPChange(value.replace(/\D/g, '')); // Chama API com valor sem formatação
+                      } else if (key === 'cpf') {
+                        formattedValue = formatCPF(value);
+                      } else if (key === 'cnpj') {
+                        formattedValue = formatCNPJ(value);
+                      } else if (key === 'phone') {
+                        formattedValue = formatPhone(value);
+                      } else {
+                        handleChange(
+                          event as React.ChangeEvent<HTMLInputElement>,
+                        ); // Garante o tipo correto para handleChange
+                      }
+
+                      // Atualiza o estado com o valor formatado para exibição
+                      setFormData((prevFormData) => ({
+                        ...prevFormData,
+                        [key]: formattedValue,
+                      }));
+                    }}
+                    placeholder={key === 'phone' ? '(xx)xxxxxxxxx' : ''}
                     variant="filled"
                     sx={styles.inputsCol2}
                     fullWidth
