@@ -10,6 +10,7 @@ import styles from '@/app/components/RegisterClientSuccess/style';
 
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ApartmentIcon from '@mui/icons-material/Apartment';
+import { InsertPhoto, PhotoCamera } from '@mui/icons-material';
 
 // Componente com Suspense
 const RegisterClientSuccessContent = () => {
@@ -45,7 +46,7 @@ const RegisterClientSuccessContent = () => {
               component={NextLink}
               href={`/clientPage/editClient?id=${clientId}`}
             >
-              <DashboardIcon sx={styles.icon} />
+              <PhotoCamera sx={styles.icon} />
             </Box>
           </CardContent>
           <CardContent sx={styles.cardContent}>
