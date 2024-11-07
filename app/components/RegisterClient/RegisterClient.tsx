@@ -58,6 +58,7 @@ const RegisterClient: React.FC = () => {
     companySize: '',
     hasOwnStore: '',
     icmsContributor: '',
+    stateRegistration: '', // Novo campo
     transportationType: '',
     companyLocation: '',
     marketSegmentNature: '',
@@ -87,6 +88,7 @@ const RegisterClient: React.FC = () => {
     companySize: 'Porte da Empresa',
     hasOwnStore: 'Possui Loja Própria',
     icmsContributor: 'Contribuinte ICMS',
+    stateRegistration: 'Inscrição Estadual', // Novo campo
     transportationType: 'Transporte entra',
     companyLocation: 'Localização da Empresa',
     marketSegmentNature: 'Segmento de Mercado e Natureza Jurídica',
@@ -269,6 +271,7 @@ const RegisterClient: React.FC = () => {
           companySize: '',
           hasOwnStore: '',
           icmsContributor: '',
+          stateRegistration: '',
           transportationType: '',
           companyLocation: '',
           marketSegmentNature: '',
@@ -323,14 +326,13 @@ const RegisterClient: React.FC = () => {
                     name={key}
                     value={formData[key as keyof typeof formData]}
                     onChange={(event) => {
-                      const target = event.target as HTMLInputElement; // Força o tipo para evitar conflitos
+                      const target = event.target as HTMLInputElement;
                       const { value } = target;
                       let formattedValue = value;
 
                       if (key === 'cep') {
-                        // Formatação específica para CEP
                         formattedValue = formatCEP(value);
-                        handleCEPChange(value.replace(/\D/g, '')); // Chama API com valor sem formatação
+                        handleCEPChange(value.replace(/\D/g, ''));
                       } else if (key === 'cpf') {
                         formattedValue = formatCPF(value);
                       } else if (key === 'cnpj') {
@@ -340,10 +342,9 @@ const RegisterClient: React.FC = () => {
                       } else {
                         handleChange(
                           event as React.ChangeEvent<HTMLInputElement>,
-                        ); // Garante o tipo correto para handleChange
+                        );
                       }
 
-                      // Atualiza o estado com o valor formatado para exibição
                       setFormData((prevFormData) => ({
                         ...prevFormData,
                         [key]: formattedValue,
@@ -356,6 +357,10 @@ const RegisterClient: React.FC = () => {
                     select={
                       key === 'state' || key === 'city' || key in selectOptions
                     }
+                    disabled={
+                      key === 'stateRegistration' &&
+                      formData.icmsContributor !== 'Sim'
+                    } // Bloqueia o campo quando "Não"
                   >
                     {key === 'state' &&
                       states.map((state) => (
@@ -380,6 +385,7 @@ const RegisterClient: React.FC = () => {
                   </TextField>
                 </Box>
               ))}
+
               <Box sx={styles.boxRegisterButton}>
                 <Button
                   type="submit"

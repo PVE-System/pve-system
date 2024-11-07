@@ -7,7 +7,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, useWatch } from 'react-hook-form';
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
@@ -41,6 +41,7 @@ const fieldLabels: { [key: string]: string } = {
   companySize: 'Porte da Empresa',
   hasOwnStore: 'Possui Loja Própria',
   icmsContributor: 'Contribuinte ICMS',
+  stateRegistration: 'Inscrição Estadual',
   transportationType: 'Transporte entra',
   companyLocation: 'Localização da Empresa',
   marketSegmentNature: 'Segmento de Mercado e Natureza Jurídica',
@@ -153,6 +154,12 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [loadingSave, setLoadingSave] = useState(false);
 
+  const icmsContributor = useWatch({
+    control,
+    name: 'icmsContributor',
+    defaultValue: 'Não', // Valor padrão direto para evitar o erro
+  });
+
   // Função para buscar cidades com base no estado selecionado
   const fetchCities = async (state: string) => {
     try {
@@ -223,24 +230,30 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
     if (!clientId) return;
 
     const fetchData = async () => {
+      setLoading(true); // Garante que o estado de carregamento é verdadeiro no início da busca
+
       try {
         const response = await fetch(`/api/getClient/${clientId}`);
         const data = await response.json();
-        setClientData(data);
-        setImageUrl(data.imageUrl || null);
-        setLoading(false);
 
-        // Atualiza os valores do formulário com os dados do cliente
-        Object.keys(data).forEach((key) => {
-          setValue(key, data[key]);
-        });
+        if (data) {
+          setClientData(data);
+          setImageUrl(data.imageUrl || null);
 
-        if (data.state) {
-          fetchCities(data.state); // Carrega as cidades ao carregar o estado inicial
+          // Atualiza os valores do formulário com os dados do cliente
+          Object.keys(data).forEach((key) => {
+            setValue(key, data[key]);
+          });
+
+          // Carrega as cidades apenas se `state` estiver definido
+          if (data.state) {
+            fetchCities(data.state);
+          }
         }
       } catch (error) {
         console.error('Error fetching client data:', error);
-        setLoading(false);
+      } finally {
+        setLoading(false); // Garante que o estado de carregamento seja atualizado mesmo em caso de erro
       }
     };
 
@@ -257,6 +270,11 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
       delete data.createdAt;
 
       let finalImageUrl = imageUrl || clientData?.imageUrl;
+
+      // Se o campo icmsContributor for "Não", limpar o valor de stateRegistration
+      if (data.icmsContributor === 'Não') {
+        data.stateRegistration = ''; // Limpa o campo para salvar como vazio
+      }
 
       // Se houver uma nova imagem, deletar a imagem antiga primeiro
       if (imageFile && imageUrl) {
@@ -493,6 +511,19 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
                               setValue('city', ''); // Limpa o campo cidade quando o estado muda
                               fetchCities(value); // Busca as novas cidades ao mudar o estado
                             }
+                            // Lógica para `icmsContributor`
+                            if (name === 'icmsContributor') {
+                              setValue(name, value);
+
+                              // Limpar o valor de `stateRegistration` se `icmsContributor` for "Não"
+                              if (value === 'Não') {
+                                setValue('stateRegistration', ''); // Limpa o campo
+                              }
+                            }
+                            // Limpar `stateRegistration` se `icmsContributor` for "Não"
+                            if (name === 'icmsContributor' && value === 'Não') {
+                              setValue('stateRegistration', ''); // Limpa o campo
+                            }
 
                             // Atualiza o valor formatado no estado
                             field.onChange(formattedValue);
@@ -501,6 +532,10 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
                             key === 'state' ||
                             key === 'city' ||
                             key in selectOptions
+                          }
+                          disabled={
+                            key === 'stateRegistration' &&
+                            icmsContributor === 'Não'
                           }
                         >
                           {key === 'state' &&

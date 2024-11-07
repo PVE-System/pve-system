@@ -69,6 +69,7 @@ export const clients = pgTable('clients', {
   companySize: text('company_size').notNull(),
   hasOwnStore: text('has_own_store').notNull(),
   icmsContributor: text('icms_contributor').notNull(),
+  stateRegistration: text('state_registration'), // nova coluna
   transportationType: text('transportation_type').notNull(),
   companyLocation: text('company_location').notNull(),
   marketSegmentNature: text('market_segment_nature').notNull(),
