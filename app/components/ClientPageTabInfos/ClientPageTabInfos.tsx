@@ -189,6 +189,10 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
       name: 'icmsContributor',
     },
     {
+      label: 'Inscrição Estadual',
+      name: 'stateRegistration',
+    },
+    {
       label: 'Transporte entra',
       name: 'transportationType',
     },
