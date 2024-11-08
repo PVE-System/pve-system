@@ -1,13 +1,15 @@
 'use client';
 
 import * as React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Box,
   Button,
   CircularProgress,
   Container,
+  Link,
   MenuItem,
+  Modal,
   TextField,
   Typography,
 } from '@mui/material';
@@ -35,6 +37,14 @@ type SelectOptionsType = {
   clientCondition: string[];
 };
 
+// Definição de ClientData com `id` incluído
+interface ClientData {
+  id?: string;
+  cnpj?: string;
+  cpf?: string;
+  // Outras propriedades do cliente
+}
+
 const RegisterClient: React.FC = () => {
   const [formData, setFormData] = useState({
     companyName: '',
@@ -58,7 +68,7 @@ const RegisterClient: React.FC = () => {
     companySize: '',
     hasOwnStore: '',
     icmsContributor: '',
-    stateRegistration: '', // Novo campo
+    stateRegistration: '',
     transportationType: '',
     companyLocation: '',
     marketSegmentNature: '',
@@ -88,7 +98,7 @@ const RegisterClient: React.FC = () => {
     companySize: 'Porte da Empresa',
     hasOwnStore: 'Possui Loja Própria',
     icmsContributor: 'Contribuinte ICMS',
-    stateRegistration: 'Inscrição Estadual', // Novo campo
+    stateRegistration: 'Inscrição Estadual',
     transportationType: 'Transporte entra',
     companyLocation: 'Localização da Empresa',
     marketSegmentNature: 'Segmento de Mercado e Natureza Jurídica',
@@ -151,7 +161,17 @@ const RegisterClient: React.FC = () => {
   const [cities, setCities] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [duplicateClient, setDuplicateClient] = useState<ClientData | null>(
+    null,
+  );
+  const [duplicateField, setDuplicateField] = useState<'cnpj' | 'cpf' | null>(
+    null,
+  );
+  const [showModal, setShowModal] = useState(false);
   const router = useRouter();
+
+  // Construir a URL com o parâmetro `id` usando `URLSearchParams`
+  const clientUrl = new URLSearchParams({ id: duplicateClient?.id || '' });
 
   // Função para buscar cidades com base no estado selecionado
   const fetchCities = async (state: string) => {
@@ -237,6 +257,28 @@ const RegisterClient: React.FC = () => {
     setLoading(true);
     setMessage(null);
 
+    // Verificação final para CNPJ e CPF duplicados
+    if (formData.cnpj) {
+      const cnpjDuplicate = await checkDuplicate('cnpj', formData.cnpj);
+      if (cnpjDuplicate) {
+        setDuplicateField('cnpj');
+        setShowModal(true);
+        setLoading(false); // Interrompe o carregamento
+        return; // Impede o envio do formulário
+      }
+    }
+
+    if (formData.cpf) {
+      const cpfDuplicate = await checkDuplicate('cpf', formData.cpf);
+      if (cpfDuplicate) {
+        setDuplicateField('cpf');
+        setShowModal(true);
+        setLoading(false); // Interrompe o carregamento
+        return; // Impede o envio do formulário
+      }
+    }
+
+    // Se nenhuma duplicata foi encontrada, prossegue com o cadastro
     try {
       const response = await fetch('/api/registerClients', {
         method: 'POST',
@@ -291,6 +333,80 @@ const RegisterClient: React.FC = () => {
     }
   };
 
+  // Função para verificar duplicidade de CNPJ ou CEP
+  // Função de verificação de duplicidade
+  const checkDuplicate = async (field: 'cnpj' | 'cpf', value: string) => {
+    try {
+      const response = await fetch('/api/checkDuplicateRegisterClient', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [field]: value }),
+      });
+
+      if (!response.ok) {
+        console.error('Erro na resposta do servidor:', response.statusText);
+        return false;
+      }
+
+      const result = await response.json();
+      if (result.duplicate) {
+        setDuplicateClient(result.client);
+        setDuplicateField(field);
+        setShowModal(true); // Exibe o modal no momento do preenchimento
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Erro ao verificar duplicata:', error);
+      return false;
+    }
+  };
+
+  // Monitoramento do CNPJ e CEP
+  useEffect(() => {
+    if (formData.cnpj) {
+      checkDuplicate('cnpj', formData.cnpj);
+    }
+  }, [formData.cnpj]);
+
+  useEffect(() => {
+    if (formData.cpf) {
+      checkDuplicate('cpf', formData.cpf);
+    }
+  }, [formData.cpf]);
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    let formattedValue = value;
+
+    // Aplicar formatação nos campos de CPF, CNPJ, Telefone e CEP
+    if (name === 'cpf') {
+      formattedValue = formatCPF(value);
+    } else if (name === 'cnpj') {
+      formattedValue = formatCNPJ(value);
+    } else if (name === 'phone') {
+      formattedValue = formatPhone(value);
+    } else if (name === 'cep') {
+      formattedValue = value;
+      handleCEPChange(formattedValue);
+    }
+
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: formattedValue,
+    }));
+
+    if (name === 'state') {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        city: '',
+      }));
+      fetchCities(value);
+    }
+  };
+
+  const handleCloseModal = () => setShowModal(false);
+
   return (
     <Container maxWidth="lg">
       <Box sx={styles.container}>
@@ -330,6 +446,7 @@ const RegisterClient: React.FC = () => {
                       const { value } = target;
                       let formattedValue = value;
 
+                      // Formatações e verificação de duplicatas
                       if (key === 'cep') {
                         formattedValue = formatCEP(value);
                         handleCEPChange(value.replace(/\D/g, ''));
@@ -350,10 +467,16 @@ const RegisterClient: React.FC = () => {
                         [key]: formattedValue,
                       }));
                     }}
+                    required={key === 'companyName'}
                     placeholder={key === 'phone' ? '(xx)xxxxxxxxx' : ''}
                     variant="filled"
                     sx={styles.inputsCol2}
                     fullWidth
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter') {
+                        event.preventDefault(); // Impede o envio
+                      }
+                    }}
                     select={
                       key === 'state' || key === 'city' || key in selectOptions
                     }
@@ -404,6 +527,43 @@ const RegisterClient: React.FC = () => {
                 </Button>
               </Box>
             </form>
+
+            {/* Modal de Duplicata */}
+            <Modal
+              open={showModal}
+              onClose={handleCloseModal}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Box
+                sx={{
+                  padding: 3,
+                  backgroundColor: 'white',
+
+                  borderRadius: 2,
+                  width: '400px',
+                  boxShadow: 24,
+                }}
+              >
+                <Typography variant="h6" sx={{ mt: 1, color: 'black' }}>
+                  Cliente já cadastrado!
+                </Typography>
+                <Typography variant="body1" sx={{ mt: 1, color: 'black' }}>
+                  Um cliente com o mesmo{' '}
+                  {duplicateField === 'cnpj' ? 'CNPJ' : 'CPF'} já existe no
+                  sistema.
+                </Typography>
+                <Button onClick={handleCloseModal} sx={{ mt: 2 }}>
+                  Fechar
+                </Button>
+                <Link href={`/clientPage?id=${duplicateClient?.id}`}>
+                  <Button sx={{ mt: 2 }}>Ver Cliente</Button>
+                </Link>
+              </Box>
+            </Modal>
           </Box>
         </Box>
         {message && (
