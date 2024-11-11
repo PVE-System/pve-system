@@ -104,14 +104,22 @@ export async function GET(request: NextRequest) {
       )
       .execute();
 
-    // Verificar atualizações nos arquivos da aba "Arquivos e anexos"
-    const balanceFiles = await fetchFilesDirectlyFromStorage(
-      `BalanceSheet/id=${clientId}`,
+    // Verificar atualizações nas novas pastas de arquivos
+    const fiscalDocsFiles = await fetchFilesDirectlyFromStorage(
+      `fiscalDocs/id=${clientId}`,
     );
-    const shipmentFiles = await fetchFilesDirectlyFromStorage(
-      `ShipmentReport/id=${clientId}`,
+    const accountingDocsFiles = await fetchFilesDirectlyFromStorage(
+      `accountingDocs/id=${clientId}`,
     );
-    const allFiles = [...balanceFiles, ...shipmentFiles];
+    const socialContractFiles = await fetchFilesDirectlyFromStorage(
+      `socialContract/id=${clientId}`,
+    );
+
+    const allFiles = [
+      ...fiscalDocsFiles,
+      ...accountingDocsFiles,
+      ...socialContractFiles,
+    ];
 
     // Se não houver arquivos, marca filesTabChanged como false
     let filesTabChanged = false;

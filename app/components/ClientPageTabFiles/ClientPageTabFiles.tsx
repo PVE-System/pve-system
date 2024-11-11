@@ -79,8 +79,10 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
       await fetchClientData();
       const folder =
         tabIndex === 0
-          ? `BalanceSheet/id=${clientId}`
-          : `ShipmentReport/id=${clientId}`;
+          ? `socialContract/id=${clientId}`
+          : tabIndex === 1
+            ? `fiscalDocs/id=${clientId}`
+            : `accountingDocs/id=${clientId}`;
       await fetchFiles(folder);
       setLoading(false);
     };
@@ -92,8 +94,10 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
     setTabIndex(newValue);
     const folder =
       newValue === 0
-        ? `BalanceSheet/id=${clientId}`
-        : `ShipmentReport/id=${clientId}`;
+        ? `socialContract/id=${clientId}`
+        : newValue === 1
+          ? `fiscalDocs/id=${clientId}`
+          : `accountingDocs/id=${clientId}`;
     fetchFiles(folder);
   };
 
@@ -107,9 +111,10 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
       formData.append('file', files[0]);
       const folder =
         tabIndex === 0
-          ? `BalanceSheet/id=${clientId}`
-          : `ShipmentReport/id=${clientId}`;
-
+          ? `socialContract/id=${clientId}`
+          : tabIndex === 1
+            ? `fiscalDocs/id=${clientId}`
+            : `accountingDocs/id=${clientId}`;
       try {
         const response = await fetch(
           `/api/uploadFilesClient?folder=${encodeURIComponent(folder)}&clientId=${clientId}`,
@@ -162,8 +167,10 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
         // Após deletar, reatualiza a lista de arquivos para garantir que tudo esteja sincronizado
         const folder =
           tabIndex === 0
-            ? `BalanceSheet/id=${clientId}`
-            : `ShipmentReport/id=${clientId}`;
+            ? `socialContract/id=${clientId}`
+            : tabIndex === 1
+              ? `fiscalDocs/id=${clientId}`
+              : `accountingDocs/id=${clientId}`;
         await fetchFiles(folder);
       } else {
         const errorResponse = await response.json();
@@ -234,8 +241,8 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
               <Tab
                 label={
                   {
-                    xs: 'Balanço P.', // Texto reduzido para telas menores
-                    md: 'Balanço Patrimonial', // Texto completo para tablets e maiores
+                    xs: 'Cont. Social', // Texto reduzido para telas menores
+                    md: 'Contrato. Social', // Texto completo para tablets e maiores
                   }[window.innerWidth < 600 ? 'xs' : 'md']
                 }
                 sx={{
@@ -249,8 +256,24 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
               <Tab
                 label={
                   {
-                    xs: 'Relatório E.',
-                    md: 'Relatório de Embarque',
+                    xs: 'Fiscais', // Texto reduzido para telas menores
+                    md: 'Docs Fiscais', // Texto completo para tablets e maiores
+                  }[window.innerWidth < 600 ? 'xs' : 'md']
+                }
+                sx={{
+                  textTransform: 'none',
+                  fontSize: {
+                    xs: '12px',
+                    md: '14px',
+                  },
+                }}
+              />
+
+              <Tab
+                label={
+                  {
+                    xs: 'Contábeis',
+                    md: 'Docs Contábeis',
                   }[window.innerWidth < 600 ? 'xs' : 'md']
                 }
                 sx={{
