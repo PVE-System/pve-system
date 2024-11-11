@@ -91,6 +91,7 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
     companySize: 'Porte da Empresa',
     hasOwnStore: 'Possui Loja Própria',
     icmsContributor: 'Contribuinte ICMS',
+    stateRegistration: 'Inscrição Estadual',
     transportationType: 'Transporte entra',
     companyLocation: 'Localização da empresa',
     marketSegmentNature: 'Segmento de Mercado e Natureza Jurídica',
