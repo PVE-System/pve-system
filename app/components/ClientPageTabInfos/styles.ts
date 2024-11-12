@@ -11,16 +11,6 @@ const styles = {
     },
   },
 
-  /*   boxCol1: {
-    justifyContent: 'center',
-    alignItens: 'center',
-    gap: '20px',
-    width: '30%',
-    '@media (max-width: 800px)': {
-      width: '100%',
-    },
-  }, */
-
   boxCol2: {
     display: 'flex',
     flexDirection: 'column',
@@ -45,6 +35,18 @@ const styles = {
     },
   },
 
+  exportExcelButton: {
+    marginTop: '20px',
+    backgroundColor: 'purple',
+
+    '&:hover': {
+      backgroundColor: '#5e005e',
+      '@media (max-width: 800px)': {
+        /* alignSelf: 'center', */
+      },
+    },
+  },
+
   exportButton: {
     marginTop: '20px',
     backgroundColor: 'mediumblue',
@@ -57,24 +59,13 @@ const styles = {
     },
   },
 
-  /*   deleteButton: {
-    marginTop: '20px',
-    backgroundColor: 'red',
-    '&:hover': {
-      backgroundColor: 'darkred',
-      '@media (max-width: 800px)': {
-        alignSelf: 'center',
-      },
-    },
-  }, */
-
   editButton: {
     marginTop: '20px',
     backgroundColor: 'green',
     '&:hover': {
       backgroundColor: 'darkgreen',
       '@media (max-width: 800px)': {
-        alignSelf: 'center',
+        /* alignSelf: 'center', */
       },
     },
   },

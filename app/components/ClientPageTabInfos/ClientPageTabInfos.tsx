@@ -5,6 +5,7 @@ import {
   CircularProgress,
   MenuItem,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
@@ -28,6 +29,7 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
   const { handleSubmit, control, getValues, setValue } = useForm(); // Hooks do react-hook-form para gerenciar o formulário
   const [clientData, setClientData] = useState<any>(null); // Estado para armazenar os dados do cliente
   const [loading, setLoading] = useState(true); // Estado para controlar o carregamento
+  const [buttonText, setButtonText] = useState('Excel');
 
   useEffect(() => {
     if (!clientId || isNaN(Number(clientId))) {
@@ -103,7 +105,7 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
     setValue(name, value); // Armazena o valor sem modificações
   };
 
-  //Start Export
+  //Start Export PDF
 
   const exportPDF = () => {
     const doc = new jsPDF(); // Cria uma nova instância do jsPDF
@@ -138,7 +140,61 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
     doc.save(`PVE Representações-Cadastro de Cliente${clientId}.pdf`); // Salva o PDF
   };
 
-  //End Export
+  //End Export PDF
+
+  //Start Export EXCEL
+
+  const copyClientDataToClipboard = (clientData: { [key: string]: any }) => {
+    // Exclui os campos irrelevantes para exportação
+    const excludedFields = [
+      'id',
+      'createdAt',
+      'rating',
+      'clientCondition',
+      'imageUrl',
+    ];
+
+    // Ordem das colunas no Excel do cliente
+    const excelColumnOrder = [
+      'cnpj',
+      'corfioCode',
+      'companyName',
+      'cnpj',
+      'address',
+      'city',
+      'cep',
+      'state',
+      '',
+      'emailCommercial',
+      'phone',
+      'stateRegistration',
+    ];
+
+    // Organiza os dados na ordem das colunas do Excel
+    const values = excelColumnOrder.map((key) => {
+      if (excludedFields.includes(key)) return ''; // Ignora campos excluídos
+      return clientData[key] || ''; // Retorna o valor do campo ou vazio se não houver
+    });
+
+    // Gera o conteúdo tabulado
+    const tabulatedText = values.join('\t'); // Dados em uma linha, separados por tabulações
+
+    // Copia para a área de transferência
+    navigator.clipboard
+      .writeText(tabulatedText)
+      .then(() => {
+        console.log('Dados do cliente copiados com sucesso!');
+        setButtonText('Copiado'); // Altera o texto do botão para "Copiado"
+
+        setTimeout(() => setButtonText('Excel'), 1500); // Volta para "Excel" após 2 segundos
+      })
+      .catch((error) => {
+        console.error('Erro ao copiar os dados:', error);
+        alert('Erro ao copiar os dados. Tente novamente.');
+      });
+  };
+
+  //End Export EXCEL
 
   if (loading) {
     return (
@@ -229,22 +285,36 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
             enableImageUpload={false}
           />
           <Box sx={styles.boxButton}>
-            <Button
-              type="button"
-              variant="contained"
-              onClick={exportPDF}
-              sx={styles.exportButton}
-            >
-              Exportar PDF
-            </Button>
-            <Button
-              type="button"
-              variant="contained"
-              onClick={() => onSubmitEdit(clientId)}
-              sx={styles.editButton}
-            >
-              Editar
-            </Button>
+            <Tooltip title={'Copiar dados para colar na planilha'}>
+              <Button
+                type="button"
+                variant="contained"
+                onClick={() => copyClientDataToClipboard(clientData)}
+                sx={styles.exportExcelButton}
+              >
+                {buttonText}
+              </Button>
+            </Tooltip>
+            <Tooltip title={'Exportar dados e gerar arquivo PDF'}>
+              <Button
+                type="button"
+                variant="contained"
+                onClick={exportPDF}
+                sx={styles.exportButton}
+              >
+                PDF
+              </Button>
+            </Tooltip>
+            <Tooltip title={'Editar cliente'}>
+              <Button
+                type="button"
+                variant="contained"
+                onClick={() => onSubmitEdit(clientId)}
+                sx={styles.editButton}
+              >
+                Editar
+              </Button>
+            </Tooltip>
           </Box>
         </Box>
         {/* Grupo 2 - formulário de cadastro */}
