@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Tooltip from '@mui/material/Tooltip';
 import {
   Box,
@@ -34,6 +34,35 @@ export default function ExcelDownloadFileComponent() {
   const [loadingUpload, setLoadingUpload] = useState(false);
   const [showAlertModal, setShowAlertModal] = useState(false);
 
+  // Função para marcar a página como visualizada no backend
+  const markPageAsViewed = useCallback(async () => {
+    const userId = Cookies.get('userId');
+    if (!userId) {
+      console.error('User ID not found in cookies');
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `/api/updatePageView?userId=${userId}&page=excel`,
+        {
+          method: 'POST',
+        },
+      );
+      if (response.ok) {
+        console.log('Page view updated successfully');
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar visualização da página:', error);
+    }
+  }, []);
+
+  // Chamado assim que a página carrega
+  useEffect(() => {
+    markPageAsViewed();
+  }, [markPageAsViewed]);
+
+  // Função para buscar os arquivos
   useEffect(() => {
     const fetchFiles = async () => {
       try {
@@ -42,12 +71,12 @@ export default function ExcelDownloadFileComponent() {
         );
         const data = await response.json();
 
-        const filesWithCorrectDates = data.files.map((file: any) => ({
-          ...file,
-          date: file.date
-            ? new Date(file.date).toISOString()
-            : new Date().toISOString(),
-        }));
+        const filesWithCorrectDates = data.files.map(
+          (file: { date: string | number | Date }) => ({
+            ...file,
+            date: new Date(file.date).toISOString(),
+          }),
+        );
 
         setFiles(filesWithCorrectDates || []);
         setLoading(false);
@@ -86,13 +115,18 @@ export default function ExcelDownloadFileComponent() {
 
           setFiles([...files, newFileWithDate]);
           event.target.value = '';
+
+          // Atualizar `page_excel` no backend para todos os usuários
+          await fetch(`/api/updatePageExcelTime`, {
+            method: 'POST',
+          });
         } else {
           console.error('Error uploading file');
         }
       } catch (error) {
         console.error('Error uploading file:', error);
       } finally {
-        setLoadingUpload(false); // Termina o carregamento
+        setLoadingUpload(false);
       }
     }
   };

@@ -158,7 +158,24 @@ export const tabsViewed = pgTable('tabs_viewed', {
   salesTabViewedAt: timestamp('sales_tab_viewed_at'), // Última vez que o usuário viu a aba de vendas
   commentsTabViewedAt: timestamp('comments_tab_viewed_at'), // Última vez que o usuário viu a aba de comentários
   filesTabViewedAt: timestamp('files_tab_viewed_at'), // Última vez que o usuário viu a aba de arquivos
+  excelPageTabViewedAt: timestamp('excel_page_tab_viewed_at').defaultNow(), // Última vez que o usuário viu a aba de Excel
 });
 
 export type TabsViewed = typeof tabsViewed.$inferSelect;
 export type NewTabsViewed = typeof tabsViewed.$inferInsert;
+
+// Tabela que armazena quando cada usuário visualizou páginas específicas pela última vez e quando houve atualização de conteúdo
+export const pageViews = pgTable('page_views', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id')
+    .references(() => users.id)
+    .notNull(),
+  pageExcel: timestamp('page_excel').defaultNow(), // Última vez que o usuário viu a página Excel
+  pageDashboard: timestamp('page_dashboard').defaultNow(), // Última vez que o usuário viu o Dashboard
+  pageSalesQuote: timestamp('page_sales_quote').defaultNow(), // Última vez que o usuário viu a página de cotações
+  lastViewedAt: timestamp('last_viewed_at').defaultNow(), // Última visualização geral da página
+  lastUpdatedAt: timestamp('last_updated_at').defaultNow(), // Última vez que o conteúdo foi atualizado
+});
+
+export type PageViews = typeof pageViews.$inferSelect;
+export type NewPageViews = typeof pageViews.$inferInsert;
