@@ -79,6 +79,16 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
     }
   };
 
+  const formatPhoneForWhatsApp = (phone: string) => {
+    // Remove todos os caracteres que não são números
+    const cleanedPhone = phone.replace(/\D/g, '');
+
+    // Adiciona o código do país (55 para Brasil) no início
+    const formattedPhone = `55${cleanedPhone}`;
+
+    return `https://wa.me/${formattedPhone}`;
+  };
+
   return (
     <Box sx={styles.boxProfile}>
       <Typography variant="h6" sx={styles.companyName}>
@@ -233,8 +243,16 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
           Código Corfio: {corfioCode}
         </Typography>{' '}
         <Typography variant="subtitle2" sx={{ marginBottom: '5px' }}>
-          Telefone: {phone}
-        </Typography>{' '}
+          Telefone:{' '}
+          <a
+            href={formatPhoneForWhatsApp(phone)} // Gera o link com o código do país
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: 'green', textDecoration: 'none' }}
+          >
+            {phone}
+          </a>
+        </Typography>
         <Typography variant="subtitle2" sx={{ marginBottom: '5px' }}>
           Email: {emailCommercial}
         </Typography>{' '}

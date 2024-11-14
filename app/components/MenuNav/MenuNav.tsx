@@ -12,7 +12,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
-import { IconButton, Link, Tooltip, Typography } from '@mui/material';
+import { Badge, IconButton, Link, Tooltip, Typography } from '@mui/material';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -42,11 +42,37 @@ export default function TemporaryDrawer() {
   const [loading, setLoading] = useState(true);
   const { theme, toggleTheme } = useTheme();
   const isMobile = useMediaQuery('(max-width:600px)');
-  const { user, logout } = useAuth(); // Obtenha o usuário do contexto de autenticação
+  const { user, logout } = useAuth();
+  const [hasNotification, setHasNotification] = useState(false);
 
+  // Função para verificar notificações
+  const checkForNotification = async () => {
+    const userId = Cookies.get('userId');
+    if (!userId) {
+      console.error('User ID not found in cookies');
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `/api/notificationCheckUpdatePages?userId=${userId}`,
+      );
+      const data = await response.json();
+
+      if (response.ok) {
+        setHasNotification(data.hasNotification); // Atualiza o estado com a resposta da API
+      } else {
+        console.error('Error fetching notification status:', data.error);
+      }
+    } catch (error) {
+      console.error('Error checking for notifications:', error);
+    }
+  };
+
+  // Busca dados do usuário e verifica notificação ao carregar a página
   useEffect(() => {
     const fetchUserData = async () => {
-      const userId = Cookies.get('userId'); // Pega o ID do usuário do cookie
+      const userId = Cookies.get('userId');
       if (userId) {
         try {
           const response = await fetch(`/api/getUser/${userId}`);
@@ -59,14 +85,15 @@ export default function TemporaryDrawer() {
         } catch (error) {
           console.error('Failed to fetch user data', error);
         } finally {
-          setLoading(false); // Finaliza o estado de carregamento
+          setLoading(false);
         }
       } else {
-        setLoading(false); // Finaliza o estado de carregamento
+        setLoading(false);
       }
     };
 
     fetchUserData();
+    checkForNotification();
   }, [user?.id]);
 
   const handleToggleTheme = () => {
@@ -82,7 +109,6 @@ export default function TemporaryDrawer() {
   const themeIcon =
     theme === 'dark' ? <Brightness4Icon /> : <Brightness7Icon />;
 
-  // Função Renderizar o nome do cliente com tamnho menor
   const renderAsIs = (str: any) => {
     if (typeof str !== 'string') {
       return '';
@@ -129,11 +155,15 @@ export default function TemporaryDrawer() {
         {[
           {
             name: 'Planilha Excel',
-            icon: <ArticleIcon />,
+            icon: (
+              <Badge color="error" variant="dot" invisible={!hasNotification}>
+                <ArticleIcon />
+              </Badge>
+            ),
             link: '/excelDownloadFile',
           },
+
           userData.role === 'admin' && {
-            // Verifica se o usuário é admin
             name: 'Cadastrar Equipe',
             icon: <GroupAddIcon />,
             link: '/registerTeam',
@@ -147,7 +177,7 @@ export default function TemporaryDrawer() {
           .filter(
             (item): item is { name: string; icon: JSX.Element; link: string } =>
               Boolean(item),
-          ) // Filtra apenas itens válidos e assegura o tipo
+          )
           .map((item) => (
             <ListItem key={item.name} disablePadding>
               <ListItemButton component="a" href={item.link}>
@@ -213,7 +243,6 @@ export default function TemporaryDrawer() {
             </Box>
             <Typography variant="subtitle2" component="h1">
               {renderAsIs(userData.name.slice(0, 25)) || 'Nome do Usuário'}
-              {/* {userData.name || 'Nome do Usuário'} */}
             </Typography>
           </Box>
           <Box sx={styles.iconLogout}>
