@@ -101,6 +101,21 @@ const sharedStyles = {
       },
     },
   },
+  modalStyle: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 300,
+    backgroundColor: (theme: Theme) =>
+      theme.palette.mode === 'light'
+        ? theme.palette.background.default
+        : theme.palette.background.default,
+    borderRadius: 2,
+    boxShadow: 24,
+    p: 4,
+    textAlign: 'center',
+  },
 };
 
 export default sharedStyles;

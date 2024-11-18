@@ -35,7 +35,8 @@ export default function ExcelDownloadFileComponent() {
   const [showAlertModal, setShowAlertModal] = useState(false);
 
   // Função para marcar a página como visualizada no backend
-  const markPageAsViewed = useCallback(async () => {
+  // Função para marcar a página como visualizada no backend e remover notificação
+  const markPageAsViewed = async () => {
     const userId = Cookies.get('userId');
     if (!userId) {
       console.error('User ID not found in cookies');
@@ -43,24 +44,19 @@ export default function ExcelDownloadFileComponent() {
     }
 
     try {
-      const response = await fetch(
-        `/api/updatePageView?userId=${userId}&page=excel`,
-        {
-          method: 'POST',
-        },
-      );
-      if (response.ok) {
-        console.log('Page view updated successfully');
-      }
+      await fetch(`/api/updatePageView?userId=${userId}&page=excel`, {
+        method: 'POST',
+      });
+      console.log('Page view updated successfully');
     } catch (error) {
       console.error('Erro ao atualizar visualização da página:', error);
     }
-  }, []);
+  };
 
-  // Chamado assim que a página carrega
+  // Atualize a última visualização ao acessar a página
   useEffect(() => {
     markPageAsViewed();
-  }, [markPageAsViewed]);
+  }, []);
 
   // Função para buscar os arquivos
   useEffect(() => {
