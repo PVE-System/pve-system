@@ -22,6 +22,7 @@ import styles from './styles';
 import { Rating } from '@mui/material';
 import dynamic from 'next/dynamic';
 import { red } from '@mui/material/colors';
+import DashboardExcelUpdateNotification from '../DashboardExcelUpdateNotification/DashboardExcelUpdateNotification';
 
 const DynamicChartComponent = dynamic(
   () => import('@/app/components/PieChart/PieChart'),
@@ -365,6 +366,9 @@ const DashboardComponent = () => {
             />
           </AccordionDetails>
         </Accordion>
+      </Box>
+      <Box>
+        <DashboardExcelUpdateNotification />
       </Box>
     </Container>
   );

@@ -2,6 +2,7 @@ import { NextResponse, NextRequest } from 'next/server';
 import { db, users, NewUser } from '@/app/db';
 import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs'; // Importando bcryptjs
+import { pageViews } from '@/app/db/schema';
 
 // METODO POST:
 
@@ -10,37 +11,50 @@ export async function POST(request: NextRequest) {
 
   try {
     // Hash da senha do usuário
-    const hashedPassword = await bcrypt.hash(newUser.password, 10); // Hash da senha com 10 rounds
+    const hashedPassword = await bcrypt.hash(newUser.password, 10);
 
     // Definir o valor padrão para 'role' se não for passado no frontend
-    const userRole = newUser.role || 'vendedor'; // Valor padrão para a função
+    const userRole = newUser.role || 'vendedor';
 
     // Inserindo o usuário no banco de dados com a senha hasheada e a função (role)
-    const createdUser = await db
+    const [createdUser] = await db
       .insert(users)
       .values({
         email: newUser.email,
-        password: hashedPassword, // Usando a senha hasheada
+        password: hashedPassword,
         name: newUser.name,
-        role: userRole, // Incluindo a função
-        createdAt: new Date(), // Adicionando a data de criação
+        role: userRole,
+        createdAt: new Date(),
       })
       .returning({
         id: users.id,
         email: users.email,
         name: users.name,
-        role: users.role, // Incluindo a função retornada
+        role: users.role,
         createdAt: users.createdAt,
       })
       .execute();
 
+    if (createdUser) {
+      // Adiciona uma linha na tabela `page_views` para o novo usuário com valores de data padrão
+      await db
+        .insert(pageViews)
+        .values({
+          userId: createdUser.id,
+          pageExcel: new Date('1970-01-01T00:00:00Z'),
+          pageDashboard: new Date('1970-01-01T00:00:00Z'),
+          pageSalesQuote: new Date('1970-01-01T00:00:00Z'),
+          lastViewedAt: new Date('1970-01-01T00:00:00Z'),
+          lastUpdatedAt: new Date('1970-01-01T00:00:00Z'),
+        })
+        .execute();
+    }
+
     return NextResponse.json({ users: createdUser });
   } catch (error: unknown) {
-    // Tipagem explícita do erro como um objeto com uma propriedade 'message'
     if (error instanceof Error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
-    // Tratamento de erro genérico se o erro não for uma instância de Error
     return NextResponse.json(
       { error: 'Unknown error occurred' },
       { status: 500 },

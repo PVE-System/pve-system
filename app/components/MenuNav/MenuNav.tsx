@@ -31,6 +31,7 @@ import styles from '@/app/components/MenuNav/styles';
 import { useAuth } from '@/app/contex/authContext'; // Importe o contexto de autenticação
 import Cookies from 'js-cookie';
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 export default function TemporaryDrawer() {
   const [open, setOpen] = React.useState(false);
@@ -44,6 +45,8 @@ export default function TemporaryDrawer() {
   const isMobile = useMediaQuery('(max-width:600px)');
   const { user, logout } = useAuth();
   const [hasNotification, setHasNotification] = useState(false);
+
+  const pathname = usePathname();
 
   // Função para verificar notificações
   const checkForNotification = async () => {
@@ -68,6 +71,11 @@ export default function TemporaryDrawer() {
       console.error('Error checking for notifications:', error);
     }
   };
+
+  // Verificação periódica para atualizações de notificação
+  useEffect(() => {
+    checkForNotification(); // Verifica a notificação apenas quando o pathname muda ou na primeira montagem
+  }, [pathname]);
 
   // Busca dados do usuário e verifica notificação ao carregar a página
   useEffect(() => {
