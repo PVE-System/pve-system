@@ -102,44 +102,43 @@ export default function ExcelUpdateNotification() {
 import React, { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import { Modal, Button, Typography, Box } from '@mui/material';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import sharedStyles from '@/app/styles/sharedStyles';
 
 export default function ExcelUpdateNotification() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
-  const pathname = usePathname();
 
-  const checkForNotification = async () => {
-    const userId = Cookies.get('userId');
-    if (!userId) {
-      console.error('User ID not found in cookies');
-      return;
-    }
-
-    console.log('Checking for notification...');
-
-    try {
-      const response = await fetch(
-        `/api/notificationCheckUpdatePages?userId=${userId}`,
-      );
-      const data = await response.json();
-
-      console.log('Notification data received:', data);
-
-      if (response.ok && data.hasNotification) {
-        console.log('Notification found, opening modal...');
-        setIsModalOpen(true);
-      } else {
-        console.log('No new notifications found');
-        setIsModalOpen(false);
+  useEffect(() => {
+    const checkForNotification = async () => {
+      const userId = Cookies.get('userId');
+      if (!userId) {
+        console.error('User ID not found in cookies');
+        return;
       }
-    } catch (error) {
-      console.error('Erro ao verificar notificações:', error);
-    }
-  };
 
-  const updateDashboardViewedAt = async () => {
+      try {
+        const response = await fetch(
+          `/api/notificationCheckModalStatus?userId=${userId}`,
+        );
+        const data = await response.json();
+
+        if (response.ok && data.hasModal) {
+          setIsModalOpen(true);
+        } else {
+          setIsModalOpen(false);
+        }
+      } catch (error) {
+        console.error('Error checking modal status:', error);
+      }
+    };
+
+    checkForNotification();
+  }, []);
+
+  const handleCloseModal = async () => {
+    setIsModalOpen(false);
+
     const userId = Cookies.get('userId');
     if (!userId) {
       console.error('User ID not found in cookies');
@@ -148,47 +147,29 @@ export default function ExcelUpdateNotification() {
 
     try {
       const response = await fetch(
-        `/api/updateDashboardViewedAt?userId=${userId}`,
+        `/api/updateDashboardNotification?userId=${userId}`,
         {
-          method: 'PUT', // Certifique-se de que o método é PUT
+          method: 'PUT',
         },
       );
       if (!response.ok) {
         console.error(
-          'Erro ao atualizar dashboard_last_viewed_at:',
+          'Error updating dashboard notification status:',
           response.statusText,
         );
       } else {
-        console.log('Dashboard view updated successfully in database');
+        console.log('Dashboard notification status updated successfully.');
       }
     } catch (error) {
-      console.error('Erro ao atualizar dashboard view:', error);
+      console.error('Error updating dashboard notification status:', error);
     }
   };
 
-  const handleCloseModal = async () => {
-    console.log('Closing modal and updating dashboard view...');
-    setIsModalOpen(false);
-    await updateDashboardViewedAt(); // Atualiza o campo no banco de dados
-    console.log('Modal closed, dashboard view updated in database');
-    await checkForNotification(); // Recheca notificações
-  };
-
   const handleCheckUpdates = async () => {
-    setIsModalOpen(false);
-    await updateDashboardViewedAt(); // Atualiza o campo no banco de dados
+    setIsModalOpen(false); // Fecha o modal
     console.log('User chose to check updates, redirecting...');
-
-    // Recheca notificações para refletir a nova atualização
-    await checkForNotification();
-
-    router.push('/excelDownloadFile');
+    router.push('/excelDownloadFile'); // Redireciona para a página Excel
   };
-
-  useEffect(() => {
-    console.log('Pathname changed, checking for notification...');
-    checkForNotification();
-  }, [pathname]);
 
   return (
     <Modal
@@ -216,9 +197,7 @@ export default function ExcelUpdateNotification() {
               '&:hover': { backgroundColor: 'darkgreen' },
             }}
             variant="contained"
-            onClick={() => {
-              handleCloseModal();
-            }}
+            onClick={handleCloseModal}
           >
             Entendi
           </Button>

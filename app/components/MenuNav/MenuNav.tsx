@@ -44,65 +44,66 @@ export default function TemporaryDrawer() {
   const { theme, toggleTheme } = useTheme();
   const isMobile = useMediaQuery('(max-width:600px)');
   const { user, logout } = useAuth();
-  const [hasNotification, setHasNotification] = useState(false);
+  const [showBadge, setShowBadge] = useState(false); // Badge status
 
   const pathname = usePathname();
 
-  // Função para verificar notificações
-  const checkForNotification = async () => {
-    const userId = Cookies.get('userId');
-    if (!userId) {
-      console.error('User ID not found in cookies');
-      return;
-    }
-
-    try {
-      const response = await fetch(
-        `/api/notificationCheckUpdatePages?userId=${userId}`,
-      );
-      const data = await response.json();
-
-      if (response.ok) {
-        setHasNotification(data.hasNotification); // Atualiza o estado com a resposta da API
-      } else {
-        console.error('Error fetching notification status:', data.error);
-      }
-    } catch (error) {
-      console.error('Error checking for notifications:', error);
-    }
-  };
-
-  // Verificação periódica para atualizações de notificação
   useEffect(() => {
-    checkForNotification(); // Verifica a notificação apenas quando o pathname muda ou na primeira montagem
+    const checkBadgeStatus = async () => {
+      const userId = Cookies.get('userId');
+      if (!userId) {
+        console.error('User ID not found in cookies');
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `/api/notificationCheckBadgeStatus?userId=${userId}`,
+        );
+        const data = await response.json();
+
+        if (response.ok) {
+          setShowBadge(data.hasBadge); // Atualiza o estado do badge
+        } else {
+          console.error('Error fetching badge status:', data.error);
+        }
+      } catch (error) {
+        console.error('Error checking badge status:', error);
+      }
+    };
+
+    checkBadgeStatus();
   }, [pathname]);
 
-  // Busca dados do usuário e verifica notificação ao carregar a página
   useEffect(() => {
     const fetchUserData = async () => {
       const userId = Cookies.get('userId');
-      if (userId) {
-        try {
-          const response = await fetch(`/api/getUser/${userId}`);
-          const data = await response.json();
-          setUserData({
-            name: data.name,
-            imageUrl: data.imageUrl,
-            role: data.role,
-          });
-        } catch (error) {
-          console.error('Failed to fetch user data', error);
-        } finally {
-          setLoading(false);
-        }
-      } else {
+      if (!userId) {
+        console.error('User ID not found in cookies');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/getUser/${userId}`);
+        const data = await response.json();
+
+        setUserData({
+          name: data.name,
+          imageUrl: data.imageUrl,
+          role: data.role,
+        });
+        console.log('User data fetched:', data);
+      } catch (error) {
+        console.error('Failed to fetch user data:', error);
+      } finally {
         setLoading(false);
       }
     };
 
+    console.log('Fetching user data on component mount...');
     fetchUserData();
-    checkForNotification();
-  }, [user?.id]);
+  }, [user?.id]); // Reexecuta quando o `user` ou seu `id` muda.
 
   const handleToggleTheme = () => {
     const newTheme = theme === 'light' ? 'light' : 'dark';
@@ -164,7 +165,7 @@ export default function TemporaryDrawer() {
           {
             name: 'Planilha Excel',
             icon: (
-              <Badge color="error" variant="dot" invisible={!hasNotification}>
+              <Badge color="error" variant="dot" invisible={!showBadge}>
                 <ArticleIcon />
               </Badge>
             ),

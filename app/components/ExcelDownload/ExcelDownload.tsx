@@ -34,9 +34,8 @@ export default function ExcelDownloadFileComponent() {
   const [loadingUpload, setLoadingUpload] = useState(false);
   const [showAlertModal, setShowAlertModal] = useState(false);
 
-  // Função para marcar a página como visualizada no backend
-  // Função para marcar a página como visualizada no backend e remover notificação
-  const markPageAsViewed = async () => {
+  // Nova função para sincronizar `pageExcel` com `pageExcelUpdatedAt`
+  const syncExcelPageView = async () => {
     const userId = Cookies.get('userId');
     if (!userId) {
       console.error('User ID not found in cookies');
@@ -44,18 +43,25 @@ export default function ExcelDownloadFileComponent() {
     }
 
     try {
-      await fetch(`/api/updatePageView?userId=${userId}&page=excel`, {
-        method: 'POST',
-      });
-      console.log('Page view updated successfully');
+      const response = await fetch(
+        `/api/updatePageExcelView?userId=${userId}`,
+        {
+          method: 'PUT',
+        },
+      );
+      if (response.ok) {
+        console.log('Successfully synced pageExcel with pageExcelUpdatedAt');
+      } else {
+        console.error('Error syncing pageExcel:', response.statusText);
+      }
     } catch (error) {
-      console.error('Erro ao atualizar visualização da página:', error);
+      console.error('Error during syncExcelPageView:', error);
     }
   };
 
-  // Atualize a última visualização ao acessar a página
+  // Atualiza `pageExcel` ao acessar a página
   useEffect(() => {
-    markPageAsViewed();
+    syncExcelPageView(); // Chama a função para sincronizar as datas
   }, []);
 
   // Função para buscar os arquivos
@@ -112,10 +118,11 @@ export default function ExcelDownloadFileComponent() {
           setFiles([...files, newFileWithDate]);
           event.target.value = '';
 
-          // Atualizar `page_excel` no backend para todos os usuários
-          await fetch(`/api/updatePageExcelTime`, {
+          // Atualizar `pageExcelUpdatedAt` no backend para todos os usuários
+          await fetch(`/api/updatePageExcelUpdatedAt`, {
             method: 'POST',
           });
+          console.log('pageExcelUpdatedAt updated successfully');
         } else {
           console.error('Error uploading file');
         }
