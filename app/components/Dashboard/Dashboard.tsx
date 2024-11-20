@@ -22,7 +22,7 @@ import styles from './styles';
 import { Rating } from '@mui/material';
 import dynamic from 'next/dynamic';
 import { red } from '@mui/material/colors';
-import DashboardExcelUpdateNotification from '../DashboardExcelUpdateNotification/DashboardExcelUpdateNotification';
+import DashboardExcelUpdateNotification from '../DashboardModalExcelUpdateNotification/DashboardExcelUpdateNotification';
 
 const DynamicChartComponent = dynamic(
   () => import('@/app/components/PieChart/PieChart'),

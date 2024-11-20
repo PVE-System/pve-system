@@ -173,6 +173,18 @@ export const pageViews = pgTable('page_views', {
   pageExcel: timestamp('page_excel').defaultNow(), // Última vez que o usuário viu a página Excel
   pageDashboard: timestamp('page_dashboard').defaultNow(), // Última vez que o usuário viu o Dashboard
   pageSalesQuote: timestamp('page_sales_quote').defaultNow(), // Última vez que o usuário viu a página de cotações
+
+  // Colunas `updated_at` para gerenciar atualizações de conteúdo
+  pageExcelUpdatedAt: timestamp('page_excel_updated_at').default(
+    new Date('1970-01-01T00:00:00.000Z'),
+  ),
+  pageDashboardUpdatedAt: timestamp('page_dashboard_updated_at').default(
+    new Date('1970-01-01T00:00:00.000Z'),
+  ),
+  pageSalesQuoteUpdatedAt: timestamp('page_sales_quote_updated_at').default(
+    new Date('1970-01-01T00:00:00.000Z'),
+  ),
+
   lastViewedAt: timestamp('last_viewed_at').defaultNow(), // Última visualização geral da página
   lastUpdatedAt: timestamp('last_updated_at').defaultNow(), // Última vez que o conteúdo foi atualizado
 });
