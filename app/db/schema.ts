@@ -26,14 +26,14 @@ export const users = pgTable(
     imageUrl: varchar('imageUrl', { length: 512 }), // Adicionando o campo imageUrl
     createdAt: timestamp('createdAt').defaultNow().notNull(),
     role: varchar('role', { length: 50 }).notNull().default('vendedor'),
+    is_active: boolean('is_active').notNull().default(true), // Status ativo
+    operatorNumber: varchar('operator_number', { length: 20 }).notNull(),
 
     // Colunas para recuperação de senha
     resetToken: varchar('resetToken', { length: 256 }).default(''),
     resetTokenExpiration: timestamp('resetTokenExpiration').default(
       new Date(0),
     ),
-    // Nova coluna para desativar o usuário
-    is_active: boolean('is_active').notNull().default(true),
   },
   (table) => {
     return {
@@ -41,8 +41,6 @@ export const users = pgTable(
     };
   },
 );
-export type User = typeof users.$inferSelect;
-export type NewUser = typeof users.$inferInsert;
 
 /*TABELA DE CLIENTES REGISTRADOS*/
 
@@ -144,7 +142,21 @@ export const comments = pgTable('comments', {
 export type Comment = typeof comments.$inferSelect;
 export type NewComment = typeof comments.$inferInsert;
 
-// Tipos inferidos para ser importados nas operações(route handlers(manipuladores))
+export const salesQuotes = pgTable('sales_quotes', {
+  id: serial('id').primaryKey(),
+  clientId: integer('client_id')
+    .references(() => clients.id)
+    .notNull(), // Referência ao cliente
+  userId: integer('user_id')
+    .references(() => users.id)
+    .notNull(), // Referência ao vendedor
+  quoteName: text('quote_name').notNull(), // Nome único da cotação
+  year: integer('year').notNull(), // Ano da cotação para filtragem
+  createdAt: timestamp('created_at').defaultNow().notNull(), // Data de criação da cotação
+});
+
+export type SalesQuote = typeof salesQuotes.$inferSelect;
+export type NewSalesQuote = typeof salesQuotes.$inferInsert;
 
 // Tabela que armazena quando cada usuário visualizou uma aba pela última vez.
 export const tabsViewed = pgTable('tabs_viewed', {

@@ -39,7 +39,12 @@ export async function PATCH(request: NextRequest) {
     // Atualizar o campo is_active para false, o e-mail e remover a senha
     await db
       .update(users)
-      .set({ is_active: false, email: fakeEmail, password: '' })
+      .set({
+        is_active: false,
+        email: fakeEmail,
+        password: '',
+        operatorNumber: '000',
+      })
       .where(eq(users.id, Number(id)))
       .execute();
 

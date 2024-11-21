@@ -39,9 +39,6 @@ export default function UsersTeamList() {
   const [loading, setLoading] = useState(false);
   const [editingUser, setEditingUser] = useState<number | null>(null);
   const [deleteLoading, setDeleteLoading] = useState<number | null>(null);
-  const [deactivateLoading, setDeactivateLoading] = useState<number | null>(
-    null,
-  );
   const [editFormData, setEditFormData] = useState<User | null>(null);
   const isSmallScreen = useMediaQuery('(max-width:600px)');
 
@@ -55,12 +52,10 @@ export default function UsersTeamList() {
       const response = await fetch('/api/getAllUsers');
       const data = await response.json();
 
-      // Filtra os usuários que estão ativos
       const activeUsers = data.users.filter(
         (user: User) => user.is_active === true,
       );
 
-      // Atualiza o estado com apenas os usuários ativos
       setUsers(activeUsers);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -69,53 +64,11 @@ export default function UsersTeamList() {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    setDeleteLoading(id);
-    try {
-      const filesResponse = await fetch(
-        `/api/getAllFilesBlobByUser?userId=${id}`,
-      );
-      const filesData = await filesResponse.json();
-
-      if (filesResponse.ok && filesData.files.length > 0) {
-        await fetch(`/api/deleteAllFilesBlobByUser`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            fileUrls: filesData.files.map((file: { url: any }) => file.url),
-          }),
-        });
-      }
-
-      // 2. Desativar o usuário após deletar os arquivos
-      const response = await fetch('/api/deactivateUserByAdmin', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ id }),
-      });
-
-      if (response.ok) {
-        // Remove o usuário da lista local para não exibi-lo mais
-        setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
-      } else {
-        const errorResponse = await response.json();
-        throw new Error(errorResponse.error || 'Failed to deactivate user');
-      }
-    } catch (error) {
-      console.error('Error deleting user or files:', error);
-    } finally {
-      setDeleteLoading(null);
-    }
-  };
-
   const handleEdit = (user: User) => {
     setEditingUser(user.id);
     setEditFormData({
       id: user.id,
+      operatorNumber: user.operatorNumber || '', // Incluímos operatorNumber no estado de edição
       name: user.name,
       email: user.email,
       role: user.role,
@@ -134,6 +87,7 @@ export default function UsersTeamList() {
         },
         body: JSON.stringify({
           id: editFormData.id,
+          operatorNumber: editFormData.operatorNumber, // Incluído no payload
           name: editFormData.name,
           email: editFormData.email,
           role: editFormData.role,
@@ -159,12 +113,55 @@ export default function UsersTeamList() {
     }
   };
 
+  const handleDelete = async (id: number) => {
+    setDeleteLoading(id);
+    try {
+      const filesResponse = await fetch(
+        `/api/getAllFilesBlobByUser?userId=${id}`,
+      );
+      const filesData = await filesResponse.json();
+
+      if (filesResponse.ok && filesData.files.length > 0) {
+        await fetch(`/api/deleteAllFilesBlobByUser`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            fileUrls: filesData.files.map((file: { url: any }) => file.url),
+          }),
+        });
+      }
+
+      const response = await fetch('/api/deactivateUserByAdmin', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id }),
+      });
+
+      if (response.ok) {
+        setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
+      } else {
+        const errorResponse = await response.json();
+        throw new Error(errorResponse.error || 'Failed to deactivate user');
+      }
+    } catch (error) {
+      console.error('Error deleting user or files:', error);
+    } finally {
+      setDeleteLoading(null);
+    }
+  };
+
   return (
     <Container maxWidth="lg" sx={styles.container}>
       <TableContainer>
         <Table>
           <TableHead>
             <TableRow>
+              <TableCell sx={styles.fontSize}>Operador</TableCell>{' '}
+              {/* Novo campo */}
               <TableCell sx={styles.fontSize}>Nome</TableCell>
               {!isSmallScreen && (
                 <TableCell sx={styles.fontSize}>Email</TableCell>
@@ -178,7 +175,7 @@ export default function UsersTeamList() {
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={isSmallScreen ? 2 : 4} align="center">
+                <TableCell colSpan={isSmallScreen ? 2 : 5} align="center">
                   <CircularProgress />
                 </TableCell>
               </TableRow>
@@ -187,6 +184,19 @@ export default function UsersTeamList() {
                 <TableRow key={user.id} sx={styles.rowHover}>
                   {editingUser === user.id ? (
                     <>
+                      <TableCell sx={styles.fontSize}>
+                        <TextField
+                          label="Operador"
+                          value={editFormData?.operatorNumber || ''} // Campo para edição
+                          onChange={(e) =>
+                            setEditFormData({
+                              ...editFormData!,
+                              operatorNumber: e.target.value,
+                            })
+                          }
+                          fullWidth
+                        />
+                      </TableCell>
                       <TableCell sx={styles.fontSize}>
                         <TextField
                           label="Nome"
@@ -239,10 +249,10 @@ export default function UsersTeamList() {
                           onClick={handleSave}
                           disabled={loading}
                           sx={{
-                            backgroundColor: 'green', // Cor verde para o botão
-                            color: 'white', // Cor do texto branco
+                            backgroundColor: 'green',
+                            color: 'white',
                             '&:hover': {
-                              backgroundColor: 'darkgreen', // Cor verde escuro no hover
+                              backgroundColor: 'darkgreen',
                             },
                           }}
                         >
@@ -252,6 +262,10 @@ export default function UsersTeamList() {
                     </>
                   ) : (
                     <>
+                      <TableCell sx={styles.fontSize}>
+                        {user.operatorNumber || '-'}{' '}
+                        {/* Exibe operatorNumber */}
+                      </TableCell>
                       <TableCell sx={styles.fontSize}>{user.name}</TableCell>
                       {!isSmallScreen && (
                         <TableCell sx={styles.fontSize}>{user.email}</TableCell>
@@ -281,25 +295,6 @@ export default function UsersTeamList() {
                             )}
                           </IconButton>
                         </Tooltip>
-                        {/* <Tooltip
-                          title={
-                            'Desativar usuário, mantendo registro de sua colaboração'
-                          }
-                        >
-                          <IconButton
-                            sx={styles.iconBlock}
-                            onClick={() => handleDeactivate(user.id)}
-                            disabled={
-                              deactivateLoading === user.id || !user.is_active
-                            }
-                          >
-                            {deactivateLoading === user.id ? (
-                              <CircularProgress size={24} />
-                            ) : (
-                              <BlockIcon />
-                            )}
-                          </IconButton>
-                        </Tooltip> */}
                       </TableCell>
                     </>
                   )}
@@ -307,7 +302,7 @@ export default function UsersTeamList() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={isSmallScreen ? 2 : 4} align="center">
+                <TableCell colSpan={isSmallScreen ? 2 : 5} align="center">
                   Nenhum usuário encontrado
                 </TableCell>
               </TableRow>
