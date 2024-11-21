@@ -24,6 +24,7 @@ export async function POST(request: NextRequest) {
         password: hashedPassword,
         name: newUser.name,
         role: userRole,
+        operatorNumber: newUser.operatorNumber,
         createdAt: new Date(),
       })
       .returning({
@@ -31,6 +32,7 @@ export async function POST(request: NextRequest) {
         email: users.email,
         name: users.name,
         role: users.role,
+        operatorNumber: users.operatorNumber,
         createdAt: users.createdAt,
       })
       .execute();
