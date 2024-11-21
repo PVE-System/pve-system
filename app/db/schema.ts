@@ -42,6 +42,9 @@ export const users = pgTable(
   },
 );
 
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferInsert;
+
 /*TABELA DE CLIENTES REGISTRADOS*/
 
 export const clients = pgTable('clients', {
