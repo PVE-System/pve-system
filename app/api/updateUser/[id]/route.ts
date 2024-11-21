@@ -50,12 +50,14 @@ export async function POST(request: NextRequest) {
         email: newUser.email,
         password: hashedPassword,
         name: newUser.name,
+        operatorNumber: newUser.operatorNumber,
         createdAt: new Date(),
       })
       .returning({
         id: users.id,
         email: users.email,
         name: users.name,
+        operatorNumber: users.operatorNumber,
         createdAt: users.createdAt,
       })
       .execute();
@@ -94,6 +96,7 @@ export async function PUT(request: NextRequest) {
         email: userToUpdate.email,
         password: userToUpdate.password,
         name: userToUpdate.name,
+        operatorNumber: userToUpdate.operatorNumber,
         createdAt: userToUpdate.createdAt,
         imageUrl: userToUpdate.imageUrl, // Adicionando a URL da imagem ao update
       })
@@ -103,6 +106,7 @@ export async function PUT(request: NextRequest) {
         email: users.email,
         name: users.name,
         password: users.password,
+        operatorNumber: users.operatorNumber,
         createdAt: users.createdAt,
         imageUrl: users.imageUrl, // Incluindo a URL da imagem no retorno
       })
@@ -131,6 +135,7 @@ export async function DELETE(request: NextRequest) {
       id: users.id,
       email: users.email,
       password: users.password,
+      operatorNumber: users.operatorNumber,
       createdAt: users.createdAt,
     });
   return NextResponse.json({ users: deleteUser });

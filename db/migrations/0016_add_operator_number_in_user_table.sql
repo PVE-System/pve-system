@@ -1,0 +1,2 @@
+ALTER TABLE users
+ADD COLUMN operator_number VARCHAR(20) DEFAULT '0000' NOT NULL;
