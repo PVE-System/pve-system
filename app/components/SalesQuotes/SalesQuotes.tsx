@@ -1,28 +1,78 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import {
+/* import {
   Box,
   Button,
+  Typography,
   Select,
   MenuItem,
-  Typography,
   List,
   ListItem,
-  IconButton,
   Tooltip,
+  IconButton,
+  CircularProgress,
 } from '@mui/material';
-import { useSearchParams } from 'next/navigation';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
+import Cookies from 'js-cookie';
+import styles from '../EditClient/styles';
+
+// Define a tipagem para os dados do cliente
+interface Quote {
+  id: number;
+  quoteIdentifier: string;
+}
+
+interface ClientData {
+  rating: number;
+  clientCondition: string;
+  companyName: string;
+  corfioCode: string;
+  phone: string;
+  emailCommercial: string;
+  imageUrl?: string | null;
+}
 
 const SalesQuotesPage: React.FC = () => {
   const searchParams = useSearchParams();
   const clientId = searchParams.get('id');
   const [year, setYear] = useState(new Date().getFullYear());
-  const [quotes, setQuotes] = useState([]);
+  const [quotes, setQuotes] = useState<Quote[]>([]);
   const [totalQuotes, setTotalQuotes] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [addingQuote, setAddingQuote] = useState(false);
+  const [clientData, setClientData] = useState<ClientData | null>(null); // Corrigido para iniciar como `null`
+  const [loadingClient, setLoadingClient] = useState(true);
 
+  // Busca os dados do cliente
+  const fetchClientData = useCallback(async () => {
+    if (!clientId) return;
+    setLoadingClient(true);
+    try {
+      const response = await fetch(`/api/getClient/${clientId}`);
+      const data = await response.json();
+
+      // Ajusta os dados do cliente com valores padrão
+      setClientData({
+        rating: data.rating || 0,
+        clientCondition: data.clientCondition || 'Normal',
+        companyName: data.companyName || '',
+        corfioCode: data.corfioCode || '',
+        phone: data.phone || '',
+        emailCommercial: data.emailCommercial || '',
+        imageUrl: data.imageUrl || null,
+      });
+    } catch (error) {
+      console.error('Error fetching client data:', error);
+    } finally {
+      setLoadingClient(false);
+    }
+  }, [clientId]);
+
+  // Busca as cotações
   const fetchQuotes = useCallback(
     async (selectedYear: number) => {
+      if (!clientId) return;
       setLoading(true);
       try {
         const response = await fetch(
@@ -45,23 +95,42 @@ const SalesQuotesPage: React.FC = () => {
   );
 
   useEffect(() => {
-    if (clientId) {
-      fetchQuotes(year);
-    }
-  }, [clientId, year, fetchQuotes]);
+    fetchClientData();
+    fetchQuotes(year);
+  }, [fetchClientData, fetchQuotes, year]);
 
-  const handleAddQuote = async () => {
+  const addSalesQuote = async () => {
+    if (!clientId) return;
+    setAddingQuote(true);
     try {
-      const response = await fetch(`/api/addSalesQuote?clientId=${clientId}`, {
+      const userId = Cookies.get('userId');
+      if (!userId) {
+        console.error('User ID not found in cookies');
+        return;
+      }
+
+      const response = await fetch(`/api/addSalesQuote`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          clientId,
+          userId: Number(userId),
+        }),
       });
+
       if (response.ok) {
-        fetchQuotes(year); // Atualiza a lista após adicionar uma nova cotação
+        console.log('Sales quote added successfully');
+        fetchQuotes(year);
       } else {
-        console.error('Error adding new sales quote');
+        const data = await response.json();
+        console.error('Error adding sales quote:', data.error);
       }
     } catch (error) {
-      console.error('Error adding new sales quote:', error);
+      console.error('Error adding sales quote:', error);
+    } finally {
+      setAddingQuote(false);
     }
   };
 
@@ -78,6 +147,29 @@ const SalesQuotesPage: React.FC = () => {
 
   return (
     <Box sx={{ padding: '20px' }}>
+      {loadingClient ? (
+        <CircularProgress />
+      ) : (
+        clientData && (
+          <ClientProfile
+            rating={clientData.rating}
+            clientCondition={clientData.clientCondition}
+            companyName={clientData.companyName}
+            corfioCode={clientData.corfioCode}
+            phone={clientData.phone}
+            emailCommercial={clientData.emailCommercial}
+            readOnly={true}
+            imageUrl={clientData.imageUrl}
+            enableImageUpload={false}
+            onRatingChange={(newRating) =>
+              console.log('Nova avaliação:', newRating)
+            }
+            onConditionChange={(newCondition) =>
+              console.log('Nova condição:', newCondition)
+            }
+          />
+        )
+      )}
       <Box
         sx={{
           display: 'flex',
@@ -86,8 +178,12 @@ const SalesQuotesPage: React.FC = () => {
           marginBottom: '20px',
         }}
       >
-        <Button variant="contained" onClick={handleAddQuote}>
-          Cotação +
+        <Button
+          variant="contained"
+          onClick={addSalesQuote}
+          disabled={addingQuote}
+        >
+          {addingQuote ? 'Adicionando...' : 'Cotação +'}
         </Button>
         <Select
           value={year}
@@ -113,16 +209,19 @@ const SalesQuotesPage: React.FC = () => {
         {loading ? (
           <Typography variant="body1">Carregando...</Typography>
         ) : quotes.length > 0 ? (
-          quotes.map((quote: { id: number; quoteIdentifier: string }) => (
+          quotes.map((quote) => (
             <ListItem
               key={quote.id}
               sx={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
+                padding: '10px',
               }}
             >
-              <Typography variant="body1">{quote.quoteIdentifier}</Typography>
+              <Typography variant="body1">
+                Nome da Cotação: {quote.quoteIdentifier}
+              </Typography>
               <Tooltip title="Copiar nome">
                 <IconButton
                   onClick={() => copyToClipboard(quote.quoteIdentifier)}
@@ -143,3 +242,4 @@ const SalesQuotesPage: React.FC = () => {
 };
 
 export default SalesQuotesPage;
+ */

@@ -1,4 +1,4 @@
-'use client';
+/* 'use client';
 
 import BasicTabs from '@/app/components/ClientPageAllTabs/ClientPageAllTabs';
 import EditClient from '@/app/components/EditClient/EditClient';
@@ -16,14 +16,14 @@ export default function SalesQuotesPage() {
       <Container>
         <Box sx={sharedStyles.container}>
           <Typography variant="h4" component="h1" sx={sharedStyles.titlePage}>
-            <span>Editar </span>Cliente
+            <span>Cotação </span>Cliente
           </Typography>
         </Box>
         <Suspense>
           <SalesQuotes />
         </Suspense>
-        {/*  <BasicTabs clientId={clientId} /> */}
       </Container>
     </>
   );
 }
+ */

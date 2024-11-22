@@ -149,12 +149,13 @@ export const salesQuotes = pgTable('sales_quotes', {
   id: serial('id').primaryKey(),
   clientId: integer('client_id')
     .references(() => clients.id)
-    .notNull(), // Referência ao cliente
+    .notNull(),
   userId: integer('user_id')
     .references(() => users.id)
-    .notNull(), // Referência ao vendedor
+    .notNull(),
   quoteName: text('quote_name').notNull(), // Nome único da cotação
   year: integer('year').notNull(), // Ano da cotação para filtragem
+  date: timestamp('date').defaultNow().notNull(), // Data completa da cotação
   createdAt: timestamp('created_at').defaultNow().notNull(), // Data de criação da cotação
 });
 
