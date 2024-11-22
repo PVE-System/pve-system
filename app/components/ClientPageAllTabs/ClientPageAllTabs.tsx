@@ -19,6 +19,7 @@ import ClientPageTabSalesInfos from '@/app/components/ClientPageTabSalesInfos/Cl
 import ClientPageTabAnnotation from '@/app/components/ClientPageTabAnnotation/ClientPageTabAnnotation';
 import ClientPageTabFiles from '@/app/components/ClientPageTabFiles/ClientPageTabFiles';
 import { useSearchParams } from 'next/navigation';
+import ClientPageTabSalesQuotes from '../ClientPageTabSalesQuotes/ClientPageTabSalesQuotes';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -181,6 +182,19 @@ export default function BasicTabs() {
                   minWidth: 'auto',
                 },
               }}
+              label={isSmallScreen ? null : 'Cotações do cliente'}
+              icon={<InfoIcon />}
+              {...a11yProps(0)}
+            />
+
+            <Tab
+              sx={{
+                fontSize: '12px',
+                minWidth: '100px',
+                '@media (max-width: 800px)': {
+                  minWidth: 'auto',
+                },
+              }}
               label={isSmallScreen ? null : 'Informações de pedidos'}
               icon={
                 <Badge
@@ -248,15 +262,20 @@ export default function BasicTabs() {
         </ClientPageTabPanel>
         <ClientPageTabPanel value={value} index={1}>
           <Box sx={styles.contentTabs}>
-            <ClientPageTabSalesInfos clientId={clientId} />
+            <ClientPageTabSalesQuotes clientId={clientId} />
           </Box>
         </ClientPageTabPanel>
         <ClientPageTabPanel value={value} index={2}>
           <Box sx={styles.contentTabs}>
-            <ClientPageTabAnnotation clientId={clientId} />
+            <ClientPageTabSalesInfos clientId={clientId} />
           </Box>
         </ClientPageTabPanel>
         <ClientPageTabPanel value={value} index={3}>
+          <Box sx={styles.contentTabs}>
+            <ClientPageTabAnnotation clientId={clientId} />
+          </Box>
+        </ClientPageTabPanel>
+        <ClientPageTabPanel value={value} index={4}>
           <Box sx={styles.contentTabs}>
             <ClientPageTabFiles clientId={clientId} />
           </Box>
