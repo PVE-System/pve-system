@@ -1,259 +1,3 @@
-/* 'use client';
-
-import React, { useEffect, useState, useCallback } from 'react';
-import {
-  Box,
-  Button,
-  CircularProgress,
-  IconButton,
-  List,
-  ListItem,
-  MenuItem,
-  Select,
-  TextField,
-  Tooltip,
-  Typography,
-} from '@mui/material';
-import { useForm, Controller } from 'react-hook-form';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import DeleteIcon from '@mui/icons-material/Delete';
-import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
-import styles from '@/app/components/ClientPageTabAnnotation/styles';
-import { useRouter } from 'next/navigation';
-import Cookies from 'js-cookie';
-
-interface ClientPageSalesQuotesProps {
-  clientId: string;
-}
-
-interface Quote {
-  id: number;
-  quoteIdentifier: string;
-}
-
-const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
-  clientId,
-}) => {
-  const [loading, setLoading] = useState(true);
-  const [clientData, setClientData] = useState<any>(null);
-  const [year, setYear] = useState(new Date().getFullYear());
-  const [quotes, setQuotes] = useState<Quote[]>([]);
-  const [totalQuotes, setTotalQuotes] = useState(0);
-  const [addingQuote, setAddingQuote] = useState(false);
-  const [loadingClient, setLoadingClient] = useState(true);
-
-  const router = useRouter();
-
-  // Busca os dados do cliente
-  const fetchClientData = useCallback(async () => {
-    if (!clientId) return;
-    setLoadingClient(true);
-    try {
-      const response = await fetch(`/api/getClient/${clientId}`);
-      const data = await response.json();
-
-      // Ajusta os dados do cliente com valores padrão
-      setClientData({
-        rating: data.rating || 0,
-        clientCondition: data.clientCondition || 'Normal',
-        companyName: data.companyName || '',
-        corfioCode: data.corfioCode || '',
-        phone: data.phone || '',
-        emailCommercial: data.emailCommercial || '',
-        imageUrl: data.imageUrl || null,
-      });
-    } catch (error) {
-      console.error('Error fetching client data:', error);
-    } finally {
-      setLoadingClient(false);
-    }
-  }, [clientId]);
-
-  // Busca as cotações
-  const fetchQuotes = useCallback(
-    async (selectedYear: number) => {
-      if (!clientId) return;
-      setLoading(true);
-      try {
-        const response = await fetch(
-          `/api/getSalesQuotes?clientId=${clientId}&year=${selectedYear}`,
-        );
-        const data = await response.json();
-        if (response.ok) {
-          setQuotes(data.quotes);
-          setTotalQuotes(data.total);
-        } else {
-          console.error('Error fetching sales quotes:', data.error);
-        }
-      } catch (error) {
-        console.error('Error fetching sales quotes:', error);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [clientId],
-  );
-
-  useEffect(() => {
-    fetchClientData();
-    fetchQuotes(year);
-  }, [fetchClientData, fetchQuotes, year]);
-
-  const addSalesQuote = async () => {
-    if (!clientId) return;
-    setAddingQuote(true);
-    try {
-      const userId = Cookies.get('userId');
-      if (!userId) {
-        console.error('User ID not found in cookies');
-        return;
-      }
-
-      const response = await fetch(`/api/addSalesQuote`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          clientId,
-          userId: Number(userId),
-        }),
-      });
-
-      if (response.ok) {
-        console.log('Sales quote added successfully');
-        fetchQuotes(year);
-      } else {
-        const data = await response.json();
-        console.error('Error adding sales quote:', data.error);
-      }
-    } catch (error) {
-      console.error('Error adding sales quote:', error);
-    } finally {
-      setAddingQuote(false);
-    }
-  };
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text).then(
-      () => {
-        console.log('Copied to clipboard:', text);
-      },
-      (error) => {
-        console.error('Failed to copy text to clipboard:', error);
-      },
-    );
-  };
-
-  const handleRatingChange = (rating: number) => {
-    console.log('Rating:', rating);
-  };
-
-  const handleConditionChange = (condition: string) => {
-    console.log('Condition:', condition);
-  };
-
-  if (loading) {
-    return (
-      <Box sx={styles.loadComponent}>
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  return (
-    <Box>
-      <Box sx={styles.boxContent}>
-        <ClientProfile
-          rating={clientData?.rating}
-          clientCondition={clientData?.clientCondition}
-          companyName={clientData?.companyName}
-          corfioCode={clientData?.corfioCode}
-          phone={clientData?.phone}
-          emailCommercial={clientData?.emailCommercial}
-          onRatingChange={handleRatingChange}
-          onConditionChange={handleConditionChange}
-          readOnly={false}
-          imageUrl={clientData?.imageUrl}
-          enableImageUpload={false}
-        />
-        <Box sx={styles.boxCol2}>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginBottom: '20px',
-            }}
-          >
-            <Button
-              variant="contained"
-              onClick={addSalesQuote}
-              disabled={addingQuote}
-            >
-              {addingQuote ? 'Adicionando...' : 'Cotação +'}
-            </Button>
-            <Select
-              value={year}
-              onChange={(e) => setYear(Number(e.target.value))}
-              displayEmpty
-              sx={{ minWidth: '150px' }}
-            >
-              {Array.from({ length: 10 }, (_, i) => {
-                const yearOption = new Date().getFullYear() - i;
-                return (
-                  <MenuItem key={yearOption} value={yearOption}>
-                    {yearOption}
-                  </MenuItem>
-                );
-              })}
-            </Select>
-            <Typography variant="subtitle1">
-              Total de cotações no ano {year}: {totalQuotes}
-            </Typography>
-          </Box>
-
-          <List>
-            {loading ? (
-              <Typography variant="body1">Carregando...</Typography>
-            ) : quotes.length > 0 ? (
-              quotes.map((quote) => (
-                <ListItem
-                  key={quote.id}
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '10px',
-                  }}
-                >
-                  <Typography variant="body1">
-                    Nome da Cotação: {quote.quoteIdentifier}
-                  </Typography>
-                  <Tooltip title="Copiar nome">
-                    <IconButton
-                      onClick={() => copyToClipboard(quote.quoteIdentifier)}
-                    >
-                      <ContentCopyIcon />
-                    </IconButton>
-                  </Tooltip>
-                </ListItem>
-              ))
-            ) : (
-              <Typography variant="body1">
-                Nenhuma cotação encontrada para o ano {year}.
-              </Typography>
-            )}
-          </List>
-        </Box>
-      </Box>
-    </Box>
-  );
-};
-
-export default ClientPageTabSalesQuotes;
- */
-
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
@@ -261,6 +5,7 @@ import {
   Box,
   Button,
   CircularProgress,
+  debounce,
   IconButton,
   List,
   ListItem,
@@ -274,11 +19,12 @@ import { useForm, Controller } from 'react-hook-form';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
-import styles from '@/app/components/ClientPageTabAnnotation/styles';
+
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import styles from '@/app/components/ClientPageTabSalesQuotes/styles';
 
 interface ClientPageSalesQuotesProps {
   clientId: string;
@@ -296,10 +42,13 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
   const [loadingQuotes, setLoadingQuotes] = useState(true);
   const [clientData, setClientData] = useState<any>(null);
   const [year, setYear] = useState(new Date().getFullYear());
+  const [inputYear, setInputYear] = useState<string>('');
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [totalQuotes, setTotalQuotes] = useState(0);
   const [addingQuote, setAddingQuote] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
+  const [showAllYears, setShowAllYears] = useState(false);
+  const [manualYearInput, setManualYearInput] = useState(false);
 
   const ITEMS_PER_PAGE = 5;
 
@@ -325,7 +74,6 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
     }
   }, [clientId]);
 
-  // Fetch Quotes
   const fetchQuotes = useCallback(
     async (selectedYear: number) => {
       setLoadingQuotes(true);
@@ -336,7 +84,6 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
         const data = await response.json();
         if (!response.ok) throw new Error('Erro ao buscar cotações');
 
-        // Ordena as cotações em ordem decrescente
         const sortedQuotes = data.quotes.sort(
           (a: { id: number }, b: { id: number }) => b.id - a.id,
         );
@@ -357,7 +104,7 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
   }, [fetchClientData]);
 
   useEffect(() => {
-    fetchQuotes(year);
+    fetchQuotes(Number(year));
   }, [fetchQuotes, year]);
 
   const addSalesQuote = async () => {
@@ -371,11 +118,30 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
         body: JSON.stringify({ clientId, userId: Number(userId) }),
       });
       if (!response.ok) throw new Error('Erro ao adicionar cotação');
-      fetchQuotes(year); // Atualiza as cotações
+      fetchQuotes(Number(year));
     } catch (error) {
       console.error('Error adding sales quote:', error);
     } finally {
       setAddingQuote(false);
+    }
+  };
+
+  const handleYearInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setInputYear(value); // Atualiza o estado temporário durante a digitação
+  };
+
+  const handleYearSubmit = () => {
+    const parsedYear = Number(inputYear);
+    if (!isNaN(parsedYear) && inputYear.length === 4) {
+      setYear(parsedYear); // Atualiza o ano principal quando válido
+      setManualYearInput(false); // Sai do modo manual
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter') {
+      handleYearSubmit(); // Chama a lógica de submissão ao pressionar Enter
     }
   };
 
@@ -404,29 +170,13 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
           enableImageUpload={false}
         />
         <Box sx={styles.boxCol2}>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginBottom: '20px',
-            }}
-          >
+          <Box sx={styles.boxButtonAndInput}>
             <Tooltip title="Registrar cotação e gerar código da negociação">
               <Button
                 variant="contained"
                 onClick={addSalesQuote}
                 disabled={addingQuote}
-                sx={{
-                  backgroundColor: 'green',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  minWidth: '120px', // Para evitar que o botão fique pequeno demais
-                  '&:hover': {
-                    backgroundColor: 'darkgreen',
-                  },
-                }}
+                sx={styles.buttonQuotesAdd}
               >
                 {addingQuote ? (
                   <CircularProgress size={24} color="inherit" />
@@ -435,42 +185,82 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
                 )}
               </Button>
             </Tooltip>
-            <Button variant="contained">
+            <Button sx={styles.buttonTotalResult} variant="contained">
               <Typography variant="subtitle1">
                 Total {year}: {totalQuotes}
               </Typography>
             </Button>
 
-            <Select
-              value={year}
-              onChange={(e) => setYear(Number(e.target.value))}
-              displayEmpty
-              sx={{ minWidth: '150px' }}
-            >
-              {Array.from({ length: 10 }, (_, i) => {
-                const yearOption = new Date().getFullYear() - i;
-                return (
-                  <MenuItem key={yearOption} value={yearOption}>
-                    {yearOption}
-                  </MenuItem>
-                );
-              })}
-            </Select>
+            <Box>
+              {!manualYearInput ? (
+                <Select
+                  value={manualYearInput ? '' : year.toString()} // Convertendo o número para string
+                  onChange={(e) => {
+                    const selectedValue = e.target.value;
+
+                    if (selectedValue === 'showMore') {
+                      setShowAllYears(true); // Expande para mais anos
+                      return;
+                    }
+
+                    if (selectedValue === 'manualInput') {
+                      setManualYearInput(true); // Ativa o campo de entrada manual
+                      return;
+                    }
+
+                    const parsedYear = Number(selectedValue); // Converte de volta para número
+                    if (!isNaN(parsedYear)) {
+                      setYear(parsedYear); // Atualiza o ano selecionado
+                    }
+                  }}
+                  displayEmpty
+                  sx={{ minWidth: '150px' }}
+                >
+                  {Array.from({ length: showAllYears ? 20 : 5 }, (_, i) => {
+                    const yearOption = new Date().getFullYear() - i;
+                    return (
+                      <MenuItem key={yearOption} value={yearOption.toString()}>
+                        {yearOption}
+                      </MenuItem>
+                    );
+                  })}
+                  {!showAllYears && (
+                    <MenuItem
+                      value="showMore"
+                      onMouseDown={(e) => {
+                        e.preventDefault(); // Impede o fechamento do menu
+                        setShowAllYears(true);
+                      }}
+                    >
+                      Ver mais anos...
+                    </MenuItem>
+                  )}
+                  <MenuItem value="manualInput">Escolher ano...</MenuItem>
+                </Select>
+              ) : (
+                <TextField
+                  label="Digite o ano"
+                  type="number"
+                  value={inputYear}
+                  onChange={handleYearInput}
+                  onKeyDown={handleKeyDown} // Envia ao teclar enter
+                  onBlur={handleYearSubmit} // Envia ao perder o foco
+                  sx={{ minWidth: '150px' }}
+                  inputProps={{
+                    step: 1,
+                    min: 1900,
+                    max: new Date().getFullYear(),
+                  }}
+                />
+              )}
+            </Box>
           </Box>
 
           {/* Lista paginada */}
           <List>
             {currentItems.length > 0 ? (
               currentItems.map((quote) => (
-                <ListItem
-                  key={quote.id}
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '10px',
-                  }}
-                >
+                <ListItem key={quote.id} sx={styles.boxList}>
                   <Typography variant="body1">
                     Cotação: {quote.quoteIdentifier}
                   </Typography>
@@ -493,15 +283,7 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
           </List>
 
           {/* Controles de paginação */}
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginTop: '10px',
-              gap: '10px',
-            }}
-          >
+          <Box sx={styles.boxPagination}>
             <IconButton
               disabled={currentPage === 0}
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}

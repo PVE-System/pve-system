@@ -9,6 +9,11 @@ import Cookies from 'js-cookie';
 import styles from '@/app/components/ClientPageAllTabs/styles';
 
 import InfoIcon from '@mui/icons-material/Info';
+
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import NotesIcon from '@mui/icons-material/Notes';
 import AttachmentIcon from '@mui/icons-material/Attachment';
@@ -183,7 +188,7 @@ export default function BasicTabs() {
                 },
               }}
               label={isSmallScreen ? null : 'Cotações do cliente'}
-              icon={<InfoIcon />}
+              icon={<RequestQuoteIcon />}
               {...a11yProps(0)}
             />
 
