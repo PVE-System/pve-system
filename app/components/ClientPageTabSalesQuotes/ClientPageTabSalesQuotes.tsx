@@ -161,7 +161,7 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
           clientCondition={clientData?.clientCondition || ''}
           companyName={clientData?.companyName || ''}
           corfioCode={clientData?.corfioCode || ''}
-          phone={clientData?.phone || ''}
+          whatsapp={clientData?.whatsapp || ''}
           emailCommercial={clientData?.emailCommercial || ''}
           onRatingChange={() => {}}
           onConditionChange={() => {}}

@@ -31,6 +31,7 @@ const fieldLabels: { [key: string]: string } = {
   state: 'Estado',
   corfioCode: 'Código Corfio',
   phone: 'Telefone/fax',
+  whatsapp: 'WhatsApp',
   emailCommercial: 'Email Comercial',
   emailFinancial: 'Email Financeiro',
   emailXml: 'Email Xml',
@@ -154,6 +155,12 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [loadingSave, setLoadingSave] = useState(false);
 
+  // Observa os campos do formulário
+  const companyName = watch('companyName');
+  const corfioCode = watch('corfioCode');
+  const whatsapp = watch('whatsapp');
+  const emailCommercial = watch('emailCommercial');
+
   const icmsContributor = useWatch({
     control,
     name: 'icmsContributor',
@@ -200,7 +207,7 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
     }
   };
 
-  const handleChange = (
+  /*   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = event.target;
@@ -224,7 +231,7 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
       setValue('city', ''); // Limpa o campo cidade quando o estado muda
       fetchCities(value); // Busca as novas cidades
     }
-  };
+  }; */
 
   useEffect(() => {
     if (!clientId) return;
@@ -438,10 +445,12 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
           <ClientProfile
             rating={watch('rating')}
             clientCondition={watch('clientCondition')}
-            companyName={clientData?.companyName}
-            corfioCode={clientData?.corfioCode}
-            phone={clientData?.phone}
-            emailCommercial={clientData?.emailCommercial}
+            companyName={companyName || clientData?.companyName || ''}
+            corfioCode={corfioCode || clientData?.corfioCode || ''}
+            whatsapp={whatsapp || clientData?.whatsapp || ''}
+            emailCommercial={
+              emailCommercial || clientData?.emailCommercial || ''
+            }
             onRatingChange={(rating) => setValue('rating', rating)}
             onConditionChange={(condition) =>
               setValue('clientCondition', condition)

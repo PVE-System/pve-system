@@ -58,6 +58,7 @@ const RegisterClient: React.FC = () => {
     state: '',
     corfioCode: '',
     phone: '',
+    whatsapp: '',
     emailCommercial: '',
     emailFinancial: '',
     emailXml: '',
@@ -88,6 +89,7 @@ const RegisterClient: React.FC = () => {
     state: 'Estado',
     corfioCode: 'Código Corfio',
     phone: 'Telefone/fax',
+    whatsapp: 'WhatsApp',
     emailCommercial: 'Email Comercial',
     emailFinancial: 'Email Financeiro',
     emailXml: 'Email Xml',
@@ -303,6 +305,7 @@ const RegisterClient: React.FC = () => {
           state: '',
           corfioCode: '',
           phone: '',
+          whatsapp: '',
           emailCommercial: '',
           emailFinancial: '',
           emailXml: '',
@@ -421,7 +424,7 @@ const RegisterClient: React.FC = () => {
               setFormData({ ...formData, clientCondition: condition })
             }
             emailCommercial={formData.emailCommercial}
-            phone={formData.phone}
+            whatsapp={formData.whatsapp}
             readOnly={false}
             imageUrl={null}
             onImageChange={() => {}}
@@ -454,8 +457,8 @@ const RegisterClient: React.FC = () => {
                         formattedValue = formatCPF(value);
                       } else if (key === 'cnpj') {
                         formattedValue = formatCNPJ(value);
-                      } else if (key === 'phone') {
-                        formattedValue = formatPhone(value);
+                      } else if (key === 'phone' || key === 'whatsapp') {
+                        formattedValue = formatPhone(value); // Reutiliza a função de formatação
                       } else {
                         handleChange(
                           event as React.ChangeEvent<HTMLInputElement>,
@@ -468,7 +471,11 @@ const RegisterClient: React.FC = () => {
                       }));
                     }}
                     required={key === 'companyName'}
-                    placeholder={key === 'phone' ? '(xx)xxxxxxxxx' : ''}
+                    placeholder={
+                      key === 'phone' || key === 'whatsapp'
+                        ? '(xx)xxxxxxxxx'
+                        : ''
+                    }
                     variant="filled"
                     sx={styles.inputsCol2}
                     fullWidth

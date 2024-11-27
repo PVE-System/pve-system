@@ -60,6 +60,7 @@ export const clients = pgTable('clients', {
   state: text('state').notNull(),
   corfioCode: text('corfio_code').notNull(),
   phone: text('phone').notNull(),
+  whatsapp: text('whatsapp'),
   emailCommercial: text('email_commercial').notNull(),
   emailFinancial: text('email_financial').notNull(),
   emailXml: text('email_xml').notNull(),
