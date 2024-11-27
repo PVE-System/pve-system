@@ -21,7 +21,7 @@ interface ClientProfileProps {
   companyName: string;
   corfioCode: string;
   emailCommercial: string;
-  phone: string;
+  whatsapp: string;
   onRatingChange: (rating: number) => void;
   onConditionChange: (condition: string) => void;
   readOnly?: boolean;
@@ -45,7 +45,7 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
   companyName,
   corfioCode,
   emailCommercial,
-  phone,
+  whatsapp,
   onRatingChange,
   onConditionChange,
   readOnly,
@@ -79,9 +79,14 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
     }
   };
 
-  const formatPhoneForWhatsApp = (phone: string) => {
+  const formatPhoneForWhatsApp = (whatsapp?: string) => {
+    if (!whatsapp) {
+      console.warn('Número de WhatsApp não está definido.');
+      return '#'; // Retorna um link vazio ou um valor padrão
+    }
+
     // Remove todos os caracteres que não são números
-    const cleanedPhone = phone.replace(/\D/g, '');
+    const cleanedPhone = whatsapp.replace(/\D/g, '');
 
     // Adiciona o código do país (55 para Brasil) no início
     const formattedPhone = `55${cleanedPhone}`;
@@ -243,14 +248,14 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
           Código Corfio: {corfioCode}
         </Typography>{' '}
         <Typography variant="subtitle2" sx={{ marginBottom: '5px' }}>
-          Telefone:{' '}
+          WhatsApp:{' '}
           <a
-            href={formatPhoneForWhatsApp(phone)} // Gera o link com o código do país
+            href={formatPhoneForWhatsApp(whatsapp)} // Gera o link com o código do país
             target="_blank"
             rel="noopener noreferrer"
             style={{ color: 'green', textDecoration: 'none' }}
           >
-            {phone}
+            {whatsapp}
           </a>
         </Typography>
         <Typography variant="subtitle2" sx={{ marginBottom: '5px' }}>

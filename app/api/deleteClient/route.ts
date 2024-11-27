@@ -4,6 +4,7 @@ import {
   comments,
   salesInformation,
   tabsViewed,
+  salesQuotes,
 } from '@/app/db/schema'; // Adicione a tabela tabs_viewed
 import { db } from '@/app/db';
 import { eq } from 'drizzle-orm';
@@ -45,6 +46,22 @@ export async function DELETE(request: NextRequest) {
       .where(eq(salesInformation.clientId, Number(id)))
       .returning();
     console.log('Deleted sales information data:', deletedSalesInformation);
+
+    // Verifique se há registros na tabela `salesQuotes`
+    const salesQuotesCheck = await db
+      .select()
+      .from(salesQuotes)
+      .where(eq(salesQuotes.clientId, Number(id)));
+    console.log(`Sales quotes found: `, salesQuotesCheck);
+
+    // Se houver registros em `salesQuotes`, deletá-los
+    if (salesQuotesCheck.length > 0) {
+      const deletedSalesQuotes = await db
+        .delete(salesQuotes)
+        .where(eq(salesQuotes.clientId, Number(id)))
+        .returning();
+      console.log('Deleted sales quotes data:', deletedSalesQuotes);
+    }
 
     // Deletar os comentários
     const deletedComments = await db

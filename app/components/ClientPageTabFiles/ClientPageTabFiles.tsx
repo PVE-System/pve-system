@@ -219,7 +219,7 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
           }
           companyName={clientData?.companyName}
           corfioCode={clientData?.corfioCode}
-          phone={clientData?.phone}
+          whatsapp={clientData?.whatsapp}
           emailCommercial={clientData?.emailCommercial}
           readOnly={false}
           imageUrl={clientData?.imageUrl}

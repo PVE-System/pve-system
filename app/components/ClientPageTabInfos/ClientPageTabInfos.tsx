@@ -64,11 +64,11 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
       });
   }, [clientId, setValue]);
 
-  const onSubmit = (data: any) => {
+  /*   const onSubmit = (data: any) => {
     console.log('Form data submitted:', data);
     const formData = getValues(); // Obtém os valores atuais do formulário
     console.log('Current form data:', formData);
-  };
+  }; */
 
   // Mapeamento dos nomes dos campos do banco de dados para nomes mais amigáveis
   const fieldLabels: { [key: string]: string } = {
@@ -83,6 +83,7 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
     state: 'Estado',
     corfioCode: 'Código Corfio',
     phone: 'Fone',
+    whatsapp: 'WhatsApp',
     emailCommercial: 'Email Comercial',
     emailFinancial: 'Email Financeiro',
     emailXml: 'Email Xml',
@@ -226,6 +227,7 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
     { label: 'Estado', name: 'state' },
     { label: 'Código Corfio', name: 'corfioCode' },
     { label: 'Telefone/fax', name: 'phone' },
+    { label: 'WhatsApp', name: 'whatsapp' },
     { label: 'Email Comercial', name: 'emailCommercial' },
     { label: 'Email Financeiro', name: 'emailFinancial' },
     { label: 'Email Xml', name: 'emailXml' },
@@ -273,7 +275,7 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
             clientCondition={clientData.clientCondition}
             companyName={clientData?.companyName} // Pass companyName
             corfioCode={clientData?.corfioCode} // Pass corfioCode
-            phone={clientData?.phone} // Pass phone
+            whatsapp={clientData?.whatsapp} // Pass whatsapp
             emailCommercial={clientData?.emailCommercial} // Pass email
             onRatingChange={(rating) => setValue('rating', rating)}
             onConditionChange={(condition) =>
