@@ -10,6 +10,8 @@ import {
   Typography,
   IconButton,
   CircularProgress,
+  Modal,
+  Button,
 } from '@mui/material';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
@@ -323,12 +325,25 @@ export default function ExcelDownloadFileComponent() {
               );
             })}
           {showAlertModal && (
-            <AlertModal
-              open={showAlertModal} // Usar o estado `showAlertModal` aqui
+            <Modal
+              open={showAlertModal}
               onClose={() => setShowAlertModal(false)}
-              onConfirm={() => setShowAlertModal(false)} // Fechar o modal ao confirmar
-              message="Somente para usuários admin" // Mensagem para o usuário
-            />
+              sx={sharedStyles.boxModal}
+            >
+              <Box sx={sharedStyles.modalAlert}>
+                <Typography variant="h6">Acesso Restrito!</Typography>
+                <Typography variant="body1">
+                  Somente usuários admin podem deletar.
+                </Typography>
+                <Button
+                  variant="contained"
+                  onClick={() => setShowAlertModal(false)}
+                  sx={sharedStyles.modalButton}
+                >
+                  Fechar
+                </Button>
+              </Box>
+            </Modal>
           )}
         </Box>
       )}

@@ -64,12 +64,6 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
       });
   }, [clientId, setValue]);
 
-  /*   const onSubmit = (data: any) => {
-    console.log('Form data submitted:', data);
-    const formData = getValues(); // Obtém os valores atuais do formulário
-    console.log('Current form data:', formData);
-  }; */
-
   // Mapeamento dos nomes dos campos do banco de dados para nomes mais amigáveis
   const fieldLabels: { [key: string]: string } = {
     companyName: 'Nome da Empresa ou Pessoa',

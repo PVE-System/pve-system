@@ -4,6 +4,8 @@ import { ReactNode, useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Cookies from 'js-cookie';
 import AlertModal from '../AlertModal/AlertModal';
+import { Box, Button, Modal, Typography } from '@mui/material';
+import sharedStyles from '@/app/styles/sharedStyles';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -47,11 +49,27 @@ const ProtectedRoute = ({
   }
   return (
     <>
-      <AlertModal
+      <Modal
         open={showModal}
         onClose={handleModalClose}
-        onConfirm={handleModalClose}
-      />
+        sx={sharedStyles.boxModal}
+      >
+        <Box sx={sharedStyles.modalAlert}>
+          <Typography variant="h6" sx={{}}>
+            Acesso Negado!
+          </Typography>
+          <Typography variant="body1">
+            Você precisa fazer login para acessar esta página.
+          </Typography>
+          <Button
+            variant="contained"
+            onClick={handleModalClose}
+            sx={sharedStyles.modalButton}
+          >
+            Fechar
+          </Button>
+        </Box>
+      </Modal>
       {isAuthenticated && children}
     </>
   );
