@@ -139,6 +139,29 @@ const styles = {
       alignSelf: 'center',
     },
   },
+
+  /*   boxModal: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  modalAlert: {
+    background: (theme: Theme) =>
+      theme.palette.mode === 'light'
+        ? theme.palette.background.paper
+        : theme.palette.background.alternative,
+
+    padding: 3,
+    borderRadius: 2,
+    width: '400px',
+    boxShadow: 24,
+  },
+
+  modalButton: {
+    marginTop: 2,
+    marginRight: 2,
+  }, */
 };
 
 export default styles;

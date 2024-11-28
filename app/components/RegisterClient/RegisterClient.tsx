@@ -173,7 +173,7 @@ const RegisterClient: React.FC = () => {
   const router = useRouter();
 
   // Construir a URL com o parâmetro `id` usando `URLSearchParams`
-  const clientUrl = new URLSearchParams({ id: duplicateClient?.id || '' });
+  /*   const clientUrl = new URLSearchParams({ id: duplicateClient?.id || '' }); */
 
   // Função para buscar cidades com base no estado selecionado
   const fetchCities = async (state: string) => {
@@ -535,39 +535,32 @@ const RegisterClient: React.FC = () => {
               </Box>
             </form>
 
-            {/* Modal de Duplicata */}
+            {/* Modal para clientes ja cadastrado, evitando duplicação*/}
             <Modal
               open={showModal}
               onClose={handleCloseModal}
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
+              sx={sharedStyles.boxModal}
             >
-              <Box
-                sx={{
-                  padding: 3,
-                  backgroundColor: 'white',
-
-                  borderRadius: 2,
-                  width: '400px',
-                  boxShadow: 24,
-                }}
-              >
-                <Typography variant="h6" sx={{ mt: 1, color: 'black' }}>
+              <Box sx={sharedStyles.modalAlert}>
+                <Typography variant="h6" sx={{}}>
                   Cliente já cadastrado!
                 </Typography>
-                <Typography variant="body1" sx={{ mt: 1, color: 'black' }}>
+                <Typography variant="body1">
                   Um cliente com o mesmo{' '}
                   {duplicateField === 'cnpj' ? 'CNPJ' : 'CPF'} já existe no
                   sistema.
                 </Typography>
-                <Button onClick={handleCloseModal} sx={{ mt: 2 }}>
+                <Button
+                  variant="contained"
+                  onClick={handleCloseModal}
+                  sx={sharedStyles.modalButton}
+                >
                   Fechar
                 </Button>
                 <Link href={`/clientPage?id=${duplicateClient?.id}`}>
-                  <Button sx={{ mt: 2 }}>Ver Cliente</Button>
+                  <Button variant="contained" sx={sharedStyles.modalButton}>
+                    Ver Cliente
+                  </Button>
                 </Link>
               </Box>
             </Modal>

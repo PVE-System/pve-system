@@ -173,29 +173,26 @@ export default function ExcelUpdateNotification() {
 
   return (
     <Modal
+      sx={sharedStyles.boxModal}
       open={isModalOpen}
       onClose={handleCloseModal}
       aria-labelledby="excel-update-notification"
       aria-describedby="notify-user-of-new-excel-update"
     >
-      <Box sx={sharedStyles.modalStyle}>
+      <Box sx={sharedStyles.modalAlert}>
         <Typography variant="h6" id="excel-update-notification" gutterBottom>
           Informamos que a Planilha de Vendas foi atualizada!
         </Typography>
-        <Box mt={2} display="flex" justifyContent="space-between">
+        <Box>
           <Button
+            sx={sharedStyles.modalButton}
             variant="contained"
-            color="primary"
             onClick={handleCheckUpdates}
           >
             Conferir
           </Button>
           <Button
-            sx={{
-              backgroundColor: 'green',
-              color: 'white',
-              '&:hover': { backgroundColor: 'darkgreen' },
-            }}
+            sx={sharedStyles.modalButton}
             variant="contained"
             onClick={handleCloseModal}
           >

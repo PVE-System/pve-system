@@ -4,6 +4,7 @@ import {
   Button,
   CircularProgress,
   MenuItem,
+  Modal,
   TextField,
   Typography,
 } from '@mui/material';
@@ -18,6 +19,7 @@ import {
   formatCEP,
 } from '@/app/components/FormFormatter/FormFormatter';
 import styles from '@/app/components/EditClient/styles';
+import sharedStyles from '@/app/styles/sharedStyles';
 
 const fieldLabels: { [key: string]: string } = {
   companyName: 'Nome da Empresa ou Pessoa',
@@ -153,6 +155,7 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [loadingDelete, setLoadingDelete] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [loadingSave, setLoadingSave] = useState(false);
 
   // Observa os campos do formulário
@@ -206,32 +209,6 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
       }
     }
   };
-
-  /*   const handleChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const { name, value } = event.target;
-    let formattedValue = value;
-
-    // Aplicar formatação nos campos de CPF, CNPJ, Telefone e CEP
-    if (name === 'cpf') {
-      formattedValue = formatCPF(value);
-    } else if (name === 'cnpj') {
-      formattedValue = formatCNPJ(value);
-    } else if (name === 'phone') {
-      formattedValue = formatPhone(value);
-    } else if (name === 'cep') {
-      formattedValue = value;
-      handleCEPChange(formattedValue);
-    }
-
-    setValue(name, formattedValue); // Atualiza o valor formatado no estado do formulário
-
-    if (name === 'state') {
-      setValue('city', ''); // Limpa o campo cidade quando o estado muda
-      fetchCities(value); // Busca as novas cidades
-    }
-  }; */
 
   useEffect(() => {
     if (!clientId) return;
@@ -465,11 +442,44 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
               type="button"
               variant="contained"
               sx={styles.deleteButton}
-              onClick={onDelete}
-              disabled={loadingDelete} // Desativa o botão enquanto carrega
+              onClick={() => setShowDeleteModal(true)} // Abre o modal
             >
-              {loadingDelete ? <CircularProgress size={24} /> : 'Deletar'}
+              Deletar
             </Button>
+            <Modal
+              open={showDeleteModal}
+              onClose={() => setShowDeleteModal(false)} // Fecha o modal
+              sx={sharedStyles.boxModal}
+            >
+              <Box sx={sharedStyles.modalAlert}>
+                <Typography variant="h6">Confirmação de Exclusão!</Typography>
+                <Typography variant="body1">
+                  Tem certeza de que deseja deletar este cliente?
+                </Typography>
+
+                <Button
+                  variant="contained"
+                  onClick={onDelete}
+                  sx={{
+                    ...sharedStyles.modalButton,
+                    backgroundColor: 'red',
+                    '&:hover': {
+                      backgroundColor: 'darkred',
+                    },
+                  }}
+                  disabled={loadingDelete} // Desativa o botão enquanto carrega
+                >
+                  {loadingDelete ? <CircularProgress size={24} /> : 'Deletar'}
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={() => setShowDeleteModal(false)} // Fecha o modal
+                  sx={sharedStyles.modalButton}
+                >
+                  Cancelar
+                </Button>
+              </Box>
+            </Modal>
             <Button
               type="button"
               variant="contained"
