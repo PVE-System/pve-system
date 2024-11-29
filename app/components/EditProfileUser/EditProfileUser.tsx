@@ -179,6 +179,7 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
                   width={180}
                   height={180}
                   style={styles.formButtonImg}
+                  priority
                 />
               ) : imageUrl ? (
                 <Image
@@ -187,6 +188,7 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
                   width={180}
                   height={180}
                   style={styles.formButtonImg}
+                  priority
                 />
               ) : (
                 <Image
@@ -194,6 +196,7 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
                   alt="Placeholder"
                   width={180}
                   height={180}
+                  priority
                 />
               )}
               <input

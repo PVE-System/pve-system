@@ -120,6 +120,7 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
               height={180}
               style={styles.imgProfile}
               onClick={handleImageClick}
+              priority
             />
           </Tooltip>
         ) : (
@@ -130,6 +131,7 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
             height={180}
             style={styles.imgProfile}
             onClick={handleImageClick}
+            priority
           />
         )}
       </label>
@@ -249,14 +251,16 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
         </Typography>{' '}
         <Typography variant="subtitle2" sx={{ marginBottom: '5px' }}>
           WhatsApp:{' '}
-          <a
-            href={formatPhoneForWhatsApp(whatsapp)} // Gera o link com o código do país
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: 'green', textDecoration: 'none' }}
-          >
-            {whatsapp}
-          </a>
+          {whatsapp ? (
+            <a
+              href={formatPhoneForWhatsApp(whatsapp)}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: 'green', textDecoration: 'none' }}
+            >
+              {whatsapp}
+            </a>
+          ) : null}
         </Typography>
         <Typography variant="subtitle2" sx={{ marginBottom: '5px' }}>
           Email: {emailCommercial}
