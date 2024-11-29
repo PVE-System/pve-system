@@ -523,6 +523,8 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
                               formattedValue = formatCNPJ(value);
                             } else if (name === 'phone') {
                               formattedValue = formatPhone(value);
+                            } else if (name === 'whatsapp') {
+                              formattedValue = formatPhone(value);
                             } else if (name === 'cep') {
                               formattedValue = formatCEP(value);
                               handleCEPChange(formattedValue); // Chama a função para buscar o CEP

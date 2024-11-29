@@ -337,7 +337,6 @@ const RegisterClient: React.FC = () => {
   };
 
   // Função para verificar duplicidade de CNPJ ou CEP
-  // Função de verificação de duplicidade
   const checkDuplicate = async (field: 'cnpj' | 'cpf', value: string) => {
     try {
       const response = await fetch('/api/checkDuplicateRegisterClient', {
@@ -367,6 +366,18 @@ const RegisterClient: React.FC = () => {
 
   // Monitoramento do CNPJ e CEP
   useEffect(() => {
+    if (formData.cnpj?.length === 18) {
+      checkDuplicate('cnpj', formData.cnpj);
+    }
+  }, [formData.cnpj]);
+
+  useEffect(() => {
+    if (formData.cpf?.length === 14) {
+      checkDuplicate('cpf', formData.cpf);
+    }
+  }, [formData.cpf]);
+
+  /* bkup  useEffect(() => {
     if (formData.cnpj) {
       checkDuplicate('cnpj', formData.cnpj);
     }
@@ -377,36 +388,7 @@ const RegisterClient: React.FC = () => {
       checkDuplicate('cpf', formData.cpf);
     }
   }, [formData.cpf]);
-
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    let formattedValue = value;
-
-    // Aplicar formatação nos campos de CPF, CNPJ, Telefone e CEP
-    if (name === 'cpf') {
-      formattedValue = formatCPF(value);
-    } else if (name === 'cnpj') {
-      formattedValue = formatCNPJ(value);
-    } else if (name === 'phone') {
-      formattedValue = formatPhone(value);
-    } else if (name === 'cep') {
-      formattedValue = value;
-      handleCEPChange(formattedValue);
-    }
-
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      [name]: formattedValue,
-    }));
-
-    if (name === 'state') {
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        city: '',
-      }));
-      fetchCities(value);
-    }
-  };
+ */
 
   const handleCloseModal = () => setShowModal(false);
 

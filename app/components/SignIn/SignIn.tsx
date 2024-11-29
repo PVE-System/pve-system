@@ -92,6 +92,7 @@ export default function SignIn() {
             alt="Logo PVE"
             width={150}
             height={150}
+            priority
           />
         </Box>
         <Typography variant="subtitle1" sx={sharedStyles.titleForm}>
