@@ -56,7 +56,13 @@ export default function UsersTeamList() {
         (user: User) => user.is_active === true,
       );
 
-      setUsers(activeUsers);
+      // Ordena os usuários com base no operatorNumber em ordem crescente
+      const sortedUsers = activeUsers.sort(
+        (a: User, b: User) => (a.operatorNumber || 0) - (b.operatorNumber || 0),
+      );
+
+      // Atualiza o estado com os usuários ordenados
+      setUsers(sortedUsers);
     } catch (error) {
       console.error('Error fetching users:', error);
     } finally {
@@ -95,11 +101,18 @@ export default function UsersTeamList() {
       });
 
       if (response.ok) {
-        setUsers((prevUsers) =>
-          prevUsers.map((user) =>
+        setUsers((prevUsers) => {
+          const updatedUsers = prevUsers.map((user) =>
             user.id === editFormData.id ? { ...editFormData } : user,
-          ),
-        );
+          );
+
+          // Ordena a lista novamente após a edição
+          return updatedUsers.sort(
+            (a, b) => (a.operatorNumber || 0) - (b.operatorNumber || 0),
+          );
+        });
+
+        // Finaliza o modo de edição
         setEditingUser(null);
         setEditFormData(null);
       } else {
