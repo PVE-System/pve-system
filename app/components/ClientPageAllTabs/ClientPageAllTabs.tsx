@@ -71,6 +71,8 @@ export default function BasicTabs() {
   const [commentsTabNotification, setCommentsTabNotification] =
     React.useState(false);
   const [filesTabNotification, setFilesTabNotification] = React.useState(false); // Estado para arquivos
+  const [salesQuotesTabNotification, setSalesQuotesTabNotification] =
+    React.useState(false);
 
   // Função para buscar o status das abas
   const checkForNotifications = React.useCallback(async () => {
@@ -95,6 +97,7 @@ export default function BasicTabs() {
         setSalesTabNotification(data.salesTabChanged);
         setCommentsTabNotification(data.commentsTabChanged);
         setFilesTabNotification(data.filesTabChanged); // Verificando aba de arquivos
+        setSalesQuotesTabNotification(data.salesQuotesTabChanged);
       } else {
         console.error('Erro ao buscar notificações:', data.error);
       }
@@ -128,12 +131,14 @@ export default function BasicTabs() {
       );
 
       // Atualiza o estado removendo a notificação
-      if (tabName === 'sales') {
+      if (tabName === 'salesQuotes') {
+        setSalesQuotesTabNotification(false);
+      } else if (tabName === 'sales') {
         setSalesTabNotification(false);
       } else if (tabName === 'comments') {
         setCommentsTabNotification(false);
       } else if (tabName === 'files') {
-        setFilesTabNotification(false); // Para arquivos
+        setFilesTabNotification(false);
       }
     } catch (error) {
       console.error('Erro ao marcar aba como visualizada:', error);
@@ -146,11 +151,13 @@ export default function BasicTabs() {
 
     // Chama a função de marcar como visualizada quando a aba é acessada
     if (newValue === 1) {
-      markTabAsViewed('sales');
+      markTabAsViewed('salesQuotes');
     } else if (newValue === 2) {
-      markTabAsViewed('comments');
+      markTabAsViewed('sales');
     } else if (newValue === 3) {
-      markTabAsViewed('files'); // Para arquivos
+      markTabAsViewed('comments');
+    } else if (newValue === 4) {
+      markTabAsViewed('files');
     }
   };
 
@@ -188,8 +195,18 @@ export default function BasicTabs() {
                 },
               }}
               label={isSmallScreen ? null : 'Cotações do cliente'}
-              icon={<RequestQuoteIcon />}
-              {...a11yProps(0)}
+              icon={
+                <Badge
+                  color="warning"
+                  badgeContent={
+                    <NotificationsIcon style={{ fontSize: '12px' }} />
+                  }
+                  invisible={!salesQuotesTabNotification}
+                >
+                  <RequestQuoteIcon />
+                </Badge>
+              }
+              {...a11yProps(1)}
             />
 
             <Tab
