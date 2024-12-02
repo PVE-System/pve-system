@@ -40,7 +40,9 @@ export async function POST(request: NextRequest) {
           ? { commentsTabViewedAt: new Date() }
           : tabName === 'files'
             ? { filesTabViewedAt: new Date() }
-            : null;
+            : tabName === 'salesQuotes' // Adicionando a lógica para salesQuotes
+              ? { salesQuoteTabViewedAt: new Date() }
+              : null;
 
     if (!updateData) {
       return NextResponse.json({ error: 'Invalid tab name' }, { status: 400 });

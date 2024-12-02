@@ -1,0 +1,2 @@
+ALTER TABLE tabs_viewed
+ADD COLUMN sales_quote_tab_viewed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
