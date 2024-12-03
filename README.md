@@ -26,27 +26,32 @@
 
 The project follows a modular organization to ensure maintainability and scalability:
 
-app/: Contains pages that render components modularly.
+- `app/`: Contains pages that render components modularly.
 
 All pages in the project are located directly under the app/ folder, following the latest Next.js routing structure.
 
-Example: The main client page is implemented in app/ClientPage/page.tsx and uses components like ClientPageTabInfos.
-app/components/: Contains reusable frontend components.
+Example: The main client page is implemented in `app/ClientPage/page.tsx` and uses components like ClientPageTabInfos.
+
+- `app/components/`: Contains reusable frontend components.
 
 Each component is responsible for managing its own logic, API calls, and rendering the frontend.
 
 Example: ClientPageTabInfos is responsible for rendering client information and making related API calls.
-Styles: Styling is applied within the same folder as the component using a file named styles.ts.
 
-Example: The styles for the ClientPageTabInfos component are defined in app/components/ClientPageTabInfos/styles.ts.
+- Styles: Styling is applied within the same folder as the component using a file named styles.ts.
+
+Example: The styles for the ClientPageTabInfos component are defined in `app/components/ClientPageTabInfos/styles.ts`.
 
 ### BackEnd
 
-- app/api/: Contains all backend logic and API endpoints, following the Next.js structure.
+- `app/api/`: Contains all backend logic and API endpoints, following the Next.js structure.
 
-Example: The /api/getClient route is implemented in app/api/getClient/route.ts.
+Example: The /api/getClient route is implemented in `app/api/getClient/route.ts`.
 
 ## Database setup
+
+The project uses Drizzle ORM for database management with PostgreSQL, offering an approach with efficient migrations, schema definitions and queries.
+This ensures that database operations are reliable, easy to maintain, and in line with TypeScript's strong typing.
 
 Spin up the database with:
 
