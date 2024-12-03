@@ -28,6 +28,7 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
 }) => {
   const { handleSubmit, control, getValues, setValue } = useForm(); // Hooks do react-hook-form para gerenciar o formulário
   const [clientData, setClientData] = useState<any>(null); // Estado para armazenar os dados do cliente
+  const [salesData, setSalesData] = useState<{ [key: string]: any }>({});
   const [loading, setLoading] = useState(true); // Estado para controlar o carregamento
   const [buttonText, setButtonText] = useState('Excel');
 
@@ -63,6 +64,36 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
         setLoading(false);
       });
   }, [clientId, setValue]);
+
+  //UseEffect para os dados da tabela salesInformation
+
+  useEffect(() => {
+    if (!clientId || isNaN(Number(clientId))) {
+      console.error('Invalid client ID:', clientId);
+      return;
+    }
+
+    const baseUrl =
+      process.env.NODE_ENV === 'production'
+        ? 'https://pve-system.vercel.app'
+        : 'http://localhost:3000';
+
+    fetch(`${baseUrl}/api/getSalesInformation/${clientId}`)
+      .then((response) => {
+        if (!response.ok) {
+          console.error('Network response was not ok');
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log('Sales data received from API:', data); // Verifique os dados recebidos
+        setSalesData(data); // Atualiza os dados de vendas
+      })
+      .catch((error) => {
+        console.error('Error fetching sales data:', error);
+      });
+  }, [clientId]);
 
   // Mapeamento dos nomes dos campos do banco de dados para nomes mais amigáveis
   const fieldLabels: { [key: string]: string } = {
@@ -137,9 +168,11 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
 
   //End Export PDF
 
-  //Start Export EXCEL
-
-  const copyClientDataToClipboard = (clientData: { [key: string]: any }) => {
+  // Start Export EXCEL
+  const copyClientAndSalesDataToClipboard = (
+    clientData: { [key: string]: any },
+    salesData: { [key: string]: any },
+  ) => {
     // Exclui os campos irrelevantes para exportação
     const excludedFields = [
       'id',
@@ -149,36 +182,71 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
       'imageUrl',
     ];
 
-    // Ordem das colunas no Excel do cliente
-    const excelColumnOrder = [
+    // Ordem das colunas no Excel para clientes
+    const clientExcelColumnOrder = [
       'cnpj',
+      'cpf',
       'corfioCode',
+
       'companyName',
-      'cnpj',
-      'address',
-      'city',
       'cep',
+      'address',
+      'locationNumber',
+      'district',
+      'city',
       'state',
-      '',
-      'emailCommercial',
+
       'phone',
+      'whatsapp',
+      'emailCommercial',
+      'emailFinancial',
+      'emailXml',
+      'socialMedia',
+
+      'contactAtCompany',
+      'financialContact',
+      'responsibleSeller',
+
+      'companySize',
+      'hasOwnStore',
+      'icmsContributor',
       'stateRegistration',
+      'transportationType',
+      'companyLocation',
+      'marketSegmentNature',
     ];
 
-    // Organiza os dados na ordem das colunas do Excel
-    const values = excelColumnOrder.map((key) => {
+    // Ordem das colunas no Excel para sales_information
+    const salesExcelColumnOrder = [
+      'commercial',
+      'marketing',
+      'invoicing',
+      'cables',
+      'financial',
+      'invoice',
+    ];
+
+    // Organiza os dados dos clientes na ordem das colunas do Excel
+    const clientValues = clientExcelColumnOrder.map((key) => {
       if (excludedFields.includes(key)) return ''; // Ignora campos excluídos
       return clientData[key] || ''; // Retorna o valor do campo ou vazio se não houver
     });
 
+    // Organiza os dados de sales_information na ordem das colunas do Excel
+    const salesValues = salesExcelColumnOrder.map((key) => {
+      return salesData[key] || ''; // Retorna o valor do campo ou vazio se não houver
+    });
+
+    // Combina os valores dos clientes e de sales_information
+    const combinedValues = [...clientValues, ...salesValues];
     // Gera o conteúdo tabulado
-    const tabulatedText = values.join('\t'); // Dados em uma linha, separados por tabulações
+    const tabulatedText = combinedValues.join('\t'); // Dados em uma linha, separados por tabulações
 
     // Copia para a área de transferência
     navigator.clipboard
       .writeText(tabulatedText)
       .then(() => {
-        console.log('Dados do cliente copiados com sucesso!');
+        console.log('Dados do cliente e de vendas copiados com sucesso!');
         setButtonText('Copiado'); // Altera o texto do botão para "Copiado"
 
         setTimeout(() => setButtonText('Excel'), 1500); // Volta para "Excel" após 2 segundos
@@ -188,6 +256,7 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
         alert('Erro ao copiar os dados. Tente novamente.');
       });
   };
+  // End Export EXCEL
 
   //End Export EXCEL
 
@@ -285,7 +354,11 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
               <Button
                 type="button"
                 variant="contained"
-                onClick={() => copyClientDataToClipboard(clientData)}
+                onClick={() => {
+                  console.log('clientData:', clientData);
+                  console.log('salesData:', salesData);
+                  copyClientAndSalesDataToClipboard(clientData, salesData);
+                }}
                 sx={styles.exportExcelButton}
               >
                 {buttonText}
