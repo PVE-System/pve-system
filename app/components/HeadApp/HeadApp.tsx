@@ -1,4 +1,5 @@
 'use client';
+
 import * as React from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
@@ -12,8 +13,10 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import Menu from '@mui/material/Menu';
 import TemporaryDrawer from '@/app/components/MenuNav/MenuNav';
 import styles from '@/app/components/HeadApp/styles';
+import { useRouter } from 'next/navigation';
 
 export default function HeadApp() {
+  const router = useRouter(); // Instanciando o useRouter
   const isSmallScreen = useMediaQuery('(max-width:600px)');
   const [filter, setFilter] = React.useState('');
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
@@ -61,12 +64,12 @@ export default function HeadApp() {
         break;
     }
     if (route) {
-      window.location.href = route;
+      router.push(route); // Usando router.push para redirecionar
     }
   };
 
   const handleSearch = () => {
-    window.location.href = `/searchResults?query=${encodeURIComponent(filter)}`;
+    router.push(`/searchResults?query=${encodeURIComponent(filter)}`); // Usando router.push para busca
   };
 
   return (
@@ -84,9 +87,9 @@ export default function HeadApp() {
             variant="outlined"
             value={filter}
             onChange={handleFilterChange}
-            onKeyPress={(event) => {
+            onKeyDown={(event) => {
               if (event.key === 'Enter') {
-                handleSearch();
+                handleSearch(); // Chama a função de busca ao pressionar Enter
               }
             }}
             InputProps={{
