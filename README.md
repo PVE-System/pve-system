@@ -36,7 +36,7 @@ Example: The main client page is implemented in `app/ClientPage/page.tsx` and us
 
 Each component is responsible for managing its own logic, API calls, and rendering the frontend.
 
-Example: ClientPageTabInfos is responsible for rendering client information and making related API calls.
+Example: `app/components/ClientPageTabInfos/ClientPageTabInfos.tsx` is responsible for rendering client information and making related API calls.
 
 - Styles: Styling is applied within the same folder as the component using a file named styles.ts.
 

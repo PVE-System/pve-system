@@ -16,6 +16,7 @@ import {
 } from '@mui/material';
 import { Rating } from '@mui/material';
 import styles from '@/app/components/ClientsMsList/styles';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 interface Client {
   id: string;
@@ -58,58 +59,62 @@ const renderAsIs = (str: any) => {
 const SearchResults = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
-  const [query, setQuery] = useState('');
+  const searchParams = useSearchParams();
+  const router = useRouter(); // Para manipular a URL
+  const query = searchParams.get('query') || ''; // Obtém o parâmetro da URL
   const isSmallScreen = useMediaQuery('(max-width:600px)');
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const queryParam =
-        new URLSearchParams(window.location.search).get('query') || '';
-      setQuery(queryParam);
-    }
-  }, []);
+  // Função para buscar os clientes com base na consulta
+  const fetchClients = async (searchQuery: string) => {
+    try {
+      setLoading(true);
 
-  useEffect(() => {
-    const fetchClients = async () => {
-      try {
-        const response = await fetch('/api/getAllClients');
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        const searchTerm = query.toLowerCase();
-
-        const filteredClients = data.clients.filter((client: Client) => {
-          // Filtra clientes com CNPJ preenchido ou sem CNPJ preenchido
-          if (searchTerm === 'cnpj') {
-            return !!client.cnpj;
-          } else if (searchTerm === 'cpf') {
-            return !client.cnpj;
-          } else {
-            // Verifica se a palavra-chave está em qualquer campo relevante
-            return Object.values(client).some((value) =>
-              value.toString().toLowerCase().includes(searchTerm),
-            );
-          }
-        });
-
-        setClients(filteredClients);
-        setLoading(false);
-      } catch (error) {
-        console.error('Failed to fetch clients:', error);
-        setLoading(false);
+      const response = await fetch('/api/getAllClients');
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
       }
-    };
 
+      const data = await response.json();
+      const searchTerm = searchQuery.toLowerCase();
+
+      const normalize = (str: string) => str.replace(/[\s.-]/g, ''); // Remove espaços, pontos e traços
+
+      const filteredClients = data.clients.filter((client: Client) => {
+        const isCnpjOrCpf =
+          !isNaN(Number(searchTerm)) && // Verifica se é um número
+          (normalize(client.cnpj || '').includes(searchTerm) || // Compara CNPJ
+            normalize(client.cpf || '').includes(searchTerm)); // Compara CPF
+
+        const isCorfioCodeMatch = client.corfioCode
+          ?.toLowerCase()
+          .includes(searchTerm);
+
+        const isNameMatch = client.companyName
+          ?.toLowerCase()
+          .includes(searchTerm);
+
+        // Verifica se o termo corresponde a qualquer campo relevante
+        return isCnpjOrCpf || isCorfioCodeMatch || isNameMatch;
+      });
+
+      setClients(filteredClients);
+    } catch (error) {
+      console.error('Failed to fetch clients:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Atualiza a busca quando o `query` muda
+  useEffect(() => {
     if (query) {
-      fetchClients();
+      fetchClients(query);
     }
   }, [query]);
 
+  // Lida com cliques em linhas para navegação
   const handleRowClick = (clientId: string) => {
-    if (typeof window !== 'undefined') {
-      window.location.href = `/clientPage?id=${clientId}`;
-    }
+    router.push(`/clientPage?id=${clientId}`);
   };
 
   if (loading) {
@@ -144,7 +149,7 @@ const SearchResults = () => {
                 onClick={() => handleRowClick(client.id)}
               >
                 <TableCell sx={styles.fontSize}>
-                  {renderAsIs(client.companyName.slice(0, 50))}
+                  {client.companyName.slice(0, 50)}
                 </TableCell>
                 {!isSmallScreen && (
                   <>
@@ -171,24 +176,18 @@ const SearchResults = () => {
                             '&:hover': {
                               backgroundColor:
                                 client.clientCondition === 'Normal'
-                                  ? ' green' // Cor de fundo do hover para 'Normal'
+                                  ? ' green'
                                   : client.clientCondition === 'Especial'
-                                    ? ' orange' // Cor de fundo do hover para 'Especial'
+                                    ? ' orange'
                                     : client.clientCondition === 'Suspenso'
-                                      ? ' red' // Cor de fundo do hover para 'Suspenso'
+                                      ? ' red'
                                       : 'grey',
                             },
                           }}
                           variant="contained"
                           size="small"
                         >
-                          {client.clientCondition === 'Normal'
-                            ? 'Normal'
-                            : client.clientCondition === 'Especial'
-                              ? 'Especial'
-                              : client.clientCondition === 'Suspenso'
-                                ? 'Suspenso'
-                                : 'Unknown'}
+                          {client.clientCondition}
                         </Button>
                       </Box>
                     </TableCell>

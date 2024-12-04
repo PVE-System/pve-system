@@ -25,6 +25,7 @@ import Cookies from 'js-cookie';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import styles from '@/app/components/ClientPageTabSalesQuotes/styles';
+import { orange } from '@mui/material/colors';
 
 interface ClientPageSalesQuotesProps {
   clientId: string;
@@ -49,6 +50,7 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
   const [currentPage, setCurrentPage] = useState(0);
   const [showAllYears, setShowAllYears] = useState(false);
   const [manualYearInput, setManualYearInput] = useState(false);
+  const [lastAddedQuoteId, setLastAddedQuoteId] = useState<number | null>(null);
 
   const ITEMS_PER_PAGE = 5;
 
@@ -90,6 +92,11 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
 
         setQuotes(sortedQuotes);
         setTotalQuotes(data.total);
+
+        // Atualize o último ID adicionado
+        if (sortedQuotes.length > 0) {
+          setLastAddedQuoteId(sortedQuotes[0].id); // O maior ID será o primeiro na lista ordenada
+        }
       } catch (error) {
         console.error('Error fetching sales quotes:', error);
       } finally {
@@ -98,6 +105,12 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
     },
     [clientId],
   );
+
+  useEffect(() => {
+    if (quotes.length > 0) {
+      setLastAddedQuoteId(quotes[0].id); // O primeiro da lista ordenada é sempre o último adicionado
+    }
+  }, [quotes]);
 
   useEffect(() => {
     fetchClientData();
@@ -118,6 +131,9 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
         body: JSON.stringify({ clientId, userId: Number(userId) }),
       });
       if (!response.ok) throw new Error('Erro ao adicionar cotação');
+
+      const newQuote = await response.json(); // Supondo que a API retorna a nova cotação criada
+      setLastAddedQuoteId(newQuote.id); // Atualiza o ID do último item gerado
       fetchQuotes(Number(year));
     } catch (error) {
       console.error('Error adding sales quote:', error);
@@ -260,10 +276,30 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
           <List>
             {currentItems.length > 0 ? (
               currentItems.map((quote) => (
-                <ListItem key={quote.id} sx={styles.boxList}>
-                  <Typography variant="body1">
-                    Cotação: {quote.quoteIdentifier}
-                  </Typography>
+                <ListItem
+                  key={quote.id}
+                  sx={{
+                    ...styles.boxList,
+                    backgroundColor:
+                      quote.id === lastAddedQuoteId ? '#inherit' : 'inherit', // Destaque o último item gerado
+                    border:
+                      quote.id === lastAddedQuoteId
+                        ? `2px solid ${orange[700]}`
+                        : 'none', // Borda para destaque
+                    borderRadius: quote.id === lastAddedQuoteId ? '8px' : '0',
+                  }}
+                >
+                  {quote.id === lastAddedQuoteId ? (
+                    <Tooltip title="Última cotação">
+                      <Typography variant="body1">
+                        Cotação: {quote.quoteIdentifier}
+                      </Typography>
+                    </Tooltip>
+                  ) : (
+                    <Typography variant="body1">
+                      Cotação: {quote.quoteIdentifier}
+                    </Typography>
+                  )}
                   <Tooltip title="Copiar código da negociação.">
                     <IconButton
                       onClick={() =>
