@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Table,
   TableBody,
@@ -49,68 +49,72 @@ interface Client {
 }
 
 // Função Renderizar o nome do cliente com tamanho menor
-const renderAsIs = (str: any) => {
+/* const renderAsIs = (str: any) => {
   if (typeof str !== 'string') {
     return '';
   }
   return str;
-};
+}; */
 
 const SearchResults = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const searchParams = useSearchParams();
-  const router = useRouter(); // Para manipular a URL
-  const query = searchParams.get('query') || ''; // Obtém o parâmetro da URL
+  const router = useRouter();
+  const query = searchParams.get('query') || '';
   const isSmallScreen = useMediaQuery('(max-width:600px)');
 
   // Função para buscar os clientes com base na consulta
-  const fetchClients = async (searchQuery: string) => {
-    try {
-      setLoading(true);
+  const fetchClients = useCallback(
+    async (searchQuery: string) => {
+      try {
+        setLoading(true);
 
-      const response = await fetch('/api/getAllClients');
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
+        const response = await fetch('/api/getAllClients');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        const normalizedSearchTerm = searchQuery
+          .toLowerCase()
+          .replace(/[^\w]/g, ''); // Remove tudo que não é alfanumérico
+
+        const filteredClients = data.clients.filter((client: Client) => {
+          const normalize = (str: string) =>
+            str.replace(/[^\w]/g, '').toLowerCase();
+
+          const normalizedCnpj = normalize(client.cnpj || '');
+          const normalizedCpf = normalize(client.cpf || '');
+
+          const isCnpjMatch = normalizedCnpj.includes(normalizedSearchTerm);
+          const isCpfMatch = normalizedCpf.includes(normalizedSearchTerm);
+          const isCorfioCodeMatch = client.corfioCode
+            ?.toLowerCase()
+            .includes(normalizedSearchTerm);
+          const isNameMatch = client.companyName
+            ?.toLowerCase()
+            .includes(normalizedSearchTerm);
+
+          return isCnpjMatch || isCpfMatch || isCorfioCodeMatch || isNameMatch;
+        });
+
+        setClients(filteredClients);
+      } catch (error) {
+        console.error('Failed to fetch clients:', error);
+      } finally {
+        setLoading(false);
       }
+    },
+    [], // Nenhuma dependência externa necessária
+  );
 
-      const data = await response.json();
-      const searchTerm = searchQuery.toLowerCase();
-
-      const normalize = (str: string) => str.replace(/[\s.-]/g, ''); // Remove espaços, pontos e traços
-
-      const filteredClients = data.clients.filter((client: Client) => {
-        const isCnpjOrCpf =
-          !isNaN(Number(searchTerm)) && // Verifica se é um número
-          (normalize(client.cnpj || '').includes(searchTerm) || // Compara CNPJ
-            normalize(client.cpf || '').includes(searchTerm)); // Compara CPF
-
-        const isCorfioCodeMatch = client.corfioCode
-          ?.toLowerCase()
-          .includes(searchTerm);
-
-        const isNameMatch = client.companyName
-          ?.toLowerCase()
-          .includes(searchTerm);
-
-        // Verifica se o termo corresponde a qualquer campo relevante
-        return isCnpjOrCpf || isCorfioCodeMatch || isNameMatch;
-      });
-
-      setClients(filteredClients);
-    } catch (error) {
-      console.error('Failed to fetch clients:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Atualiza a busca quando o `query` muda
+  // Atualiza a busca quando `query` muda
   useEffect(() => {
     if (query) {
       fetchClients(query);
     }
-  }, [query]);
+  }, [query, fetchClients]);
 
   // Lida com cliques em linhas para navegação
   const handleRowClick = (clientId: string) => {
