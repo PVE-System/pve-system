@@ -165,6 +165,9 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
   const [duplicateField, setDuplicateField] = useState<'cnpj' | 'cpf' | null>(
     null,
   );
+  const [debouncedCnpj, setDebouncedCnpj] = useState('');
+  const [debouncedCpf, setDebouncedCpf] = useState('');
+
   const cnpj = watch('cnpj'); // Extrai o valor do CNPJ
   const cpf = watch('cpf'); // Extrai o valor do CPF
 
@@ -257,78 +260,61 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
   const onSubmit = async (data: any) => {
     if (!clientId) return;
 
-    setLoadingSave(true); // Inicia o estado de loading ao salvar
+    setLoadingSave(true);
 
     try {
-      // Verificação final para CNPJ e CPF duplicados
-      if (data.cnpj && data.cnpj !== initialCnpj) {
-        const cnpjDuplicate = await checkDuplicate('cnpj', data.cnpj);
-        if (cnpjDuplicate) {
-          setDuplicateField('cnpj');
-          setShowModal(true);
-          setLoadingSave(false); // Interrompe o carregamento
-          return; // Impede o envio do formulário
-        }
-      }
+      // Verifica duplicidade para CNPJ
+      const cnpjDuplicate = await handleDuplicateCheck(
+        'cnpj',
+        data.cnpj,
+        initialCnpj,
+      );
+      if (cnpjDuplicate) return;
 
-      if (data.cpf && data.cpf !== initialCpf) {
-        const cpfDuplicate = await checkDuplicate('cpf', data.cpf);
-        if (cpfDuplicate) {
-          setDuplicateField('cpf');
-          setShowModal(true);
-          setLoadingSave(false); // Interrompe o carregamento
-          return; // Impede o envio do formulário
-        }
-      }
+      // Verifica duplicidade para CPF
+      const cpfDuplicate = await handleDuplicateCheck(
+        'cpf',
+        data.cpf,
+        initialCpf,
+      );
+      if (cpfDuplicate) return;
 
+      // Lógica de atualização permanece inalterada
       delete data.id;
       delete data.createdAt;
 
       let finalImageUrl = imageUrl || clientData?.imageUrl;
 
-      // Se o campo icmsContributor for "Não", limpar o valor de stateRegistration
       if (data.icmsContributor === 'Não') {
         data.stateRegistration = ''; // Limpa o campo para salvar como vazio
       }
 
-      // Se houver uma nova imagem, deletar a imagem antiga primeiro
       if (imageFile && imageUrl) {
         try {
-          console.log(
-            'Deletando a imagem anterior associada ao cliente:',
-            clientId,
-          );
+          console.log('Deletando imagem antiga:', clientId);
           const deleteImageResponse = await fetch(
             `/api/deleteImageClient?clientId=${clientId}&imageUrl=${encodeURIComponent(imageUrl)}`,
-            {
-              method: 'DELETE',
-            },
+            { method: 'DELETE' },
           );
 
           if (!deleteImageResponse.ok) {
             const errorResponse = await deleteImageResponse.json();
             throw new Error(
-              errorResponse.error || 'Erro ao deletar a imagem anterior',
+              errorResponse.error || 'Erro ao deletar imagem antiga',
             );
           }
-
-          console.log('Imagem anterior deletada com sucesso.');
         } catch (error) {
-          console.error('Erro ao deletar a imagem anterior:', error);
+          console.error('Erro ao deletar imagem antiga:', error);
         }
       }
 
-      // Faz o upload da nova imagem (se houver)
       if (imageFile) {
         const formData = new FormData();
         formData.append('file', imageFile);
 
         const uploadResponse = await fetch(
           `/api/uploadImageClient?pathname=clients/id=${clientId}/image-${Date.now()}&clientId=${clientId}`,
-          {
-            method: 'POST',
-            body: formData,
-          },
+          { method: 'POST', body: formData },
         );
 
         if (uploadResponse.ok) {
@@ -339,7 +325,6 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
         }
       }
 
-      // Atualiza os dados do cliente no banco de dados
       const updatedData = {
         ...data,
         imageUrl: finalImageUrl,
@@ -347,9 +332,7 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
 
       const response = await fetch(`/api/updateClient?id=${clientId}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedData),
       });
 
@@ -360,12 +343,12 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
         );
       }
 
-      console.log('Dados do cliente atualizados com sucesso.');
+      console.log('Dados atualizados com sucesso.');
       router.push(`/clientPage?id=${clientId}`);
     } catch (error) {
       console.error('Erro ao atualizar os dados do cliente:', error);
     } finally {
-      setLoadingSave(false); // Finaliza o estado de loading
+      setLoadingSave(false);
     }
   };
 
@@ -425,6 +408,23 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
     }
   };
 
+  const handleDuplicateCheck = async (
+    field: 'cnpj' | 'cpf',
+    value: string,
+    initialValue: string,
+  ) => {
+    if (value && (value !== initialValue || !initialValue)) {
+      const isDuplicate = await checkDuplicate(field, value);
+      if (isDuplicate) {
+        setDuplicateField(field);
+        setShowModal(true);
+        setLoadingSave(false);
+        return true;
+      }
+    }
+    return false;
+  };
+
   const checkDuplicate = useCallback(
     async (field: 'cnpj' | 'cpf', value: string) => {
       try {
@@ -464,18 +464,38 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
   }, [clientData]);
 
   useEffect(() => {
-    // Só verifica duplicidade se os valores iniciais já foram definidos
-    if (initialCnpj && cnpj && cnpj !== initialCnpj && cnpj.length === 18) {
-      checkDuplicate('cnpj', cnpj);
-    }
-  }, [checkDuplicate, cnpj, initialCnpj]);
+    // Debounce para CNPJ
+    const handler = setTimeout(() => {
+      setDebouncedCnpj(cnpj || ''); // Atualiza o valor debounced
+    }, 500); // Aguarda 500ms após o último input
+
+    return () => {
+      clearTimeout(handler); // Limpa o timeout anterior
+    };
+  }, [cnpj]);
 
   useEffect(() => {
-    // Só verifica duplicidade se os valores iniciais já foram definidos
-    if (initialCpf && cpf && cpf !== initialCpf && cpf.length === 14) {
-      checkDuplicate('cpf', cpf);
+    // Debounce para CPF
+    const handler = setTimeout(() => {
+      setDebouncedCpf(cpf || ''); // Atualiza o valor debounced
+    }, 500); // Aguarda 500ms após o último input
+
+    return () => {
+      clearTimeout(handler); // Limpa o timeout anterior
+    };
+  }, [cpf]);
+
+  useEffect(() => {
+    if (debouncedCnpj && debouncedCnpj !== initialCnpj) {
+      checkDuplicate('cnpj', debouncedCnpj);
     }
-  }, [checkDuplicate, cpf, initialCpf]);
+  }, [checkDuplicate, debouncedCnpj, initialCnpj]);
+
+  useEffect(() => {
+    if (debouncedCpf && debouncedCpf !== initialCpf) {
+      checkDuplicate('cpf', debouncedCpf);
+    }
+  }, [checkDuplicate, debouncedCpf, initialCpf]);
 
   // Lógica para fechar o modal
   const handleCloseModal = () => setShowModal(false);
