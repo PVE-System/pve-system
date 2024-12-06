@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Box,
   Button,
   CircularProgress,
+  Link,
   MenuItem,
   Modal,
   TextField,
@@ -157,6 +158,15 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [loadingSave, setLoadingSave] = useState(false);
+  const [showModal, setShowModal] = useState(false); // Estado para o modal de duplicata
+  const [initialCnpj, setInitialCnpj] = useState(''); // Valor inicial do CNPJ
+  const [initialCpf, setInitialCpf] = useState(''); // Valor inicial do CPF
+  const [duplicateClient, setDuplicateClient] = useState<any>(null);
+  const [duplicateField, setDuplicateField] = useState<'cnpj' | 'cpf' | null>(
+    null,
+  );
+  const cnpj = watch('cnpj'); // Extrai o valor do CNPJ
+  const cpf = watch('cpf'); // Extrai o valor do CPF
 
   // Observa os campos do formulário
   const companyName = watch('companyName');
@@ -250,6 +260,27 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
     setLoadingSave(true); // Inicia o estado de loading ao salvar
 
     try {
+      // Verificação final para CNPJ e CPF duplicados
+      if (data.cnpj && data.cnpj !== initialCnpj) {
+        const cnpjDuplicate = await checkDuplicate('cnpj', data.cnpj);
+        if (cnpjDuplicate) {
+          setDuplicateField('cnpj');
+          setShowModal(true);
+          setLoadingSave(false); // Interrompe o carregamento
+          return; // Impede o envio do formulário
+        }
+      }
+
+      if (data.cpf && data.cpf !== initialCpf) {
+        const cpfDuplicate = await checkDuplicate('cpf', data.cpf);
+        if (cpfDuplicate) {
+          setDuplicateField('cpf');
+          setShowModal(true);
+          setLoadingSave(false); // Interrompe o carregamento
+          return; // Impede o envio do formulário
+        }
+      }
+
       delete data.id;
       delete data.createdAt;
 
@@ -394,6 +425,92 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
     }
   };
 
+  const checkDuplicate = useCallback(
+    async (field: 'cnpj' | 'cpf', value: string) => {
+      try {
+        const response = await fetch('/api/checkDuplicateRegisterClient', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ [field]: value }),
+        });
+
+        if (!response.ok) {
+          console.error('Erro na resposta do servidor:', response.statusText);
+          return false;
+        }
+
+        const result = await response.json();
+        if (result.duplicate && result.client.id !== clientId) {
+          setDuplicateClient(result.client);
+          setDuplicateField(field);
+          setShowModal(true);
+          return true;
+        }
+        return false;
+      } catch (error) {
+        console.error('Erro ao verificar duplicata:', error);
+        return false;
+      }
+    },
+    [clientId], // Agora, `checkDuplicate` depende apenas de `clientId`
+  );
+
+  useEffect(() => {
+    // Carregar os valores iniciais de CNPJ e CPF quando clientData estiver disponível
+    if (clientData) {
+      setInitialCnpj(clientData.cnpj || '');
+      setInitialCpf(clientData.cpf || '');
+    }
+  }, [clientData]);
+
+  useEffect(() => {
+    // Só verifica duplicidade se os valores iniciais já foram definidos
+    if (initialCnpj && cnpj && cnpj !== initialCnpj && cnpj.length === 18) {
+      checkDuplicate('cnpj', cnpj);
+    }
+  }, [checkDuplicate, cnpj, initialCnpj]);
+
+  useEffect(() => {
+    // Só verifica duplicidade se os valores iniciais já foram definidos
+    if (initialCpf && cpf && cpf !== initialCpf && cpf.length === 14) {
+      checkDuplicate('cpf', cpf);
+    }
+  }, [checkDuplicate, cpf, initialCpf]);
+
+  // Lógica para fechar o modal
+  const handleCloseModal = () => setShowModal(false);
+
+  // Modal de duplicidade
+  const renderDuplicateModal = () => (
+    <Modal
+      open={showModal}
+      onClose={handleCloseModal}
+      sx={sharedStyles.boxModal}
+    >
+      <Box sx={sharedStyles.modalAlert}>
+        <Typography variant="h6">Cliente já cadastrado!</Typography>
+        <Typography variant="body1">
+          Um cliente com o mesmo {duplicateField === 'cnpj' ? 'CNPJ' : 'CPF'} já
+          existe no sistema.
+        </Typography>
+        <Button
+          variant="contained"
+          onClick={handleCloseModal}
+          sx={sharedStyles.modalButton}
+        >
+          Fechar
+        </Button>
+        {duplicateClient && (
+          <Link href={`/clientPage?id=${duplicateClient.id}`}>
+            <Button variant="contained" sx={sharedStyles.modalButton}>
+              Ver Cliente
+            </Button>
+          </Link>
+        )}
+      </Box>
+    </Modal>
+  );
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center">
@@ -418,6 +535,7 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
   return (
     <Box sx={styles.contentTabs}>
       <Box sx={styles.boxContent}>
+        {renderDuplicateModal()}
         <Box>
           <ClientProfile
             rating={watch('rating')}
@@ -530,6 +648,10 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
                               handleCEPChange(formattedValue); // Chama a função para buscar o CEP
                             } else if (name === 'state') {
                               setValue('city', ''); // Limpa o campo cidade quando o estado muda
+                              setValue('address', ''); // Limpa o campo cidade quando o estado muda
+                              setValue('cep', ''); // Limpa o campo cidade quando o estado muda
+                              setValue('district', ''); // Limpa o campo cidade quando o estado muda
+
                               fetchCities(value); // Busca as novas cidades ao mudar o estado
                             }
                             // Lógica para `icmsContributor`
