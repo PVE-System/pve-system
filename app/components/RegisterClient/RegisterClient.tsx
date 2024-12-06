@@ -172,9 +172,6 @@ const RegisterClient: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const router = useRouter();
 
-  // Construir a URL com o parâmetro `id` usando `URLSearchParams`
-  /*   const clientUrl = new URLSearchParams({ id: duplicateClient?.id || '' }); */
-
   // Função para buscar cidades com base no estado selecionado
   const fetchCities = async (state: string) => {
     try {
@@ -249,6 +246,9 @@ const RegisterClient: React.FC = () => {
       setFormData((prevFormData) => ({
         ...prevFormData,
         city: '', // Limpa o campo cidade quando o estado muda
+        address: '',
+        district: '',
+        cep: '',
       }));
       fetchCities(value);
     }
@@ -376,19 +376,6 @@ const RegisterClient: React.FC = () => {
       checkDuplicate('cpf', formData.cpf);
     }
   }, [formData.cpf]);
-
-  /* bkup  useEffect(() => {
-    if (formData.cnpj) {
-      checkDuplicate('cnpj', formData.cnpj);
-    }
-  }, [formData.cnpj]);
-
-  useEffect(() => {
-    if (formData.cpf) {
-      checkDuplicate('cpf', formData.cpf);
-    }
-  }, [formData.cpf]);
- */
 
   const handleCloseModal = () => setShowModal(false);
 

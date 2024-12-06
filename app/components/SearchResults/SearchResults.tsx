@@ -48,14 +48,6 @@ interface Client {
   marketSegmentNature: string;
 }
 
-// Função Renderizar o nome do cliente com tamanho menor
-/* const renderAsIs = (str: any) => {
-  if (typeof str !== 'string') {
-    return '';
-  }
-  return str;
-}; */
-
 const SearchResults = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
