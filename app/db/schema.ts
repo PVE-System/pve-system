@@ -94,22 +94,22 @@ export const salesInformation = pgTable('sales_information', {
   userId: integer('user_id')
     .references(() => users.id)
     .notNull(),
-  commercial: text('commercial').notNull(),
+  commercial: text('commercial').default(''),
   commercialUpdatedAt: timestamp('commercial_updated_at').defaultNow(),
   commercialUpdatedBy: integer('commercial_updated_by').references(
     () => users.id,
   ),
-  marketing: text('marketing').notNull(),
+  marketing: text('marketing').default(''),
   marketingUpdatedAt: timestamp('marketing_updated_at').defaultNow(),
   marketingUpdatedBy: integer('marketing_updated_by').references(
     () => users.id,
   ),
-  invoicing: text('invoicing').notNull(),
+  invoicing: text('invoicing').default(''),
   invoicingUpdatedAt: timestamp('invoicing_updated_at').defaultNow(),
   invoicingUpdatedBy: integer('invoicing_updated_by').references(
     () => users.id,
   ),
-  cables: text('cables').notNull(),
+  cables: text('cables').default(''),
   cablesUpdatedAt: timestamp('cables_updated_at').defaultNow(),
   cablesUpdatedBy: integer('cables_updated_by').references(() => users.id),
   financial: text('financial').notNull(),
@@ -117,7 +117,7 @@ export const salesInformation = pgTable('sales_information', {
   financialUpdatedBy: integer('financial_updated_by').references(
     () => users.id,
   ),
-  invoice: text('invoice').notNull(),
+  invoice: text('invoice').default(''),
   invoiceUpdatedAt: timestamp('invoice_updated_at').defaultNow(),
   invoiceUpdatedBy: integer('invoice_updated_by').references(() => users.id),
   createdAt: timestamp('created_at').defaultNow().notNull(),

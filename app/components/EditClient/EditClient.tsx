@@ -467,7 +467,7 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
     // Debounce para CNPJ
     const handler = setTimeout(() => {
       setDebouncedCnpj(cnpj || ''); // Atualiza o valor debounced
-    }, 500); // Aguarda 500ms após o último input
+    }, 1000); // Aguarda 500ms após o último input
 
     return () => {
       clearTimeout(handler); // Limpa o timeout anterior
@@ -478,7 +478,7 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
     // Debounce para CPF
     const handler = setTimeout(() => {
       setDebouncedCpf(cpf || ''); // Atualiza o valor debounced
-    }, 500); // Aguarda 500ms após o último input
+    }, 1000); // Aguarda 500ms após o último input
 
     return () => {
       clearTimeout(handler); // Limpa o timeout anterior
@@ -592,7 +592,7 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
               <Box sx={sharedStyles.modalAlert}>
                 <Typography variant="h6">Confirmação de Exclusão!</Typography>
                 <Typography variant="body1">
-                  Tem certeza de que deseja deletar este cliente?
+                  Tem certeza de que deseja excluir este cliente?
                 </Typography>
 
                 <Button

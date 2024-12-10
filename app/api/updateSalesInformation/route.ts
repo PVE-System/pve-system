@@ -48,7 +48,7 @@ export async function PUT(request: NextRequest) {
     const fieldValue = body[fieldName]?.trim(); // Remover espaços em branco
 
     // Verificar se o valor é válido (não vazio)
-    if (!fieldValue) {
+    if (fieldValue === undefined) {
       return NextResponse.json(
         { error: 'Field value is required' },
         { status: 400 },
