@@ -61,8 +61,8 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
         const salesData = await salesResponse.json();
         setSalesData(salesData);
 
-        Object.keys(salesData).forEach((key) => {
-          setValue(key, salesData[key]);
+        Object.keys(fieldLabels).forEach((key) => {
+          setValue(key, salesData?.[key] || ''); // Inicializa como string vazia se ausente
         });
       }
     } catch (error) {
@@ -89,19 +89,19 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
       const fieldValue = getValues(fieldName);
 
       const requestData = {
-        [fieldName]: fieldValue || '*',
+        [fieldName]: fieldValue || '',
         clientId,
         userId: Number(userId),
       };
 
-      const method = salesData && salesData[fieldName] ? 'PUT' : 'POST';
+      const method = salesData?.clientId ? 'PUT' : 'POST';
       const url =
         method === 'PUT'
           ? `/api/updateSalesInformation?id=${clientId}`
           : `/api/registerSalesInformation?id=${clientId}`;
 
       const response = await fetch(url, {
-        method: method,
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestData),
       });
@@ -114,15 +114,13 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
 
       setSalesData((prevData: any) => ({
         ...prevData,
-        [fieldName]: fieldValue || '*', // Atualiza o campo que foi modificado
+        [fieldName]: fieldValue || '',
         [`${fieldName}UpdatedAt`]: result.updatedAt,
         [`${fieldName}UpdatedBy`]: result.userName,
       }));
 
-      // Chama a função para atualizar os dados após o POST ou PUT
-      if (method === 'POST') {
-        await fetchClientData(); // Atualiza os dados chamando o fetchClientData
-      }
+      // Revalidar dados para sincronização
+      fetchClientData();
     } catch (error) {
       console.error('Error processing sales information:', error);
     } finally {
@@ -253,17 +251,17 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
                   </Box>
 
                   {salesData &&
-                    salesData[key] !== '*' &&
-                    salesData[`${key}UpdatedBy`] && (
+                    (salesData[key] !== undefined ||
+                      salesData[`${key}UpdatedBy`]) && (
                       <Typography variant="caption">
                         Última atualização:{' '}
                         <strong>
-                          {formatDate(salesData[`${key}UpdatedAt`])}
+                          {salesData[`${key}UpdatedAt`]
+                            ? formatDate(salesData[`${key}UpdatedAt`])
+                            : 'Data indisponível'}
                         </strong>{' '}
                         por{' '}
-                        <strong>
-                          {salesData[`${key}UpdatedBy`] || 'Desconhecido'}
-                        </strong>
+                        <strong>{salesData[`${key}UpdatedBy`] || ''}</strong>
                       </Typography>
                     )}
                 </Box>

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/app/db';
-import { salesInformation, clients, users } from '@/app/db/schema';
+import { salesInformation, users } from '@/app/db/schema';
 import { eq, inArray } from 'drizzle-orm';
 
 export async function GET(
@@ -19,94 +19,84 @@ export async function GET(
   try {
     console.log('Fetching sales information for client ID:', id);
 
-    // Selecionar as informações de vendas com os campos atualizados
+    // Definir o mapeamento de campos com tipos explícitos
+    const fieldMapping = {
+      commercial: 'commercial',
+      marketing: 'marketing',
+      invoicing: 'invoicing',
+      cables: 'cables',
+      financial: 'financial',
+      invoice: 'invoice',
+    } as const;
+
+    type FieldKeys = keyof typeof fieldMapping;
+    type UpdatedFields = `${FieldKeys}UpdatedBy` | `${FieldKeys}UpdatedAt`;
+
+    type SalesInfoData = {
+      clientId: number;
+    } & {
+      [key in FieldKeys | UpdatedFields]?: string | number | null;
+    };
+
+    // Selecionar todas as colunas relacionadas ao cliente
     const salesInfo = await db
       .select({
         clientId: salesInformation.clientId,
-        commercial: salesInformation.commercial,
-        commercialUpdatedAt: salesInformation.commercialUpdatedAt,
-        commercialUpdatedBy: salesInformation.commercialUpdatedBy,
-        marketing: salesInformation.marketing,
-        marketingUpdatedAt: salesInformation.marketingUpdatedAt,
-        marketingUpdatedBy: salesInformation.marketingUpdatedBy,
-        invoicing: salesInformation.invoicing,
-        invoicingUpdatedAt: salesInformation.invoicingUpdatedAt,
-        invoicingUpdatedBy: salesInformation.invoicingUpdatedBy,
-        cables: salesInformation.cables,
-        cablesUpdatedAt: salesInformation.cablesUpdatedAt,
-        cablesUpdatedBy: salesInformation.cablesUpdatedBy,
-        financial: salesInformation.financial,
-        financialUpdatedAt: salesInformation.financialUpdatedAt,
-        financialUpdatedBy: salesInformation.financialUpdatedBy,
-        invoice: salesInformation.invoice,
-        invoiceUpdatedAt: salesInformation.invoiceUpdatedAt,
-        invoiceUpdatedBy: salesInformation.invoiceUpdatedBy,
+        ...Object.keys(fieldMapping).reduce(
+          (acc, key) => {
+            acc[key] = salesInformation[key as FieldKeys];
+            acc[`${key}UpdatedAt` as UpdatedFields] =
+              salesInformation[`${key}UpdatedAt` as UpdatedFields];
+            acc[`${key}UpdatedBy` as UpdatedFields] =
+              salesInformation[`${key}UpdatedBy` as UpdatedFields];
+            return acc;
+          },
+          {} as Record<string, any>,
+        ),
       })
       .from(salesInformation)
       .where(eq(salesInformation.clientId, Number(id)))
       .execute();
 
     if (salesInfo.length === 0) {
-      return NextResponse.json(
-        { error: 'Sales information not found' },
-        { status: 404 },
-      );
+      // Retorna um objeto vazio ao invés de erro 404
+      return NextResponse.json({}, { status: 200 });
     }
 
-    // Obter os IDs dos usuários responsáveis pelas atualizações, filtrando os que não são null
-    const updatedByIds = [
-      salesInfo[0].commercialUpdatedBy,
-      salesInfo[0].marketingUpdatedBy,
-      salesInfo[0].invoicingUpdatedBy,
-      salesInfo[0].cablesUpdatedBy,
-      salesInfo[0].financialUpdatedBy,
-      salesInfo[0].invoiceUpdatedBy,
-    ].filter((id) => id !== null) as number[]; // Converter para número
+    const salesInfoData: SalesInfoData = salesInfo[0];
 
-    if (updatedByIds.length === 0) {
-      // Se não houver IDs de usuários válidos, retornar os dados sem tentar buscar nomes
-      return NextResponse.json(salesInfo[0], { status: 200 });
-    }
+    // Obter os IDs dos usuários responsáveis pelas atualizações
+    const updatedByIds = (Object.keys(fieldMapping) as FieldKeys[])
+      .map((field) => salesInfoData[`${field}UpdatedBy` as UpdatedFields])
+      .filter((id) => id !== null) as number[];
 
-    // Obter os nomes dos usuários responsáveis pelas atualizações
-    const userInfo = await db
-      .select({ id: users.id, name: users.name }) // Aqui, corrigido para "name"
-      .from(users)
-      .where(inArray(users.id, updatedByIds)) // Usar inArray para pegar todos os usuários
-      .execute();
+    const userInfo = updatedByIds.length
+      ? await db
+          .select({ id: users.id, name: users.name })
+          .from(users)
+          .where(inArray(users.id, updatedByIds))
+          .execute()
+      : [];
 
-    // Criar um mapeamento de userId para userName
+    // Mapeamento de ID do usuário para o nome
     const userNameMap: { [key: number]: string } = {};
     userInfo.forEach((user) => {
-      userNameMap[user.id] = user.name || 'Desconhecido'; // Garantir que o valor seja sempre string
+      userNameMap[user.id] = user.name || 'Desconhecido';
     });
 
-    // Combinar os dados e substituir os userId pelos userName
-    const combinedData = {
-      ...salesInfo[0],
-      commercialUpdatedBy:
-        userNameMap[salesInfo[0].commercialUpdatedBy as number] ||
-        'Desconhecido',
-      marketingUpdatedBy:
-        userNameMap[salesInfo[0].marketingUpdatedBy as number] ||
-        'Desconhecido',
-      invoicingUpdatedBy:
-        userNameMap[salesInfo[0].invoicingUpdatedBy as number] ||
-        'Desconhecido',
-      cablesUpdatedBy:
-        userNameMap[salesInfo[0].cablesUpdatedBy as number] || 'Desconhecido',
-      financialUpdatedBy:
-        userNameMap[salesInfo[0].financialUpdatedBy as number] ||
-        'Desconhecido',
-      invoiceUpdatedBy:
-        userNameMap[salesInfo[0].invoiceUpdatedBy as number] || 'Desconhecido',
-    };
+    // Substituir IDs de usuários pelos nomes nos dados retornados
+    (Object.keys(fieldMapping) as FieldKeys[]).forEach((field) => {
+      const updatedByKey = `${field}UpdatedBy` as UpdatedFields;
+      const updatedById = salesInfoData[updatedByKey] as number | null;
+      salesInfoData[updatedByKey] =
+        userNameMap[updatedById || 0] || 'Desconhecido';
+    });
 
-    return NextResponse.json(combinedData, { status: 200 });
+    return NextResponse.json(salesInfoData, { status: 200 });
   } catch (error) {
-    console.error('Error fetching client data:', error);
+    console.error('Error fetching sales information:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch client data' },
+      { error: 'Failed to fetch sales information' },
       { status: 500 },
     );
   }

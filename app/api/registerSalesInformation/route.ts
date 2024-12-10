@@ -15,12 +15,12 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const {
       clientId,
-      commercial = '*', // Use '*' como valor padrão simbólico
-      marketing = '*',
-      invoicing = '*',
-      cables = '*',
-      financial = '*',
-      invoice = '*',
+      commercial = '', // Use '*' como valor padrão simbólico
+      marketing = '',
+      invoicing = '',
+      cables = '',
+      financial = '',
+      invoice = '',
     } = body;
 
     const userId = getUserIdFromCookies(request);
