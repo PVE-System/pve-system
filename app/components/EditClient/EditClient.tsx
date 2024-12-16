@@ -21,6 +21,7 @@ import {
 } from '@/app/components/FormFormatter/FormFormatter';
 import styles from '@/app/components/EditClient/styles';
 import sharedStyles from '@/app/styles/sharedStyles';
+import { User } from '@/app/db';
 
 const fieldLabels: { [key: string]: string } = {
   companyName: 'Nome da Empresa ou Pessoa',
@@ -165,6 +166,9 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
   const [duplicateField, setDuplicateField] = useState<'cnpj' | 'cpf' | null>(
     null,
   );
+  const [users, setUsers] = useState<
+    { operatorNumber: string; name: string }[]
+  >([]);
   const [debouncedCnpj, setDebouncedCnpj] = useState('');
   const [debouncedCpf, setDebouncedCpf] = useState('');
 
@@ -408,6 +412,24 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
     }
   };
 
+  useEffect(() => {
+    const fetchActiveUsers = async () => {
+      try {
+        const response = await fetch('/api/getAllUsers'); // Endpoint original
+        if (!response.ok) throw new Error('Erro ao buscar usuários');
+        const data = await response.json();
+
+        // Filtrar usuários ativos no frontend
+        const activeUsers = data.users.filter((user: User) => user.is_active);
+        setUsers(activeUsers);
+      } catch (error) {
+        console.error('Erro ao buscar usuários ativos:', error);
+      }
+    };
+
+    fetchActiveUsers();
+  }, []);
+
   const handleDuplicateCheck = async (
     field: 'cnpj' | 'cpf',
     value: string,
@@ -642,85 +664,67 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
                       name={key}
                       control={control}
                       defaultValue={clientData[key] || ''}
-                      render={({ field }) => (
-                        <TextField
-                          {...field}
-                          variant="filled"
-                          sx={styles.inputsCol2}
-                          InputProps={{
-                            readOnly: false,
-                          }}
-                          onChange={(event) => {
-                            const { name, value } = event.target;
-                            let formattedValue = value;
+                      render={({ field }) => {
+                        if (key === 'responsibleSeller') {
+                          return (
+                            <TextField
+                              {...field}
+                              select
+                              variant="filled"
+                              fullWidth
+                              sx={styles.inputsCol2}
+                            >
+                              {users.map((user) => (
+                                <MenuItem
+                                  key={user.operatorNumber}
+                                  value={user.operatorNumber}
+                                >
+                                  {`${user.operatorNumber} - ${user.name}`}
+                                </MenuItem>
+                              ))}
+                            </TextField>
+                          );
+                        }
 
-                            // Aplicar formatação nos campos de CPF, CNPJ, Telefone e CEP
-                            if (name === 'cpf') {
-                              formattedValue = formatCPF(value);
-                            } else if (name === 'cnpj') {
-                              formattedValue = formatCNPJ(value);
-                            } else if (name === 'phone') {
-                              formattedValue = formatPhone(value);
-                            } else if (name === 'whatsapp') {
-                              formattedValue = formatPhone(value);
-                            } else if (name === 'cep') {
-                              formattedValue = formatCEP(value);
-                              handleCEPChange(formattedValue); // Chama a função para buscar o CEP
-                            } else if (name === 'state') {
-                              setValue('city', ''); // Limpa o campo cidade quando o estado muda
-                              setValue('address', ''); // Limpa o campo cidade quando o estado muda
-                              setValue('cep', ''); // Limpa o campo cidade quando o estado muda
-                              setValue('district', ''); // Limpa o campo cidade quando o estado muda
-
-                              fetchCities(value); // Busca as novas cidades ao mudar o estado
+                        return (
+                          <TextField
+                            {...field}
+                            variant="filled"
+                            sx={styles.inputsCol2}
+                            InputProps={{
+                              readOnly: false,
+                            }}
+                            select={
+                              key === 'state' ||
+                              key === 'city' ||
+                              key in selectOptions
                             }
-                            // Lógica para `icmsContributor`
-                            if (name === 'icmsContributor') {
-                              setValue(name, value);
-
-                              // Limpar o valor de `stateRegistration` se `icmsContributor` for "Não"
-                              if (value === 'Não') {
-                                setValue('stateRegistration', ''); // Limpa o campo
-                              }
+                            disabled={
+                              key === 'stateRegistration' &&
+                              icmsContributor === 'Não'
                             }
-                            // Limpar `stateRegistration` se `icmsContributor` for "Não"
-                            if (name === 'icmsContributor' && value === 'Não') {
-                              setValue('stateRegistration', ''); // Limpa o campo
-                            }
-
-                            // Atualiza o valor formatado no estado
-                            field.onChange(formattedValue);
-                          }}
-                          select={
-                            key === 'state' ||
-                            key === 'city' ||
-                            key in selectOptions
-                          }
-                          disabled={
-                            key === 'stateRegistration' &&
-                            icmsContributor === 'Não'
-                          }
-                        >
-                          {key === 'state' &&
-                            states.map((state) => (
-                              <MenuItem key={state} value={state}>
-                                {state}
-                              </MenuItem>
-                            ))}
-                          {key === 'city' &&
-                            cities.map((city) => (
-                              <MenuItem key={city} value={city}>
-                                {city}
-                              </MenuItem>
-                            ))}
-                          {key in selectOptions &&
-                            selectOptions[key].map((option) => (
-                              <MenuItem key={option} value={option}>
-                                {option}
-                              </MenuItem>
-                            ))}
-                        </TextField>
-                      )}
+                          >
+                            {key === 'state' &&
+                              states.map((state) => (
+                                <MenuItem key={state} value={state}>
+                                  {state}
+                                </MenuItem>
+                              ))}
+                            {key === 'city' &&
+                              cities.map((city) => (
+                                <MenuItem key={city} value={city}>
+                                  {city}
+                                </MenuItem>
+                              ))}
+                            {key in selectOptions &&
+                              selectOptions[key].map((option) => (
+                                <MenuItem key={option} value={option}>
+                                  {option}
+                                </MenuItem>
+                              ))}
+                          </TextField>
+                        );
+                      }}
                     />
                   </Box>
                 );

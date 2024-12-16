@@ -241,8 +241,8 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
               <Tab
                 label={
                   {
-                    xs: 'Cont. Social', // Texto reduzido para telas menores
-                    md: 'Contrato. Social', // Texto completo para tablets e maiores
+                    xs: 'Social', // Texto reduzido para telas menores
+                    md: 'Contrato Social', // Texto completo para tablets e maiores
                   }[window.innerWidth < 600 ? 'xs' : 'md']
                 }
                 sx={{
