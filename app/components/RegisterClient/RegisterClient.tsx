@@ -23,6 +23,7 @@ import {
 } from '@/app/components/FormFormatter/FormFormatter'; // Funções de formatação
 import sharedStyles from '@/app/styles/sharedStyles';
 import styles from './styles';
+import { User } from '@/app/db';
 
 // Tipagem para as opções de select
 type SelectOptionsType = {
@@ -163,6 +164,9 @@ const RegisterClient: React.FC = () => {
   const [cities, setCities] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [users, setUsers] = useState<
+    { operatorNumber: string; name: string }[]
+  >([]);
   const [duplicateClient, setDuplicateClient] = useState<ClientData | null>(
     null,
   );
@@ -253,6 +257,29 @@ const RegisterClient: React.FC = () => {
       fetchCities(value);
     }
   };
+
+  // Função para buscar os usuários da tabela 'users'
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await fetch('/api/getAllUsers');
+        if (!response.ok) throw new Error('Erro ao buscar usuários');
+        const data = await response.json();
+
+        // Filtrar usuários ativos
+        const activeUsers = data.users.filter((user: User) => user.is_active);
+        setUsers(activeUsers); // Apenas os ativos são armazenados no estado
+      } catch (error) {
+        console.error('Erro ao buscar usuários:', error);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
+  useEffect(() => {
+    console.log('Usuários carregados:', users);
+  }, [users]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -410,78 +437,110 @@ const RegisterClient: React.FC = () => {
                   >
                     {fieldLabels[key] || key}
                   </Typography>
-                  <TextField
-                    name={key}
-                    value={formData[key as keyof typeof formData]}
-                    onChange={(event) => {
-                      const target = event.target as HTMLInputElement;
-                      const { value } = target;
-                      let formattedValue = value;
 
-                      // Formatações e verificação de duplicatas
-                      if (key === 'cep') {
-                        formattedValue = formatCEP(value);
-                        handleCEPChange(value.replace(/\D/g, ''));
-                      } else if (key === 'cpf') {
-                        formattedValue = formatCPF(value);
-                      } else if (key === 'cnpj') {
-                        formattedValue = formatCNPJ(value);
-                      } else if (key === 'phone' || key === 'whatsapp') {
-                        formattedValue = formatPhone(value); // Reutiliza a função de formatação
-                      } else {
-                        handleChange(
-                          event as React.ChangeEvent<HTMLInputElement>,
-                        );
-                      }
-
-                      setFormData((prevFormData) => ({
-                        ...prevFormData,
-                        [key]: formattedValue,
-                      }));
-                    }}
-                    required={key === 'companyName'}
-                    placeholder={
-                      key === 'phone' || key === 'whatsapp'
-                        ? '(xx)xxxxxxxxx'
-                        : ''
-                    }
-                    variant="filled"
-                    sx={styles.inputsCol2}
-                    fullWidth
-                    onKeyDown={(event) => {
-                      if (event.key === 'Enter') {
-                        event.preventDefault(); // Impede o envio
-                      }
-                    }}
-                    select={
-                      key === 'state' || key === 'city' || key in selectOptions
-                    }
-                    disabled={
-                      key === 'stateRegistration' &&
-                      formData.icmsContributor !== 'Sim'
-                    } // Bloqueia o campo quando "Não"
-                  >
-                    {key === 'state' &&
-                      states.map((state) => (
-                        <MenuItem key={state} value={state}>
-                          {state}
-                        </MenuItem>
-                      ))}
-                    {key === 'city' &&
-                      cities.map((city) => (
-                        <MenuItem key={city} value={city}>
-                          {city}
-                        </MenuItem>
-                      ))}
-                    {key in selectOptions &&
-                      selectOptions[key as keyof SelectOptionsType].map(
-                        (option) => (
-                          <MenuItem key={option} value={option}>
-                            {option}
+                  {/* Campo específico para 'responsibleSeller' */}
+                  {key === 'responsibleSeller' ? (
+                    <TextField
+                      name={key}
+                      value={formData.responsibleSeller}
+                      onChange={(event) => {
+                        setFormData({
+                          ...formData,
+                          responsibleSeller: event.target.value,
+                        });
+                      }}
+                      select
+                      fullWidth
+                      variant="filled"
+                      sx={styles.inputsCol2}
+                    >
+                      {Array.isArray(users) &&
+                        users.map((user) => (
+                          <MenuItem
+                            key={user.operatorNumber}
+                            value={user.operatorNumber}
+                          >
+                            {`${user.operatorNumber} - ${user.name}`}
                           </MenuItem>
-                        ),
-                      )}
-                  </TextField>
+                        ))}
+                    </TextField>
+                  ) : (
+                    /* Renderizar os outros campos normalmente */
+                    <TextField
+                      name={key}
+                      value={formData[key as keyof typeof formData]}
+                      onChange={(event) => {
+                        const target = event.target as HTMLInputElement;
+                        const { value } = target;
+                        let formattedValue = value;
+
+                        // Formatação específica
+                        if (key === 'cep') {
+                          formattedValue = formatCEP(value);
+                          handleCEPChange(value.replace(/\D/g, ''));
+                        } else if (key === 'cpf') {
+                          formattedValue = formatCPF(value);
+                        } else if (key === 'cnpj') {
+                          formattedValue = formatCNPJ(value);
+                        } else if (key === 'phone' || key === 'whatsapp') {
+                          formattedValue = formatPhone(value);
+                        } else {
+                          handleChange(
+                            event as React.ChangeEvent<HTMLInputElement>,
+                          );
+                        }
+
+                        setFormData((prevFormData) => ({
+                          ...prevFormData,
+                          [key]: formattedValue,
+                        }));
+                      }}
+                      required={key === 'companyName'}
+                      placeholder={
+                        key === 'phone' || key === 'whatsapp'
+                          ? '(xx)xxxxxxxxx'
+                          : ''
+                      }
+                      variant="filled"
+                      sx={styles.inputsCol2}
+                      fullWidth
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter') {
+                          event.preventDefault(); // Impede o envio
+                        }
+                      }}
+                      select={
+                        key === 'state' ||
+                        key === 'city' ||
+                        key in selectOptions
+                      }
+                      disabled={
+                        key === 'stateRegistration' &&
+                        formData.icmsContributor !== 'Sim'
+                      }
+                    >
+                      {key === 'state' &&
+                        states.map((state) => (
+                          <MenuItem key={state} value={state}>
+                            {state}
+                          </MenuItem>
+                        ))}
+                      {key === 'city' &&
+                        cities.map((city) => (
+                          <MenuItem key={city} value={city}>
+                            {city}
+                          </MenuItem>
+                        ))}
+                      {key in selectOptions &&
+                        selectOptions[key as keyof SelectOptionsType].map(
+                          (option) => (
+                            <MenuItem key={option} value={option}>
+                              {option}
+                            </MenuItem>
+                          ),
+                        )}
+                    </TextField>
+                  )}
                 </Box>
               ))}
 

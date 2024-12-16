@@ -12,6 +12,7 @@ import { useForm, Controller } from 'react-hook-form';
 import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
 import styles from '@/app/components/ClientPageTabInfos/styles';
 import { jsPDF } from 'jspdf';
+import { User } from '@/app/db';
 
 interface ClientPageTabInfosProps {
   clientId: string;
@@ -31,6 +32,9 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
   const [salesData, setSalesData] = useState<{ [key: string]: any }>({});
   const [loading, setLoading] = useState(true); // Estado para controlar o carregamento
   const [buttonText, setButtonText] = useState('Excel');
+  const [users, setUsers] = useState<
+    { operatorNumber: string; name: string }[]
+  >([]);
 
   useEffect(() => {
     if (!clientId || isNaN(Number(clientId))) {
@@ -130,6 +134,24 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
   const handleChange = (name: string, value: string) => {
     setValue(name, value); // Armazena o valor sem modificações
   };
+
+  useEffect(() => {
+    const fetchActiveUsers = async () => {
+      try {
+        const response = await fetch('/api/getAllUsers'); // Endpoint original
+        if (!response.ok) throw new Error('Erro ao buscar usuários');
+        const data = await response.json();
+
+        // Filtrar usuários ativos no frontend
+        const activeUsers = data.users.filter((user: User) => user.is_active);
+        setUsers(activeUsers);
+      } catch (error) {
+        console.error('Erro ao buscar usuários ativos:', error);
+      }
+    };
+
+    fetchActiveUsers();
+  }, []);
 
   //Start Export PDF
 
@@ -388,29 +410,42 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
         </Box>
         {/* Grupo 2 - formulário de cadastro */}
         <Box sx={styles.boxCol2}>
-          {/* map dos inputs sem select*/}
-          {formFields.map(({ label, name }) => (
-            <Box key={name}>
-              <Typography variant="subtitle1">{label}</Typography>
-              <Controller
-                name={name}
-                control={control}
-                defaultValue={clientData[name] || ''}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    variant="filled"
-                    sx={styles.inputsCol2}
-                    value={field.value || ''}
-                    onChange={(e) => handleChange(name, e.target.value)}
-                    InputProps={{
-                      readOnly: true,
-                    }}
-                  />
-                )}
-              />
-            </Box>
-          ))}
+          {formFields.map(({ label, name }) => {
+            const value =
+              name === 'responsibleSeller'
+                ? (() => {
+                    const seller = users.find(
+                      (user) =>
+                        user.operatorNumber === clientData.responsibleSeller,
+                    );
+                    return seller
+                      ? `${seller.operatorNumber} - ${seller.name}`
+                      : clientData.responsibleSeller; // Exibe apenas o operatorNumber se não encontrar o vendedor
+                  })()
+                : clientData[name];
+
+            return (
+              <Box key={name}>
+                <Typography variant="subtitle1">{label}</Typography>
+                <Controller
+                  name={name}
+                  control={control}
+                  defaultValue={clientData[name] || ''}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      variant="filled"
+                      sx={styles.inputsCol2}
+                      value={value || ''}
+                      InputProps={{
+                        readOnly: true,
+                      }}
+                    />
+                  )}
+                />
+              </Box>
+            );
+          })}
         </Box>
       </Box>
     </Box>
