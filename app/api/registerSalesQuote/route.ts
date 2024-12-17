@@ -2,11 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/app/db';
 import { salesQuotes } from '@/app/db/schema';
 import { clients, users } from '@/app/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, max } from 'drizzle-orm';
 
 export async function POST(request: NextRequest) {
   try {
-    const { clientId, userId } = await request.json();
+    const { clientId, userId, industry, quoteNumber } = await request.json();
 
     if (!clientId || !userId) {
       return NextResponse.json(
@@ -40,21 +40,27 @@ export async function POST(request: NextRequest) {
     // Obtenha o ano atual
     const currentYear = new Date().getFullYear();
 
-    // Verifique o número da próxima cotação para o cliente
-    const countQuotes = await db
-      .select()
+    // Obter o último número da cotação para o cliente
+    const [lastQuote] = await db
+      .select({ maxQuoteNumber: max(salesQuotes.quoteNumber) }) // Use max()
       .from(salesQuotes)
-      .where(eq(salesQuotes.clientId, clientId))
-      .execute();
+      .where(eq(salesQuotes.clientId, clientId));
 
-    const newQuoteNumber = countQuotes.length + 1;
+    const newQuoteNumber = (lastQuote?.maxQuoteNumber || 0) + 1;
 
     const sanitizeFileName = (name: string) => {
-      return name.replace(/[\/\\:*?"<>|]/g, '-'); // Substitui caracteres inválidos por '-'
+      return name.replace(/[\/\\:*?"<>|]/g, '-');
     };
-    //Gerar o nome da cotação
+
+    // Obter a data atual no formato ANO-MES-DIA
+    const currentDate = new Date();
+    const formattedDate = `${currentDate.getFullYear()}-${String(
+      currentDate.getMonth() + 1,
+    ).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
+
+    // Gerar o nome da cotação
     const quoteName = sanitizeFileName(
-      `${currentYear}-${client.cnpj || client.cpf}-${user.operatorNumber}-${newQuoteNumber}`,
+      `${formattedDate}-${industry}-${client.cnpj || client.cpf}-${user.operatorNumber}-${newQuoteNumber}`,
     );
 
     // Insira a nova cotação no banco de dados
@@ -64,8 +70,10 @@ export async function POST(request: NextRequest) {
         clientId,
         userId,
         year: currentYear,
-        date: new Date(), // Data completa da cotação
+        date: new Date(),
         quoteName,
+        quoteNumber: newQuoteNumber, // Use o valor calculado
+        industry,
       })
       .execute();
 

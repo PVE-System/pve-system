@@ -25,7 +25,7 @@ import Cookies from 'js-cookie';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import styles from '@/app/components/ClientPageTabSalesQuotes/styles';
-import { orange } from '@mui/material/colors';
+import { orange, red } from '@mui/material/colors';
 
 interface ClientPageSalesQuotesProps {
   clientId: string;
@@ -51,6 +51,7 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
   const [showAllYears, setShowAllYears] = useState(false);
   const [manualYearInput, setManualYearInput] = useState(false);
   const [lastAddedQuoteId, setLastAddedQuoteId] = useState<number | null>(null);
+  const [industry, setIndustry] = useState<string>('CORFIO');
 
   const ITEMS_PER_PAGE = 5;
 
@@ -125,20 +126,39 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
     try {
       const userId = Cookies.get('userId');
       if (!userId) throw new Error('ID do usuário não encontrado');
-      const response = await fetch(`/api/addSalesQuote`, {
+      const response = await fetch(`/api/registerSalesQuote`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ clientId, userId: Number(userId) }),
+        body: JSON.stringify({
+          clientId,
+          userId: Number(userId),
+          industry, // Envia o valor selecionado no campo "Indústria"
+        }),
       });
       if (!response.ok) throw new Error('Erro ao adicionar cotação');
 
-      const newQuote = await response.json(); // Supondo que a API retorna a nova cotação criada
+      const newQuote = await response.json();
       setLastAddedQuoteId(newQuote.id); // Atualiza o ID do último item gerado
       fetchQuotes(Number(year));
     } catch (error) {
       console.error('Error adding sales quote:', error);
     } finally {
       setAddingQuote(false);
+    }
+  };
+
+  // Função para deletar uma cotação
+  const deleteQuotes = async (quoteId: number) => {
+    try {
+      const response = await fetch(`/api/deleteSalesQuote?id=${quoteId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) throw new Error('Erro ao deletar cotação');
+
+      // Atualiza a lista após a exclusão
+      fetchQuotes(Number(year));
+    } catch (error) {
+      console.error('Erro ao deletar cotação:', error);
     }
   };
 
@@ -187,6 +207,19 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
         />
         <Box sx={styles.boxCol2}>
           <Box sx={styles.boxButtonAndInput}>
+            <Box sx={{ minWidth: '150px' }}>
+              <TextField
+                select
+                label="Indústria" // Label em português
+                value={industry} // Valor atual do select
+                onChange={(e) => setIndustry(e.target.value)} // Atualiza o estado
+                variant="outlined"
+                fullWidth
+              >
+                <MenuItem value="CORFIO">CORFIO</MenuItem>
+                <MenuItem value="TCM">TCM</MenuItem>
+              </TextField>
+            </Box>
             <Tooltip title="Registrar cotação e gerar código da negociação">
               <Button
                 variant="contained"
@@ -201,11 +234,13 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
                 )}
               </Button>
             </Tooltip>
-            <Button sx={styles.buttonTotalResult} variant="contained">
-              <Typography variant="subtitle1">
-                Total {year}: {totalQuotes}
-              </Typography>
-            </Button>
+            <Tooltip title="Em desenvolvimento...">
+              <Button sx={styles.buttonTotalResult} variant="contained">
+                <Typography variant="subtitle1">
+                  Total {year}: {totalQuotes}
+                </Typography>
+              </Button>
+            </Tooltip>
 
             <Box>
               {!manualYearInput ? (
@@ -281,34 +316,72 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
                   sx={{
                     ...styles.boxList,
                     backgroundColor:
-                      quote.id === lastAddedQuoteId ? '#inherit' : 'inherit', // Destaque o último item gerado
+                      quote.id === lastAddedQuoteId ? '#inherit' : 'inherit',
                     border:
                       quote.id === lastAddedQuoteId
                         ? `2px solid ${orange[700]}`
-                        : 'none', // Borda para destaque
+                        : 'none',
                     borderRadius: quote.id === lastAddedQuoteId ? '8px' : '0',
+                    transition:
+                      quote.id === lastAddedQuoteId
+                        ? 'transform 0.2s ease, box-shadow 0.2s ease'
+                        : 'none', // Aplica a transição apenas no último item
+                    '&:hover':
+                      quote.id === lastAddedQuoteId
+                        ? {
+                            transform: 'scale(1.05)', // Aumenta o item em 5%
+                            boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)', // Sombra suave
+                            zIndex: 1,
+                          }
+                        : {}, // Não aplica hover nos outros itens
                   }}
                 >
                   {quote.id === lastAddedQuoteId ? (
                     <Tooltip title="Última cotação">
                       <Typography variant="body1">
-                        Cotação: {quote.quoteIdentifier}
+                        <Typography component="span" fontWeight="bold">
+                          Cotação:
+                        </Typography>{' '}
+                        {quote.quoteIdentifier}
                       </Typography>
                     </Tooltip>
                   ) : (
                     <Typography variant="body1">
-                      Cotação: {quote.quoteIdentifier}
+                      <Typography component="span" fontWeight="bold">
+                        Cotação:
+                      </Typography>{' '}
+                      {quote.quoteIdentifier}
                     </Typography>
                   )}
-                  <Tooltip title="Copiar código da negociação.">
-                    <IconButton
-                      onClick={() =>
-                        navigator.clipboard.writeText(quote.quoteIdentifier)
-                      }
-                    >
-                      <ContentCopyIcon />
-                    </IconButton>
-                  </Tooltip>
+                  <Box>
+                    <Tooltip title="Copiar código da negociação.">
+                      <IconButton
+                        sx={{
+                          color: 'inherit', // Cor padrão
+                          '&:hover': {
+                            color: orange[700], // Cor do ícone ao passar o mouse
+                          },
+                        }}
+                        onClick={() =>
+                          navigator.clipboard.writeText(quote.quoteIdentifier)
+                        }
+                      >
+                        <ContentCopyIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Deletar cotação">
+                      <IconButton onClick={() => deleteQuotes(quote.id)}>
+                        <DeleteIcon
+                          sx={{
+                            color: 'inherit', // Cor padrão
+                            '&:hover': {
+                              color: red[600], // Cor do ícone ao passar o mouse
+                            },
+                          }}
+                        />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
                 </ListItem>
               ))
             ) : (

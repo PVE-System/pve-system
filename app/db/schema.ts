@@ -154,10 +154,12 @@ export const salesQuotes = pgTable('sales_quotes', {
   userId: integer('user_id')
     .references(() => users.id)
     .notNull(),
-  quoteName: text('quote_name').notNull(), // Nome único da cotação
-  year: integer('year').notNull(), // Ano da cotação para filtragem
-  date: timestamp('date').defaultNow().notNull(), // Data completa da cotação
-  createdAt: timestamp('created_at').defaultNow().notNull(), // Data de criação da cotação
+  quoteName: text('quote_name').notNull(),
+  quoteNumber: integer('quote_number').notNull(),
+  industry: text('industry').notNull(),
+  year: integer('year').notNull(),
+  date: timestamp('date').defaultNow().notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 export type SalesQuote = typeof salesQuotes.$inferSelect;
