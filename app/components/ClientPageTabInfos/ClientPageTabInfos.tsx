@@ -160,7 +160,7 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
 
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
-    doc.text(['PVE Representações - Cadastro de Cliente:'], 10, 10);
+    doc.text(['PVE Representações - Cadastro do Cliente:'], 10, 10);
 
     doc.setFont('helvetica', 'normal');
 
@@ -185,7 +185,9 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
       yPosition += 10;
     });
 
-    doc.save(`PVE Representações-Cadastro de Cliente${clientId}.pdf`); // Salva o PDF
+    doc.save(
+      `PVE Representações - Cadastro do Cliente ${clientData.companyName}.pdf`,
+    ); // Salva o PDF
   };
 
   //End Export PDF

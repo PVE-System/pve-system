@@ -1,3 +1,4 @@
+import { Height } from '@mui/icons-material';
 import { Theme } from '@mui/material';
 
 const styles = {
@@ -38,7 +39,8 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    minWidth: '120px', // Para evitar que o botão fique pequeno demais
+    minWidth: '150px', // Para evitar que o botão fique pequeno demais
+    height: '40px',
     '&:hover': {
       backgroundColor: 'darkgreen',
     },
@@ -48,7 +50,8 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    minWidth: '120px', // Para evitar que o botão fique pequeno demais
+    minWidth: '150px', // Para evitar que o botão fique pequeno demais
+    height: '40px',
   },
 
   boxList: {
