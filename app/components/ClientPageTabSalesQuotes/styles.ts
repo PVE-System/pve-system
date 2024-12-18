@@ -1,4 +1,3 @@
-import { Height } from '@mui/icons-material';
 import { Theme } from '@mui/material';
 
 const styles = {
@@ -22,35 +21,46 @@ const styles = {
     },
   },
 
-  boxButtonAndInput: {
+  boxInputAndButtons: {
     display: 'flex',
+    justifyContent: 'center',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: '20px',
+    width: '100%',
+    maxWidth: '600px',
+    margin: '0 auto',
+    gap: 5,
+    flexWrap: 'wrap',
+  },
 
-    '@media (max-width: 450px)': {
-      flexDirection: 'column',
-      gap: 2,
-    },
+  inputAndButtomColumnLeft: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 2,
+    flex: 1,
+    minWidth: '200px',
+    maxWidth: '250px',
   },
 
   buttonQuotesAdd: {
-    backgroundColor: 'green',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minWidth: '150px', // Para evitar que o botão fique pequeno demais
+    width: '100%',
     height: '40px',
+    backgroundColor: 'green',
     '&:hover': {
       backgroundColor: 'darkgreen',
     },
   },
 
-  buttonTotalResult: {
+  inputAndButtomColumnRight: {
     display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minWidth: '150px', // Para evitar que o botão fique pequeno demais
+    flexDirection: 'column',
+    gap: 2,
+    flex: 1,
+    minWidth: '200px',
+    maxWidth: '250px',
+  },
+
+  buttonTotalResult: {
+    width: '100%',
     height: '40px',
   },
 

@@ -21,7 +21,7 @@ export default function ClientPage() {
       <Container>
         <Box sx={sharedStyles.container}>
           <Typography variant="h4" component="h1" sx={sharedStyles.titlePage}>
-            <span>Perfil </span>Cliente
+            <span>Página do </span>Cliente
           </Typography>
           <Suspense>
             <BasicTabs />

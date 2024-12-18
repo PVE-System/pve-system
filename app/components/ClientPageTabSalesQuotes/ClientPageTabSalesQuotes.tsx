@@ -25,7 +25,7 @@ import Cookies from 'js-cookie';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import styles from '@/app/components/ClientPageTabSalesQuotes/styles';
-import { orange, red } from '@mui/material/colors';
+import { green, orange, red } from '@mui/material/colors';
 
 interface ClientPageSalesQuotesProps {
   clientId: string;
@@ -52,6 +52,7 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
   const [manualYearInput, setManualYearInput] = useState(false);
   const [lastAddedQuoteId, setLastAddedQuoteId] = useState<number | null>(null);
   const [industry, setIndustry] = useState<string>('CORFIO');
+  const [deleting, setDeleting] = useState<number | null>(null); // Armazena o ID da cotação sendo deletada
 
   const ITEMS_PER_PAGE = 5;
 
@@ -149,6 +150,7 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
 
   // Função para deletar uma cotação
   const deleteQuotes = async (quoteId: number) => {
+    setDeleting(quoteId); // Define o ID da cotação sendo deletada
     try {
       const response = await fetch(`/api/deleteSalesQuote?id=${quoteId}`, {
         method: 'DELETE',
@@ -159,6 +161,8 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
       fetchQuotes(Number(year));
     } catch (error) {
       console.error('Erro ao deletar cotação:', error);
+    } finally {
+      setDeleting(null); // Reseta o estado após a operação
     }
   };
 
@@ -206,104 +210,108 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
           enableImageUpload={false}
         />
         <Box sx={styles.boxCol2}>
-          <Box sx={styles.boxButtonAndInput}>
-            <Box sx={{ minWidth: '150px' }}>
+          <Box sx={styles.boxInputAndButtons}>
+            <Box sx={styles.inputAndButtomColumnLeft}>
               <TextField
                 select
-                label="Indústria" // Label em português
-                value={industry} // Valor atual do select
-                onChange={(e) => setIndustry(e.target.value)} // Atualiza o estado
+                label="Indústria"
+                value={industry}
+                onChange={(e) => setIndustry(e.target.value)}
                 variant="outlined"
                 fullWidth
               >
                 <MenuItem value="CORFIO">CORFIO</MenuItem>
                 <MenuItem value="TCM">TCM</MenuItem>
               </TextField>
-            </Box>
-            <Tooltip title="Registrar cotação e gerar código da negociação">
-              <Button
-                variant="contained"
-                onClick={addSalesQuote}
-                disabled={addingQuote}
-                sx={styles.buttonQuotesAdd}
-              >
-                {addingQuote ? (
-                  <CircularProgress size={24} color="inherit" />
-                ) : (
-                  'Cotação +'
-                )}
-              </Button>
-            </Tooltip>
-            <Tooltip title="Em desenvolvimento...">
-              <Button sx={styles.buttonTotalResult} variant="contained">
-                <Typography variant="subtitle1">
-                  Total {year}: {totalQuotes}
-                </Typography>
-              </Button>
-            </Tooltip>
-
-            <Box>
-              {!manualYearInput ? (
-                <Select
-                  value={manualYearInput ? '' : year.toString()} // Convertendo o número para string
-                  onChange={(e) => {
-                    const selectedValue = e.target.value;
-
-                    if (selectedValue === 'showMore') {
-                      setShowAllYears(true); // Expande para mais anos
-                      return;
-                    }
-
-                    if (selectedValue === 'manualInput') {
-                      setManualYearInput(true); // Ativa o campo de entrada manual
-                      return;
-                    }
-
-                    const parsedYear = Number(selectedValue); // Converte de volta para número
-                    if (!isNaN(parsedYear)) {
-                      setYear(parsedYear); // Atualiza o ano selecionado
-                    }
-                  }}
-                  displayEmpty
-                  sx={{ minWidth: '150px' }}
+              <Tooltip title="Registrar cotação e gerar código da negociação">
+                <Button
+                  variant="contained"
+                  onClick={addSalesQuote}
+                  disabled={addingQuote}
+                  sx={styles.buttonQuotesAdd}
                 >
-                  {Array.from({ length: showAllYears ? 20 : 5 }, (_, i) => {
-                    const yearOption = new Date().getFullYear() - i;
-                    return (
-                      <MenuItem key={yearOption} value={yearOption.toString()}>
-                        {yearOption}
-                      </MenuItem>
-                    );
-                  })}
-                  {!showAllYears && (
-                    <MenuItem
-                      value="showMore"
-                      onMouseDown={(e) => {
-                        e.preventDefault(); // Impede o fechamento do menu
-                        setShowAllYears(true);
-                      }}
-                    >
-                      Ver mais anos...
-                    </MenuItem>
+                  {addingQuote ? (
+                    <CircularProgress size={24} color="inherit" />
+                  ) : (
+                    'Cotação +'
                   )}
-                  <MenuItem value="manualInput">Escolher ano...</MenuItem>
-                </Select>
-              ) : (
-                <TextField
-                  label="Digite o ano"
-                  type="number"
-                  value={inputYear}
-                  onChange={handleYearInput}
-                  onKeyDown={handleKeyDown} // Envia ao teclar enter
-                  onBlur={handleYearSubmit} // Envia ao perder o foco
-                  sx={{ minWidth: '150px' }}
-                  inputProps={{
-                    step: 1,
-                    min: 1900,
-                    max: new Date().getFullYear(),
-                  }}
-                />
-              )}
+                </Button>
+              </Tooltip>
+            </Box>
+
+            {/* Coluna Direita */}
+            <Box sx={styles.inputAndButtomColumnRight}>
+              <Box>
+                {!manualYearInput ? (
+                  <TextField
+                    label="Ano"
+                    select
+                    value={manualYearInput ? '' : year.toString()}
+                    onChange={(e) => {
+                      const selectedValue = e.target.value;
+                      if (selectedValue === 'showMore') {
+                        setShowAllYears(true);
+                        return;
+                      }
+                      if (selectedValue === 'manualInput') {
+                        setManualYearInput(true);
+                        return;
+                      }
+                      const parsedYear = Number(selectedValue);
+                      if (!isNaN(parsedYear)) {
+                        setYear(parsedYear);
+                      }
+                    }}
+                    sx={{ width: '100%' }}
+                  >
+                    {Array.from({ length: showAllYears ? 20 : 5 }, (_, i) => {
+                      const yearOption = new Date().getFullYear() - i;
+                      return (
+                        <MenuItem
+                          key={yearOption}
+                          value={yearOption.toString()}
+                        >
+                          {yearOption}
+                        </MenuItem>
+                      );
+                    })}
+                    {!showAllYears && (
+                      <MenuItem
+                        value="showMore"
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          setShowAllYears(true);
+                        }}
+                      >
+                        Ver mais anos...
+                      </MenuItem>
+                    )}
+                    <MenuItem value="manualInput">Escolher ano...</MenuItem>
+                  </TextField>
+                ) : (
+                  <TextField
+                    label="Ano"
+                    type="number"
+                    value={inputYear}
+                    onChange={handleYearInput}
+                    onKeyDown={handleKeyDown}
+                    onBlur={handleYearSubmit}
+                    sx={{ width: '100%' }}
+                    inputProps={{
+                      step: 1,
+                      min: 1900,
+                      max: new Date().getFullYear(),
+                    }}
+                  />
+                )}
+              </Box>
+              <Tooltip title="Em desenvolvimento...">
+                <Button sx={styles.buttonTotalResult} variant="contained">
+                  <Typography variant="subtitle1">
+                    Total {year}: {totalQuotes}
+                  </Typography>
+                </Button>
+              </Tooltip>
             </Box>
           </Box>
 
@@ -325,12 +333,12 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
                     transition:
                       quote.id === lastAddedQuoteId
                         ? 'transform 0.2s ease, box-shadow 0.2s ease'
-                        : 'none', // Aplica a transição apenas no último item
+                        : 'none',
                     '&:hover':
                       quote.id === lastAddedQuoteId
                         ? {
-                            transform: 'scale(1.05)', // Aumenta o item em 5%
-                            boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)', // Sombra suave
+                            transform: 'scale(1.05)',
+                            boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)',
                             zIndex: 1,
                           }
                         : {}, // Não aplica hover nos outros itens
@@ -346,7 +354,7 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
                       </Typography>
                     </Tooltip>
                   ) : (
-                    <Typography variant="body1">
+                    <Typography variant="body2">
                       <Typography component="span" fontWeight="bold">
                         Cotação:
                       </Typography>{' '}
@@ -370,15 +378,22 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="Deletar cotação">
-                      <IconButton onClick={() => deleteQuotes(quote.id)}>
-                        <DeleteIcon
-                          sx={{
-                            color: 'inherit', // Cor padrão
-                            '&:hover': {
-                              color: red[600], // Cor do ícone ao passar o mouse
-                            },
-                          }}
-                        />
+                      <IconButton
+                        onClick={() => deleteQuotes(quote.id)}
+                        disabled={deleting === quote.id} // Desativa enquanto está deletando
+                      >
+                        {deleting === quote.id ? ( // Mostra o spinner enquanto está deletando
+                          <CircularProgress size={24} />
+                        ) : (
+                          <DeleteIcon
+                            sx={{
+                              color: 'inherit', // Cor padrão
+                              '&:hover': {
+                                color: red[600], // Cor do ícone ao passar o mouse
+                              },
+                            }}
+                          />
+                        )}
                       </IconButton>
                     </Tooltip>
                   </Box>
