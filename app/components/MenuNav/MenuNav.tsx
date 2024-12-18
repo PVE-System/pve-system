@@ -163,7 +163,7 @@ export default function TemporaryDrawer() {
       <List sx={styles.textMenu}>
         {[
           {
-            name: 'Planilha Excel',
+            name: 'Planilha Vendas',
             icon: (
               <Badge color="error" variant="dot" invisible={!showBadge}>
                 <ArticleIcon />
