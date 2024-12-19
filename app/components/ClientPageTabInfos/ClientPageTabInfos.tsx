@@ -160,7 +160,7 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
 
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
-    doc.text(['PVE Representações - Cadastro do Cliente:'], 10, 10);
+    doc.text(['PVE Representacoes - Cadastro do Cliente:'], 10, 10);
 
     doc.setFont('helvetica', 'normal');
 
@@ -253,6 +253,14 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
     // Organiza os dados dos clientes na ordem das colunas do Excel
     const clientValues = clientExcelColumnOrder.map((key) => {
       if (excludedFields.includes(key)) return ''; // Ignora campos excluídos
+
+      // Combinar operador e nome para o campo responsibleSeller
+      if (key === 'responsibleSeller') {
+        const operatorNumber = clientData[key];
+        const user = users.find((u) => u.operatorNumber === operatorNumber);
+        return user ? `${user.operatorNumber} - ${user.name}` : operatorNumber;
+      }
+
       return clientData[key] || ''; // Retorna o valor do campo ou vazio se não houver
     });
 
@@ -281,8 +289,6 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
       });
   };
   // End Export EXCEL
-
-  //End Export EXCEL
 
   if (loading) {
     return (
