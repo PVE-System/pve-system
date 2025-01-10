@@ -169,7 +169,7 @@ function RegisterTeamComponent() {
             required
             fullWidth
             name="password"
-            label="Password"
+            label="Senha"
             type="password"
             id="password"
             autoComplete="new-password"
@@ -185,7 +185,7 @@ function RegisterTeamComponent() {
             required
             fullWidth
             name="confirmPassword"
-            label="Confirm Password"
+            label="Confirmar senha"
             type="password"
             id="confirmPassword"
             autoComplete="new-password"

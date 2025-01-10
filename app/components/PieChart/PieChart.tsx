@@ -35,9 +35,9 @@ const SimpleChart = () => {
         // Contar os estados com comparação case-insensitive e eliminando espaços extras
         clients.forEach((client: { state: string }) => {
           const state = client.state.trim().toLowerCase();
-          if (state === 'mato grosso do sul') {
+          if (state === 'ms') {
             msCount += 1;
-          } else if (state === 'mato grosso') {
+          } else if (state === 'mt') {
             mtCount += 1;
           } else {
             otherCount += 1;
