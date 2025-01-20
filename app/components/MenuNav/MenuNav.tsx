@@ -93,7 +93,7 @@ export default function TemporaryDrawer() {
           imageUrl: data.imageUrl,
           role: data.role,
         });
-        console.log('User data fetched:', data);
+        /* console.log('User data fetched:', data); */
       } catch (error) {
         console.error('Failed to fetch user data:', error);
       } finally {
@@ -101,7 +101,7 @@ export default function TemporaryDrawer() {
       }
     };
 
-    console.log('Fetching user data on component mount...');
+    /* console.log('Fetching user data on component mount...'); */
     fetchUserData();
   }, [user?.id]); // Reexecuta quando o `user` ou seu `id` muda.
 
