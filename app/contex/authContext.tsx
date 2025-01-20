@@ -37,8 +37,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const token = Cookies.get('token');
     const userId = Cookies.get('userId'); // Obtém o id do usuário do cookie
 
-    console.log('AuthProvider useEffect Token:', token);
-    console.log('AuthProvider useEffect User ID:', userId);
+    /* console.log('AuthProvider useEffect Token:', token); */
+    /* console.log('AuthProvider useEffect User ID:', userId); */
     if (token && userId) {
       setUser({ id: userId, token });
     }
