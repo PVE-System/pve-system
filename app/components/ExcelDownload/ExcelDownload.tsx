@@ -20,6 +20,7 @@ import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import styles from '@/app/components/ExcelDownload/style';
 import sharedStyles from '@/app/styles/sharedStyles';
 import Cookies from 'js-cookie';
+
 import AlertModal from '../AlertModalDelete/AlertModalDelete';
 
 interface ExcelFile {
@@ -224,8 +225,17 @@ export default function ExcelDownloadFileComponent() {
     } catch (error) {
       console.error('Error deleting file:', error);
     } finally {
-      setLoadingDelete(null); // Termina o carregamento
+      setLoadingDelete(null);
     }
+  };
+  //Funções para renderizar o nome do arquivo como foi solicitado.
+  const removeHashFromFileName = (fileName: string) => {
+    // Remove o hash do nome do arquivo (tudo após o último "-")
+    return fileName.split('-').slice(0, -1).join('-');
+  };
+
+  const decodeFileName = (fileName: string) => {
+    return decodeURIComponent(fileName);
   };
   return (
     <Container fixed>
@@ -289,10 +299,21 @@ export default function ExcelDownloadFileComponent() {
                         flex: 1,
                       }}
                     >
-                      Planilha atualizada no dia:{' '}
+                      <Box
+                        sx={{
+                          display: 'block',
+                          '@media (max-width:600px)': {
+                            wordBreak: 'break-word',
+                          },
+                        }}
+                      >
+                        {decodeFileName(removeHashFromFileName(file.name))}
+                      </Box>
+
                       <span style={{ fontWeight: 'bold' }}>
                         {new Date(file.date).toLocaleDateString('pt-BR')}
                       </span>
+                      {/* Adiciona o nome do arquivo */}
                     </Typography>
                     <Tooltip title="Baixar Planilha" arrow>
                       <IconButton
