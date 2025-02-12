@@ -16,9 +16,10 @@ const SimpleChart = () => {
     { name: 'MS', value: 0 },
     { name: 'MT', value: 0 },
     { name: 'Outras UF', value: 0 },
-    { name: 'Total', value: 0 },
+    /* { name: 'Total', value: 0 }, */
   ]);
   const [loading, setLoading] = useState(true);
+  const [totalClients, setTotalClients] = useState(0);
   const isSmallScreen = useMediaQuery('(max-width:600px)');
 
   useEffect(() => {
@@ -49,10 +50,11 @@ const SimpleChart = () => {
           { name: 'MS', value: msCount },
           { name: 'MT', value: mtCount },
           { name: 'Outras UF', value: otherCount },
-          { name: 'Total', value: totalCount },
+          /* { name: 'Total', value: totalCount }, */
         ];
 
         setData(chartData);
+        setTotalClients(totalCount);
         setLoading(false);
       } catch (error) {
         console.error('Failed to fetch client data:', error);
@@ -63,15 +65,7 @@ const SimpleChart = () => {
     fetchData();
   }, []);
 
-  /*   if (loading) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center">
-        <CircularProgress />
-      </Box>
-    );
-  } */
-
-  const COLORS = ['#2196F3', '#FF5722', '#985afc', '#4CAF50'];
+  const COLORS = ['#2196F3', '#4CAF50', '#985afc'];
 
   return (
     <Box sx={{ textAlign: 'center' }}>
@@ -85,7 +79,7 @@ const SimpleChart = () => {
               <Pie
                 dataKey="value"
                 data={data}
-                cx={isSmallScreen ? 125 : 150}
+                cx={isSmallScreen ? '50px' : '50px'}
                 cy={150}
                 innerRadius={60}
                 outerRadius={80}
@@ -105,6 +99,9 @@ const SimpleChart = () => {
               <Legend />
             </PieChart>
           </Box>
+          <Typography variant="body1" sx={{ mt: 2 }}>
+            Total de clientes cadastrados: <strong>{totalClients}</strong>
+          </Typography>
         </CardContent>
       </Card>
     </Box>
