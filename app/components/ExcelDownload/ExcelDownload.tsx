@@ -21,8 +21,6 @@ import styles from '@/app/components/ExcelDownload/style';
 import sharedStyles from '@/app/styles/sharedStyles';
 import Cookies from 'js-cookie';
 
-import AlertModal from '../AlertModalDelete/AlertModalDelete';
-
 interface ExcelFile {
   url: string;
   name: string;
@@ -68,29 +66,30 @@ export default function ExcelDownloadFileComponent() {
   }, []);
 
   // Função para buscar os arquivos
+  const fetchFiles = async () => {
+    try {
+      const response = await fetch(
+        `/api/getExcelFile?folder=ExcelSalesSpreadsheet`,
+      );
+      const data = await response.json();
+
+      const filesWithCorrectDates = data.files.map(
+        (file: { date: string | number | Date }) => ({
+          ...file,
+          date: new Date(file.date).toISOString(),
+        }),
+      );
+
+      setFiles(filesWithCorrectDates || []);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching files:', error);
+      setLoading(false);
+    }
+  };
+
+  // Chama a função ao montar o componente
   useEffect(() => {
-    const fetchFiles = async () => {
-      try {
-        const response = await fetch(
-          `/api/getExcelFile?folder=ExcelSalesSpreadsheet`,
-        );
-        const data = await response.json();
-
-        const filesWithCorrectDates = data.files.map(
-          (file: { date: string | number | Date }) => ({
-            ...file,
-            date: new Date(file.date).toISOString(),
-          }),
-        );
-
-        setFiles(filesWithCorrectDates || []);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching files:', error);
-        setLoading(false);
-      }
-    };
-
     fetchFiles();
   }, []);
 
@@ -118,14 +117,18 @@ export default function ExcelDownloadFileComponent() {
             name: file.name,
           };
 
-          setFiles([...files, newFileWithDate]);
+          setFiles((prevFiles) => [...prevFiles, newFileWithDate]);
           event.target.value = '';
 
           // Atualizar `pageExcelUpdatedAt` no backend para todos os usuários
           await fetch(`/api/updatePageExcelUpdatedAt`, {
             method: 'POST',
           });
+
           console.log('pageExcelUpdatedAt updated successfully');
+
+          // Atualizar a lista de arquivos para garantir que está atualizado
+          fetchFiles();
         } else {
           console.error('Error uploading file');
         }
@@ -307,13 +310,13 @@ export default function ExcelDownloadFileComponent() {
                           },
                         }}
                       >
+                        {/* Adiciona o nome do arquivo */}
                         {decodeFileName(removeHashFromFileName(file.name))}
                       </Box>
 
                       <span style={{ fontWeight: 'bold' }}>
                         {new Date(file.date).toLocaleDateString('pt-BR')}
                       </span>
-                      {/* Adiciona o nome do arquivo */}
                     </Typography>
                     <Tooltip title="Baixar Planilha" arrow>
                       <IconButton
