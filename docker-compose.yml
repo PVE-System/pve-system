@@ -1,7 +1,7 @@
 version: '3.3'
 services:
   db:
-    image: postgres:14
+    image: postgres:16
     restart: always
     ports:
       - '5432:5432'
@@ -11,6 +11,7 @@ services:
       POSTGRES_DB: postgres
     volumes:
       - db_data:/var/lib/postgresql/data
+      - ./backup:/backup
 
 volumes:
   db_data:
