@@ -1,1 +1,0 @@
-ALTER TABLE tabs_viewed ADD COLUMN files_tab_viewed_at TIMESTAMP;

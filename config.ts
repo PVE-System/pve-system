@@ -7,3 +7,5 @@ export const DB_PORT = process.env.DB_PORT
   ? parseInt(process.env.DB_PORT, 10)
   : 5432;
 export const POSTGRES_DATABASE = process.env.POSTGRES_DATABASE || 'postgres';
+
+console.log('debug raras');

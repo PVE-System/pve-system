@@ -211,3 +211,14 @@ export const pageViews = pgTable('page_views', {
 
 export type PageViews = typeof pageViews.$inferSelect;
 export type NewPageViews = typeof pageViews.$inferInsert;
+
+// Nova tabela para grupos empresariais
+export const businessGroups = pgTable('business_groups', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull().unique(), // Nome do grupo deve ser único
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// Tipos TypeScript para os novos modelos
+export type BusinessGroup = typeof businessGroups.$inferSelect;
+export type NewBusinessGroup = typeof businessGroups.$inferInsert;
