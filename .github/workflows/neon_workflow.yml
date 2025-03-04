@@ -35,6 +35,27 @@ jobs:
       || github.event.action == 'reopened')
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Cache Node Modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
+        name: List the state of node modules
+        continue-on-error: true
+        run: npm list
+
+      - name: Install Dependencies
+        run: npm install
+
       - name: Create Neon Branch
         id: create_neon_branch
         uses: neondatabase/create-branch-action@v5
@@ -43,41 +64,36 @@ jobs:
           branch_name: preview/pr-${{ github.event.number }}-${{ needs.setup.outputs.branch }}
           api_key: ${{ secrets.NEON_API_KEY }}
 
-  # The step above creates a new Neon branch.
-  # You may want to do something with the new branch, such as run migrations, run tests
-  # on it, or send the connection details to a hosting platform environment.
-  # The branch DATABASE_URL is available to you via:
-  # "${{ steps.create_neon_branch.outputs.db_url_with_pooler }}".
-  # It's important you don't log the DATABASE_URL as output as it contains a username and
-  # password for your database.
-  # For example, you can uncomment the lines below to run a database migration command:
-  #      - name: Run Migrations
-  #        run: npm run db:migrate
-  #        env:
-  #          # to use pooled connection
-  #          DATABASE_URL: "${{ steps.create_neon_branch.outputs.db_url_with_pooler }}"
-  #          # OR to use unpooled connection
-  #          # DATABASE_URL: "${{ steps.create_neon_branch.outputs.db_url }}"
+      - name: Run Migrations
+        run: npm run db:migrate
+        env:
+          # to use pooled connection
+          POSTGRES_URL: '${{ steps.create_neon_branch.outputs.db_url_with_pooler }}'
+          # OR to use unpooled connection
+          # POSTGRES_URL: "${{ steps.create_neon_branch.outputs.db_url }}"
 
-  # Following the step above, which runs database migrations, you may want to check
-  # for schema changes in your database. We recommend using the following action to
-  # post a comment to your pull request with the schema diff. For this action to work,
-  # you also need to give permissions to the workflow job to be able to post comments
-  # and read your repository contents. Add the following permissions to the workflow job:
-  #
-  # permissions:
-  #   contents: read
-  #   pull-requests: write
-  #
-  # You can also check out https://github.com/neondatabase/schema-diff-action for more
-  # information on how to use the schema diff action.
-  # You can uncomment the lines below to enable the schema diff action.
-  #      - name: Post Schema Diff Comment to PR
-  #        uses: neondatabase/schema-diff-action@v1
-  #        with:
-  #          project_id: ${{ vars.NEON_PROJECT_ID }}
-  #          compare_branch: preview/pr-${{ github.event.number }}-${{ needs.setup.outputs.branch }}
-  #          api_key: ${{ secrets.NEON_API_KEY }}
+      - name: Post Schema Diff Comment to PR
+        uses: neondatabase/schema-diff-action@v1
+        with:
+          project_id: ${{ vars.NEON_PROJECT_ID }}
+          compare_branch: preview/pr-${{ github.event.number }}-${{ needs.setup.outputs.branch }}
+          api_key: ${{ secrets.NEON_API_KEY }}
+
+      - name: Set Env Vars on Vercel Project
+        uses: dkershner6/vercel-set-env-action@v3
+        with:
+          token: ${{ secrets.VERCEL_API_TOKEN }}
+          projectName: pve-system
+          envVariableKeys: POSTGRES_URL
+        env:
+          POSTGRES_URL: '${{ steps.create_neon_branch.outputs.db_url_with_pooler }}'
+          TARGET_POSTGRES_URL: preview
+          TYPE_POSTGRES_URL: plain
+          GIT_BRANCH_POSTGRES_URL: ${{ needs.setup.outputs.branch }}
+
+    permissions:
+      contents: read
+      pull-requests: write
 
   delete_neon_branch:
     name: Delete Neon Branch
