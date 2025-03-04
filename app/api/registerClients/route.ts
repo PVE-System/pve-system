@@ -20,6 +20,7 @@ export async function POST(request: NextRequest) {
       clientCondition: newClient.clientCondition,
       rating: newClient.rating, // Mantém o valor do rating como está
       imageUrl: newClient.imageUrl,
+      businessGroupId: newClient.businessGroupId,
     };
 
     // Inserir novo cliente no banco de dados

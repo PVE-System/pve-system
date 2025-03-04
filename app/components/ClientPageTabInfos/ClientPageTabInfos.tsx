@@ -102,6 +102,7 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
   // Mapeamento dos nomes dos campos do banco de dados para nomes mais amigáveis
   const fieldLabels: { [key: string]: string } = {
     companyName: 'Nome da Empresa ou Pessoa',
+    businessGroupId: 'Grupo Empresarial',
     cnpj: 'CNPJ',
     cpf: 'CPF',
     cep: 'CEP',
@@ -310,6 +311,7 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
   // Definição dos campos do formulário vinculando com o nome das propriedade da tabela no db
   const formFields = [
     { label: 'Nome da Empresa ou Pessoa', name: 'companyName' },
+    { label: 'Grupo Empresarial', name: 'businessGroupId' },
     { label: 'CNPJ', name: 'cnpj' },
     { label: 'CPF', name: 'cpf' },
     { label: 'CEP', name: 'cep' },

@@ -79,6 +79,12 @@ export const clients = pgTable('clients', {
   clientCondition: text('client_condition').notNull().default('normal'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   imageUrl: varchar('imageUrl', { length: 512 }),
+
+  // Permite NULL para clientes sem grupo empresarial ou caso o grupo seja deletado
+  businessGroupId: integer('business_group_id').references(
+    () => businessGroups.id,
+    { onDelete: 'set null' },
+  ),
 });
 
 export type Client = typeof clients.$inferSelect;

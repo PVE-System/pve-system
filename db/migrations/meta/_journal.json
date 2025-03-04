@@ -15,6 +15,20 @@
       "when": 1740145657544,
       "tag": "0001_add_business_groups_table",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1740572785127,
+      "tag": "0002_include_business_groups_into_client_table",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1741095136946,
+      "tag": "0003_include_business_groups_into_client_table",
+      "breakpoints": true
     }
   ]
 }
