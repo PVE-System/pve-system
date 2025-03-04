@@ -90,10 +90,24 @@ jobs:
           TARGET_POSTGRES_URL: preview
           TYPE_POSTGRES_URL: plain
           GIT_BRANCH_POSTGRES_URL: ${{ needs.setup.outputs.branch }}
+        continue-on-error: true
 
     permissions:
       contents: read
       pull-requests: write
+
+  # deploy-preview:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Install Vercel CLI
+  #       run: npm install --global vercel@latest
+  #     - name: Pull Vercel Environment Information
+  #       run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_API_TOKEN }}
+  #     - name: Build Project Artifacts
+  #       run: vercel build --token=${{ secrets.VERCEL_API_TOKEN }}
+  #     - name: Deploy Project Artifacts to Vercel
+  #       run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_API_TOKEN }}
 
   delete_neon_branch:
     name: Delete Neon Branch
