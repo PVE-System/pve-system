@@ -39,7 +39,37 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
     { operatorNumber: string; name: string }[]
   >([]);
 
+  //Get Client Start
+
   useEffect(() => {
+    if (!clientId || isNaN(Number(clientId))) {
+      console.error('Invalid client ID:', clientId);
+      return;
+    }
+
+    fetch(`/api/getClient/${clientId}`)
+      .then((response) => {
+        if (!response.ok) {
+          console.error('Network response was not ok');
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log('Client data received:', data);
+        setClientData(data);
+        setLoading(false);
+        Object.keys(data).forEach((key) => {
+          setValue(key, data[key]);
+        });
+      })
+      .catch((error) => {
+        console.error('Error fetching client data:', error);
+        setLoading(false);
+      });
+  }, [clientId, setValue]);
+
+  /* useEffect(() => {
     if (!clientId || isNaN(Number(clientId))) {
       console.error('Invalid client ID:', clientId);
       return;
@@ -70,7 +100,9 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
         console.error('Error fetching client data:', error);
         setLoading(false);
       });
-  }, [clientId, setValue]);
+  }, [clientId, setValue]); */
+
+  //Get Client End
 
   // Buscar os grupos empresariais
   useEffect(() => {
@@ -94,9 +126,33 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
     const group = businessGroups.find((group) => group.id === businessGroupId);
     return group ? group.name : 'Grupo não encontrado';
   };
-  //UseEffect para os dados da tabela salesInformation
+
+  //Get salesInformation Start
 
   useEffect(() => {
+    if (!clientId || isNaN(Number(clientId))) {
+      console.error('Invalid client ID:', clientId);
+      return;
+    }
+
+    fetch(`/api/getSalesInformation/${clientId}`)
+      .then((response) => {
+        if (!response.ok) {
+          console.error('Network response was not ok');
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log('Sales data received from API:', data); // Verifique os dados recebidos
+        setSalesData(data); // Atualiza os dados de vendas
+      })
+      .catch((error) => {
+        console.error('Error fetching sales data:', error);
+      });
+  }, [clientId]);
+
+  /*   useEffect(() => {
     if (!clientId || isNaN(Number(clientId))) {
       console.error('Invalid client ID:', clientId);
       return;
@@ -122,7 +178,9 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
       .catch((error) => {
         console.error('Error fetching sales data:', error);
       });
-  }, [clientId]);
+  }, [clientId]); */
+
+  //Get salesInformation END
 
   // Mapeamento dos nomes dos campos do banco de dados para nomes mais amigáveis
   const fieldLabels: { [key: string]: string } = {
