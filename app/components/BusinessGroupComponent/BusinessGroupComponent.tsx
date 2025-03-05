@@ -19,6 +19,8 @@ import EditIcon from '@mui/icons-material/Edit';
 
 import sharedStyles from '@/app/styles/sharedStyles';
 import styles from './styles';
+import router from 'next/router';
+import { useRouter } from 'next/navigation';
 
 interface BusinessGroup {
   id: number;
@@ -32,6 +34,7 @@ export default function BusinessGroupComponent() {
   const [loadingDelete, setLoadingDelete] = useState<number | null>(null);
   const [loadingEdit, setLoadingEdit] = useState<number | null>(null);
   const [newGroupName, setNewGroupName] = useState('');
+  const router = useRouter();
 
   // Busca todos os grupos empresariais
   const fetchBusinessGroups = async () => {
@@ -141,13 +144,25 @@ export default function BusinessGroupComponent() {
             value={newGroupName}
             onChange={(e) => setNewGroupName(e.target.value)}
           />
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={registerNewBusinessGroup}
-          >
-            Criar
-          </Button>
+          <Tooltip title="Criar um novo grupo empresarial">
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={registerNewBusinessGroup}
+            >
+              Criar
+            </Button>
+          </Tooltip>
+          <Tooltip title="Voltar para página de cadastro">
+            <Button
+              sx={styles.buttonBack}
+              variant="contained"
+              color="primary"
+              onClick={() => router.push('/registerClient')}
+            >
+              Voltar
+            </Button>
+          </Tooltip>
         </Box>
       </Box>
 
@@ -161,14 +176,8 @@ export default function BusinessGroupComponent() {
             <Typography>Nenhum grupo empresarial encontrado.</Typography>
           ) : (
             businessGroups.map((group) => (
-              <Card key={group.id} sx={{ marginBottom: 2 }}>
-                <CardContent
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}
-                >
+              <Card key={group.id} sx={styles.fileList}>
+                <CardContent sx={styles.contentFileList}>
                   <Typography variant="h6">{group.name}</Typography>
                   <Box>
                     {/* Botão de Editar */}
@@ -186,7 +195,7 @@ export default function BusinessGroupComponent() {
                         {loadingEdit === group.id ? (
                           <CircularProgress size={24} />
                         ) : (
-                          <EditIcon />
+                          <EditIcon sx={styles.iconDownload} />
                         )}
                       </IconButton>
                     </Tooltip>
@@ -200,7 +209,7 @@ export default function BusinessGroupComponent() {
                         {loadingDelete === group.id ? (
                           <CircularProgress size={24} />
                         ) : (
-                          <DeleteIcon />
+                          <DeleteIcon sx={styles.iconDelete} />
                         )}
                       </IconButton>
                     </Tooltip>

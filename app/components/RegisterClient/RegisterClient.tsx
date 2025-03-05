@@ -526,17 +526,25 @@ const RegisterClient: React.FC = () => {
                           Criar Novo Grupo
                         </MenuItem>
 
-                        {/* Opção "Não" */}
-                        <MenuItem value="Não">Não</MenuItem>
+                        {/* Opção "Não pertence a nenhum grupo" */}
+                        {businessGroups.some((group) => group.id === 4) ? (
+                          <MenuItem value={4}>
+                            Não pertence a nenhum grupo
+                          </MenuItem>
+                        ) : (
+                          <MenuItem value="Não"></MenuItem>
+                        )}
 
-                        {/* Lista de grupos empresariais */}
+                        {/* Lista de grupos empresariais (excluindo o grupo específico) */}
                         {Array.isArray(businessGroups) &&
                         businessGroups.length > 0 ? (
-                          businessGroups.map((group) => (
-                            <MenuItem key={group.id} value={group.id}>
-                              {group.name}
-                            </MenuItem>
-                          ))
+                          businessGroups
+                            .filter((group) => group.id !== 4) // Remove o grupo específico da lista
+                            .map((group) => (
+                              <MenuItem key={group.id} value={group.id}>
+                                {group.name}
+                              </MenuItem>
+                            ))
                         ) : (
                           <MenuItem disabled>Carregando grupos...</MenuItem>
                         )}

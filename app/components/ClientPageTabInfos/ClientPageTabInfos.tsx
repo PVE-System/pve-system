@@ -32,6 +32,9 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
   const [salesData, setSalesData] = useState<{ [key: string]: any }>({});
   const [loading, setLoading] = useState(true); // Estado para controlar o carregamento
   const [buttonText, setButtonText] = useState('Excel');
+  const [businessGroups, setBusinessGroups] = useState<
+    { id: number; name: string }[]
+  >([]);
   const [users, setUsers] = useState<
     { operatorNumber: string; name: string }[]
   >([]);
@@ -69,6 +72,28 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
       });
   }, [clientId, setValue]);
 
+  // Buscar os grupos empresariais
+  useEffect(() => {
+    const fetchBusinessGroups = async () => {
+      try {
+        const response = await fetch('/api/getAllBusinessGroups');
+        if (!response.ok) throw new Error('Erro ao buscar grupos empresariais');
+        const data = await response.json();
+        setBusinessGroups(data.businessGroups);
+      } catch (error) {
+        console.error('Erro ao buscar grupos empresariais:', error);
+        setBusinessGroups([]);
+      }
+    };
+
+    fetchBusinessGroups();
+  }, []);
+
+  // Função para obter o nome do grupo empresarial
+  const getBusinessGroupName = (businessGroupId: number) => {
+    const group = businessGroups.find((group) => group.id === businessGroupId);
+    return group ? group.name : 'Grupo não encontrado';
+  };
   //UseEffect para os dados da tabela salesInformation
 
   useEffect(() => {
@@ -161,28 +186,65 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
 
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
-    doc.text(['PVE Representacoes - Cadastro do Cliente:'], 10, 10);
+    doc.text('PVE Representações - Cadastro do Cliente:', 10, 10);
 
     doc.setFont('helvetica', 'normal');
 
     let yPosition = 20;
 
-    // Adiciona os detalhes do cliente ao PDF
+    // Função para obter o nome do responsável
+    const getResponsibleName = (operatorNumber: string) => {
+      const user = users.find((user) => user.operatorNumber === operatorNumber);
+      return user ? `${user.operatorNumber} - ${user.name}` : operatorNumber;
+    };
+
+    // Função para obter o nome do grupo empresarial
+    const getBusinessGroupName = (businessGroupId: number) => {
+      const group = businessGroups.find(
+        (group) => group.id === businessGroupId,
+      );
+      return group ? group.name : 'Grupo não encontrado';
+    };
+
+    // Renderiza o campo "Nome da Empresa ou Pessoa" (companyName)
+    const companyNameLabel =
+      fieldLabels['companyName'] || 'Nome da Empresa ou Pessoa';
+    const companyNameValue = clientData['companyName'];
+    doc.text(`${companyNameLabel}: ${companyNameValue}`, 10, yPosition);
+    yPosition += 10;
+
+    // Renderiza o campo "Grupo Empresarial" (businessGroupId)
+    const businessGroupLabel =
+      fieldLabels['businessGroupId'] || 'Grupo Empresarial';
+    const businessGroupValue = getBusinessGroupName(
+      clientData['businessGroupId'],
+    );
+    doc.text(`${businessGroupLabel}: ${businessGroupValue}`, 10, yPosition);
+    yPosition += 10;
+
+    // Adiciona os outros detalhes do cliente ao PDF
     Object.keys(clientData).forEach((key) => {
       if (
         key === 'id' ||
         key === 'createdAt' ||
         key === 'rating' ||
         key === 'clientCondition' ||
-        key === 'imageUrl'
+        key === 'imageUrl' ||
+        key === 'companyName' || // Ignora companyName, pois já foi renderizado
+        key === 'businessGroupId' // Ignora businessGroupId, pois já foi renderizado
       ) {
         return;
       }
 
       const label = fieldLabels[key] || key;
-      const value = clientData[key];
+      let value = clientData[key];
 
-      doc.text(`${label}: ${value}`, 10, yPosition); // Mantém o valor original
+      // Tratamento especial para o campo responsibleSeller
+      if (key === 'responsibleSeller') {
+        value = getResponsibleName(clientData['responsibleSeller']);
+      }
+
+      doc.text(`${label}: ${value}`, 10, yPosition); // Adiciona o valor ao PDF
       yPosition += 10;
     });
 
@@ -421,18 +483,22 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
         {/* Grupo 2 - formulário de cadastro */}
         <Box sx={styles.boxCol2}>
           {formFields.map(({ label, name }) => {
-            const value =
-              name === 'responsibleSeller'
-                ? (() => {
-                    const seller = users.find(
-                      (user) =>
-                        user.operatorNumber === clientData.responsibleSeller,
-                    );
-                    return seller
-                      ? `${seller.operatorNumber} - ${seller.name}`
-                      : clientData.responsibleSeller; // Exibe apenas o operatorNumber se não encontrar o vendedor
-                  })()
-                : clientData[name];
+            let value = clientData[name];
+
+            // Tratamento especial para o campo businessGroupId
+            if (name === 'businessGroupId') {
+              value = getBusinessGroupName(clientData.businessGroupId);
+            }
+
+            // Tratamento especial para o campo responsibleSeller
+            if (name === 'responsibleSeller') {
+              const seller = users.find(
+                (user) => user.operatorNumber === clientData.responsibleSeller,
+              );
+              value = seller
+                ? `${seller.operatorNumber} - ${seller.name}`
+                : clientData.responsibleSeller;
+            }
 
             return (
               <Box key={name}>

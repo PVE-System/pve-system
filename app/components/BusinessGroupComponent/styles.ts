@@ -1,5 +1,5 @@
 import { Theme } from '@mui/material';
-import { blueGrey, grey, orange, red } from '@mui/material/colors';
+import { blueGrey, green, grey, orange, red } from '@mui/material/colors';
 
 const styles = {
   card: {
@@ -56,7 +56,7 @@ const styles = {
       transform: 'scale(1.05)',
     },
 
-    marginBottom: '10px',
+    marginBottom: '20px',
     width: '100%',
 
     '@media (max-width:450px)': {
@@ -181,6 +181,13 @@ const styles = {
     '@media (max-width:450px)': {
       width: '20px',
       height: '20px',
+    },
+  },
+
+  buttonBack: {
+    backgroundColor: 'green',
+    '&:hover': {
+      backgroundColor: 'darkGreen',
     },
   },
 };
