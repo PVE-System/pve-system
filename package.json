@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build:default": "next build",
+    "build:main": "tsx db/migrate && next build",
     "start": "next start",
     "lint": "next lint",
     "db:up": "docker-compose up -d",
