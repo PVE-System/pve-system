@@ -25,6 +25,8 @@ import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import BusinessIcon from '@mui/icons-material/Business';
 import LogoutIcon from '@mui/icons-material/Logout';
 import CloseIcon from '@mui/icons-material/Close';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import CorporateFareIcon from '@mui/icons-material/CorporateFare';
 import { useMediaQuery } from '@mui/material';
 import { useTheme } from '@/app/theme/ThemeContext';
 import styles from '@/app/components/MenuNav/styles';
@@ -150,6 +152,11 @@ export default function TemporaryDrawer() {
             icon: <AddBusinessIcon />,
             link: '/registerClient',
           },
+          {
+            name: 'Grupo Empresarial',
+            icon: <CorporateFareIcon />,
+            link: '/businessGroupPage',
+          },
         ].map((item) => (
           <ListItem key={item.name} disablePadding>
             <ListItemButton component="a" href={item.link}>
@@ -181,6 +188,11 @@ export default function TemporaryDrawer() {
             name: 'Editar Perfil',
             icon: <ManageAccountsIcon />,
             link: `/editProfile?id=${user?.id}`,
+          },
+          userData.role === 'admin' && {
+            name: 'Admin PVE',
+            icon: <AdminPanelSettingsIcon />,
+            link: '/adminPage',
           },
         ]
           .filter(
@@ -219,7 +231,8 @@ export default function TemporaryDrawer() {
             <Image src="/logoPveMenu.png" alt="Logo" width={120} height={120} />
           </Box>
           {DrawerList}
-          <Box sx={styles.contentMenu}>
+          <Divider sx={styles.dividerMenu} />
+          <Box sx={{ ...styles.contentMenu, mt: 2 }}>
             <Tooltip title={'Trocar de tema'}>
               <IconButton
                 sx={styles.iconTheme}
@@ -229,7 +242,7 @@ export default function TemporaryDrawer() {
                 {themeIcon}
               </IconButton>
             </Tooltip>
-            <Divider sx={styles.dividerMenu} />
+
             <Box>
               {userData.imageUrl ? (
                 <Image
@@ -250,10 +263,12 @@ export default function TemporaryDrawer() {
                 />
               )}
             </Box>
+
             <Typography variant="subtitle2" component="h1">
               {renderAsIs(userData.name.slice(0, 25)) || 'Nome do Usuário'}
             </Typography>
           </Box>
+
           <Box sx={styles.iconLogout}>
             <Link onClick={logout}>
               <Tooltip title={'Sair do sistema'}>

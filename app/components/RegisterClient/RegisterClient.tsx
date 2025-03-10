@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Box,
   Button,
@@ -291,22 +291,30 @@ const RegisterClient: React.FC = () => {
     console.log('Usuários carregados:', users);
   }, [users]);
 
+  // Ordena os grupos
+  const sortBusinessGroups = (groups: BusinessGroup[]): BusinessGroup[] => {
+    return groups.sort((a, b) =>
+      a.name.localeCompare(b.name, 'pt-BR', { sensitivity: 'base' }),
+    );
+  };
+
   // Função para buscar os Grupos empresarial da tabela 'bussinesGroup'
-  const fetchBusinessGroups = async () => {
+  const fetchBusinessGroups = useCallback(async () => {
     try {
       const response = await fetch('/api/getAllBusinessGroups');
       if (!response.ok) throw new Error('Erro ao buscar grupos empresariais');
+
       const data = await response.json();
-      setBusinessGroups(data.businessGroups); // Acesse a chave `businessGroups` do objeto
+      setBusinessGroups(sortBusinessGroups(data.businessGroups));
     } catch (error) {
       console.error('Erro ao buscar grupos empresariais:', error);
-      setBusinessGroups([]); // Garante que o estado seja um array vazio em caso de erro
+      setBusinessGroups([]);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchBusinessGroups();
-  }, []);
+  }, [fetchBusinessGroups]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -515,7 +523,7 @@ const RegisterClient: React.FC = () => {
                         sx={styles.inputsCol2}
                       >
                         {/* Opção "Criar Novo Grupo" */}
-                        <MenuItem
+                        {/*                         <MenuItem
                           value="createNewGroup"
                           onClick={() => router.push('/businessGroupPage')} // Redireciona para /businessGroupPage
                           sx={{
@@ -524,7 +532,7 @@ const RegisterClient: React.FC = () => {
                           }}
                         >
                           Criar Novo Grupo
-                        </MenuItem>
+                        </MenuItem> */}
 
                         {/* Opção "Não pertence a nenhum grupo" */}
                         {businessGroups.some((group) => group.id === 4) ? (
