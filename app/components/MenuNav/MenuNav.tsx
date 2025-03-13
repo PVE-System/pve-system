@@ -208,6 +208,7 @@ export default function TemporaryDrawer() {
             </ListItem>
           ))}
       </List>
+      <Divider sx={styles.dividerMenu} />
     </div>
   );
 
@@ -231,7 +232,7 @@ export default function TemporaryDrawer() {
             <Image src="/logoPveMenu.png" alt="Logo" width={120} height={120} />
           </Box>
           {DrawerList}
-          <Divider sx={styles.dividerMenu} />
+          {/* <Divider sx={styles.dividerMenu} /> */}
           <Box sx={{ ...styles.contentMenu, mt: 2 }}>
             <Tooltip title={'Trocar de tema'}>
               <IconButton

@@ -278,7 +278,15 @@ const RegisterClient: React.FC = () => {
 
         // Filtrar usuários ativos
         const activeUsers = data.users.filter((user: User) => user.is_active);
-        setUsers(activeUsers); // Apenas os ativos são armazenados no estado
+
+        // Ordenar usuários pelo operatorNumber (numericamente)
+        const sortedUsers = activeUsers.sort((a: User, b: User) => {
+          const numA = parseInt(a.operatorNumber, 10); // Converte operatorNumber para número
+          const numB = parseInt(b.operatorNumber, 10); // Converte operatorNumber para número
+          return numA - numB; // Ordena de forma crescente
+        });
+
+        setUsers(sortedUsers); // Atualiza o estado com os usuários ordenados
       } catch (error) {
         console.error('Erro ao buscar usuários:', error);
       }
