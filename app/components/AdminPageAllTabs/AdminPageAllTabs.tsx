@@ -9,7 +9,7 @@ import { Container } from '@mui/material';
 
 // Ícones
 import InfoIcon from '@mui/icons-material/Info';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import GroupIcon from '@mui/icons-material/Group';
 import NotesIcon from '@mui/icons-material/Notes';
 import AdminPageTabClientByUser from '../AdminPageTabClientByUser/AdminPageTabClientByUser';
 import styles from './styles';
@@ -55,7 +55,7 @@ export default function AdminPageComponent() {
   };
 
   return (
-    <Container maxWidth="md" sx={styles.containerTabs}>
+    <Container maxWidth="lg" sx={styles.containerTabs}>
       <Box>
         {/* Abas */}
         <Box sx={styles.boxTabs}>
@@ -77,8 +77,8 @@ export default function AdminPageComponent() {
               {...a11yProps(0)}
             />
             <Tab
-              label="Aba 2"
-              icon={<ShoppingCartIcon />}
+              label="Gerenciar equipe"
+              icon={<GroupIcon />}
               sx={{
                 fontSize: '12px',
                 minWidth: '100px',
