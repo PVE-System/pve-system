@@ -37,6 +37,7 @@ const EditModalGeneric: React.FC<EditModalGenericProps> = ({
           margin: 'auto',
           padding: 2,
           backgroundColor: 'background.default',
+          color: 'text.primary',
           textAlign: 'center',
           borderRadius: 2,
           position: 'absolute',

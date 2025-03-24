@@ -207,7 +207,7 @@ function RegisterTeamComponent() {
           <Grid container>
             <Grid item xs>
               <Tooltip title={'Gerenciar todos os usuários'}>
-                <Link href="/administerUsersTeam" variant="body2">
+                <Link href="/adminPage" variant="body2">
                   Gerenciar Equipe
                 </Link>
               </Tooltip>

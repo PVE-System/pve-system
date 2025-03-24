@@ -13,6 +13,7 @@ import GroupIcon from '@mui/icons-material/Group';
 import NotesIcon from '@mui/icons-material/Notes';
 import AdminPageTabClientByUser from '../AdminPageTabClientByUser/AdminPageTabClientByUser';
 import styles from './styles';
+import AdminPageTabUsersManager from '../AdminPageTabUsersManager/AdminPageTabUsersManager';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -111,7 +112,9 @@ export default function AdminPageComponent() {
           </Box>
         </AdminTabPanel>
         <AdminTabPanel value={value} index={1}>
-          Possibilidade de conteúdo para Aba 2
+          <Box sx={styles.contentTabs}>
+            <AdminPageTabUsersManager />
+          </Box>
         </AdminTabPanel>
         <AdminTabPanel value={value} index={2}>
           Possibilidade de conteúdo para Aba 3

@@ -3,6 +3,7 @@ import sharedStyles from '../styles/sharedStyles';
 import dynamic from 'next/dynamic';
 import HeadApp from '../components/HeadApp/HeadApp';
 import { Suspense } from 'react';
+import ProtectedRouteAdminPage from '../components/ProtectedRouteAdminPage/ProtectedRouteAdminPage';
 
 const AdminPageAllTabs = dynamic(
   () => import('../components/AdminPageAllTabs/AdminPageAllTabs'),
@@ -13,7 +14,7 @@ const AdminPageAllTabs = dynamic(
 
 export default function AdminPage() {
   return (
-    <>
+    <ProtectedRouteAdminPage>
       <HeadApp />
       <Container>
         <Box sx={sharedStyles.container}>
@@ -28,6 +29,6 @@ export default function AdminPage() {
           </Suspense>
         </Box>
       </Container>
-    </>
+    </ProtectedRouteAdminPage>
   );
 }

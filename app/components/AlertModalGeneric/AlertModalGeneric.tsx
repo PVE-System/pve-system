@@ -27,6 +27,7 @@ const AlertModalGeneric: React.FC<AlertModalGenericProps> = ({
           margin: 'auto',
           padding: 2,
           backgroundColor: 'background.default',
+          color: 'text.primary',
           textAlign: 'center',
           borderRadius: 2,
           position: 'absolute',

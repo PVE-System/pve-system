@@ -23,8 +23,9 @@ import {
   Edit as EditIcon,
   Block as BlockIcon,
 } from '@mui/icons-material';
-import styles from './style';
+
 import sharedStyles from '@/app/styles/sharedStyles';
+import styles from './styles';
 
 export interface User {
   [x: string]: any;
@@ -173,7 +174,7 @@ export default function UsersTeamList() {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell sx={styles.fontSize}>Operador</TableCell>{' '}
+              <TableCell sx={styles.fontSize}>Operador</TableCell>
               {/* Novo campo */}
               <TableCell sx={styles.fontSize}>Nome</TableCell>
               {!isSmallScreen && (

@@ -47,6 +47,7 @@ export default function TemporaryDrawer() {
   const isMobile = useMediaQuery('(max-width:600px)');
   const { user, logout } = useAuth();
   const [showBadge, setShowBadge] = useState(false); // Badge status
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   const pathname = usePathname();
 
@@ -75,7 +76,7 @@ export default function TemporaryDrawer() {
     };
 
     checkBadgeStatus();
-  }, [pathname]);
+  }, [pathname, isRedirecting]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -104,8 +105,10 @@ export default function TemporaryDrawer() {
     };
 
     /* console.log('Fetching user data on component mount...'); */
-    fetchUserData();
-  }, [user?.id]); // Reexecuta quando o `user` ou seu `id` muda.
+    if (!isRedirecting) {
+      fetchUserData();
+    }
+  }, [user?.id, isRedirecting]);
 
   const handleToggleTheme = () => {
     const newTheme = theme === 'light' ? 'light' : 'dark';
@@ -125,6 +128,11 @@ export default function TemporaryDrawer() {
       return '';
     }
     return str;
+  };
+
+  const handleLogout = async () => {
+    setIsRedirecting(true); // Indica que o redirecionamento está em andamento
+    await logout(); // Chama a função de logout
   };
 
   const DrawerList = (
@@ -271,7 +279,7 @@ export default function TemporaryDrawer() {
           </Box>
 
           <Box sx={styles.iconLogout}>
-            <Link onClick={logout}>
+            <Link onClick={handleLogout}>
               <Tooltip title={'Sair do sistema'}>
                 <IconButton>
                   <LogoutIcon />

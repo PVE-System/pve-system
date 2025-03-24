@@ -11,14 +11,15 @@ import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 
 interface User {
-  id: string; // Adicione o campo id
+  id: string;
   token: string;
+  role: string; // Adicionando a role do usuário
 }
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (user: User) => void; // Atualize para aceitar um objeto User
+  login: (user: User) => void;
   logout: () => Promise<void>;
 }
 
@@ -30,26 +31,27 @@ interface AuthProviderProps {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true); // Estado de carregamento inicial
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
     const token = Cookies.get('token');
-    const userId = Cookies.get('userId'); // Obtém o id do usuário do cookie
+    const userId = Cookies.get('userId');
+    const role = Cookies.get('role'); // Captura a role do usuário
 
-    /* console.log('AuthProvider useEffect Token:', token); */
-    /* console.log('AuthProvider useEffect User ID:', userId); */
-    if (token && userId) {
-      setUser({ id: userId, token });
+    if (token && userId && role) {
+      setUser({ id: userId, token, role });
     }
-    setLoading(false); // Dados carregados, desativa o loading
+    setLoading(false);
   }, []);
 
   const login = (user: User) => {
     Cookies.set('token', user.token, { path: '/' });
-    Cookies.set('userId', user.id, { path: '/' }); // Salva o id do usuário no cookie
+    Cookies.set('userId', user.id, { path: '/' });
+    Cookies.set('role', user.role, { path: '/' }); // Salva a role do usuário no cookie
+
     setUser(user);
-    setLoading(false); // Login concluído, desativa o loading
+    setLoading(false);
     router.push('/dashboard');
   };
 
@@ -63,10 +65,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       });
 
       if (response.ok) {
+        // Remove os cookies
         Cookies.remove('token');
-        Cookies.remove('userId'); // Remove o id do usuário dos cookies
+        Cookies.remove('userId');
+        Cookies.remove('role');
+
+        // Atualiza o estado do usuário
         setUser(null);
-        router.push('/');
+
+        // Redireciona para a página de login
+        router.replace('/'); // Usamos replace para evitar adicionar uma nova entrada ao histórico
       } else {
         console.error('Erro ao fazer logout:', response.statusText);
       }

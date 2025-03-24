@@ -62,8 +62,8 @@ export default function SignIn() {
       });
 
       if (response.ok) {
-        const { token, userId } = await response.json();
-        login({ id: userId, token }); // Faz o login via contexto
+        const { token, userId, role } = await response.json();
+        login({ id: userId, token, role }); // Faz o login via contexto
 
         setLoading(false);
       } else {
