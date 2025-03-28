@@ -52,7 +52,6 @@ const styles = {
   },
 
   exportExcelButton: {
-    marginTop: '20px',
     backgroundColor: 'purple',
 
     '&:hover': {

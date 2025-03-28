@@ -42,6 +42,18 @@ const styles = {
     },
   },
 
+  newGroupAdd: {
+    border: '2px solid',
+    borderColor: orange[800],
+  },
+
+  newGroupAddText: {
+    fontWeight: 'bold',
+    color: orange[800],
+    fontSize: '0.9rem',
+    marginBottom: 0.5,
+  },
+
   fileList: {
     background: (theme: Theme) =>
       theme.palette.mode === 'light'

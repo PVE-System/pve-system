@@ -317,6 +317,7 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
   const copyClientAndSalesDataToClipboard = (
     clientData: { [key: string]: any },
     salesData: { [key: string]: any },
+    businessGroups: { id: string | number; name: string }[],
   ) => {
     // Exclui os campos irrelevantes para exportação
     const excludedFields = [
@@ -359,6 +360,7 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
       'transportationType',
       'companyLocation',
       'marketSegmentNature',
+      'businessGroupId',
     ];
 
     // Ordem das colunas no Excel para sales_information
@@ -374,6 +376,16 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
     // Organiza os dados dos clientes na ordem das colunas do Excel
     const clientValues = clientExcelColumnOrder.map((key) => {
       if (excludedFields.includes(key)) return ''; // Ignora campos excluídos
+
+      // Substituir businessGroupId pelo nome correspondente
+      if (key === 'businessGroupId') {
+        const businessGroup = businessGroups.find(
+          (b) => b.id === clientData.businessGroupId,
+        );
+        return businessGroup
+          ? businessGroup.name
+          : 'Não pertence a nenhum grupo';
+      }
 
       // Combinar operador e nome para o campo responsibleSeller
       if (key === 'responsibleSeller') {
@@ -509,7 +521,11 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
                 onClick={() => {
                   console.log('clientData:', clientData);
                   console.log('salesData:', salesData);
-                  copyClientAndSalesDataToClipboard(clientData, salesData);
+                  copyClientAndSalesDataToClipboard(
+                    clientData,
+                    salesData,
+                    businessGroups,
+                  );
                 }}
                 sx={styles.exportExcelButton}
               >

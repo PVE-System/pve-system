@@ -19,7 +19,6 @@ import EditIcon from '@mui/icons-material/Edit';
 
 import sharedStyles from '@/app/styles/sharedStyles';
 import styles from './styles';
-import router from 'next/router';
 import { useRouter } from 'next/navigation';
 import AlertModalGeneric from '../AlertModalGeneric/AlertModalGeneric';
 import AlertEditModalGeneric from '../AlertEditModalGeneric/AlertEditModalGeneric';
@@ -36,6 +35,11 @@ export default function BusinessGroupComponent() {
   const [loadingDelete, setLoadingDelete] = useState<number | null>(null);
   const [loadingEdit, setLoadingEdit] = useState<number | null>(null);
   const [newGroupName, setNewGroupName] = useState('');
+  const [newGroups, setNewGroups] = useState<BusinessGroup[]>([]);
+
+  const [lastCreatedGroupId, setLastCreatedGroupId] = useState<number | null>(
+    null,
+  );
   const router = useRouter();
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -54,10 +58,12 @@ export default function BusinessGroupComponent() {
   };
   //Função para exibir o modal de edição
   const showEditModal = (groupId: number) => {
-    const group = businessGroups.find((g) => g.id === groupId);
+    const group =
+      businessGroups.find((g) => g.id === groupId) ||
+      newGroups.find((g) => g.id === groupId);
     if (group) {
       setEditingGroupId(group.id);
-      setEditingGroupName(group.name); // Certifique-se de que está passando o nome correto
+      setEditingGroupName(group.name);
       setEditModalOpen(true);
     }
   };
@@ -74,10 +80,8 @@ export default function BusinessGroupComponent() {
     try {
       const response = await fetch('/api/getAllBusinessGroups');
       const data = await response.json();
-
-      // Ordena os grupos alfabeticamente ignorando maiúsculas/minúsculas
       const sortedGroups = (data.businessGroups || []).sort(
-        (a: { name: string }, b: { name: string }) =>
+        (a: BusinessGroup, b: BusinessGroup) =>
           a.name.localeCompare(b.name, 'pt-BR', { sensitivity: 'base' }),
       );
 
@@ -103,45 +107,51 @@ export default function BusinessGroupComponent() {
 
   // Criar um novo grupo empresarial
   const registerNewBusinessGroup = async () => {
+    // Verifica se o nome não está vazio
     if (!newGroupName.trim()) return;
 
-    const nameExists = checkIfGroupNameExists(newGroupName);
-    if (nameExists) {
+    // 🚨 Verifica se o nome já existe ANTES de fazer a requisição
+    if (checkIfGroupNameExists(newGroupName)) {
       showModal(
         'Grupo Existente',
         'Este grupo já está cadastrado, confira na lista.',
       );
-      return;
+      return; // Não continua a execução se o nome já existir
     }
 
     try {
+      // Envia a requisição para cadastrar um novo grupo
       const response = await fetch('/api/registerBusinessGroups', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: newGroupName }),
+        body: JSON.stringify({ name: newGroupName }), // Passa o nome do novo grupo
       });
 
+      // Verifica se a resposta foi bem-sucedida
       if (response.ok) {
-        const newGroup = await response.json();
+        const newGroup = await response.json(); // Espera o retorno do novo grupo
 
-        // Adiciona o novo grupo à lista e reordena
-        const updatedGroups = sortBusinessGroups([
-          ...businessGroups,
-          newGroup.businessGroup[0],
-        ]);
+        // Adiciona o novo grupo à lista de novos grupos (estado)
+        setNewGroups([newGroup.businessGroup[0], ...newGroups]);
 
-        // Atualiza o estado com a lista ordenada
-        setBusinessGroups(updatedGroups);
+        // Limpa o campo de nome do grupo
         setNewGroupName('');
       } else {
-        console.error('Erro ao criar grupo empresarial');
+        console.error('Erro ao criar grupo empresarial', response.status); // Loga o erro, se houver
+        showModal(
+          'Erro ao Criar Grupo',
+          'Houve um problema ao cadastrar o grupo. Tente novamente.',
+        );
       }
     } catch (error) {
-      console.error('Erro na criação do grupo:', error);
+      console.error('Erro na criação do grupo:', error); // Loga qualquer erro durante o processo
+      showModal(
+        'Erro ao Criar Grupo',
+        'Houve um erro ao tentar criar o grupo. Tente novamente mais tarde.',
+      );
     }
   };
 
-  // Atualizar um grupo empresarial
   // Atualizar um grupo empresarial
   const handleEdit = async (groupId: number, newName: string) => {
     const nameExists = checkIfGroupNameExists(newName);
@@ -166,8 +176,13 @@ export default function BusinessGroupComponent() {
           group.id === groupId ? { ...group, name: newName } : group,
         );
 
-        // Reordena a lista antes de atualizar o estado
+        const updatedNewGroups = newGroups.map((group) =>
+          group.id === groupId ? { ...group, name: newName } : group,
+        );
+
+        // Atualiza os estados
         setBusinessGroups(sortBusinessGroups(updatedGroups));
+        setNewGroups(updatedNewGroups); // Aqui atualiza o `newGroups` também
       } else {
         console.error('Erro ao atualizar grupo');
       }
@@ -192,6 +207,7 @@ export default function BusinessGroupComponent() {
             businessGroups.filter((group) => group.id !== groupId),
           ),
         );
+        setNewGroups(newGroups.filter((group) => group.id !== groupId));
       } else {
         console.error('Erro ao excluir grupo');
       }
@@ -240,6 +256,61 @@ export default function BusinessGroupComponent() {
         </Box>
       ) : (
         <Box sx={{ marginTop: 4 }}>
+          {/* Exibe grupos recém-criados primeiro, com borda laranja */}
+          {newGroups.map((group) => (
+            <Card
+              key={group.id}
+              sx={{ ...styles.fileList, ...styles.newGroupAdd }}
+            >
+              <CardContent sx={styles.contentFileList}>
+                <Box sx={{ flex: 1 }}>
+                  <Typography sx={styles.newGroupAddText}>
+                    Grupo criado com sucesso!
+                  </Typography>
+                  <Typography
+                    sx={{
+                      ...styles.textFileList,
+                      ...sharedStyles.subTitleFontFamily,
+                    }}
+                    variant="h6"
+                  >
+                    {group.name}
+                  </Typography>
+                </Box>
+                <Box>
+                  {/* Botão de Editar */}
+                  <Tooltip title="Editar Grupo">
+                    <IconButton
+                      onClick={() => showEditModal(group.id)}
+                      disabled={loadingEdit === group.id}
+                    >
+                      {loadingEdit === group.id ? (
+                        <CircularProgress size={24} />
+                      ) : (
+                        <EditIcon sx={styles.iconDownload} />
+                      )}
+                    </IconButton>
+                  </Tooltip>
+
+                  {/* Botão de Deletar */}
+                  <Tooltip title="Excluir Grupo">
+                    <IconButton
+                      onClick={() => handleDelete(group.id)}
+                      disabled={loadingDelete === group.id}
+                    >
+                      {loadingDelete === group.id ? (
+                        <CircularProgress size={24} />
+                      ) : (
+                        <DeleteIcon sx={styles.iconDelete} />
+                      )}
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              </CardContent>
+            </Card>
+          ))}
+
+          {/* Exibe lista ordenada de grupos existentes */}
           {businessGroups.length === 0 ? (
             <Typography>Nenhum grupo empresarial encontrado.</Typography>
           ) : (
@@ -291,6 +362,7 @@ export default function BusinessGroupComponent() {
           )}
         </Box>
       )}
+
       <AlertModalGeneric
         open={modalOpen}
         onClose={() => setModalOpen(false)}

@@ -531,7 +531,7 @@ const RegisterClient: React.FC = () => {
                         sx={styles.inputsCol2}
                       >
                         {/* Opção "Criar Novo Grupo" */}
-                        {/*                         <MenuItem
+                        <MenuItem
                           value="createNewGroup"
                           onClick={() => router.push('/businessGroupPage')} // Redireciona para /businessGroupPage
                           sx={{
@@ -539,8 +539,8 @@ const RegisterClient: React.FC = () => {
                             color: 'primary.main', // Estilo para destacar a opção
                           }}
                         >
-                          Criar Novo Grupo
-                        </MenuItem> */}
+                          Adicionar Grupo
+                        </MenuItem>
 
                         {/* Opção "Não pertence a nenhum grupo" */}
                         {businessGroups.some((group) => group.id === 4) ? (

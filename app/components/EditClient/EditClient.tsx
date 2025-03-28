@@ -21,10 +21,11 @@ import {
 } from '@/app/components/FormFormatter/FormFormatter';
 import styles from '@/app/components/EditClient/styles';
 import sharedStyles from '@/app/styles/sharedStyles';
-import { User } from '@/app/db';
+import { BusinessGroup, User } from '@/app/db';
 
 const fieldLabels: { [key: string]: string } = {
   companyName: 'Nome da Empresa ou Pessoa',
+  businessGroupId: 'Grupo Empresarial',
   cnpj: 'CNPJ',
   cpf: 'CPF',
   cep: 'CEP',
@@ -171,23 +172,28 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
   >([]);
   const [debouncedCnpj, setDebouncedCnpj] = useState('');
   const [debouncedCpf, setDebouncedCpf] = useState('');
+  const [businessGroups, setBusinessGroups] = useState<BusinessGroup[]>([]);
 
-  const cnpj = watch('cnpj'); // Extrai o valor do CNPJ
-  const cpf = watch('cpf'); // Extrai o valor do CPF
+  const [cepPreenchido, setCepPreenchido] = useState(false);
+  const [stateEditadoManualmente, setStateEditadoManualmente] = useState(false);
 
   // Observa os campos do formulário
   const companyName = watch('companyName');
   const corfioCode = watch('corfioCode');
   const whatsapp = watch('whatsapp');
   const emailCommercial = watch('emailCommercial');
+  const cnpj = watch('cnpj');
+  const cpf = watch('cpf');
+  const stateValue = watch('state');
 
   const icmsContributor = useWatch({
     control,
     name: 'icmsContributor',
-    defaultValue: 'Não', // Valor padrão direto para evitar o erro
+    defaultValue: 'Não',
   });
 
   // Função para buscar cidades com base no estado selecionado
+
   const fetchCities = async (state: string) => {
     try {
       const response = await fetch(
@@ -195,13 +201,14 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
       );
       const data = await response.json();
       const cityNames = data.map((city: any) => city.nome);
-      setCities(cityNames); // Atualiza o estado de cidades
+      setCities(cityNames);
     } catch (error) {
       console.error('Erro ao buscar cidades:', error);
     }
   };
 
   // Função para buscar o endereço pelo CEP via ViaCEP
+
   const handleCEPChange = async (cep: string) => {
     const cleanedCEP = cep.replace(/\D/g, '');
     if (cleanedCEP.length === 8) {
@@ -215,11 +222,10 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
           setValue('address', data.logradouro || '');
           setValue('district', data.bairro || '');
           setValue('city', data.localidade || '');
-          const previousState = watch('state');
-          if (previousState !== data.uf) {
-            setValue('state', data.uf || '');
-            fetchCities(data.uf); // Atualiza as cidades ao alterar o estado via CEP
-          }
+          setValue('state', data.uf || '');
+          fetchCities(data.uf);
+          setCepPreenchido(true); // Marca que o CEP foi preenchido pela API
+          setStateEditadoManualmente(false); // Reseta o estado manual
         }
       } catch (error) {
         console.error('Erro ao buscar endereço pelo CEP:', error);
@@ -227,8 +233,44 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
     }
   };
 
+  // Função para capturar mudança manual no campo de estado
+
+  const handleStateChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const newState = event.target.value;
+
+    setValue('state', newState);
+    setValue('city', '');
+    setValue('address', '');
+    setValue('district', '');
+    setValue('locationNumber', '');
+    setValue('cep', '');
+
+    setCepPreenchido(false);
+    setStateEditadoManualmente(true);
+  };
+
+  // Atualiza as cidades sempre que o estado mudar
+  useEffect(() => {
+    if (stateValue) {
+      fetchCities(stateValue);
+      // Se o usuário alterou o estado manualmente, limpamos os campos
+      if (stateEditadoManualmente) {
+        setValue('cep', '');
+        setValue('city', '');
+        setValue('address', '');
+        setValue('district', '');
+        setValue('locationNumber', '');
+        setCepPreenchido(false);
+      }
+    }
+  }, [stateValue, setValue, stateEditadoManualmente]);
+
   useEffect(() => {
     if (!clientId) return;
+
+    //Get Client
 
     const fetchData = async () => {
       setLoading(true); // Garante que o estado de carregamento é verdadeiro no início da busca
@@ -254,12 +296,14 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
       } catch (error) {
         console.error('Error fetching client data:', error);
       } finally {
-        setLoading(false); // Garante que o estado de carregamento seja atualizado mesmo em caso de erro
+        setLoading(false);
       }
     };
 
     fetchData();
   }, [clientId, setValue]);
+
+  //Lidar com submit form
 
   const onSubmit = async (data: any) => {
     if (!clientId) return;
@@ -283,15 +327,16 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
       );
       if (cpfDuplicate) return;
 
-      // Lógica de atualização permanece inalterada
       delete data.id;
       delete data.createdAt;
 
       let finalImageUrl = imageUrl || clientData?.imageUrl;
 
       if (data.icmsContributor === 'Não') {
-        data.stateRegistration = ''; // Limpa o campo para salvar como vazio
+        data.stateRegistration = '';
       }
+
+      //Lidar com a imagem do client
 
       if (imageFile && imageUrl) {
         try {
@@ -334,6 +379,8 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
         imageUrl: finalImageUrl,
       };
 
+      //Salvar as atualizações do client após a edição do usuario
+
       const response = await fetch(`/api/updateClient?id=${clientId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -363,6 +410,8 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
       setPreviewImage(previewUrl);
     }
   };
+
+  //lidar com delete client
 
   const onDelete = async () => {
     setLoadingDelete(true); // Inicia o estado de loading ao deletar
@@ -412,16 +461,26 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
     }
   };
 
+  // Buscar usuarios para o input select Vendedor Responsável
+
   useEffect(() => {
     const fetchActiveUsers = async () => {
       try {
-        const response = await fetch('/api/getAllUsers'); // Endpoint original
+        const response = await fetch('/api/getAllUsers');
         if (!response.ok) throw new Error('Erro ao buscar usuários');
         const data = await response.json();
 
         // Filtrar usuários ativos no frontend
         const activeUsers = data.users.filter((user: User) => user.is_active);
-        setUsers(activeUsers);
+
+        // Ordenar os usuários numericamente pelo operatorNumber
+        const sortedUsers = activeUsers.sort((a: User, b: User) => {
+          const numA = parseInt(a.operatorNumber, 10); // Converte para número
+          const numB = parseInt(b.operatorNumber, 10); // Converte para número
+          return numA - numB; // Ordena de forma crescente
+        });
+
+        setUsers(sortedUsers); // Atualiza o estado com a lista ordenada
       } catch (error) {
         console.error('Erro ao buscar usuários ativos:', error);
       }
@@ -429,6 +488,36 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
 
     fetchActiveUsers();
   }, []);
+
+  // Ordena os grupos empresariais
+
+  const sortBusinessGroups = (groups: BusinessGroup[]): BusinessGroup[] => {
+    return groups.sort((a, b) =>
+      a.name.localeCompare(b.name, 'pt-BR', { sensitivity: 'base' }),
+    );
+  };
+
+  // Buscar os Grupos empresarial
+
+  const fetchBusinessGroups = useCallback(async () => {
+    try {
+      const response = await fetch('/api/getAllBusinessGroups');
+      if (!response.ok) throw new Error('Erro ao buscar grupos empresariais');
+
+      const data = await response.json();
+
+      setBusinessGroups(sortBusinessGroups(data.businessGroups));
+    } catch (error) {
+      console.error('Erro ao buscar grupos empresariais:', error);
+      setBusinessGroups([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchBusinessGroups();
+  }, [fetchBusinessGroups]);
+
+  // Lidar com duplicação
 
   const handleDuplicateCheck = async (
     field: 'cnpj' | 'cpf',
@@ -474,11 +563,11 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
         return false;
       }
     },
-    [clientId], // Agora, `checkDuplicate` depende apenas de `clientId`
+    [clientId],
   );
 
+  // Carregar os valores iniciais de CNPJ e CPF para conferir duplicação
   useEffect(() => {
-    // Carregar os valores iniciais de CNPJ e CPF quando clientData estiver disponível
     if (clientData) {
       setInitialCnpj(clientData.cnpj || '');
       setInitialCpf(clientData.cpf || '');
@@ -488,22 +577,22 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
   useEffect(() => {
     // Debounce para CNPJ
     const handler = setTimeout(() => {
-      setDebouncedCnpj(cnpj || ''); // Atualiza o valor debounced
-    }, 1000); // Aguarda 500ms após o último input
+      setDebouncedCnpj(cnpj || ''); //
+    }, 1000);
 
     return () => {
-      clearTimeout(handler); // Limpa o timeout anterior
+      clearTimeout(handler);
     };
   }, [cnpj]);
 
   useEffect(() => {
     // Debounce para CPF
     const handler = setTimeout(() => {
-      setDebouncedCpf(cpf || ''); // Atualiza o valor debounced
-    }, 1000); // Aguarda 500ms após o último input
+      setDebouncedCpf(cpf || '');
+    }, 1000);
 
     return () => {
-      clearTimeout(handler); // Limpa o timeout anterior
+      clearTimeout(handler);
     };
   }, [cpf]);
 
@@ -653,84 +742,186 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
         </Box>
         <Box sx={styles.boxCol2}>
           <form>
-            {Object.keys(clientData).map((key) => {
-              if (key !== 'id' && key !== 'createdAt' && key !== 'imageUrl') {
-                return (
-                  <Box key={key}>
-                    <Typography variant="subtitle1">
-                      {fieldLabels[key] || key}
-                    </Typography>
-                    <Controller
-                      name={key}
-                      control={control}
-                      defaultValue={clientData[key] || ''}
-                      render={({ field }) => {
-                        if (key === 'responsibleSeller') {
-                          return (
-                            <TextField
-                              {...field}
-                              select
-                              variant="filled"
-                              fullWidth
-                              sx={styles.inputsCol2}
-                            >
-                              {users.map((user) => (
-                                <MenuItem
-                                  key={user.operatorNumber}
-                                  value={user.operatorNumber}
-                                >
-                                  {`${user.operatorNumber} - ${user.name}`}
-                                </MenuItem>
-                              ))}
-                            </TextField>
-                          );
+            {/* Renderiza primeiro companyName e businessGroupId */}
+            {['companyName', 'businessGroupId'].map((key) => (
+              <Box key={key}>
+                <Typography variant="subtitle1">
+                  {fieldLabels[key] || key}
+                </Typography>
+                <Controller
+                  name={key}
+                  control={control}
+                  defaultValue={clientData[key] || ''}
+                  render={({ field }) => {
+                    if (key === 'businessGroupId') {
+                      return (
+                        <TextField
+                          {...field}
+                          select
+                          variant="filled"
+                          fullWidth
+                          sx={styles.inputsCol2}
+                          value={
+                            businessGroups.some((g) => g.id === field.value)
+                              ? field.value
+                              : ''
+                          }
+                        >
+                          {businessGroups.map((group) => (
+                            <MenuItem key={group.id} value={group.id}>
+                              {group.name}
+                            </MenuItem>
+                          ))}
+                        </TextField>
+                      );
+                    }
+
+                    return (
+                      <TextField
+                        {...field}
+                        variant="filled"
+                        sx={styles.inputsCol2}
+                        InputProps={{
+                          readOnly: false,
+                        }}
+                      />
+                    );
+                  }}
+                />
+              </Box>
+            ))}
+
+            {/* Renderiza os outros campos, ignorando estes campos */}
+            {Object.keys(clientData)
+              .filter(
+                (key) =>
+                  key !== 'id' &&
+                  key !== 'createdAt' &&
+                  key !== 'imageUrl' &&
+                  key !== 'companyName' &&
+                  key !== 'businessGroupId',
+              )
+              .map((key) => (
+                <Box key={key}>
+                  <Typography variant="subtitle1">
+                    {fieldLabels[key] || key}
+                  </Typography>
+                  <Controller
+                    name={key}
+                    control={control}
+                    defaultValue={clientData[key] || ''}
+                    render={({ field: { onChange, value, ...restField } }) => {
+                      // Formatação específica para CPF, CNPJ, telefone e CEP
+                      const handleFormattedChange = (
+                        event: React.ChangeEvent<
+                          HTMLInputElement | HTMLTextAreaElement
+                        >,
+                      ) => {
+                        const { name, value } = event.target;
+                        let formattedValue = value;
+
+                        if (name === 'cpf') {
+                          formattedValue = formatCPF(value);
+                        } else if (name === 'cnpj') {
+                          formattedValue = formatCNPJ(value);
+                        } else if (name === 'phone' || name === 'whatsapp') {
+                          formattedValue = formatPhone(value);
+                        } else if (name === 'cep') {
+                          formattedValue = formatCEP(value);
+                          handleCEPChange(value.replace(/\D/g, ''));
                         }
 
+                        onChange(formattedValue);
+                      };
+
+                      if (key === 'responsibleSeller') {
                         return (
                           <TextField
-                            {...field}
+                            {...restField}
+                            value={
+                              users.some((u) => u.operatorNumber === value)
+                                ? value
+                                : ''
+                            }
+                            onChange={onChange}
+                            select
                             variant="filled"
+                            fullWidth
                             sx={styles.inputsCol2}
-                            InputProps={{
-                              readOnly: false,
-                            }}
-                            select={
-                              key === 'state' ||
-                              key === 'city' ||
-                              key in selectOptions
-                            }
-                            disabled={
-                              key === 'stateRegistration' &&
-                              icmsContributor === 'Não'
-                            }
                           >
-                            {key === 'state' &&
-                              states.map((state) => (
-                                <MenuItem key={state} value={state}>
-                                  {state}
-                                </MenuItem>
-                              ))}
-                            {key === 'city' &&
-                              cities.map((city) => (
-                                <MenuItem key={city} value={city}>
-                                  {city}
-                                </MenuItem>
-                              ))}
-                            {key in selectOptions &&
-                              selectOptions[key].map((option) => (
-                                <MenuItem key={option} value={option}>
-                                  {option}
-                                </MenuItem>
-                              ))}
+                            {users.map((user) => (
+                              <MenuItem
+                                key={user.operatorNumber}
+                                value={user.operatorNumber}
+                              >
+                                {`${user.operatorNumber} - ${user.name}`}
+                              </MenuItem>
+                            ))}
                           </TextField>
                         );
-                      }}
-                    />
-                  </Box>
-                );
-              }
-              return null;
-            })}
+                      }
+
+                      return (
+                        <TextField
+                          {...restField}
+                          name={key}
+                          value={
+                            key === 'city'
+                              ? cities.includes(value)
+                                ? value
+                                : ''
+                              : key === 'state'
+                                ? states.includes(value)
+                                  ? value
+                                  : ''
+                                : value
+                          }
+                          onChange={(event) => {
+                            handleFormattedChange(event);
+                            if (key === 'state') {
+                              handleStateChange(event); // Reseta campos quando o estado muda manualmente
+                            }
+                            if (key === 'cep') {
+                              handleCEPChange(event.target.value); // Busca dados da API ao alterar o CEP
+                            }
+                          }}
+                          variant="filled"
+                          sx={styles.inputsCol2}
+                          InputProps={{ readOnly: false }}
+                          select={
+                            key === 'state' ||
+                            key === 'city' ||
+                            key in selectOptions
+                          }
+                          disabled={
+                            key === 'stateRegistration' &&
+                            icmsContributor === 'Não'
+                          }
+                        >
+                          {key === 'state' &&
+                            states.map((state) => (
+                              <MenuItem key={state} value={state}>
+                                {state}
+                              </MenuItem>
+                            ))}
+                          {key === 'city' &&
+                            cities.map((city) => (
+                              <MenuItem key={city} value={city}>
+                                {city}
+                              </MenuItem>
+                            ))}
+                          {key in selectOptions &&
+                            selectOptions[key].map((option) => (
+                              <MenuItem key={option} value={option}>
+                                {option}
+                              </MenuItem>
+                            ))}
+                        </TextField>
+                      );
+                    }}
+                  />
+                </Box>
+              ))}
           </form>
         </Box>
       </Box>
