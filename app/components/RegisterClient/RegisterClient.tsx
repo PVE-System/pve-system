@@ -173,6 +173,7 @@ const RegisterClient: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [businessGroups, setBusinessGroups] = useState<BusinessGroup[]>([]);
+  const [refreshTrigger, setRefreshTrigger] = useState(false);
   const [users, setUsers] = useState<
     { operatorNumber: string; name: string }[]
   >([]);
@@ -299,7 +300,9 @@ const RegisterClient: React.FC = () => {
     console.log('Usuários carregados:', users);
   }, [users]);
 
-  // Ordena os grupos
+  //Grupo Empresarial Start
+
+  // Ordena os grupos empresarial
   const sortBusinessGroups = (groups: BusinessGroup[]): BusinessGroup[] => {
     return groups.sort((a, b) =>
       a.name.localeCompare(b.name, 'pt-BR', { sensitivity: 'base' }),
@@ -323,6 +326,19 @@ const RegisterClient: React.FC = () => {
   useEffect(() => {
     fetchBusinessGroups();
   }, [fetchBusinessGroups]);
+
+  // Atualiza os grupos empresariais sempre que abrir o select
+  const handleSelectFocus = () => {
+    fetchBusinessGroups();
+  };
+
+  // Função para abrir a página de criação e depois atualizar os grupos
+  const handleOpenNewGroup = () => {
+    window.open('/businessGroupPage', '_blank');
+    setRefreshTrigger(true); // Ativa o trigger para forçar atualização depois
+  };
+
+  //Grupo Empresarial END
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -515,7 +531,6 @@ const RegisterClient: React.FC = () => {
                     </TextField>
                   ) : key === 'businessGroup' ? (
                     <Box>
-                      {/* Select do Grupo Empresarial */}
                       <TextField
                         name={key}
                         value={formData.businessGroup}
@@ -529,17 +544,15 @@ const RegisterClient: React.FC = () => {
                         fullWidth
                         variant="filled"
                         sx={styles.inputsCol2}
+                        onFocus={handleSelectFocus}
                       >
                         {/* Opção "Criar Novo Grupo" */}
                         <MenuItem
                           value="createNewGroup"
-                          onClick={() => router.push('/businessGroupPage')} // Redireciona para /businessGroupPage
-                          sx={{
-                            fontStyle: 'italic',
-                            color: 'primary.main', // Estilo para destacar a opção
-                          }}
+                          onClick={handleOpenNewGroup}
+                          sx={{ fontStyle: 'italic', color: 'primary.main' }}
                         >
-                          Adicionar Grupo
+                          Adicionar novo grupo
                         </MenuItem>
 
                         {/* Opção "Não pertence a nenhum grupo" */}
@@ -551,11 +564,11 @@ const RegisterClient: React.FC = () => {
                           <MenuItem value="Não"></MenuItem>
                         )}
 
-                        {/* Lista de grupos empresariais (excluindo o grupo específico) */}
+                        {/* Lista de grupos empresariais */}
                         {Array.isArray(businessGroups) &&
                         businessGroups.length > 0 ? (
                           businessGroups
-                            .filter((group) => group.id !== 4) // Remove o grupo específico da lista
+                            .filter((group) => group.id !== 4)
                             .map((group) => (
                               <MenuItem key={group.id} value={group.id}>
                                 {group.name}
