@@ -247,7 +247,7 @@ export default function ExcelDownloadFileComponent() {
           <span>Planilha </span> de vendas
         </Typography>
         <Box>
-          <Typography sx={sharedStyles.subtitleSize}>
+          <Typography component="span" sx={sharedStyles.subtitleSize}>
             Faça o <span>Download </span> da planilha Excel na versão mais
             atual.
           </Typography>
@@ -255,6 +255,7 @@ export default function ExcelDownloadFileComponent() {
         <Box sx={styles.boxUploadIcon}>
           <Typography
             variant="h6"
+            component="div"
             sx={{
               ...sharedStyles.subtitleSize,
               fontSize: '14px',
@@ -295,6 +296,7 @@ export default function ExcelDownloadFileComponent() {
                     <InsertDriveFileIcon />
 
                     <Typography
+                      component="div"
                       variant="body1"
                       sx={{
                         ...styles.textFileList,

@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Box,
   Button,
@@ -14,6 +14,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
+
 import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
 import {
   formatCPF,
@@ -46,9 +47,15 @@ interface ClientData {
   // Outras propriedades do cliente
 }
 
+interface BusinessGroup {
+  id: number;
+  name: string;
+}
+
 const RegisterClient: React.FC = () => {
   const [formData, setFormData] = useState({
     companyName: '',
+    businessGroup: '',
     cnpj: '',
     cpf: '',
     cep: '',
@@ -80,6 +87,7 @@ const RegisterClient: React.FC = () => {
 
   const fieldLabels: { [key: string]: string } = {
     companyName: 'Nome da Empresa ou Pessoa',
+    businessGroup: 'Grupo Empresarial',
     cnpj: 'CNPJ',
     cpf: 'CPF',
     cep: 'CEP',
@@ -164,6 +172,8 @@ const RegisterClient: React.FC = () => {
   const [cities, setCities] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [businessGroups, setBusinessGroups] = useState<BusinessGroup[]>([]);
+  const [refreshTrigger, setRefreshTrigger] = useState(false);
   const [users, setUsers] = useState<
     { operatorNumber: string; name: string }[]
   >([]);
@@ -173,6 +183,7 @@ const RegisterClient: React.FC = () => {
   const [duplicateField, setDuplicateField] = useState<'cnpj' | 'cpf' | null>(
     null,
   );
+
   const [showModal, setShowModal] = useState(false);
   const router = useRouter();
 
@@ -268,7 +279,15 @@ const RegisterClient: React.FC = () => {
 
         // Filtrar usuários ativos
         const activeUsers = data.users.filter((user: User) => user.is_active);
-        setUsers(activeUsers); // Apenas os ativos são armazenados no estado
+
+        // Ordenar usuários pelo operatorNumber (numericamente)
+        const sortedUsers = activeUsers.sort((a: User, b: User) => {
+          const numA = parseInt(a.operatorNumber, 10); // Converte operatorNumber para número
+          const numB = parseInt(b.operatorNumber, 10); // Converte operatorNumber para número
+          return numA - numB; // Ordena de forma crescente
+        });
+
+        setUsers(sortedUsers); // Atualiza o estado com os usuários ordenados
       } catch (error) {
         console.error('Erro ao buscar usuários:', error);
       }
@@ -280,6 +299,46 @@ const RegisterClient: React.FC = () => {
   useEffect(() => {
     console.log('Usuários carregados:', users);
   }, [users]);
+
+  //Grupo Empresarial Start
+
+  // Ordena os grupos empresarial
+  const sortBusinessGroups = (groups: BusinessGroup[]): BusinessGroup[] => {
+    return groups.sort((a, b) =>
+      a.name.localeCompare(b.name, 'pt-BR', { sensitivity: 'base' }),
+    );
+  };
+
+  // Função para buscar os Grupos empresarial da tabela 'bussinesGroup'
+  const fetchBusinessGroups = useCallback(async () => {
+    try {
+      const response = await fetch('/api/getAllBusinessGroups');
+      if (!response.ok) throw new Error('Erro ao buscar grupos empresariais');
+
+      const data = await response.json();
+      setBusinessGroups(sortBusinessGroups(data.businessGroups));
+    } catch (error) {
+      console.error('Erro ao buscar grupos empresariais:', error);
+      setBusinessGroups([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchBusinessGroups();
+  }, [fetchBusinessGroups]);
+
+  // Atualiza os grupos empresariais sempre que abrir o select
+  const handleSelectFocus = () => {
+    fetchBusinessGroups();
+  };
+
+  // Função para abrir a página de criação e depois atualizar os grupos
+  const handleOpenNewGroup = () => {
+    window.open('/businessGroupPage', '_blank');
+    setRefreshTrigger(true); // Ativa o trigger para forçar atualização depois
+  };
+
+  //Grupo Empresarial END
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -314,7 +373,12 @@ const RegisterClient: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          businessGroupId: formData.businessGroup
+            ? Number(formData.businessGroup)
+            : null,
+        }),
       });
 
       const result = await response.json();
@@ -322,6 +386,7 @@ const RegisterClient: React.FC = () => {
       if (response.ok) {
         setFormData({
           companyName: '',
+          businessGroup: '',
           cnpj: '',
           cpf: '',
           cep: '',
@@ -464,6 +529,56 @@ const RegisterClient: React.FC = () => {
                           </MenuItem>
                         ))}
                     </TextField>
+                  ) : key === 'businessGroup' ? (
+                    <Box>
+                      <TextField
+                        name={key}
+                        value={formData.businessGroup}
+                        onChange={(event) =>
+                          setFormData({
+                            ...formData,
+                            businessGroup: event.target.value,
+                          })
+                        }
+                        select
+                        fullWidth
+                        variant="filled"
+                        sx={styles.inputsCol2}
+                        onFocus={handleSelectFocus}
+                      >
+                        {/* Opção "Criar Novo Grupo" */}
+                        <MenuItem
+                          value="createNewGroup"
+                          onClick={handleOpenNewGroup}
+                          sx={{ fontStyle: 'italic', color: 'primary.main' }}
+                        >
+                          Adicionar novo grupo
+                        </MenuItem>
+
+                        {/* Opção "Não pertence a nenhum grupo" */}
+                        {businessGroups.some((group) => group.id === 4) ? (
+                          <MenuItem value={4}>
+                            Não pertence a nenhum grupo
+                          </MenuItem>
+                        ) : (
+                          <MenuItem value="Não"></MenuItem>
+                        )}
+
+                        {/* Lista de grupos empresariais */}
+                        {Array.isArray(businessGroups) &&
+                        businessGroups.length > 0 ? (
+                          businessGroups
+                            .filter((group) => group.id !== 4)
+                            .map((group) => (
+                              <MenuItem key={group.id} value={group.id}>
+                                {group.name}
+                              </MenuItem>
+                            ))
+                        ) : (
+                          <MenuItem disabled>Carregando grupos...</MenuItem>
+                        )}
+                      </TextField>
+                    </Box>
                   ) : (
                     /* Renderizar os outros campos normalmente */
                     <TextField

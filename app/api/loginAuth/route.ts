@@ -26,6 +26,9 @@ export async function POST(request: NextRequest) {
 
   const existingUser = user[0];
 
+  // 🔥 Pegando a role do usuário
+  const userRole = existingUser.role; // Certifique-se de que a role existe no banco!
+
   // Verificar a senha
   const isPasswordCorrect = await bcrypt.compare(
     password,
@@ -35,16 +38,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Senha incorreta' }, { status: 401 });
   }
 
-  // Gerar token JWT
+  // Gerar token JWT incluindo a role
   const token = jwt.sign(
-    { id: existingUser.id, email: existingUser.email },
+    { id: existingUser.id, email: existingUser.email, role: userRole }, // Adicionamos a role aqui!
     JWT_SECRET,
     { expiresIn: '1h' },
   );
 
-  // Retornar o token e o ID do usuário
+  // Retornar o token, ID do usuário e role
   return NextResponse.json(
-    { token, userId: existingUser.id }, // Inclua o ID do usuário na resposta
+    { token, userId: existingUser.id, role: userRole }, // Incluímos a role na resposta!
     { status: 200 },
   );
 }

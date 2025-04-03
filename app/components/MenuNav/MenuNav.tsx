@@ -25,6 +25,8 @@ import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import BusinessIcon from '@mui/icons-material/Business';
 import LogoutIcon from '@mui/icons-material/Logout';
 import CloseIcon from '@mui/icons-material/Close';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import CorporateFareIcon from '@mui/icons-material/CorporateFare';
 import { useMediaQuery } from '@mui/material';
 import { useTheme } from '@/app/theme/ThemeContext';
 import styles from '@/app/components/MenuNav/styles';
@@ -45,6 +47,7 @@ export default function TemporaryDrawer() {
   const isMobile = useMediaQuery('(max-width:600px)');
   const { user, logout } = useAuth();
   const [showBadge, setShowBadge] = useState(false); // Badge status
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   const pathname = usePathname();
 
@@ -73,7 +76,7 @@ export default function TemporaryDrawer() {
     };
 
     checkBadgeStatus();
-  }, [pathname]);
+  }, [pathname, isRedirecting]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -102,8 +105,10 @@ export default function TemporaryDrawer() {
     };
 
     /* console.log('Fetching user data on component mount...'); */
-    fetchUserData();
-  }, [user?.id]); // Reexecuta quando o `user` ou seu `id` muda.
+    if (!isRedirecting) {
+      fetchUserData();
+    }
+  }, [user?.id, isRedirecting]);
 
   const handleToggleTheme = () => {
     const newTheme = theme === 'light' ? 'light' : 'dark';
@@ -123,6 +128,11 @@ export default function TemporaryDrawer() {
       return '';
     }
     return str;
+  };
+
+  const handleLogout = async () => {
+    setIsRedirecting(true); // Indica que o redirecionamento está em andamento
+    await logout(); // Chama a função de logout
   };
 
   const DrawerList = (
@@ -149,6 +159,11 @@ export default function TemporaryDrawer() {
             name: 'Cadastrar Cliente',
             icon: <AddBusinessIcon />,
             link: '/registerClient',
+          },
+          {
+            name: 'Grupo Empresarial',
+            icon: <CorporateFareIcon />,
+            link: '/businessGroupPage',
           },
         ].map((item) => (
           <ListItem key={item.name} disablePadding>
@@ -182,6 +197,11 @@ export default function TemporaryDrawer() {
             icon: <ManageAccountsIcon />,
             link: `/editProfile?id=${user?.id}`,
           },
+          userData.role === 'admin' && {
+            name: 'Admin PVE',
+            icon: <AdminPanelSettingsIcon />,
+            link: '/adminPage',
+          },
         ]
           .filter(
             (item): item is { name: string; icon: JSX.Element; link: string } =>
@@ -196,6 +216,7 @@ export default function TemporaryDrawer() {
             </ListItem>
           ))}
       </List>
+      <Divider sx={styles.dividerMenu} />
     </div>
   );
 
@@ -219,7 +240,8 @@ export default function TemporaryDrawer() {
             <Image src="/logoPveMenu.png" alt="Logo" width={120} height={120} />
           </Box>
           {DrawerList}
-          <Box sx={styles.contentMenu}>
+          {/* <Divider sx={styles.dividerMenu} /> */}
+          <Box sx={{ ...styles.contentMenu, mt: 2 }}>
             <Tooltip title={'Trocar de tema'}>
               <IconButton
                 sx={styles.iconTheme}
@@ -229,7 +251,7 @@ export default function TemporaryDrawer() {
                 {themeIcon}
               </IconButton>
             </Tooltip>
-            <Divider sx={styles.dividerMenu} />
+
             <Box>
               {userData.imageUrl ? (
                 <Image
@@ -250,12 +272,14 @@ export default function TemporaryDrawer() {
                 />
               )}
             </Box>
+
             <Typography variant="subtitle2" component="h1">
               {renderAsIs(userData.name.slice(0, 25)) || 'Nome do Usuário'}
             </Typography>
           </Box>
+
           <Box sx={styles.iconLogout}>
-            <Link onClick={logout}>
+            <Link onClick={handleLogout}>
               <Tooltip title={'Sair do sistema'}>
                 <IconButton>
                   <LogoutIcon />
