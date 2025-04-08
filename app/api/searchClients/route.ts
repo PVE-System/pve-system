@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { ilike, or, sql } from 'drizzle-orm';
 import { clients } from '@/app/db/schema';
