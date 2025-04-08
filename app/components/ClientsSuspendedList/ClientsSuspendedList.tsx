@@ -41,27 +41,15 @@ const ClientSuspendedList = () => {
   useEffect(() => {
     const fetchClients = async () => {
       try {
-        const response = await fetch('/api/getAllClients');
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-
-        // Filtrar clientes com clientCondition 'Normal'
-        const filteredClients = data.clients.filter((client: Client) => {
-          return client.clientCondition === 'Suspenso';
-        });
-
-        // Ordenar os clientes pelo nome da empresa em ordem alfabética
-        const sortedClients = filteredClients.sort(
-          (a: { companyName: string }, b: { companyName: string }) =>
-            a.companyName.localeCompare(b.companyName),
+        const response = await fetch(
+          '/api/getListAllClients?page=clientsSuspendedList',
         );
-
-        setClients(sortedClients);
-        setLoading(false);
+        if (!response.ok) throw new Error('Erro ao buscar clientes');
+        const data = await response.json();
+        setClients(data.clients);
       } catch (error) {
-        console.error('Failed to fetch clients:', error);
+        console.error('Erro ao buscar clientes:', error);
+      } finally {
         setLoading(false);
       }
     };
