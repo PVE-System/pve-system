@@ -79,10 +79,13 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
       await fetchClientData();
       const folder =
         tabIndex === 0
-          ? `socialContract/id=${clientId}`
+          ? `quotations/id=${clientId}`
           : tabIndex === 1
-            ? `fiscalDocs/id=${clientId}`
-            : `accountingDocs/id=${clientId}`;
+            ? `socialContract/id=${clientId}`
+            : tabIndex === 2
+              ? `fiscalDocs/id=${clientId}`
+              : `accountingDocs/id=${clientId}`;
+
       await fetchFiles(folder);
       setLoading(false);
     };
@@ -94,10 +97,13 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
     setTabIndex(newValue);
     const folder =
       newValue === 0
-        ? `socialContract/id=${clientId}`
+        ? `quotations/id=${clientId}`
         : newValue === 1
-          ? `fiscalDocs/id=${clientId}`
-          : `accountingDocs/id=${clientId}`;
+          ? `socialContract/id=${clientId}`
+          : newValue === 2
+            ? `fiscalDocs/id=${clientId}`
+            : `accountingDocs/id=${clientId}`;
+
     fetchFiles(folder);
   };
 
@@ -111,18 +117,23 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
       formData.append('file', files[0]);
       const folder =
         tabIndex === 0
-          ? `socialContract/id=${clientId}`
+          ? `quotations/id=${clientId}`
           : tabIndex === 1
-            ? `fiscalDocs/id=${clientId}`
-            : `accountingDocs/id=${clientId}`;
+            ? `socialContract/id=${clientId}`
+            : tabIndex === 2
+              ? `fiscalDocs/id=${clientId}`
+              : `accountingDocs/id=${clientId}`;
+
       try {
-        const response = await fetch(
-          `/api/uploadFilesClient?folder=${encodeURIComponent(folder)}&clientId=${clientId}`,
-          {
-            method: 'POST',
-            body: formData,
-          },
-        );
+        const uploadUrl =
+          tabIndex === 0
+            ? `/api/uploadQuoteFilesClient?folder=${encodeURIComponent(folder)}&clientId=${clientId}`
+            : `/api/uploadFilesClient?folder=${encodeURIComponent(folder)}&clientId=${clientId}`;
+
+        const response = await fetch(uploadUrl, {
+          method: 'POST',
+          body: formData,
+        });
 
         if (response.ok) {
           const newFile = await response.json();
@@ -167,10 +178,13 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
         // Após deletar, reatualiza a lista de arquivos para garantir que tudo esteja sincronizado
         const folder =
           tabIndex === 0
-            ? `socialContract/id=${clientId}`
+            ? `quotations/id=${clientId}`
             : tabIndex === 1
-              ? `fiscalDocs/id=${clientId}`
-              : `accountingDocs/id=${clientId}`;
+              ? `socialContract/id=${clientId}`
+              : tabIndex === 2
+                ? `fiscalDocs/id=${clientId}`
+                : `accountingDocs/id=${clientId}`;
+
         await fetchFiles(folder);
       } else {
         const errorResponse = await response.json();
@@ -238,6 +252,21 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
                 },
               }}
             >
+              <Tab
+                label={
+                  {
+                    xs: 'Cotações',
+                    md: 'Cotações',
+                  }[window.innerWidth < 600 ? 'xs' : 'md']
+                }
+                sx={{
+                  textTransform: 'none',
+                  fontSize: {
+                    xs: '12px',
+                    md: '14px',
+                  },
+                }}
+              />
               <Tab
                 label={
                   {
