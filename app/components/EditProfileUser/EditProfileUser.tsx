@@ -45,6 +45,7 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
       try {
         const response = await fetch(`/api/getUser/${userId}`);
         const data = await response.json();
+        console.log('Fetched User Data:', data); // Adicionado para verificar os dados
         setUserName(data.name || '');
         setImageUrl(data.imageUrl || null); // Defina a URL da imagem do estado do usuário
         setValue('name', data.name || '');

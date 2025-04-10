@@ -297,7 +297,7 @@ const RegisterClient: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    console.log('Usuários carregados:', users);
+    /* console.log('Usuários carregados:', users); */
   }, [users]);
 
   //Grupo Empresarial Start
