@@ -583,7 +583,12 @@ const RegisterClient: React.FC = () => {
                     /* Renderizar os outros campos normalmente */
                     <TextField
                       name={key}
-                      value={formData[key as keyof typeof formData]}
+                      /* value={formData[key as keyof typeof formData]} */
+                      value={
+                        key === 'city' && !cities.includes(formData.city)
+                          ? ''
+                          : formData[key as keyof typeof formData]
+                      }
                       onChange={(event) => {
                         const target = event.target as HTMLInputElement;
                         const { value } = target;

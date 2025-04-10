@@ -96,7 +96,7 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
 
   return (
     <Box sx={styles.boxProfile}>
-      <Typography variant="h6" sx={styles.companyName}>
+      <Typography variant="h6" component="div" sx={styles.companyName}>
         {renderAsIs(companyName.slice(0, 35))} {/* Limita a 35 caracteres */}
       </Typography>{' '}
       <label htmlFor="profile-picture-input">
@@ -137,7 +137,9 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
       </label>
       <Box sx={styles.statusRating}>
         <Tooltip title="Relacionado ao faturamento e frequência de pedidos deste cliente">
-          <Typography variant="subtitle2">Status de Atividade:</Typography>
+          <Typography variant="subtitle2" component="div">
+            Status de Atividade:
+          </Typography>
         </Tooltip>
         <Controller
           name="rating"
@@ -162,7 +164,9 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
       </Box>
       <Box sx={styles.clientCondition}>
         <Tooltip title="Relacionado a condição deste cliente">
-          <Typography variant="subtitle2">Condição do Cliente:</Typography>
+          <Typography variant="subtitle2" component="div">
+            Condição do Cliente:
+          </Typography>
         </Tooltip>
         <Box sx={styles.clientConditionButtonBox}>
           <Button
@@ -246,10 +250,18 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
           alignSelf: 'start',
         }}
       >
-        <Typography variant="subtitle2" sx={{ marginBottom: '5px' }}>
+        <Typography
+          variant="subtitle2"
+          component="div"
+          sx={{ marginBottom: '5px' }}
+        >
           Código Corfio: {corfioCode}
         </Typography>{' '}
-        <Typography variant="subtitle2" sx={{ marginBottom: '5px' }}>
+        <Typography
+          variant="subtitle2"
+          component="div"
+          sx={{ marginBottom: '5px' }}
+        >
           WhatsApp:{' '}
           {whatsapp ? (
             <a
@@ -262,7 +274,11 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
             </a>
           ) : null}
         </Typography>
-        <Typography variant="subtitle2" sx={{ marginBottom: '5px' }}>
+        <Typography
+          variant="subtitle2"
+          component="div"
+          sx={{ marginBottom: '5px' }}
+        >
           Email: {emailCommercial}
         </Typography>{' '}
       </Box>
