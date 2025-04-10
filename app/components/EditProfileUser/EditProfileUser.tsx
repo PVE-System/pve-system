@@ -45,7 +45,7 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
       try {
         const response = await fetch(`/api/getUser/${userId}`);
         const data = await response.json();
-        console.log('Fetched User Data:', data); // Adicionado para verificar os dados
+        /* console.log('Fetched User Data:', data); */
         setUserName(data.name || '');
         setImageUrl(data.imageUrl || null); // Defina a URL da imagem do estado do usuário
         setValue('name', data.name || '');
@@ -180,6 +180,7 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
                   height={180}
                   style={styles.formButtonImg}
                   priority
+                  unoptimized
                 />
               ) : imageUrl ? (
                 <Image
@@ -189,6 +190,7 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
                   height={180}
                   style={styles.formButtonImg}
                   priority
+                  unoptimized
                 />
               ) : (
                 <Image
