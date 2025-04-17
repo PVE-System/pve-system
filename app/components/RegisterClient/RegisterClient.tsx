@@ -705,11 +705,15 @@ const RegisterClient: React.FC = () => {
                 >
                   Fechar
                 </Button>
-                <Link href={`/clientPage?id=${duplicateClient?.id}`}>
+                <a
+                  href={`/clientPage?id=${duplicateClient?.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <Button variant="contained" sx={sharedStyles.modalButton}>
                     Ver Cliente
                   </Button>
-                </Link>
+                </a>
               </Box>
             </Modal>
           </Box>

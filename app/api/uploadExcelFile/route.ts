@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { put } from '@vercel/blob';
+import { del, list, put } from '@vercel/blob';
 
 export async function POST(request: NextRequest) {
   const formData = await request.formData();
@@ -15,6 +15,21 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    const prefix = `${folder}/`;
+    const existingFiles = await list({ prefix });
+
+    // Se já existem 10 ou mais arquivos, deleta o mais antigo
+    if (existingFiles.blobs.length >= 10) {
+      const sortedFiles = existingFiles.blobs.sort(
+        (a, b) =>
+          new Date(a.uploadedAt).getTime() - new Date(b.uploadedAt).getTime(),
+      );
+
+      const oldestFile = sortedFiles[0];
+      await del(oldestFile.url);
+      console.log(`Deleted oldest file: ${oldestFile.pathname}`);
+    }
+
     const { url } = await put(`${folder}/${fileName}`, file, {
       access: 'public',
     });

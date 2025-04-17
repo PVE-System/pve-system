@@ -19,7 +19,10 @@ export async function GET(request: NextRequest) {
     // Listar arquivos no caminho para encontrar a URL correta
     const { blobs } = await list({ prefix: filePath });
 
-    const file = blobs.find((blob) => blob.url.includes(fileName));
+    const file = blobs.find((blob) => {
+      const path = blob.url.split('/').slice(-1)[0]; // pega apenas o nome do arquivo com hash
+      return path === fileName;
+    });
 
     if (!file) {
       return NextResponse.json({ error: 'File not found' }, { status: 404 });

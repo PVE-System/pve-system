@@ -170,6 +170,7 @@ const styles = {
 
   accordionIconList: {
     marginLeft: 'auto',
+    marginTop: 'auto',
     cursor: 'pointer',
     fontSize: '24px',
     transition: 'color 0.3s ease', // Para uma transição suave no hover

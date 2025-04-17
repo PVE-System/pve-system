@@ -13,6 +13,10 @@ import {
   Box,
   useMediaQuery,
   CircularProgress,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
 import { Rating } from '@mui/material';
 import styles from '../ClientsMsList/styles';
@@ -23,6 +27,7 @@ interface Client {
   corfioCode: string;
   clientCondition: string;
   rating: number;
+  state: string;
 }
 
 // Função Renderizar o nome do cliente como está no banco de dados
@@ -36,6 +41,7 @@ const renderAsIs = (str: any) => {
 const ClientNormalList = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState('MS');
   const isSmallScreen = useMediaQuery('(max-width:600px)');
 
   useEffect(() => {
@@ -46,6 +52,7 @@ const ClientNormalList = () => {
         );
         if (!response.ok) throw new Error('Erro ao buscar clientes');
         const data = await response.json();
+
         setClients(data.clients);
       } catch (error) {
         console.error('Erro ao buscar clientes:', error);
@@ -61,6 +68,14 @@ const ClientNormalList = () => {
     window.location.href = `/clientPage?id=${clientId}`;
   };
 
+  const filteredClients = clients.filter((client) => {
+    if (filter === 'MS') return client.state === 'MS';
+    if (filter === 'MT') return client.state === 'MT';
+    if (filter === 'OUTRAS')
+      return client.state !== 'MS' && client.state !== 'MT';
+    return true;
+  });
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center">
@@ -71,6 +86,21 @@ const ClientNormalList = () => {
 
   return (
     <Container maxWidth="lg" sx={styles.container}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
+        <FormControl sx={{ minWidth: 200 }}>
+          <InputLabel id="filter-label">Filtrar por UF</InputLabel>
+          <Select
+            labelId="filter-label"
+            value={filter}
+            label="Filtrar por UF"
+            onChange={(e) => setFilter(e.target.value)}
+          >
+            <MenuItem value="MS">MS</MenuItem>
+            <MenuItem value="MT">MT</MenuItem>
+            <MenuItem value="OUTRAS">Outras UF</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
       <TableContainer>
         <Table>
           <TableHead>
@@ -78,6 +108,7 @@ const ClientNormalList = () => {
               <TableCell sx={styles.fontSize}>Cliente:</TableCell>
               {!isSmallScreen && (
                 <>
+                  <TableCell sx={styles.fontSize}>Estado:</TableCell>
                   <TableCell sx={styles.fontSize}>Cód. Corfio:</TableCell>
                   <TableCell sx={styles.fontSize}>Condição:</TableCell>
                   <TableCell sx={styles.fontSize}>Status:</TableCell>
@@ -86,48 +117,59 @@ const ClientNormalList = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {clients.map((client) => (
-              <TableRow
-                key={client.id}
-                sx={{ ...styles.rowHover, cursor: 'pointer' }}
-                onClick={() => handleRowClick(client.id)}
-              >
-                <TableCell sx={styles.fontSize}>
-                  {renderAsIs(client.companyName.slice(0, 50))}
+            {filteredClients.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} align="center">
+                  Nenhum cliente encontrado para a UF selecionada.
                 </TableCell>
-                {!isSmallScreen && (
-                  <>
-                    <TableCell sx={styles.fontSize}>
-                      {client.corfioCode}
-                    </TableCell>
-                    <TableCell sx={styles.fontSize}>
-                      <Button
-                        sx={{
-                          ...styles.buttonTagCondition,
-                          backgroundColor: 'green',
-                          '&:hover': {
-                            backgroundColor: 'green',
-                          },
-                        }}
-                        variant="contained"
-                        size="small"
-                      >
-                        Normal
-                      </Button>
-                    </TableCell>
-                    <TableCell sx={styles.fontSize}>
-                      <Rating
-                        name={`rating-${client.id}`}
-                        value={client.rating}
-                        readOnly
-                        size="medium"
-                        max={3}
-                      />
-                    </TableCell>
-                  </>
-                )}
               </TableRow>
-            ))}
+            ) : (
+              filteredClients.map((client) => (
+                <TableRow
+                  key={client.id}
+                  sx={{ ...styles.rowHover, cursor: 'pointer' }}
+                  onClick={() => handleRowClick(client.id)}
+                >
+                  <TableCell sx={styles.fontSize}>
+                    {renderAsIs(client.companyName.slice(0, 50))}
+                  </TableCell>
+                  {!isSmallScreen && (
+                    <>
+                      <TableCell sx={styles.fontSize}>
+                        {client.state || '-'}
+                      </TableCell>
+                      <TableCell sx={styles.fontSize}>
+                        {client.corfioCode}
+                      </TableCell>
+                      <TableCell sx={styles.fontSize}>
+                        <Button
+                          sx={{
+                            ...styles.buttonTagCondition,
+                            backgroundColor: 'green',
+                            '&:hover': {
+                              backgroundColor: 'green',
+                            },
+                          }}
+                          variant="contained"
+                          size="small"
+                        >
+                          Normal
+                        </Button>
+                      </TableCell>
+                      <TableCell sx={styles.fontSize}>
+                        <Rating
+                          name={`rating-${client.id}`}
+                          value={client.rating}
+                          readOnly
+                          size="medium"
+                          max={3}
+                        />
+                      </TableCell>
+                    </>
+                  )}
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </TableContainer>
