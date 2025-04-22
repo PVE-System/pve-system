@@ -261,6 +261,7 @@ export default function TemporaryDrawer() {
                   height={80}
                   style={{ borderRadius: '50%' }}
                   priority
+                  unoptimized
                 />
               ) : (
                 <Image
