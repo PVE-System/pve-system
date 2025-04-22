@@ -50,6 +50,8 @@ export default function TemporaryDrawer() {
   const [isRedirecting, setIsRedirecting] = useState(false);
 
   const pathname = usePathname();
+  console.log(userData.imageUrl);
+  const isPreview = process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview';
 
   useEffect(() => {
     const checkBadgeStatus = async () => {
@@ -255,7 +257,13 @@ export default function TemporaryDrawer() {
             <Box>
               {userData.imageUrl ? (
                 <Image
-                  src={userData.imageUrl}
+                  /* src={userData.imageUrl} */
+                  /* src={decodeURIComponent(userData.imageUrl)} */
+                  src={
+                    isPreview
+                      ? decodeURIComponent(userData.imageUrl)
+                      : userData.imageUrl
+                  }
                   alt="Foto do usuário"
                   width={80}
                   height={80}
