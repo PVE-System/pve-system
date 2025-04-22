@@ -35,8 +35,6 @@ import Cookies from 'js-cookie';
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 
-const isPreview = process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview';
-
 export default function TemporaryDrawer() {
   const [open, setOpen] = React.useState(false);
   const [userData, setUserData] = useState<{
@@ -256,25 +254,14 @@ export default function TemporaryDrawer() {
 
             <Box>
               {userData.imageUrl ? (
-                isPreview ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={userData.imageUrl}
-                    alt="Foto do usuário"
-                    width={80}
-                    height={80}
-                    style={{ borderRadius: '50%' }}
-                  />
-                ) : (
-                  <Image
-                    src={userData.imageUrl}
-                    alt="Foto do usuário"
-                    width={80}
-                    height={80}
-                    style={{ borderRadius: '50%' }}
-                    priority
-                  />
-                )
+                <Image
+                  src={userData.imageUrl}
+                  alt="Foto do usuário"
+                  width={80}
+                  height={80}
+                  style={{ borderRadius: '50%' }}
+                  priority
+                />
               ) : (
                 <Image
                   src="/profile-placeholder.png"
