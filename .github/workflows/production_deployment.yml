@@ -1,0 +1,179 @@
+name: Production Deployment
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      deployments: write
+      issues: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Cache Node Modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Database Migrations
+        run: npm run db:migrate
+        env:
+          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DATABASE: ${{ secrets.POSTGRES_DATABASE }}
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Set Vercel Environment Variables
+        uses: dkershner6/vercel-set-env-action@v3
+        with:
+          token: ${{ secrets.VERCEL_API_TOKEN }}
+          projectName: pve-system
+          envVariableKeys: POSTGRES_URL,POSTGRES_USER,POSTGRES_HOST,POSTGRES_PASSWORD,POSTGRES_DATABASE,BLOB_READ_WRITE_TOKEN,VERCEL_SUBDOMAIN,MAILGUN_API_KEY,DOMAIN,RESEND_API_KEY
+        env:
+          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DATABASE: ${{ secrets.POSTGRES_DATABASE }}
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+          VERCEL_SUBDOMAIN: ${{ secrets.VERCEL_SUBDOMAIN }}
+          MAILGUN_API_KEY: ${{ secrets.MAILGUN_API_KEY }}
+          DOMAIN: ${{ secrets.DOMAIN }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          # TARGET_POSTGRES_URL: production
+          # TYPE_POSTGRES_URL: plain
+          # GIT_BRANCH_POSTGRES_URL: main
+
+      - name: Deploy to Production
+        id: deploy
+        run: |
+          DEPLOYMENT_URL=$(vercel pull --yes --environment=production --token=${{ secrets.VERCEL_API_TOKEN }} 2>&1 | grep -o 'https://.*vercel.app' || echo "https://${{ secrets.VERCEL_SUBDOMAIN }}.vercel.app")
+          echo "deployment_url=${DEPLOYMENT_URL}" >> $GITHUB_OUTPUT
+          vercel build --prod --token=${{ secrets.VERCEL_API_TOKEN }}
+          vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_API_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Create GitHub Deployment
+        if: always()
+        uses: actions/github-script@v6
+        env:
+          DEPLOY_URL: ${{ steps.deploy.outputs.deployment_url }}
+        with:
+          script: |
+            const { status } = context.job;
+            const date = new Date().toISOString();
+            const isSuccess = status === 'success';
+
+            // Criar deployment
+            const deployment = await github.rest.repos.createDeployment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: context.sha,
+              environment: 'production',
+              auto_merge: false,
+              required_contexts: []
+            });
+
+            // Atualizar status do deployment
+            await github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: deployment.data.id,
+              state: isSuccess ? 'success' : 'failure',
+              environment_url: process.env.DEPLOY_URL || `https://${process.env.VERCEL_SUBDOMAIN}.vercel.app`,
+              description: isSuccess ? '✅ Production deployment successful' : '❌ Production deployment failed',
+              auto_inactive: true
+            });
+
+            if (isSuccess) {
+              // Criar uma release com informações detalhadas
+              const tagName = `prod-${date.split('T')[0]}`;
+              const commitInfo = await github.rest.repos.getCommit({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: context.sha
+              });
+              
+              await github.rest.repos.createRelease({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                tag_name: tagName,
+                name: `Production Deploy ${date.split('T')[0]}`,
+                body: `## 🚀 Production Deployment
+
+                ### Deployment Information
+                - **Status**: ✅ Success
+                - **Environment**: Production
+                - **Deploy URL**: ${process.env.DEPLOY_URL || `https://${process.env.VERCEL_SUBDOMAIN}.vercel.app`}
+                - **Deployment Date**: ${date}
+                
+                ### Commit Details
+                - **SHA**: ${context.sha}
+                - **Author**: ${commitInfo.data.commit.author.name}
+                - **Message**: ${commitInfo.data.commit.message}
+                
+                ### Build Information
+                - **Workflow Run**: [View Details](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
+                - **Branch**: main
+                
+                ### 🔍 Additional Details
+                - Database migrations were applied
+                - Environment variables were updated
+                - Vercel deployment completed
+                
+                To rollback to a previous version, you can use the releases page to find the desired version.`,
+                prerelease: false,
+                generate_release_notes: true
+              });
+            }
+
+      - name: Notify on Failure
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { sha } = context;
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `⚠️ Production Deployment Failed - ${new Date().toISOString().split('T')[0]}`,
+              body: `## ❌ Production Deployment Failed
+              
+              ### Details
+              - **Commit**: ${sha}
+              - **Workflow Run**: [View Details](${runUrl})
+              - **Date**: ${new Date().toISOString()}
+              
+              Please check the workflow logs for more details on the failure.
+              
+              [View Workflow Logs](${runUrl})`
+            });
