@@ -45,12 +45,12 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
       try {
         const response = await fetch(`/api/getUser/${userId}`);
         const data = await response.json();
-        console.log('Fetched User Data:', data); // Adicionado para verificar os dados
+        /* console.log('Fetched User Data:', data); */
         setUserName(data.name || '');
         setImageUrl(data.imageUrl || null); // Defina a URL da imagem do estado do usuário
         setValue('name', data.name || '');
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        /* console.error('Error fetching user data:', error); */
       } finally {
         setLoading(false);
       }
@@ -90,8 +90,10 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
         const formData = new FormData();
         formData.append('file', imageFile);
 
+        const pathName = `users/id=${userId}/image-${Date.now()}`;
+
         const uploadResponse = await fetch(
-          `/api/uploadImage?pathname=users/id=${userId}/image-${Date.now()}&userId=${userId}`,
+          `/api/uploadImage?pathname=${encodeURIComponent(pathName)}&userId=${userId}`,
           {
             method: 'POST',
             body: formData,
@@ -99,7 +101,18 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
         );
 
         const uploadData = await uploadResponse.json();
-        finalImageUrl = uploadData.url; // Atualiza a URL final da nova imagem
+
+        if (!uploadData.url) {
+          throw new Error('Falha no upload: URL da imagem não foi retornada');
+        }
+
+        // 🧠 Log útil (opcional)
+        console.log('Nova imagem salva em:', uploadData.url);
+
+        finalImageUrl = uploadData.url;
+
+        // Delay para garantir propagação no blob storage
+        await new Promise((resolve) => setTimeout(resolve, 1500));
       }
 
       // Atualiza os dados do usuário, incluindo a URL da nova imagem
@@ -180,6 +193,7 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
                   height={180}
                   style={styles.formButtonImg}
                   priority
+                  unoptimized
                 />
               ) : imageUrl ? (
                 <Image
@@ -189,6 +203,7 @@ const EditProfileUser: React.FC<EditProfileUserProps> = ({ setFormData }) => {
                   height={180}
                   style={styles.formButtonImg}
                   priority
+                  unoptimized
                 />
               ) : (
                 <Image

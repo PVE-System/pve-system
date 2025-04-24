@@ -58,8 +58,60 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
         );
         const data = await response.json();
 
-        // Ordena os arquivos por data (mais recente primeiro)
-        const sortedFiles = data.files.sort((b: any, a: any) => {
+        const removeHashFromFileName = (fileName: string) => {
+          return fileName.replace(/-[^-]+\.[0-9a-z]+$/i, (match) => {
+            const ext = match.split('.').pop();
+            return `.${ext}`;
+          });
+        };
+
+        const decodeFileName = (fileName: string) => {
+          return decodeURIComponent(fileName);
+        };
+
+        const trimFileName = (name: string, maxLength = 40) => {
+          return name.length > maxLength
+            ? name.slice(0, maxLength) + '...'
+            : name;
+        };
+
+        const getUniqueFileName = (
+          baseName: string,
+          existingNames: string[],
+        ) => {
+          let name = baseName;
+          let counter = 1;
+
+          while (existingNames.includes(name)) {
+            const match = baseName.match(/(.*)(\.[^.]+)$/);
+            if (match) {
+              const [_, namePart, extension] = match;
+              name = `${namePart} (${counter})${extension}`;
+            } else {
+              name = `${baseName} (${counter})`;
+            }
+            counter++;
+          }
+
+          return name;
+        };
+
+        const cleanedNamesSet: string[] = [];
+
+        const treatedFiles = data.files.map((file: any) => {
+          const rawName = decodeFileName(removeHashFromFileName(file.name));
+          const trimmedName = trimFileName(rawName);
+          const uniqueName = getUniqueFileName(trimmedName, cleanedNamesSet);
+          cleanedNamesSet.push(uniqueName);
+
+          return {
+            ...file,
+            cleanedName: uniqueName,
+          };
+        });
+
+        // Ordenar por data (mais recente primeiro)
+        const sortedFiles = treatedFiles.sort((b: any, a: any) => {
           return new Date(b.date).getTime() - new Date(a.date).getTime();
         });
 
@@ -79,10 +131,13 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
       await fetchClientData();
       const folder =
         tabIndex === 0
-          ? `socialContract/id=${clientId}`
+          ? `quotations/id=${clientId}`
           : tabIndex === 1
-            ? `fiscalDocs/id=${clientId}`
-            : `accountingDocs/id=${clientId}`;
+            ? `socialContract/id=${clientId}`
+            : tabIndex === 2
+              ? `fiscalDocs/id=${clientId}`
+              : `accountingDocs/id=${clientId}`;
+
       await fetchFiles(folder);
       setLoading(false);
     };
@@ -94,49 +149,110 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
     setTabIndex(newValue);
     const folder =
       newValue === 0
-        ? `socialContract/id=${clientId}`
+        ? `quotations/id=${clientId}`
         : newValue === 1
-          ? `fiscalDocs/id=${clientId}`
-          : `accountingDocs/id=${clientId}`;
+          ? `socialContract/id=${clientId}`
+          : newValue === 2
+            ? `fiscalDocs/id=${clientId}`
+            : `accountingDocs/id=${clientId}`;
+
     fetchFiles(folder);
   };
 
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    const files = event.target.files;
-    if (files) {
+    const fileList = event.target.files; // renomeado para evitar conflito
+    if (fileList) {
       setLoadingUpload(true);
       const formData = new FormData();
-      formData.append('file', files[0]);
+      formData.append('file', fileList[0]);
       const folder =
         tabIndex === 0
-          ? `socialContract/id=${clientId}`
+          ? `quotations/id=${clientId}`
           : tabIndex === 1
-            ? `fiscalDocs/id=${clientId}`
-            : `accountingDocs/id=${clientId}`;
+            ? `socialContract/id=${clientId}`
+            : tabIndex === 2
+              ? `fiscalDocs/id=${clientId}`
+              : `accountingDocs/id=${clientId}`;
+
       try {
-        const response = await fetch(
-          `/api/uploadFilesClient?folder=${encodeURIComponent(folder)}&clientId=${clientId}`,
-          {
-            method: 'POST',
-            body: formData,
-          },
-        );
+        const uploadUrl =
+          tabIndex === 0
+            ? `/api/uploadQuoteFilesClient?folder=${encodeURIComponent(folder)}&clientId=${clientId}`
+            : `/api/uploadFilesClient?folder=${encodeURIComponent(folder)}&clientId=${clientId}`;
+
+        const response = await fetch(uploadUrl, {
+          method: 'POST',
+          body: formData,
+        });
 
         if (response.ok) {
           const newFile = await response.json();
 
-          // Adiciona o arquivo recém-enviado à lista de arquivos com nome formatado
+          const removeHashFromFileName = (fileName: string) => {
+            return fileName.replace(/-[^-]+\.[0-9a-z]+$/i, (match) => {
+              const ext = match.split('.').pop();
+              return `.${ext}`;
+            });
+          };
+
+          const decodeFileName = (fileName: string) => {
+            return decodeURIComponent(fileName);
+          };
+
+          const trimFileName = (name: string, maxLength = 40) => {
+            return name.length > maxLength
+              ? name.slice(0, maxLength) + '...'
+              : name;
+          };
+
+          const getUniqueFileName = (
+            baseName: string,
+            existingNames: string[],
+          ) => {
+            let name = baseName;
+            let counter = 1;
+
+            while (existingNames.includes(name)) {
+              const match = baseName.match(/(.*)(\.[^.]+)$/);
+              if (match) {
+                const [_, namePart, extension] = match;
+                name = `${namePart} (${counter})${extension}`;
+              } else {
+                name = `${baseName} (${counter})`;
+              }
+              counter++;
+            }
+
+            return name;
+          };
+
+          const rawFileName = decodeFileName(
+            removeHashFromFileName(fileList[0].name),
+          );
+          const formattedName = trimFileName(rawFileName);
+
+          // Aqui `files` é o estado com a lista dos arquivos já enviados
+          const existingNames = files.map(
+            (file: { name: string; cleanedName?: string }) =>
+              file.cleanedName || file.name,
+          );
+
+          const uniqueCleanedName = getUniqueFileName(
+            formattedName,
+            existingNames,
+          );
+
           const newFileWithDate = {
             ...newFile,
             date: new Date().toISOString(),
-            name: files[0].name, // Use o nome do arquivo que o usuário selecionou
+            name: fileList[0].name,
+            cleanedName: uniqueCleanedName, // aplicar nome único aqui
           };
 
           setFiles((prevFiles) => [...prevFiles, newFileWithDate]);
 
-          // Reiniciar o campo de input de arquivo
           event.target.value = '';
         } else {
           console.error('Error uploading file');
@@ -167,10 +283,13 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
         // Após deletar, reatualiza a lista de arquivos para garantir que tudo esteja sincronizado
         const folder =
           tabIndex === 0
-            ? `socialContract/id=${clientId}`
+            ? `quotations/id=${clientId}`
             : tabIndex === 1
-              ? `fiscalDocs/id=${clientId}`
-              : `accountingDocs/id=${clientId}`;
+              ? `socialContract/id=${clientId}`
+              : tabIndex === 2
+                ? `fiscalDocs/id=${clientId}`
+                : `accountingDocs/id=${clientId}`;
+
         await fetchFiles(folder);
       } else {
         const errorResponse = await response.json();
@@ -238,6 +357,21 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
                 },
               }}
             >
+              <Tab
+                label={
+                  {
+                    xs: 'Cotações',
+                    md: 'Cotações',
+                  }[window.innerWidth < 600 ? 'xs' : 'md']
+                }
+                sx={{
+                  textTransform: 'none',
+                  fontSize: {
+                    xs: '12px',
+                    md: '14px',
+                  },
+                }}
+              />
               <Tab
                 label={
                   {
@@ -312,20 +446,7 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
                         sx={{ marginRight: 1, color: 'darkOrange' }}
                       />
                       <ListItemText
-                        primary={
-                          file.name && file.name.includes('-')
-                            ? decodeURIComponent(
-                                file.name.split('-')[0],
-                              ).substring(0, 40) +
-                              (file.name.split('-')[0].length > 40
-                                ? '...'
-                                : '') +
-                              file.name
-                                .split('-')
-                                .pop()
-                                .match(/\.[0-9a-z]+$/i)[0]
-                            : file.name
-                        }
+                        primary={file.cleanedName}
                         secondary={new Date(file.date).toLocaleDateString(
                           'pt-BR',
                         )}

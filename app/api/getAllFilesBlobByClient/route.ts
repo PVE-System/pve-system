@@ -23,6 +23,9 @@ export async function GET(request: NextRequest) {
     const socialContractFiles = await list({
       prefix: `socialContract/id=${clientId}/`,
     });
+    const quotationsFiles = await list({
+      prefix: `quotations/id=${clientId}/`,
+    });
 
     // Combinar todos os arquivos das pastas atualizadas
     const allFiles = [
@@ -30,6 +33,7 @@ export async function GET(request: NextRequest) {
       ...(fiscalDocsFiles.blobs || []),
       ...(accountingDocsFiles.blobs || []),
       ...(socialContractFiles.blobs || []),
+      ...(quotationsFiles.blobs || []),
     ];
 
     if (allFiles.length === 0) {

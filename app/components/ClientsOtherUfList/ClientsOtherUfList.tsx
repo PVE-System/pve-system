@@ -42,37 +42,17 @@ const ClientsOtherUfList = () => {
   useEffect(() => {
     const fetchClients = async () => {
       try {
-        const response = await fetch('/api/getAllClients');
+        const response = await fetch(
+          '/api/getListAllClients?page=clientsOtherUfList',
+        );
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          throw new Error('Erro ao buscar clientes');
         }
         const data = await response.json();
-
-        // Remover a conversão para minúsculas e apenas limpar os estados
-        const cleanedClients = data.clients.map((client: Client) => ({
-          ...client,
-          state: client.state.trim(), // Remove apenas espaços extras
-        }));
-
-        const filteredClients = cleanedClients.filter((client: Client) => {
-          return !(
-            client.state.toLowerCase() === 'mato grosso' ||
-            client.state.toLowerCase() === 'mt' ||
-            client.state.toLowerCase() === 'mato grosso do sul' ||
-            client.state.toLowerCase() === 'ms'
-          );
-        });
-
-        // Ordenar os clientes pelo nome da empresa em ordem alfabética
-        const sortedClients = filteredClients.sort(
-          (a: { companyName: string }, b: { companyName: any }) =>
-            a.companyName.localeCompare(b.companyName),
-        );
-
-        setClients(sortedClients);
-        setLoading(false);
+        setClients(data.clients);
       } catch (error) {
-        console.error('Failed to fetch clients:', error);
+        console.error('Erro ao buscar clientes:', error);
+      } finally {
         setLoading(false);
       }
     };

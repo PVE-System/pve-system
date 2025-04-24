@@ -71,7 +71,7 @@ const AdminPageTabClientByUser = () => {
         if (!response.ok) throw new Error('Erro ao buscar usuários');
 
         const data = await response.json();
-        console.log('Usuários da API:', data);
+        /* console.log('Usuários da API:', data); */
 
         if (!data.users)
           throw new Error('A chave "users" não existe na resposta da API');

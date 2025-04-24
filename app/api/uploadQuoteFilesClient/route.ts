@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { del, list, put } from '@vercel/blob';
+import { put, list, del } from '@vercel/blob';
 
 export async function POST(request: NextRequest) {
   const formData = await request.formData();
-  const file = formData.get('file') as File; // Use File aqui, não Blob
+  const file = formData.get('file') as File;
   const folder = request.nextUrl.searchParams.get('folder');
-  const fileName = file?.name || `file-${Date.now()}`; // Use file.name para o nome
 
   if (!file || !folder) {
     return NextResponse.json(
@@ -15,30 +14,36 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const prefix = `${folder}/`;
+    const prefix = `${folder}/`; // Define o prefixo para buscar arquivos da pasta
     const existingFiles = await list({ prefix });
 
-    // Se já existem 10 ou mais arquivos, deleta o mais antigo
+    // Se tiver 10 ou mais arquivos, deletar o mais antigo
     if (existingFiles.blobs.length >= 10) {
+      // Ordenar por data de criação
       const sortedFiles = existingFiles.blobs.sort(
         (a, b) =>
           new Date(a.uploadedAt).getTime() - new Date(b.uploadedAt).getTime(),
       );
 
       const oldestFile = sortedFiles[0];
-      await del(oldestFile.url);
+
+      await del(oldestFile.url); // Deleta o arquivo mais antigo
       console.log(`Deleted oldest file: ${oldestFile.pathname}`);
     }
 
-    const { url } = await put(`${folder}/${fileName}`, file, {
+    const fileName = `${folder}/${file.name}`;
+
+    const { url } = await put(fileName, file, {
       access: 'public',
     });
 
-    return NextResponse.json({ url });
+    const uploadDate = new Date().toISOString();
+
+    return NextResponse.json({ url, date: uploadDate });
   } catch (error) {
-    console.error('Error uploading file:', error);
+    console.error('Error uploading quote file:', error);
     return NextResponse.json(
-      { error: 'An error occurred during the file upload' },
+      { error: 'An error occurred during the quote file upload' },
       { status: 500 },
     );
   }

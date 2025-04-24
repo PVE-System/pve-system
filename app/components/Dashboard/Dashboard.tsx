@@ -141,7 +141,7 @@ const DashboardComponent = () => {
                 {clientData.Normal}
               </Typography>
               <Button
-                title="Confira estes clientes"
+                title="Confira a lista destes clientes"
                 onClick={() => (window.location.href = '/clientsNormalList')}
                 sx={{
                   ...styles.cardButton,
@@ -176,7 +176,7 @@ const DashboardComponent = () => {
                 {clientData.Especial}
               </Typography>
               <Button
-                title="Confira estes clientes"
+                title="Confira a lista destes clientes"
                 onClick={() => (window.location.href = '/clientsEspecialList')}
                 sx={{
                   ...styles.cardButton,
@@ -210,7 +210,7 @@ const DashboardComponent = () => {
                 {clientData.Suspenso}
               </Typography>
               <Button
-                title="Confira estes clientes"
+                title="Confira a lista destes clientes"
                 sx={{
                   ...styles.cardButton,
                   backgroundColor: 'red',
@@ -257,6 +257,14 @@ const DashboardComponent = () => {
             <Typography sx={styles.accordionTitle}>
               <span>{ratingCounts.active}</span> Clientes ativos
             </Typography>
+            <FormatListBulletedIcon
+              sx={styles.accordionIconList}
+              onClick={(e) => {
+                e.stopPropagation(); // Evita que o clique no ícone expanda/colapse o Accordion
+                window.location.href = '/clientsRating3List'; // Redireciona o usuário
+              }}
+              titleAccess="Confira a lista destes clientes" // Texto que aparece ao passar o mouse por cima
+            />
           </AccordionSummary>
           <AccordionDetails>
             <Typography
@@ -269,14 +277,6 @@ const DashboardComponent = () => {
               <br />
               São clientes fidelizados que temos um bom relacionamento.
             </Typography>
-            <FormatListBulletedIcon
-              sx={styles.accordionIconList}
-              onClick={(e) => {
-                e.stopPropagation(); // Evita que o clique no ícone expanda/colapse o Accordion
-                window.location.href = '/clientsRating3List'; // Redireciona o usuário
-              }}
-              titleAccess="Confira a lista de clientes" // Texto que aparece ao passar o mouse por cima
-            />
           </AccordionDetails>
         </Accordion>
         <Accordion
@@ -300,6 +300,14 @@ const DashboardComponent = () => {
             <Typography sx={styles.accordionTitle}>
               <span>{ratingCounts.moderate}</span> Clientes moderado
             </Typography>
+            <FormatListBulletedIcon
+              sx={styles.accordionIconList}
+              onClick={(e) => {
+                e.stopPropagation(); // Evita que o clique no ícone expanda/colapse o Accordion
+                window.location.href = '/clientsRating2List'; // Redireciona o usuário
+              }}
+              titleAccess="Confira a lista destes clientes"
+            />
           </AccordionSummary>
           <AccordionDetails>
             <Typography
@@ -312,14 +320,6 @@ const DashboardComponent = () => {
               <br />
               Compensa analisar os motivos e tentar fechar mais pedidos.
             </Typography>
-            <FormatListBulletedIcon
-              sx={styles.accordionIconList}
-              onClick={(e) => {
-                e.stopPropagation(); // Evita que o clique no ícone expanda/colapse o Accordion
-                window.location.href = '/clientsRating2List'; // Redireciona o usuário
-              }}
-              titleAccess="Confira a lista de clientes"
-            />
           </AccordionDetails>
         </Accordion>
         <Accordion
@@ -343,6 +343,14 @@ const DashboardComponent = () => {
             <Typography sx={styles.accordionTitle}>
               <span>{ratingCounts.inactive}</span> Clientes pouco ativo
             </Typography>
+            <FormatListBulletedIcon
+              sx={styles.accordionIconList}
+              onClick={(e) => {
+                e.stopPropagation(); // Evita que o clique no ícone expanda/colapse o Accordion
+                window.location.href = '/clientsRating1List'; // Redireciona o usuário
+              }}
+              titleAccess="Confira a lista destes clientes"
+            />
           </AccordionSummary>
           <AccordionDetails>
             <Typography
@@ -356,14 +364,6 @@ const DashboardComponent = () => {
               Importante fazer uma análise, entender os motivos, e se necessário
               elaborar alguma estratégia.
             </Typography>
-            <FormatListBulletedIcon
-              sx={styles.accordionIconList}
-              onClick={(e) => {
-                e.stopPropagation(); // Evita que o clique no ícone expanda/colapse o Accordion
-                window.location.href = '/clientsRating1List'; // Redireciona o usuário
-              }}
-              titleAccess="Confira a lista de clientes"
-            />
           </AccordionDetails>
         </Accordion>
       </Box>

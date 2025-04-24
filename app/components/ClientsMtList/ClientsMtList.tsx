@@ -42,27 +42,17 @@ const ClientMtList = () => {
   useEffect(() => {
     const fetchClients = async () => {
       try {
-        const response = await fetch('/api/getAllClients');
+        const response = await fetch(
+          '/api/getListAllClients?page=clientsMtList',
+        );
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          throw new Error('Erro ao buscar clientes');
         }
         const data = await response.json();
-
-        // Filtrar os clientes com base no estado sem converter para minúsculas
-        const filteredClients = data.clients.filter((client: Client) => {
-          return client.state === 'Mato Grosso' || client.state === 'MT';
-        });
-
-        // Ordenar os clientes pelo nome da empresa em ordem alfabética
-        const sortedClients = filteredClients.sort(
-          (a: { companyName: string }, b: { companyName: string }) =>
-            a.companyName.localeCompare(b.companyName),
-        );
-
-        setClients(sortedClients);
-        setLoading(false);
+        setClients(data.clients);
       } catch (error) {
-        console.error('Failed to fetch clients:', error);
+        console.error('Erro ao buscar clientes:', error);
+      } finally {
         setLoading(false);
       }
     };

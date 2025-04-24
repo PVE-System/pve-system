@@ -297,7 +297,7 @@ const RegisterClient: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    console.log('Usuários carregados:', users);
+    /* console.log('Usuários carregados:', users); */
   }, [users]);
 
   //Grupo Empresarial Start
@@ -583,7 +583,12 @@ const RegisterClient: React.FC = () => {
                     /* Renderizar os outros campos normalmente */
                     <TextField
                       name={key}
-                      value={formData[key as keyof typeof formData]}
+                      /* value={formData[key as keyof typeof formData]} */
+                      value={
+                        key === 'city' && !cities.includes(formData.city)
+                          ? ''
+                          : formData[key as keyof typeof formData]
+                      }
                       onChange={(event) => {
                         const target = event.target as HTMLInputElement;
                         const { value } = target;
@@ -700,11 +705,15 @@ const RegisterClient: React.FC = () => {
                 >
                   Fechar
                 </Button>
-                <Link href={`/clientPage?id=${duplicateClient?.id}`}>
+                <a
+                  href={`/clientPage?id=${duplicateClient?.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <Button variant="contained" sx={sharedStyles.modalButton}>
                     Ver Cliente
                   </Button>
-                </Link>
+                </a>
               </Box>
             </Modal>
           </Box>

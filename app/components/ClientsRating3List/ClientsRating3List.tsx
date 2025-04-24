@@ -13,6 +13,10 @@ import {
   Box,
   useMediaQuery,
   CircularProgress,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
 import { Rating } from '@mui/material';
 import styles from '../ClientsMsList/styles';
@@ -23,6 +27,7 @@ interface Client {
   corfioCode: string;
   clientCondition: string;
   rating: number;
+  state: string;
 }
 
 // Função para renderizar o nome do cliente como está no banco de dados
@@ -36,32 +41,21 @@ const renderAsIs = (str: any) => {
 const ClientsRating3List = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState('MS');
   const isSmallScreen = useMediaQuery('(max-width:600px)');
 
   useEffect(() => {
     const fetchClients = async () => {
       try {
-        const response = await fetch('/api/getAllClients');
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-
-        // Filtrar clientes com rating 3
-        const filteredClients = data.clients.filter((client: Client) => {
-          return client.rating === 3;
-        });
-
-        // Ordenar os clientes pelo nome da empresa em ordem alfabética
-        const sortedClients = filteredClients.sort(
-          (a: { companyName: string }, b: { companyName: string }) =>
-            a.companyName.localeCompare(b.companyName),
+        const response = await fetch(
+          '/api/getListAllClients?page=clientsRating3List',
         );
-
-        setClients(sortedClients);
-        setLoading(false);
+        if (!response.ok) throw new Error('Erro ao buscar clientes');
+        const data = await response.json();
+        setClients(data.clients);
       } catch (error) {
-        console.error('Failed to fetch clients:', error);
+        console.error('Erro ao buscar clientes:', error);
+      } finally {
         setLoading(false);
       }
     };
@@ -73,6 +67,14 @@ const ClientsRating3List = () => {
     window.location.href = `/clientPage?id=${clientId}`;
   };
 
+  const filteredClients = clients.filter((client) => {
+    if (filter === 'MS') return client.state === 'MS';
+    if (filter === 'MT') return client.state === 'MT';
+    if (filter === 'OUTRAS')
+      return client.state !== 'MS' && client.state !== 'MT';
+    return true;
+  });
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center">
@@ -83,6 +85,21 @@ const ClientsRating3List = () => {
 
   return (
     <Container maxWidth="lg" sx={styles.container}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
+        <FormControl sx={{ minWidth: 200 }}>
+          <InputLabel id="filter-label">Filtrar por UF</InputLabel>
+          <Select
+            labelId="filter-label"
+            value={filter}
+            label="Filtrar por UF"
+            onChange={(e) => setFilter(e.target.value)}
+          >
+            <MenuItem value="MS">MS</MenuItem>
+            <MenuItem value="MT">MT</MenuItem>
+            <MenuItem value="OUTRAS">Outras UF</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
       <TableContainer>
         <Table>
           <TableHead>
@@ -90,6 +107,7 @@ const ClientsRating3List = () => {
               <TableCell sx={styles.fontSize}>Cliente:</TableCell>
               {!isSmallScreen && (
                 <>
+                  <TableCell sx={styles.fontSize}>Estado:</TableCell>
                   <TableCell sx={styles.fontSize}>Cód. Corfio:</TableCell>
                   <TableCell sx={styles.fontSize}>Condição:</TableCell>
                   <TableCell sx={styles.fontSize}>Status:</TableCell>
@@ -98,66 +116,77 @@ const ClientsRating3List = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {clients.map((client) => (
-              <TableRow
-                key={client.id}
-                sx={{ ...styles.rowHover, cursor: 'pointer' }}
-                onClick={() => handleRowClick(client.id)}
-              >
-                <TableCell sx={styles.fontSize}>
-                  {renderAsIs(client.companyName.slice(0, 50))}
+            {filteredClients.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} align="center">
+                  Nenhum cliente encontrado para a UF selecionada.
                 </TableCell>
-                {!isSmallScreen && (
-                  <>
-                    <TableCell sx={styles.fontSize}>
-                      {client.corfioCode}
-                    </TableCell>
-                    <TableCell sx={styles.fontSize}>
-                      <Button
-                        sx={{
-                          ...styles.buttonTagCondition,
-                          backgroundColor:
-                            client.clientCondition === 'Normal'
-                              ? 'green'
-                              : client.clientCondition === 'Especial'
-                                ? 'orange'
-                                : client.clientCondition === 'Suspenso'
-                                  ? 'red'
-                                  : 'grey',
-                          color:
-                            client.clientCondition === 'Especial'
-                              ? 'black'
-                              : 'white',
-                          '&:hover': {
+              </TableRow>
+            ) : (
+              filteredClients.map((client) => (
+                <TableRow
+                  key={client.id}
+                  sx={{ ...styles.rowHover, cursor: 'pointer' }}
+                  onClick={() => handleRowClick(client.id)}
+                >
+                  <TableCell sx={styles.fontSize}>
+                    {renderAsIs(client.companyName.slice(0, 50))}
+                  </TableCell>
+                  {!isSmallScreen && (
+                    <>
+                      <TableCell sx={styles.fontSize}>
+                        {client.state || '-'}
+                      </TableCell>
+                      <TableCell sx={styles.fontSize}>
+                        {client.corfioCode}
+                      </TableCell>
+                      <TableCell sx={styles.fontSize}>
+                        <Button
+                          sx={{
+                            ...styles.buttonTagCondition,
                             backgroundColor:
                               client.clientCondition === 'Normal'
-                                ? ' green' // Cor de fundo do hover para 'Normal'
+                                ? 'green'
                                 : client.clientCondition === 'Especial'
-                                  ? ' orange' // Cor de fundo do hover para 'Especial'
+                                  ? 'orange'
                                   : client.clientCondition === 'Suspenso'
-                                    ? ' red' // Cor de fundo do hover para 'Suspenso'
+                                    ? 'red'
                                     : 'grey',
-                          },
-                        }}
-                        variant="contained"
-                        size="small"
-                      >
-                        {client.clientCondition}
-                      </Button>
-                    </TableCell>
-                    <TableCell sx={styles.fontSize}>
-                      <Rating
-                        name={`rating-${client.id}`}
-                        value={client.rating}
-                        readOnly
-                        size="medium"
-                        max={3}
-                      />
-                    </TableCell>
-                  </>
-                )}
-              </TableRow>
-            ))}
+                            color:
+                              client.clientCondition === 'Especial'
+                                ? 'black'
+                                : 'white',
+                            '&:hover': {
+                              backgroundColor:
+                                client.clientCondition === 'Normal'
+                                  ? ' green' // Cor de fundo do hover para 'Normal'
+                                  : client.clientCondition === 'Especial'
+                                    ? ' orange' // Cor de fundo do hover para 'Especial'
+                                    : client.clientCondition === 'Suspenso'
+                                      ? ' red' // Cor de fundo do hover para 'Suspenso'
+                                      : 'grey',
+                            },
+                          }}
+                          variant="contained"
+                          size="small"
+                        >
+                          {client.clientCondition}
+                        </Button>
+                      </TableCell>
+                      <TableCell sx={styles.fontSize}>
+                        <Rating
+                          name={`rating-${client.id}`}
+                          value={client.rating}
+                          readOnly
+                          size="medium"
+                          max={3}
+                        />
+                      </TableCell>
+                    </>
+                  )}
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </TableContainer>

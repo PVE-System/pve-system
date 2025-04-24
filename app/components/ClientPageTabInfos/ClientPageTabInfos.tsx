@@ -576,7 +576,9 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
 
             return (
               <Box key={name}>
-                <Typography variant="subtitle1">{label}</Typography>
+                <Typography variant="subtitle1" component="div">
+                  {label}
+                </Typography>
                 <Controller
                   name={name}
                   control={control}
