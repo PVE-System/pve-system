@@ -14,6 +14,7 @@ import NotesIcon from '@mui/icons-material/Notes';
 import AdminPageTabClientByUser from '../AdminPageTabClientByUser/AdminPageTabClientByUser';
 import styles from './styles';
 import AdminPageTabUsersManager from '../AdminPageTabUsersManager/AdminPageTabUsersManager';
+import AdminPageTabQuotationManager from '../AdminPageTabQuotationManager/AdminPageTabQuotationManager';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -90,7 +91,7 @@ export default function AdminPageComponent() {
               {...a11yProps(1)}
             />
             <Tab
-              label="Aba 3"
+              label="Gerenciar cotações"
               icon={<NotesIcon />}
               sx={{
                 fontSize: '12px',
@@ -117,7 +118,7 @@ export default function AdminPageComponent() {
           </Box>
         </AdminTabPanel>
         <AdminTabPanel value={value} index={2}>
-          Possibilidade de conteúdo para Aba 3
+          <AdminPageTabQuotationManager />
         </AdminTabPanel>
       </Box>
     </Container>

@@ -53,6 +53,14 @@ Example: The /api/getClient route is implemented in `app/api/getClient/route.ts`
 The project uses Drizzle ORM for database management with PostgreSQL, offering an approach with efficient migrations, schema definitions and queries.
 This ensures that database operations are reliable, easy to maintain, and in line with TypeScript's strong typing.
 
+⚠️ Important:
+
+Due to some functionalities that emerged after the project went into production, it’s important to know that:
+
+- The `clients` table does not have a direct foreign key to the `users` table.
+- However, the `responsibleSeller` field in `clients` stores the same value as `operatorNumber` in `users`, creating a relationship between the tables.
+- Check out a method that has been implemented and documented in the file `app/api/getSalesQuotesByState/route.ts`.
+
 Spin up the database with:
 
 ```bash
