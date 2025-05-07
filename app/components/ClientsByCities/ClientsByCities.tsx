@@ -61,11 +61,24 @@ const ClientsByCities = () => {
       setAllClients(data.clients); // Armazena a lista completa de clientes do estado
       setClients(data.clients); // Inicialmente, todos os clientes
 
-      const uniqueCities = Array.from(
-        new Set(data.clients.map((client: Client) => client.city)),
-      ) as string[];
+      //ordenar as cidades de A a Z
+      const uniqueSortedCities = Array.from(
+        new Set(
+          data.clients.map((client: Client) => client.city),
+        ) as Set<string>,
+      )
+        .filter(
+          (city): city is string =>
+            typeof city === 'string' && city.trim() !== '',
+        )
+        .sort((a, b) => {
+          const normalize = (s: string) => s.trim().toLowerCase();
+          return normalize(a).localeCompare(normalize(b), 'pt-BR', {
+            sensitivity: 'base',
+          });
+        });
 
-      setAvailableCities(uniqueCities);
+      setAvailableCities(uniqueSortedCities);
     } catch (error) {
       console.error('Erro ao buscar clientes:', error);
     } finally {
@@ -126,7 +139,7 @@ const ClientsByCities = () => {
         }}
       >
         {/* Select de Estados */}
-        <FormControl sx={{ minWidth: 200 }}>
+        <FormControl sx={{ maxWidth: 250, width: '100%' }}>
           <InputLabel id="state-filter-label">Filtrar por UF</InputLabel>
           <Select
             labelId="state-filter-label"
@@ -141,15 +154,20 @@ const ClientsByCities = () => {
         </FormControl>
 
         {stateFilter && (
-          <FormControl sx={{ minWidth: 200 }}>
+          <FormControl sx={{ maxWidth: 250, width: '100%' }}>
             <InputLabel id="city-filter-label">Filtrar por Cidade</InputLabel>
             <Select
               labelId="city-filter-label"
-              value={cityFilter}
+              value={cityFilter || 'Todas as cidades'}
               label="Filtrar por Cidade"
-              onChange={(e) => setCityFilter(e.target.value)}
+              onChange={(e) =>
+                setCityFilter(
+                  e.target.value === 'Todas as cidades' ? '' : e.target.value,
+                )
+              }
               disabled={!stateFilter}
             >
+              <MenuItem value="Todas as cidades">Todas as cidades</MenuItem>
               {availableCities.length > 0 ? (
                 availableCities.map((city) => (
                   <MenuItem key={city} value={city}>
@@ -178,7 +196,7 @@ const ClientsByCities = () => {
                 <>
                   <TableCell sx={styles.fontSize}>Estado:</TableCell>
                   <TableCell sx={styles.fontSize}>Cidade:</TableCell>
-                  <TableCell sx={styles.fontSize}>Cód. Corfio:</TableCell>
+                  <TableCell sx={styles.fontSize}>Cód.Corfio:</TableCell>
                   <TableCell sx={styles.fontSize}>Condição:</TableCell>
                   <TableCell sx={styles.fontSize}>Status:</TableCell>
                 </>

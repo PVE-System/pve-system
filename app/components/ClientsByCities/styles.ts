@@ -28,7 +28,7 @@ const styles = {
   },
 
   fontSize: {
-    fontSize: '16px',
+    fontSize: '14px',
     '@media (max-width: 450px)': {
       fontSize: '12px',
       hover: 'none',

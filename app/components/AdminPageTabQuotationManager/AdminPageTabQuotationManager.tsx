@@ -36,6 +36,7 @@ interface SalesQuote {
 }
 
 interface ClientWithQuotes extends Client {
+  businessGroup: string;
   cpf: string | undefined;
   sellerName: any;
   salesQuotes: any;
@@ -115,11 +116,11 @@ const SalesQuotesByState = () => {
 
       // Cabeçalho com nova ordem
       let textToCopy =
-        'CNPJ ou CPF\tNome da Empresa\tCódigo Corfio\tEstado\tCidade\tResponsável\tCotação\n';
+        'CNPJ ou CPF\tNome da Empresa\tCódigo Corfio\tGrupo Empresarial\tEstado\tCidade\tResponsável\tCotação\n';
 
       clientsWithQuotes.forEach((client) => {
         client.quotes.forEach((quote) => {
-          textToCopy += `${client.cnpj || client.cpf || ''}\t${client.companyName}\t${client.corfioCode || ''}\t${client.state}\t${client.city || ''}\t${client.responsibleSeller || ''}\t${quote.quoteName}\n`;
+          textToCopy += `${client.cnpj || client.cpf || ''}\t${client.companyName}\t${client.corfioCode || ''}\t${client.businessGroup || ''}\t${client.state}\t${client.city || ''}\t${client.responsibleSeller || ''}\t${quote.quoteName}\n`;
         });
       });
 
