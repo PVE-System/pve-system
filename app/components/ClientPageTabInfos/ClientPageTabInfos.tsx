@@ -13,6 +13,7 @@ import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
 import styles from '@/app/components/ClientPageTabInfos/styles';
 import { jsPDF } from 'jspdf';
 import { User } from '@/app/db';
+import { SalesQuote, salesQuotes } from '@/app/db/schema';
 
 interface ClientPageTabInfosProps {
   clientId: string;
@@ -38,6 +39,7 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
   const [users, setUsers] = useState<
     { operatorNumber: string; name: string }[]
   >([]);
+  const [salesQuotes, setSalesQuotes] = useState<SalesQuote[]>([]);
 
   //Get Client Start
 
@@ -69,39 +71,6 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
       });
   }, [clientId, setValue]);
 
-  /* useEffect(() => {
-    if (!clientId || isNaN(Number(clientId))) {
-      console.error('Invalid client ID:', clientId);
-      return;
-    }
-
-    const baseUrl =
-      process.env.NODE_ENV === 'production'
-        ? 'https://pve-system.vercel.app'
-        : 'http://localhost:3000';
-
-    fetch(`${baseUrl}/api/getClient/${clientId}`)
-      .then((response) => {
-        if (!response.ok) {
-          console.error('Network response was not ok');
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then((data) => {
-        console.log('Client data received:', data);
-        setClientData(data);
-        setLoading(false);
-        Object.keys(data).forEach((key) => {
-          setValue(key, data[key]);
-        });
-      })
-      .catch((error) => {
-        console.error('Error fetching client data:', error);
-        setLoading(false);
-      });
-  }, [clientId, setValue]); */
-
   //Get Client End
 
   // Buscar os grupos empresariais
@@ -127,6 +96,29 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
     return group ? group.name : 'Grupo não encontrado';
   };
 
+  // Função para obter as cotações
+
+  useEffect(() => {
+    const fetchSalesQuotes = async () => {
+      const clientId = clientData.id;
+      const currentYear = new Date().getFullYear();
+
+      try {
+        const response = await fetch(
+          `/api/getSalesQuotes?clientId=${clientId}&year=${currentYear}`,
+        );
+        if (!response.ok) throw new Error('Erro ao buscar cotações');
+
+        const data = await response.json();
+        setSalesQuotes(data.quotes); // ou outro estado conforme seu uso
+      } catch (error) {
+        console.error('Erro ao buscar cotações:', error);
+      }
+    };
+
+    if (clientData?.id) fetchSalesQuotes(); // Evita fetch prematuro sem clientId
+  }, [clientData]);
+
   //Get salesInformation Start
 
   useEffect(() => {
@@ -151,34 +143,6 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
         console.error('Error fetching sales data:', error);
       });
   }, [clientId]);
-
-  /*   useEffect(() => {
-    if (!clientId || isNaN(Number(clientId))) {
-      console.error('Invalid client ID:', clientId);
-      return;
-    }
-
-    const baseUrl =
-      process.env.NODE_ENV === 'production'
-        ? 'https://pve-system.vercel.app'
-        : 'http://localhost:3000';
-
-    fetch(`${baseUrl}/api/getSalesInformation/${clientId}`)
-      .then((response) => {
-        if (!response.ok) {
-          console.error('Network response was not ok');
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then((data) => {
-        console.log('Sales data received from API:', data); // Verifique os dados recebidos
-        setSalesData(data); // Atualiza os dados de vendas
-      })
-      .catch((error) => {
-        console.error('Error fetching sales data:', error);
-      });
-  }, [clientId]); */
 
   //Get salesInformation END
 
@@ -318,15 +282,13 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
     clientData: { [key: string]: any },
     salesData: { [key: string]: any },
     businessGroups: { id: string | number; name: string }[],
+    salesQuotes: { clientId: number }[],
   ) => {
+    console.log('SalesQuotes recebidas:', salesQuotes);
+    console.log('ID do cliente atual:', clientData.id);
+
     // Exclui os campos irrelevantes para exportação
-    const excludedFields = [
-      'id',
-      'createdAt',
-      'rating',
-      'clientCondition',
-      'imageUrl',
-    ];
+    const excludedFields = ['id', 'createdAt', 'clientCondition', 'imageUrl'];
 
     // Ordem das colunas no Excel para clientes
     const clientExcelColumnOrder = [
@@ -361,6 +323,8 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
       'companyLocation',
       'marketSegmentNature',
       'businessGroupId',
+      'rating',
+      'totalQuotes',
     ];
 
     // Ordem das colunas no Excel para sales_information
@@ -372,6 +336,10 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
       'financial',
       'invoice',
     ];
+    // calc total de cotações
+    const totalQuotes = salesQuotes.filter(
+      (quote) => Number(quote.clientId) === Number(clientData.id),
+    ).length;
 
     // Organiza os dados dos clientes na ordem das colunas do Excel
     const clientValues = clientExcelColumnOrder.map((key) => {
@@ -392,6 +360,18 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
         const operatorNumber = clientData[key];
         const user = users.find((u) => u.operatorNumber === operatorNumber);
         return user ? `${user.operatorNumber} - ${user.name}` : operatorNumber;
+      }
+
+      if (key === 'rating') {
+        const ratingMap: { [key: number]: string } = {
+          1: '1 - Pouco ativo',
+          2: '2 - Moderado',
+          3: '3 - Ativo',
+        };
+        return ratingMap[clientData.rating] || 'Sem Status';
+      }
+      if (key === 'totalQuotes') {
+        return totalQuotes.toString();
       }
 
       return clientData[key] || ''; // Retorna o valor do campo ou vazio se não houver
@@ -525,6 +505,7 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
                     clientData,
                     salesData,
                     businessGroups,
+                    salesQuotes,
                   );
                 }}
                 sx={styles.exportExcelButton}

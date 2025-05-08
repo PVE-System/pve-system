@@ -20,6 +20,7 @@ export async function GET(request: NextRequest) {
         id: salesQuotes.id,
         quoteIdentifier: salesQuotes.quoteName,
         date: salesQuotes.date,
+        clientId: salesQuotes.clientId,
       })
       .from(salesQuotes)
       .where(
