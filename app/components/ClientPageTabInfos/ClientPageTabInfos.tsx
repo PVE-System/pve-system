@@ -119,6 +119,21 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
     if (clientData?.id) fetchSalesQuotes(); // Evita fetch prematuro sem clientId
   }, [clientData]);
 
+  //// Função para obter as cotações referente aos 3 ultimos anos
+  async function fetchQuotesByClientLastThreeYears(clientId: number) {
+    const currentYear = new Date().getFullYear();
+    const startYear = currentYear - 2;
+
+    const response = await fetch(
+      `/api/getSalesQuotesByYears?clientId=${clientId}&startYear=${startYear}`,
+    );
+
+    if (!response.ok) throw new Error('Erro ao buscar cotações');
+    const data = await response.json();
+
+    return data;
+  }
+
   //Get salesInformation Start
 
   useEffect(() => {
@@ -278,14 +293,40 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
   //End Export PDF
 
   // Start Export EXCEL
-  const copyClientAndSalesDataToClipboard = (
+  const copyClientAndSalesDataToClipboard = async (
     clientData: { [key: string]: any },
     salesData: { [key: string]: any },
     businessGroups: { id: string | number; name: string }[],
-    salesQuotes: { clientId: number }[],
+    salesQuotes: {
+      createdAt: string | number | Date;
+      clientId: number;
+    }[],
   ) => {
     console.log('SalesQuotes recebidas:', salesQuotes);
     console.log('ID do cliente atual:', clientData.id);
+
+    // ✅ Anos dinâmicos
+    const apiResponse = await fetchQuotesByClientLastThreeYears(clientData.id);
+
+    // Transforma o array em um objeto indexado por ano
+    const totalQuotesByYear = apiResponse.data.reduce(
+      (
+        acc: { [year: number]: number },
+        item: { year: number; total: number },
+      ) => {
+        acc[item.year] = item.total;
+        return acc;
+      },
+      {},
+    );
+
+    const currentYear = new Date().getFullYear();
+    const years = [currentYear, currentYear - 1, currentYear - 2];
+
+    // Preenche os valores na ordem correta
+    const totalQuotesCurrent = totalQuotesByYear[currentYear] || 0;
+    const totalQuotesLastYear = totalQuotesByYear[currentYear - 1] || 0;
+    const totalQuotesTwoYearsAgo = totalQuotesByYear[currentYear - 2] || 0;
 
     // Exclui os campos irrelevantes para exportação
     const excludedFields = ['id', 'createdAt', 'clientCondition', 'imageUrl'];
@@ -324,7 +365,10 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
       'marketSegmentNature',
       'businessGroupId',
       'rating',
-      'totalQuotes',
+      /* 'totalQuotes', */
+      'totalQuotesCurrent',
+      'totalQuotesLastYear',
+      'totalQuotesTwoYearsAgo',
     ];
 
     // Ordem das colunas no Excel para sales_information
@@ -337,9 +381,20 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
       'invoice',
     ];
     // calc total de cotações
-    const totalQuotes = salesQuotes.filter(
+    /*     const totalQuotes = salesQuotes.filter(
       (quote) => Number(quote.clientId) === Number(clientData.id),
-    ).length;
+    ).length; */
+
+    // ✅ Cria um mapa com a contagem por ano
+    const quotesByYear: { [year: number]: number } = {};
+    years.forEach((year) => {
+      quotesByYear[year] = salesQuotes.filter((quote) => {
+        const quoteYear = new Date(quote.createdAt).getFullYear();
+        return (
+          Number(quote.clientId) === Number(clientData.id) && quoteYear === year
+        );
+      }).length;
+    });
 
     // Organiza os dados dos clientes na ordem das colunas do Excel
     const clientValues = clientExcelColumnOrder.map((key) => {
@@ -370,8 +425,19 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
         };
         return ratingMap[clientData.rating] || 'Sem Status';
       }
-      if (key === 'totalQuotes') {
+      /* if (key === 'totalQuotes') {
         return totalQuotes.toString();
+      } */
+      if (key === 'totalQuotesCurrent') return totalQuotesCurrent.toString();
+      if (key === 'totalQuotesLastYear') return totalQuotesLastYear.toString();
+      if (key === 'totalQuotesTwoYearsAgo')
+        return totalQuotesTwoYearsAgo.toString();
+
+      // ✅ Preenche os campos totalQuotesYYYY
+      const match = key.match(/^totalQuotes(\d{4})$/);
+      if (match) {
+        const year = Number(match[1]);
+        return quotesByYear[year]?.toString() || '0';
       }
 
       return clientData[key] || ''; // Retorna o valor do campo ou vazio se não houver
