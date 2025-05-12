@@ -104,7 +104,7 @@ const AdminPageTabClientByUser = () => {
     const fetchClients = async () => {
       setLoadingClients(true);
       try {
-        const response = await fetch('/api/getAllClients');
+        const response = await fetch('/api/getClientsByUser');
         if (!response.ok) throw new Error('Erro ao buscar clientes');
 
         const data = await response.json();
@@ -113,7 +113,6 @@ const AdminPageTabClientByUser = () => {
         if (!data.clients)
           throw new Error('A chave "clients" não existe na resposta da API');
 
-        // 🛠 Log dos dados para checar valores de responsibleSeller
         console.log(
           'Clientes mapeados:',
           data.clients.map((c: Client) => ({
@@ -122,30 +121,15 @@ const AdminPageTabClientByUser = () => {
           })),
         );
 
-        // Filtrar clientes pelo operador selecionado
+        // Apenas filtra os clientes (ordem já vem do backend)
         const filteredClients = data.clients.filter(
           (client: Client) =>
             String(client.responsibleSeller) === String(selectedOperator),
         );
 
         console.log('Clientes filtrados:', filteredClients);
-        // Ordenar clientes pelo nome da empresa (A a Z)
-        const sortedClients = filteredClients.sort((a: Client, b: Client) =>
-          a.companyName
-            .trim()
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .localeCompare(
-              b.companyName
-                .trim()
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, ''),
-              'pt-BR',
-              { sensitivity: 'base' },
-            ),
-        );
 
-        setClients(sortedClients); // Atualiza o estado com a lista ordenada
+        setClients(filteredClients); // Atualiza o estado
       } catch (error) {
         console.error('Erro ao buscar clientes:', error);
       } finally {

@@ -27,6 +27,8 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import CloseIcon from '@mui/icons-material/Close';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import CorporateFareIcon from '@mui/icons-material/CorporateFare';
+import PublicIcon from '@mui/icons-material/Public';
+/* import HomeWorkIcon from '@mui/icons-material/HomeWork'; */
 import { useMediaQuery } from '@mui/material';
 import { useTheme } from '@/app/theme/ThemeContext';
 import styles from '@/app/components/MenuNav/styles';
@@ -154,6 +156,11 @@ export default function TemporaryDrawer() {
             name: 'Outras UF',
             icon: <BusinessIcon />,
             link: '/clientsOtherUfList',
+          },
+          {
+            name: 'Por Cidades',
+            icon: <PublicIcon />,
+            link: '/clientsByCities',
           },
           {
             name: 'Cadastrar Cliente',

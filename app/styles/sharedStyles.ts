@@ -40,6 +40,7 @@ const sharedStyles = {
 
   subtitleSize: {
     fontFamily: `'Montserrat', sans-serif`,
+    textAlign: 'center',
 
     // FontSize Desktop
     fontSize: '18px',

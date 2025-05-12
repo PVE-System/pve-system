@@ -118,7 +118,7 @@ function RegisterTeamComponent() {
             priority
           />
         </Box>
-        <Typography variant="subtitle1" sx={sharedStyles.titleForm}>
+        <Typography variant="subtitle1" sx={sharedStyles.subtitleSize}>
           Digite email e senha para cadastrar equipe.
         </Typography>
 

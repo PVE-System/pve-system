@@ -41,7 +41,7 @@ const renderAsIs = (str: any) => {
 const ClientsRating1List = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('MS');
+  const [filter, setFilter] = useState('');
   const isSmallScreen = useMediaQuery('(max-width:600px)');
 
   useEffect(() => {
@@ -90,10 +90,15 @@ const ClientsRating1List = () => {
           <InputLabel id="filter-label">Filtrar por UF</InputLabel>
           <Select
             labelId="filter-label"
-            value={filter}
+            value={filter || 'Todos Estados'}
             label="Filtrar por UF"
-            onChange={(e) => setFilter(e.target.value)}
+            onChange={(e) =>
+              setFilter(
+                e.target.value === 'Todos Estados' ? '' : e.target.value,
+              )
+            }
           >
+            <MenuItem value="Todos Estados">Todos Estados</MenuItem>
             <MenuItem value="MS">MS</MenuItem>
             <MenuItem value="MT">MT</MenuItem>
             <MenuItem value="OUTRAS">Outras UF</MenuItem>
