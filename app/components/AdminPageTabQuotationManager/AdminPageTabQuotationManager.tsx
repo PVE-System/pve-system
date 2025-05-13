@@ -154,9 +154,21 @@ const SalesQuotesByState = () => {
           onChange={(e) => setStateFilter(e.target.value)}
           variant="outlined"
           fullWidth
+          sx={{
+            '& .MuiInputLabel-root': {
+              fontSize: '14px', // Tamanho da fonte do label
+            },
+            '& .MuiSelect-select': {
+              fontSize: '14px', // Tamanho da fonte do valor selecionado
+            },
+          }}
         >
           {['MS', 'MT', 'OUTRAS UF', 'TODOS CLIENTES'].map((stateOption) => (
-            <MenuItem key={stateOption} value={stateOption}>
+            <MenuItem
+              sx={styles.fontSize}
+              key={stateOption}
+              value={stateOption}
+            >
               {stateOption}
             </MenuItem>
           ))}
@@ -169,11 +181,19 @@ const SalesQuotesByState = () => {
           onChange={(e) => setYearFilter(parseInt(e.target.value))}
           variant="outlined"
           fullWidth
+          sx={{
+            '& .MuiInputLabel-root': {
+              fontSize: '14px', // Tamanho da fonte do label
+            },
+            '& .MuiSelect-select': {
+              fontSize: '14px', // Tamanho da fonte do valor selecionado
+            },
+          }}
         >
           {[...Array(5)].map((_, i) => {
             const year = currentYear - i;
             return (
-              <MenuItem key={year} value={year}>
+              <MenuItem key={year} value={year} sx={styles.fontSize}>
                 {year}
               </MenuItem>
             );
@@ -187,8 +207,18 @@ const SalesQuotesByState = () => {
           onChange={(e) => setMonthFilter(e.target.value)}
           variant="outlined"
           fullWidth
+          sx={{
+            '& .MuiInputLabel-root': {
+              fontSize: '14px', // Tamanho da fonte do label
+            },
+            '& .MuiSelect-select': {
+              fontSize: '14px', // Tamanho da fonte do valor selecionado
+            },
+          }}
         >
-          <MenuItem value="TODOS">Todos os meses</MenuItem>
+          <MenuItem value="TODOS" sx={styles.fontSize}>
+            Todos os meses
+          </MenuItem>
           {[
             'Janeiro',
             'Fevereiro',
@@ -203,7 +233,7 @@ const SalesQuotesByState = () => {
             'Novembro',
             'Dezembro',
           ].map((month, index) => (
-            <MenuItem key={index + 1} value={index + 1}>
+            <MenuItem key={index + 1} value={index + 1} sx={styles.fontSize}>
               {month}
             </MenuItem>
           ))}
@@ -242,7 +272,17 @@ const SalesQuotesByState = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell sx={styles.fontSize}>Cliente:</TableCell>
+              <TableCell
+                sx={{
+                  ...styles.fontSize,
+                  textAlign: {
+                    xs: 'center',
+                    sm: 'left',
+                  },
+                }}
+              >
+                Cliente:
+              </TableCell>
               {!isSmallScreen && (
                 <>
                   <TableCell sx={styles.fontSize}>Estado:</TableCell>
@@ -265,7 +305,6 @@ const SalesQuotesByState = () => {
                   <TableRow
                     key={quote.id}
                     sx={{ ...styles.rowHover, cursor: 'pointer' }}
-                    /* onClick={() => handleRowClick(client.id)} */
                     onClick={() => handleRowClick(String(client.id))}
                   >
                     <TableCell sx={styles.fontSize}>
@@ -290,7 +329,7 @@ const SalesQuotesByState = () => {
             ) : (
               <TableRow>
                 <TableCell colSpan={4} align="center">
-                  <Typography>
+                  <Typography sx={styles.fontSize}>
                     Nenhuma cotação encontrada para este filtro.
                   </Typography>
                 </TableCell>

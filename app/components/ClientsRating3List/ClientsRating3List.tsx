@@ -97,11 +97,27 @@ const ClientsRating3List = () => {
                 e.target.value === 'Todos Estados' ? '' : e.target.value,
               )
             }
+            sx={{
+              '& .MuiInputLabel-root': {
+                fontSize: '14px',
+              },
+              '& .MuiSelect-select': {
+                fontSize: '14px',
+              },
+            }}
           >
-            <MenuItem value="Todos Estados">Todos Estados</MenuItem>
-            <MenuItem value="MS">MS</MenuItem>
-            <MenuItem value="MT">MT</MenuItem>
-            <MenuItem value="OUTRAS">Outras UF</MenuItem>
+            <MenuItem value="Todos Estados" sx={styles.fontSize}>
+              Todos Estados
+            </MenuItem>
+            <MenuItem value="MS" sx={styles.fontSize}>
+              MS
+            </MenuItem>
+            <MenuItem value="MT" sx={styles.fontSize}>
+              MT
+            </MenuItem>
+            <MenuItem value="OUTRAS" sx={styles.fontSize}>
+              Outras UF
+            </MenuItem>
           </Select>
         </FormControl>
       </Box>
@@ -123,7 +139,7 @@ const ClientsRating3List = () => {
           <TableBody>
             {filteredClients.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} align="center">
+                <TableCell colSpan={5} align="center" sx={styles.fontSize}>
                   Nenhum cliente encontrado para a UF selecionada.
                 </TableCell>
               </TableRow>

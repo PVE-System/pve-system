@@ -174,7 +174,7 @@ export default function UsersTeamList() {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell sx={styles.fontSize}>Operador</TableCell>
+              <TableCell sx={styles.fontSize}>OP</TableCell>
               {/* Novo campo */}
               <TableCell sx={styles.fontSize}>Nome</TableCell>
               {!isSmallScreen && (

@@ -419,35 +419,63 @@ const AdminPageTabClientByUser = () => {
       {/* Dropdown para selecionar o operador */}
       <TextField
         select
-        label="Selecione o Responsável PVE"
+        label="Responsável PVE"
         value={selectedOperator}
         onChange={(e) => setSelectedOperator(e.target.value)}
         variant="outlined"
         fullWidth
-        sx={{ marginBottom: 2 }}
+        sx={{
+          marginBottom: 2,
+          '& .MuiInputLabel-root': {
+            fontSize: '14px', // Tamanho da fonte do label
+          },
+          '& .MuiSelect-select': {
+            fontSize: '14px', // Tamanho da fonte do valor selecionado
+          },
+        }}
       >
         {users.length > 0 ? (
           users.map((user) => (
             <MenuItem
               key={user.id || user.operatorNumber}
               value={user.operatorNumber}
+              sx={styles.fontSize}
             >
               {user.operatorNumber} - {user.name}
             </MenuItem>
           ))
         ) : (
-          <MenuItem disabled>Nenhum usuário encontrado</MenuItem>
+          <MenuItem disabled sx={styles.fontSize}>
+            Nenhum usuário encontrado
+          </MenuItem>
         )}
       </TextField>
 
       {/* Exibir total de clientes encontrados */}
-      <Typography variant="subtitle2" sx={{ marginBottom: 2 }}>
-        Total de clientes: <strong>{clients.length}</strong>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+
+          marginBottom: 2,
+          flexWrap: 'wrap',
+          gap: 2,
+          '@media (max-width: 600px)': {
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            textAlign: 'center',
+          },
+        }}
+      >
+        <Typography variant="subtitle2" sx={styles.fontSize}>
+          Total de clientes: <strong>{clients.length}</strong>
+        </Typography>
         <Tooltip title={'Copiar dados para colar na planilha'}>
           <Button
             variant="contained"
             color="primary"
-            sx={{ ...styles.exportExcelButton, marginLeft: 2 }}
+            sx={{ ...styles.exportExcelButton }}
             onClick={handleCopyClick} // Use a nova função aqui
             disabled={isPreparingData}
             startIcon={isPreparingData ? <CircularProgress size={20} /> : null}
@@ -455,13 +483,23 @@ const AdminPageTabClientByUser = () => {
             {isPreparingData ? 'Preparando dados...' : buttonText}
           </Button>
         </Tooltip>
-      </Typography>
+      </Box>
 
       <TableContainer>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell sx={styles.fontSize}>Cliente:</TableCell>
+              <TableCell
+                sx={{
+                  ...styles.fontSize,
+                  textAlign: {
+                    xs: 'center',
+                    sm: 'left',
+                  },
+                }}
+              >
+                Cliente:
+              </TableCell>
               {!isSmallScreen && (
                 <>
                   <TableCell sx={styles.fontSize}>Cód. Corfio:</TableCell>
@@ -544,7 +582,7 @@ const AdminPageTabClientByUser = () => {
             ) : (
               <TableRow>
                 <TableCell colSpan={4} align="center">
-                  <Typography>
+                  <Typography sx={styles.fontSize}>
                     Nenhum cliente encontrado para este responsável.
                   </Typography>
                 </TableCell>
