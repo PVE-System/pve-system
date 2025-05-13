@@ -146,10 +146,24 @@ const ClientsByCities = () => {
             value={stateFilter}
             label="Filtrar por UF"
             onChange={(e) => setStateFilter(e.target.value)}
+            sx={{
+              '& .MuiInputLabel-root': {
+                fontSize: '14px', // Tamanho da fonte do label
+              },
+              '& .MuiSelect-select': {
+                fontSize: '14px', // Tamanho da fonte do valor selecionado
+              },
+            }}
           >
-            <MenuItem value="MS">MS</MenuItem>
-            <MenuItem value="MT">MT</MenuItem>
-            <MenuItem value="OUTRAS">Outras UF</MenuItem>
+            <MenuItem value="MS" sx={styles.fontSize}>
+              MS
+            </MenuItem>
+            <MenuItem value="MT" sx={styles.fontSize}>
+              MT
+            </MenuItem>
+            <MenuItem value="OUTRAS" sx={styles.fontSize}>
+              Outras UF
+            </MenuItem>
           </Select>
         </FormControl>
 
@@ -166,16 +180,26 @@ const ClientsByCities = () => {
                 )
               }
               disabled={!stateFilter}
+              sx={{
+                '& .MuiInputLabel-root': {
+                  fontSize: '14px', // Tamanho da fonte do label
+                },
+                '& .MuiSelect-select': {
+                  fontSize: '14px', // Tamanho da fonte do valor selecionado
+                },
+              }}
             >
-              <MenuItem value="Todas as cidades">Todas as cidades</MenuItem>
+              <MenuItem value="Todas as cidades" sx={styles.fontSize}>
+                Todas as cidades
+              </MenuItem>
               {availableCities.length > 0 ? (
                 availableCities.map((city) => (
-                  <MenuItem key={city} value={city}>
+                  <MenuItem key={city} value={city} sx={styles.fontSize}>
                     {city}
                   </MenuItem>
                 ))
               ) : (
-                <MenuItem value="">
+                <MenuItem value="" sx={styles.fontSize}>
                   {stateFilter
                     ? 'Nenhuma cidade encontrada'
                     : 'Selecione um Estado'}

@@ -8,13 +8,15 @@ import Box from '@mui/material/Box';
 import { Container } from '@mui/material';
 
 // Ícones
-import InfoIcon from '@mui/icons-material/Info';
-import GroupIcon from '@mui/icons-material/Group';
-import NotesIcon from '@mui/icons-material/Notes';
+import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import GroupsIcon from '@mui/icons-material/Groups';
+
 import AdminPageTabClientByUser from '../AdminPageTabClientByUser/AdminPageTabClientByUser';
 import styles from './styles';
 import AdminPageTabUsersManager from '../AdminPageTabUsersManager/AdminPageTabUsersManager';
 import AdminPageTabQuotationManager from '../AdminPageTabQuotationManager/AdminPageTabQuotationManager';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -52,6 +54,8 @@ function a11yProps(index: number) {
 export default function AdminPageComponent() {
   const [value, setValue] = React.useState(0);
 
+  const isSmallScreen = useMediaQuery('(max-width:800px)');
+
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
@@ -67,8 +71,8 @@ export default function AdminPageComponent() {
             aria-label="abas do administrador"
           >
             <Tab
-              label="Clientes por vendedor"
-              icon={<InfoIcon />}
+              label={isSmallScreen ? null : 'Clientes por vendedor'}
+              icon={<AccountCircleIcon />}
               sx={{
                 fontSize: '12px',
                 minWidth: '100px',
@@ -79,8 +83,8 @@ export default function AdminPageComponent() {
               {...a11yProps(0)}
             />
             <Tab
-              label="Gerenciar equipe"
-              icon={<GroupIcon />}
+              label={isSmallScreen ? null : 'Gerenciar equipe'}
+              icon={<GroupsIcon />}
               sx={{
                 fontSize: '12px',
                 minWidth: '100px',
@@ -91,8 +95,8 @@ export default function AdminPageComponent() {
               {...a11yProps(1)}
             />
             <Tab
-              label="Gerenciar cotações"
-              icon={<NotesIcon />}
+              label={isSmallScreen ? null : 'Gerenciar cotações'}
+              icon={<RequestQuoteIcon />}
               sx={{
                 fontSize: '12px',
                 minWidth: '100px',

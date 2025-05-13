@@ -95,24 +95,36 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
   };
 
   return (
-    <Box sx={styles.boxProfile}>
-      <Typography variant="h6" component="div" sx={styles.companyName}>
-        {renderAsIs(companyName.slice(0, 35))} {/* Limita a 35 caracteres */}
-      </Typography>{' '}
-      <label htmlFor="profile-picture-input">
-        {/* Exibe o input apenas se enableImageUpload for true */}
-        {enableImageUpload && (
-          <input
-            id="profile-picture-input"
-            type="file"
-            accept="image/*"
-            style={{ display: 'none' }}
-            onChange={handleFileChange}
-            disabled={readOnly}
-          />
-        )}
-        {showTooltip ? (
-          <Tooltip title="Primeiro conclua o cadastro do cliente e depois escolha a foto do perfil">
+    <Box>
+      <Box sx={styles.boxProfile}>
+        <Typography variant="h6" component="div" sx={styles.companyName}>
+          {renderAsIs(companyName.slice(0, 35))} {/* Limita a 35 caracteres */}
+        </Typography>{' '}
+        <label htmlFor="profile-picture-input">
+          {/* Exibe o input apenas se enableImageUpload for true */}
+          {enableImageUpload && (
+            <input
+              id="profile-picture-input"
+              type="file"
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={handleFileChange}
+              disabled={readOnly}
+            />
+          )}
+          {showTooltip ? (
+            <Tooltip title="Primeiro conclua o cadastro do cliente e depois escolha a foto do perfil">
+              <Image
+                src={previewImage || imageUrl || '/profile-placeholder.png'}
+                alt="Profile Picture"
+                width={180}
+                height={180}
+                style={styles.imgProfile}
+                onClick={handleImageClick}
+                priority
+              />
+            </Tooltip>
+          ) : (
             <Image
               src={previewImage || imageUrl || '/profile-placeholder.png'}
               alt="Profile Picture"
@@ -122,194 +134,188 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
               onClick={handleImageClick}
               priority
             />
+          )}
+        </label>
+        <Box sx={styles.statusRating}>
+          <Tooltip title="Relacionado ao faturamento e frequência de pedidos deste cliente">
+            <Typography variant="subtitle2" component="div">
+              Status de Atividade:
+            </Typography>
           </Tooltip>
-        ) : (
-          <Image
-            src={previewImage || imageUrl || '/profile-placeholder.png'}
-            alt="Profile Picture"
-            width={180}
-            height={180}
-            style={styles.imgProfile}
-            onClick={handleImageClick}
-            priority
+          <Controller
+            name="rating"
+            control={control}
+            render={({ field }) => (
+              <Rating
+                sx={styles.rating}
+                {...field}
+                name="rating"
+                value={rating}
+                max={3}
+                onChange={(event, value) => {
+                  if (!readOnly) {
+                    field.onChange(value);
+                    onRatingChange(value || 0);
+                  }
+                }}
+                readOnly={readOnly}
+              />
+            )}
           />
-        )}
-      </label>
-      <Box sx={styles.statusRating}>
-        <Tooltip title="Relacionado ao faturamento e frequência de pedidos deste cliente">
-          <Typography variant="subtitle2" component="div">
-            Status de Atividade:
-          </Typography>
-        </Tooltip>
-        <Controller
-          name="rating"
-          control={control}
-          render={({ field }) => (
-            <Rating
-              sx={styles.rating}
-              {...field}
-              name="rating"
-              value={rating}
-              max={3}
-              onChange={(event, value) => {
+        </Box>
+        <Box sx={styles.clientCondition}>
+          <Tooltip title="Relacionado a condição deste cliente">
+            <Typography variant="subtitle2" component="div">
+              Condição do Cliente:
+            </Typography>
+          </Tooltip>
+          <Box sx={styles.clientConditionButtonBox}>
+            <Button
+              variant="outlined"
+              color="success"
+              sx={{
+                ...styles.clientConditionButton,
+                ...(clientCondition === 'Normal' && {
+                  backgroundColor: 'green',
+                  borderColor: 'green',
+                  /* border: 'none', */
+                  color: 'white',
+
+                  '&:hover': {
+                    backgroundColor: 'green', // Manter a cor verde no hover se estiver selecionado
+                    borderColor: 'green',
+                  },
+                }),
+              }}
+              disabled={readOnly}
+              onClick={() => {
                 if (!readOnly) {
-                  field.onChange(value);
-                  onRatingChange(value || 0);
+                  onConditionChange('Normal');
                 }
               }}
-              readOnly={readOnly}
-            />
-          )}
-        />
-      </Box>
-      <Box sx={styles.clientCondition}>
-        <Tooltip title="Relacionado a condição deste cliente">
-          <Typography variant="subtitle2" component="div">
-            Condição do Cliente:
-          </Typography>
-        </Tooltip>
-        <Box sx={styles.clientConditionButtonBox}>
-          <Button
-            variant="outlined"
-            color="success"
-            sx={{
-              ...styles.clientConditionButton,
-              ...(clientCondition === 'Normal' && {
-                backgroundColor: 'green',
-                borderColor: 'green',
-                /* border: 'none', */
-                color: 'white',
-
-                '&:hover': {
-                  backgroundColor: 'green', // Manter a cor verde no hover se estiver selecionado
-                  borderColor: 'green',
-                },
-              }),
-            }}
-            disabled={readOnly}
-            onClick={() => {
-              if (!readOnly) {
-                onConditionChange('Normal');
-              }
-            }}
-          >
-            Normal
-          </Button>
-          <Button
-            variant="outlined"
-            color="warning"
-            sx={{
-              ...styles.clientConditionButton,
-              ...(clientCondition === 'Especial' && {
-                backgroundColor: 'orange',
-                /* border: 'none', */
-                color: 'black',
-                '&:hover': {
-                  backgroundColor: 'orange', // Manter a cor verde no hover se estiver selecionado
-                  borderColor: 'orange',
-                },
-              }),
-            }}
-            disabled={readOnly}
-            onClick={() => {
-              if (!readOnly) {
-                onConditionChange('Especial');
-              }
-            }}
-          >
-            Especial
-          </Button>
-          <Button
-            variant="outlined"
-            color="error"
-            sx={{
-              ...styles.clientConditionButton,
-              ...(clientCondition === 'Suspenso' && {
-                backgroundColor: 'red',
-                /* border: 'none', */
-                color: 'white',
-                '&:hover': {
-                  backgroundColor: 'red', // Manter a cor verde no hover se estiver selecionado
-                  borderColor: 'red',
-                },
-              }),
-            }}
-            disabled={readOnly}
-            onClick={() => {
-              if (!readOnly) {
-                onConditionChange('Suspenso');
-              }
-            }}
-          >
-            Suspenso
-          </Button>
-        </Box>
-      </Box>
-      <Box
-        sx={{
-          alignSelf: 'start',
-        }}
-      >
-        <Typography
-          variant="subtitle2"
-          component="div"
-          sx={{ marginBottom: '5px' }}
-        >
-          Código Corfio: {corfioCode}
-        </Typography>{' '}
-        <Typography
-          variant="subtitle2"
-          component="div"
-          sx={{ marginBottom: '5px' }}
-        >
-          WhatsApp:{' '}
-          {whatsapp ? (
-            <a
-              href={formatPhoneForWhatsApp(whatsapp)}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ color: 'green', textDecoration: 'none' }}
             >
-              {whatsapp}
-            </a>
-          ) : null}
-        </Typography>
-        <Typography
-          variant="subtitle2"
-          component="div"
-          sx={{ marginBottom: '5px' }}
-        >
-          Email: {emailCommercial}
-        </Typography>{' '}
-      </Box>
-      {/* Dialog para exibir a imagem em tamanho maior */}
-      <Dialog
-        open={openDialog}
-        onClose={() => setOpenDialog(false)}
-        maxWidth="sm"
-        fullWidth
-        PaperProps={{
-          style: {
-            borderRadius: 10,
-          },
-        }}
-      >
-        <DialogContent
+              Normal
+            </Button>
+            <Button
+              variant="outlined"
+              color="warning"
+              sx={{
+                ...styles.clientConditionButton,
+                ...(clientCondition === 'Especial' && {
+                  backgroundColor: 'orange',
+                  /* border: 'none', */
+                  color: 'black',
+                  '&:hover': {
+                    backgroundColor: 'orange', // Manter a cor verde no hover se estiver selecionado
+                    borderColor: 'orange',
+                  },
+                }),
+              }}
+              disabled={readOnly}
+              onClick={() => {
+                if (!readOnly) {
+                  onConditionChange('Especial');
+                }
+              }}
+            >
+              Especial
+            </Button>
+            <Button
+              variant="outlined"
+              color="error"
+              sx={{
+                ...styles.clientConditionButton,
+                ...(clientCondition === 'Suspenso' && {
+                  backgroundColor: 'red',
+                  /* border: 'none', */
+                  color: 'white',
+                  '&:hover': {
+                    backgroundColor: 'red', // Manter a cor verde no hover se estiver selecionado
+                    borderColor: 'red',
+                  },
+                }),
+              }}
+              disabled={readOnly}
+              onClick={() => {
+                if (!readOnly) {
+                  onConditionChange('Suspenso');
+                }
+              }}
+            >
+              Suspenso
+            </Button>
+          </Box>
+        </Box>
+        <Box
           sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
+            alignSelf: 'start',
+            width: '100%',
+            maxWidth: '100%',
+            overflowWrap: 'break-word',
+            wordBreak: 'break-word',
           }}
         >
-          <Image
-            src={previewImage || imageUrl || '/profile-placeholder.png'}
-            alt="Profile Picture"
-            width={500}
-            height={500}
-            style={{ borderRadius: '10px' }}
-          />
-        </DialogContent>
-      </Dialog>
+          <Typography
+            variant="subtitle2"
+            component="div"
+            sx={{ marginBottom: '5px', wordBreak: 'break-word' }}
+          >
+            Código Corfio: {corfioCode}
+          </Typography>{' '}
+          <Typography
+            variant="subtitle2"
+            component="div"
+            sx={{ marginBottom: '5px', wordBreak: 'break-word' }}
+          >
+            WhatsApp:{' '}
+            {whatsapp ? (
+              <a
+                href={formatPhoneForWhatsApp(whatsapp)}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: 'green', textDecoration: 'none' }}
+              >
+                {whatsapp}
+              </a>
+            ) : null}
+          </Typography>
+          <Typography
+            variant="subtitle2"
+            component="div"
+            sx={{ marginBottom: '5px', wordBreak: 'break-word' }}
+          >
+            Email: {emailCommercial}
+          </Typography>{' '}
+        </Box>
+        {/* Dialog para exibir a imagem em tamanho maior */}
+        <Dialog
+          open={openDialog}
+          onClose={() => setOpenDialog(false)}
+          maxWidth="sm"
+          fullWidth
+          PaperProps={{
+            style: {
+              borderRadius: 10,
+            },
+          }}
+        >
+          <DialogContent
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <Image
+              src={previewImage || imageUrl || '/profile-placeholder.png'}
+              alt="Profile Picture"
+              width={500}
+              height={500}
+              style={{ borderRadius: '10px' }}
+            />
+          </DialogContent>
+        </Dialog>
+      </Box>
     </Box>
   );
 };

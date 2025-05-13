@@ -17,7 +17,8 @@ const styles = {
     borderRadius: '10px',
     padding: '20px',
     width: '300px',
-    height: '600px',
+    height: 'auto',
+    /* height: '600px' */
 
     boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
 
