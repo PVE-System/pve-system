@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
 }
  */
 
-import { NextResponse, NextRequest } from 'next/server';
+/* import { NextResponse, NextRequest } from 'next/server';
 import { db, users } from '@/app/db';
 import { eq } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';
@@ -119,4 +119,4 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({
     message: 'Um link de recuperação foi enviado para o seu e-mail',
   });
-}
+} */

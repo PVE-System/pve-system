@@ -13,6 +13,9 @@ const styles = {
     mt: 8,
     mb: 4,
   },
+  fontSize: {
+    fontSize: '14px',
+  },
 };
 
 export default styles;

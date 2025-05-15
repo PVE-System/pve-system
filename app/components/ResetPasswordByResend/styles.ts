@@ -6,6 +6,7 @@ const styles = {
     alignItems: 'center',
   },
   button: {
+    mt: 3,
     mb: 2,
   },
   copyright: {
