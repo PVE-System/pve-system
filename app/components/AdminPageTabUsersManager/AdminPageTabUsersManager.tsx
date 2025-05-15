@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Box,
   Button,
@@ -23,6 +24,8 @@ import {
   Edit as EditIcon,
   Block as BlockIcon,
 } from '@mui/icons-material';
+
+import LockResetIcon from '@mui/icons-material/LockReset';
 
 import sharedStyles from '@/app/styles/sharedStyles';
 import styles from './styles';
@@ -168,6 +171,12 @@ export default function UsersTeamList() {
     }
   };
 
+  const router = useRouter();
+
+  const handleResetPassword = (userId: number) => {
+    router.push(`/resetPasswordByAdmin?id=${userId}`);
+  };
+
   return (
     <Container maxWidth="lg" sx={styles.container}>
       <TableContainer>
@@ -296,6 +305,14 @@ export default function UsersTeamList() {
                             <EditIcon />
                           </IconButton>
                         </Tooltip>
+                        <Tooltip title={'Redefinir senha'}>
+                          <IconButton
+                            onClick={() => handleResetPassword(user.id)}
+                          >
+                            <LockResetIcon />
+                          </IconButton>
+                        </Tooltip>
+
                         <Tooltip title={'Deletar usuário'}>
                           <IconButton
                             sx={styles.iconDelete}

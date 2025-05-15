@@ -17,6 +17,8 @@ import sharedStyles from '@/app/styles/sharedStyles';
 import { CircularProgress } from '@mui/material';
 import styles from './styles';
 
+import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
+
 export default function RecoverPassword() {
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -67,23 +69,48 @@ export default function RecoverPassword() {
             alt="Logo PVE"
             width={150}
             height={150}
+            priority
           />
         </Box>
-        <Typography variant="subtitle1" sx={sharedStyles.titleForm}>
-          Insira o seu email de login para receber um link para alterar a senha.
-        </Typography>
-
-        {message && (
-          <Typography variant="body2" color="error">
-            {message}
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            width: '100%',
+            maxWidth: '300px',
+          }}
+        >
+          <Typography
+            variant="subtitle1"
+            sx={{ ...styles.fontSize, textAlign: 'center' }}
+          >
+            Insira o email do usuário que deseja alterar a senha e receba um
+            link em seu email para continuar.
           </Typography>
-        )}
 
+          {message && (
+            <Typography
+              variant="body2"
+              color="error"
+              sx={{ ...styles.fontSize, textAlign: 'center' }}
+            >
+              {message}
+            </Typography>
+          )}
+        </Box>
         <Box
           component="form"
           onSubmit={handleSubmit}
           noValidate
-          sx={sharedStyles.titleForm}
+          sx={{
+            ...sharedStyles.titleForm,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            width: '100%',
+            maxWidth: '300px',
+          }}
         >
           <TextField
             margin="normal"
@@ -94,7 +121,17 @@ export default function RecoverPassword() {
             name="email"
             autoComplete="email"
             autoFocus
-            sx={{ width: '400px', textAlign: 'center' }}
+            sx={{
+              ...styles.button,
+              width: '100%',
+              maxWidth: '300px',
+              '& .MuiInputLabel-root': {
+                fontSize: '14px', // Tamanho da fonte do label
+              },
+              '& .MuiSelect-select': {
+                fontSize: '14px', // Tamanho da fonte do valor selecionado
+              },
+            }}
           />
 
           <Button
@@ -110,6 +147,54 @@ export default function RecoverPassword() {
               'Enviar link de recuperação'
             )}
           </Button>
+        </Box>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            width: '100%',
+            maxWidth: '300px',
+          }}
+        >
+          <ReportProblemOutlinedIcon color="primary" />
+          <Typography
+            variant="subtitle1"
+            sx={{
+              fontSize: '16px',
+              fontWeight: 600,
+              textAlign: 'center',
+              mb: 2,
+            }}
+          >
+            Etapas para nova senha:
+          </Typography>
+          <Typography
+            variant="subtitle1"
+            sx={{ ...styles.fontSize, textAlign: 'center', mb: 2 }}
+          >
+            1- Após digitar o email, clique no botão enviar link de recuperação.
+          </Typography>
+          <Typography
+            variant="subtitle1"
+            sx={{ ...styles.fontSize, textAlign: 'center', mb: 2 }}
+          >
+            2- Ao receber o email com um link, clique nele para ir à página
+            /resetPassword.
+          </Typography>
+          <Typography
+            variant="subtitle1"
+            sx={{ ...styles.fontSize, textAlign: 'center', mb: 2 }}
+          >
+            3- Escolha e confirme a nova senha.
+          </Typography>
+          <Typography
+            variant="subtitle1"
+            sx={{ ...styles.fontSize, textAlign: 'center', mb: 2 }}
+          >
+            4- Pronto! Senha alterada, você será encaminhado para a página de
+            login.
+          </Typography>
         </Box>
       </Box>
     </Container>
