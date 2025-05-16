@@ -163,9 +163,9 @@ const AdminPageTabClientByUser = () => {
     fetchBusinessGroups();
   }, []);
 
-  //Cotações
+  //Cotações do ultimo ano
 
-  useEffect(() => {
+  /* useEffect(() => {
     if (selectedOperator) {
       const loadQuotesData = async () => {
         const data = await fetchSalesQuotesByUser(selectedOperator);
@@ -216,28 +216,76 @@ const AdminPageTabClientByUser = () => {
         rawQuotes: [],
       };
     }
-  };
+  }; */
+  // Buscar Cotações dos ultimos 3 anos
+
+  async function fetchQuoteTotalsForClient(clientId: number) {
+    const response = await fetch(
+      `/api/getSalesQuotesByYears?clientId=${clientId}`,
+    );
+
+    if (!response.ok) throw new Error('Erro ao buscar cotações');
+
+    const result = await response.json();
+
+    const map: Record<number, number> = {};
+    for (const entry of result.data) {
+      map[entry.year] = entry.total;
+    }
+
+    const currentYear = new Date().getFullYear();
+
+    return {
+      totalQuotesCurrent: map[currentYear] || 0,
+      totalQuotesLastYear: map[currentYear - 1] || 0,
+      totalQuotesTwoYearsAgo: map[currentYear - 2] || 0,
+    };
+  }
 
   const handleCopyClick = async () => {
     setIsPreparingData(true);
 
     try {
-      console.log('Iniciando cópia...'); // DEBUG
+      const filteredClients = clients.filter(
+        (client) => client.responsibleSeller === selectedOperator,
+      );
 
-      // Atualize esta verificação para usar a nova estrutura
-      if (Object.keys(quotesData.quotesCountByClient).length > 0) {
-        console.log('Usando dados existentes'); // DEBUG
-        await copyClientsByUserToClipboard(
-          clients,
-          salesDataMap,
-          businessGroups,
-          users,
-          selectedOperator,
-          setButtonText,
-        );
+      if (filteredClients.length === 0) {
+        alert('Nenhum cliente encontrado para este vendedor.');
         return;
       }
 
+      // Obtem os dados de totais de cotações
+      const quoteTotalsMap: Record<
+        number,
+        {
+          totalQuotesCurrent: number;
+          totalQuotesLastYear: number;
+          totalQuotesTwoYearsAgo: number;
+        }
+      > = {};
+
+      await Promise.all(
+        filteredClients.map(async (client) => {
+          try {
+            const clientId = Number(client.id); // <- conversão aqui
+            const totals = await fetchQuoteTotalsForClient(clientId);
+            quoteTotalsMap[clientId] = totals;
+          } catch (err) {
+            console.error(
+              `Erro ao buscar totais de cotações para o cliente ${client.id}`,
+              err,
+            );
+            quoteTotalsMap[Number(client.id)] = {
+              totalQuotesCurrent: 0,
+              totalQuotesLastYear: 0,
+              totalQuotesTwoYearsAgo: 0,
+            };
+          }
+        }),
+      );
+
+      // Passa os dados extras para o exportador
       await copyClientsByUserToClipboard(
         clients,
         salesDataMap,
@@ -245,9 +293,10 @@ const AdminPageTabClientByUser = () => {
         users,
         selectedOperator,
         setButtonText,
+        quoteTotalsMap, // <--- Novo parâmetro
       );
     } catch (error) {
-      console.error('Erro detalhado:', error); // DEBUG melhorado
+      console.error('Erro detalhado:', error);
       alert(`Erro ao copiar:`);
     } finally {
       setIsPreparingData(false);
@@ -263,14 +312,15 @@ const AdminPageTabClientByUser = () => {
     users: { operatorNumber: string; name: string }[],
     selectedOperator: string,
     setButtonText: React.Dispatch<React.SetStateAction<string>>,
+    quoteTotalsMap: {
+      [clientId: number]: {
+        totalQuotesCurrent: number;
+        totalQuotesLastYear: number;
+        totalQuotesTwoYearsAgo: number;
+      };
+    },
   ) => {
-    const excludedFields = [
-      'id',
-      'createdAt',
-      'rating',
-      'clientCondition',
-      'imageUrl',
-    ];
+    const excludedFields = ['id', 'createdAt', 'clientCondition', 'imageUrl'];
 
     const clientExcelColumnOrder = [
       'cnpj',
@@ -300,7 +350,10 @@ const AdminPageTabClientByUser = () => {
       'companyLocation',
       'marketSegmentNature',
       'businessGroupId',
-      'quoteNumber',
+      'rating',
+      'totalQuotesCurrent',
+      'totalQuotesLastYear',
+      'totalQuotesTwoYearsAgo',
     ];
 
     const salesExcelColumnOrder = [
@@ -322,9 +375,12 @@ const AdminPageTabClientByUser = () => {
     }
 
     // 🚀 Usar os dados do estado em vez de buscar novamente
-    const { quotesCountByClient } = quotesData;
+    /* const { quotesCountByClient } = quotesData; */
 
     const rows = filteredClients.map((client) => {
+      const clientId = Number(client.id);
+
+      // Gera os dados do cliente
       const clientValues = clientExcelColumnOrder.map((key) => {
         if (excludedFields.includes(key)) return '';
 
@@ -350,33 +406,37 @@ const AdminPageTabClientByUser = () => {
             : operatorNumber;
         }
 
-        if (key === 'quoteNumber') {
-          // Correção principal: Acesse o clientId como string para consistência
-          const clientId = String(client.id);
-          const quoteValue = quotesCountByClient[clientId];
-
-          console.log(`Cliente ${clientId} - Valor da cotação:`, quoteValue); // DEBUG
-
-          // Verificação mais robusta
-          if (
-            quoteValue !== undefined &&
-            quoteValue !== null &&
-            !isNaN(quoteValue)
-          ) {
-            // Use Intl.NumberFormat para formatar o número com separador de milhar
-            const formatter = new Intl.NumberFormat('pt-BR', {
-              minimumFractionDigits: 0,
-              maximumFractionDigits: 2,
-            });
-
-            return formatter.format(quoteValue); // Retorna o número formatado
-          }
-          return '0';
+        if (key === 'rating') {
+          const ratingMap: { [key: number]: string } = {
+            1: '1 - Pouco ativo',
+            2: '2 - Moderado',
+            3: '3 - Ativo',
+          };
+          return ratingMap[client.rating] || 'Sem Status';
         }
 
         return client[key] || '';
       });
 
+      // Índice onde está a coluna "rating"
+      const ratingIndex = clientExcelColumnOrder.indexOf('rating');
+
+      // Dados de cotação a inserir após "rating"
+      const quoteTotals = quoteTotalsMap[clientId] || {
+        totalQuotesCurrent: 0,
+        totalQuotesLastYear: 0,
+        totalQuotesTwoYearsAgo: 0,
+      };
+      const quoteValues = [
+        quoteTotals.totalQuotesCurrent,
+        quoteTotals.totalQuotesLastYear,
+        quoteTotals.totalQuotesTwoYearsAgo,
+      ];
+
+      // Insere os dados após a coluna "rating"
+      clientValues.splice(ratingIndex + 1, 0, ...quoteValues);
+
+      // Dados de vendas
       const salesValues = salesExcelColumnOrder.map((key) => {
         return salesDataMap[client.id]?.[key] || '';
       });
@@ -476,11 +536,11 @@ const AdminPageTabClientByUser = () => {
             variant="contained"
             color="primary"
             sx={{ ...styles.exportExcelButton }}
-            onClick={handleCopyClick} // Use a nova função aqui
+            onClick={handleCopyClick}
             disabled={isPreparingData}
             startIcon={isPreparingData ? <CircularProgress size={20} /> : null}
           >
-            {isPreparingData ? 'Preparando dados...' : buttonText}
+            {isPreparingData ? 'Copiando' : buttonText}
           </Button>
         </Tooltip>
       </Box>
