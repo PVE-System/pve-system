@@ -643,7 +643,7 @@ const AdminPageTabClientByUser = () => {
               <TableRow>
                 <TableCell colSpan={4} align="center">
                   <Typography sx={styles.fontSize}>
-                    Nenhum cliente encontrado para este responsável.
+                    Nenhum cliente encontrado para o responsável.
                   </Typography>
                 </TableCell>
               </TableRow>
