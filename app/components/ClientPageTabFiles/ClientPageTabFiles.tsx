@@ -131,7 +131,7 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
       await fetchClientData();
       const folder =
         tabIndex === 0
-          ? `quotations/id=${clientId}`
+          ? `files/id=${clientId}`
           : tabIndex === 1
             ? `socialContract/id=${clientId}`
             : tabIndex === 2
@@ -149,7 +149,7 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
     setTabIndex(newValue);
     const folder =
       newValue === 0
-        ? `quotations/id=${clientId}`
+        ? `files/id=${clientId}`
         : newValue === 1
           ? `socialContract/id=${clientId}`
           : newValue === 2
@@ -162,14 +162,14 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    const fileList = event.target.files; // renomeado para evitar conflito
+    const fileList = event.target.files;
     if (fileList) {
       setLoadingUpload(true);
       const formData = new FormData();
       formData.append('file', fileList[0]);
       const folder =
         tabIndex === 0
-          ? `quotations/id=${clientId}`
+          ? `files/id=${clientId}`
           : tabIndex === 1
             ? `socialContract/id=${clientId}`
             : tabIndex === 2
@@ -179,7 +179,7 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
       try {
         const uploadUrl =
           tabIndex === 0
-            ? `/api/uploadQuoteFilesClient?folder=${encodeURIComponent(folder)}&clientId=${clientId}`
+            ? `/api/uploadGeneralFilesClient?folder=${encodeURIComponent(folder)}&clientId=${clientId}`
             : `/api/uploadFilesClient?folder=${encodeURIComponent(folder)}&clientId=${clientId}`;
 
         const response = await fetch(uploadUrl, {
@@ -283,7 +283,7 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
         // Após deletar, reatualiza a lista de arquivos para garantir que tudo esteja sincronizado
         const folder =
           tabIndex === 0
-            ? `quotations/id=${clientId}`
+            ? `files/id=${clientId}`
             : tabIndex === 1
               ? `socialContract/id=${clientId}`
               : tabIndex === 2
@@ -360,8 +360,8 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
               <Tab
                 label={
                   {
-                    xs: 'Cotações',
-                    md: 'Cotações',
+                    xs: 'Arquivos',
+                    md: 'Arquivos',
                   }[window.innerWidth < 600 ? 'xs' : 'md']
                 }
                 sx={{

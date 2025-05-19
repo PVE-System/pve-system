@@ -144,8 +144,8 @@ export async function GET(request: NextRequest) {
     const socialContractFiles = clientId
       ? await fetchFilesDirectlyFromStorage(`socialContract/id=${clientId}`)
       : [];
-    const quotationsFiles = clientId
-      ? await fetchFilesDirectlyFromStorage(`quotations/id=${clientId}`)
+    const filesFiles = clientId
+      ? await fetchFilesDirectlyFromStorage(`files/id=${clientId}`)
       : [];
     const excelFiles = await fetchFilesDirectlyFromStorage(
       `ExcelSalesSpreadsheet`,
@@ -155,7 +155,7 @@ export async function GET(request: NextRequest) {
       ...fiscalDocsFiles,
       ...accountingDocsFiles,
       ...socialContractFiles,
-      ...quotationsFiles,
+      ...filesFiles,
     ];
 
     // Determinar se há alterações nos arquivos (tab de arquivos gerais)
