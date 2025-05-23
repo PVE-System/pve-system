@@ -1,7 +1,7 @@
 /* Propósito: O arquivo schema.ts é usado para definir a estrutura inicial do seu banco de dados.  Permite definir a estrutura completa do db*/
 /*Neste arquivo que criamos outras tabelas, não precisa ser outro arquivo*/
 
-import { boolean, integer } from 'drizzle-orm/pg-core';
+import { boolean, integer, jsonb } from 'drizzle-orm/pg-core';
 import {
   pgTable,
   serial,
@@ -228,3 +228,29 @@ export const businessGroups = pgTable('business_groups', {
 // Tipos TypeScript para os novos modelos
 export type BusinessGroup = typeof businessGroups.$inferSelect;
 export type NewBusinessGroup = typeof businessGroups.$inferInsert;
+
+// tabela para Ocorrencias frequentes
+export const frequentOccurrences = pgTable('frequent_occurrences', {
+  id: serial('id').primaryKey(),
+
+  clientId: integer('client_id')
+    .references(() => clients.id)
+    .notNull(),
+
+  userId: integer('user_id')
+    .references(() => users.id)
+    .notNull(),
+
+  problem: text('problem'),
+  solution: text('solution'),
+  conclusion: text('conclusion'),
+
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+
+  attachments: varchar('attachments', { length: 512 }), // usado para exibir 1 imagem principal
+  attachmentsList: jsonb('attachments_list'), // reservado para suportar múltiplos uploads futuros
+});
+
+export type FrequentOccurrence = typeof frequentOccurrences.$inferSelect;
+export type NewFrequentOccurrence = typeof frequentOccurrences.$inferInsert;

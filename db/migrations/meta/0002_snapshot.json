@@ -1,6 +1,6 @@
 {
-  "id": "3c555cf7-0eed-474e-8df9-fa1082adae76",
-  "prevId": "d985cb4e-d24c-46a9-878a-e3d314962196",
+  "id": "d985cb4e-d24c-46a9-878a-e3d314962196",
+  "prevId": "3a57e16d-3478-4053-8c07-e7b9df010570",
   "version": "6",
   "dialect": "postgresql",
   "tables": {
@@ -328,105 +328,6 @@
         "comments_user_id_users_id_fk": {
           "name": "comments_user_id_users_id_fk",
           "tableFrom": "comments",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "public.frequent_occurrences": {
-      "name": "frequent_occurrences",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "client_id": {
-          "name": "client_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "problem": {
-          "name": "problem",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "solution": {
-          "name": "solution",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "conclusion": {
-          "name": "conclusion",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "attachments": {
-          "name": "attachments",
-          "type": "varchar(512)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "attachments_list": {
-          "name": "attachments_list",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "frequent_occurrences_client_id_clients_id_fk": {
-          "name": "frequent_occurrences_client_id_clients_id_fk",
-          "tableFrom": "frequent_occurrences",
-          "tableTo": "clients",
-          "columnsFrom": [
-            "client_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "frequent_occurrences_user_id_users_id_fk": {
-          "name": "frequent_occurrences_user_id_users_id_fk",
-          "tableFrom": "frequent_occurrences",
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
