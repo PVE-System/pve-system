@@ -18,7 +18,7 @@ import FrequentOccurrencesRegistered from '../FrequentOccurrencesRegistered/Freq
 import styles from './styles';
 
 const stepLabels = [
-  'Qual o nome do Cliente?',
+  'Qual o nome do Cliente TESTE DEPLOY PREVIEW?',
   'Qual foi o problema?',
   'Qual foi a solução?',
   'Qual foi a conclusão?',
