@@ -9,6 +9,9 @@ import {
   Box,
   CircularProgress,
   Button,
+  IconButton,
+  Tooltip,
+  Link,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import Accordion from '@mui/material/Accordion';
@@ -23,6 +26,9 @@ import { Rating } from '@mui/material';
 import dynamic from 'next/dynamic';
 import { red } from '@mui/material/colors';
 import DashboardExcelUpdateNotification from '../DashboardModalExcelUpdateNotification/DashboardExcelUpdateNotification';
+import FrequentOccurrencesRegistered from '../FrequentOccurrencesRegistered/FrequentOccurrencesRegistered';
+
+import WarningIcon from '@mui/icons-material/Warning';
 
 const DynamicChartComponent = dynamic(
   () => import('@/app/components/PieChart/PieChart'),
@@ -369,6 +375,46 @@ const DashboardComponent = () => {
       </Box>
       <Box>
         <DashboardExcelUpdateNotification />
+      </Box>
+
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          textAlign: 'center',
+          alignItems: 'center',
+          gap: 1,
+        }}
+      >
+        <Typography
+          sx={{
+            ...styles.BoxFrequentOccurrencesTitle,
+            mt: 5,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            textAlign: 'center',
+          }}
+        >
+          <WarningIcon color="warning" sx={{ mr: 1 }} />
+          Ocorrências <span>Frequentes</span>
+          <WarningIcon color="warning" sx={{ ml: 1 }} />
+        </Typography>
+        <Typography sx={{ fontSize: '12px' }}>
+          Clique{' '}
+          <Link
+            href="/frequentOccurrencesPage"
+            color="warning.dark"
+            onClick={(e) => {}}
+            sx={{ cursor: 'pointer', textDecoration: 'underline' }}
+          >
+            aqui
+          </Link>{' '}
+          para registrar uma ocorrência.
+        </Typography>
+      </Box>
+      <Box sx={{ ...styles.BoxFrequentOccurrences, mt: 3 }}>
+        <FrequentOccurrencesRegistered />
       </Box>
     </Container>
   );
