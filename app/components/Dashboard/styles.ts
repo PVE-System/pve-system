@@ -188,6 +188,38 @@ const styles = {
   arrowIcon: {
     color: 'grey',
   },
+
+  BoxFrequentOccurrencesTitle: {
+    fontFamily: `'Montserrat', sans-serif`,
+    textAlign: 'center',
+
+    // FontSize Desktop
+    fontSize: '22px',
+    // FontSize Notebook
+    '@media (max-width:1050px)': {
+      fontSize: '20px',
+    },
+    // FontSize Tablet
+    '@media (max-width:800px)': {
+      fontSize: '14px',
+    },
+    // FontSize Mobile
+    '@media (max-width:450px)': {
+      fontSize: '14px',
+    },
+    span: {
+      color: orange[800],
+    },
+  },
+
+  BoxFrequentOccurrences: {
+    border: '2px solid #ccc',
+    borderRadius: 2,
+    p: 2,
+    mb: 4,
+    width: '100%',
+    maxWidth: 600,
+  },
 };
 
 export default styles;
