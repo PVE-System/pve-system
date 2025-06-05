@@ -6,6 +6,9 @@ import { eq } from 'drizzle-orm';
 
 export async function POST(request: NextRequest) {
   try {
+    const body = await request.json();
+    console.log('Dados recebidos na API:', body);
+
     const {
       clientId,
       userId,
@@ -14,14 +17,40 @@ export async function POST(request: NextRequest) {
       conclusion,
       attachments,
       attachmentsList,
-    } = await request.json();
+      occurrencesStatus,
+    } = body;
 
+    // Validação dos campos obrigatórios
     if (!clientId || !userId) {
       return NextResponse.json(
-        { error: 'Client ID and User ID are required' },
+        { error: 'ID do cliente e usuário são obrigatórios' },
         { status: 400 },
       );
     }
+
+    if (!problem || !solution) {
+      return NextResponse.json(
+        { error: 'Todos os campos de texto são obrigatórios' },
+        { status: 400 },
+      );
+    }
+
+    // Validação do occurrencesStatus
+    if (
+      !occurrencesStatus ||
+      !['EM_ABERTO', 'CONCLUIDO'].includes(occurrencesStatus)
+    ) {
+      return NextResponse.json(
+        { error: 'Status inválido. Deve ser EM_ABERTO ou CONCLUIDO' },
+        { status: 400 },
+      );
+    }
+
+    // Se o status for EM_ABERTO, usar o texto padrão para conclusion
+    const conclusionText =
+      occurrencesStatus === 'EM_ABERTO'
+        ? 'Esta ocorrência está em aberto, atualize futuramente quando concluir.'
+        : conclusion;
 
     // Obtenha os dados do cliente
     const [client] = await db
@@ -31,7 +60,10 @@ export async function POST(request: NextRequest) {
       .execute();
 
     if (!client) {
-      return NextResponse.json({ error: 'Client not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Cliente não encontrado' },
+        { status: 404 },
+      );
     }
 
     // Obtenha os dados do usuário
@@ -42,23 +74,32 @@ export async function POST(request: NextRequest) {
       .execute();
 
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Usuário não encontrado' },
+        { status: 404 },
+      );
     }
+
+    // Dados para inserção
+    const occurrenceData = {
+      clientId,
+      userId,
+      problem,
+      solution,
+      conclusion: conclusionText,
+      occurrencesStatus,
+      attachments: attachments || '',
+      attachmentsList: attachmentsList || [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    console.log('Dados para inserção:', occurrenceData);
 
     // Insira a nova ocorrência no banco de dados
     const [newOccurrence] = await db
       .insert(frequentOccurrences)
-      .values({
-        clientId,
-        userId,
-        problem,
-        solution,
-        conclusion,
-        attachments,
-        attachmentsList,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      })
+      .values(occurrenceData)
       .returning()
       .execute();
 
@@ -67,9 +108,9 @@ export async function POST(request: NextRequest) {
       result: newOccurrence,
     });
   } catch (error) {
-    console.error('Error adding frequent occurrence:', error);
+    console.error('Erro ao adicionar ocorrência frequente:', error);
     return NextResponse.json(
-      { error: 'Failed to add frequent occurrence' },
+      { error: 'Falha ao adicionar ocorrência frequente' },
       { status: 500 },
     );
   }

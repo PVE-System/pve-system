@@ -31,6 +31,7 @@ const styles = {
   },
   spanText: {
     color: orange[800],
+    fontSize: { xs: '12px', sm: '12px', md: '14px' },
   },
 };
 

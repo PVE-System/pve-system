@@ -18,6 +18,10 @@ import {
   ListItem,
   ListItemText,
   Theme,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
 } from '@mui/material';
 import { useState, useEffect } from 'react';
 import sharedStyles from '@/app/styles/sharedStyles';
@@ -27,7 +31,10 @@ import styles from './styles';
 import Cookies from 'js-cookie';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import DeleteIcon from '@mui/icons-material/Delete';
+import WarningIcon from '@mui/icons-material/Warning';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { blueGrey, green, grey, orange, red } from '@mui/material/colors';
+import FrequentOccurrencesRegisteredCompleted from '../FrequentOccurrencesRegisteredCompleted/FrequentOccurrencesRegisteredCompleted';
 
 interface Client {
   id: string;
@@ -39,8 +46,9 @@ interface Client {
 const stepLabels = [
   'Selecione o Cliente',
   'Qual foi o problema?',
-  'Qual foi a solução?',
-  'Qual foi a conclusão?',
+  'Status da ocorrência?',
+  'Ações para solucionar o problema?',
+  'Qual foi a conclusão final?',
   'Finalizar e salvar ocorrência',
   'Arquivos e imagens (opcional)',
 ];
@@ -57,6 +65,7 @@ export default function FrequentOccurrencesComponent() {
     solution: '',
     conclusion: '',
     attachments: '',
+    occurrencesStatus: 'EM_ABERTO',
     attachmentsList: [] as { url: string; name: string }[],
   });
 
@@ -108,17 +117,37 @@ export default function FrequentOccurrencesComponent() {
       const userId = Cookies.get('userId');
       if (!userId) throw new Error('ID do usuário não encontrado');
 
+      // Garantir que o solution sempre comece com Ação 1: "
+      const solutionWithPrefix = newOccurrence.solution.startsWith('Ação 1: ')
+        ? newOccurrence.solution
+        : `Ação 1: ${newOccurrence.solution}`;
+
+      // Garantir que o conclusion tenha um valor quando status é EM_ABERTO
+      const conclusionText =
+        newOccurrence.occurrencesStatus === 'EM_ABERTO'
+          ? 'Esta ocorrência está em aberto, atualize futuramente quando concluir.'
+          : newOccurrence.conclusion;
+
       const response = await fetch('/api/registerFrequentOccurrence', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...newOccurrence,
           clientId: Number(selectedClient.id),
           userId: Number(userId),
+          problem: newOccurrence.problem,
+          solution: solutionWithPrefix,
+          conclusion: conclusionText,
+          occurrencesStatus: newOccurrence.occurrencesStatus,
+          attachments: newOccurrence.attachments || '',
+          attachmentsList: newOccurrence.attachmentsList || [],
         }),
       });
 
-      if (!response.ok) throw new Error('Erro ao salvar ocorrência');
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Resposta de erro da API:', errorData);
+        throw new Error(errorData.error || 'Erro ao salvar ocorrência');
+      }
 
       const data = await response.json();
       console.log('Ocorrência registrada com sucesso. ID:', data.result.id);
@@ -126,6 +155,13 @@ export default function FrequentOccurrencesComponent() {
       setStep(step + 1);
     } catch (error) {
       console.error('Erro ao salvar ocorrência:', error);
+      setAlertModalConfig({
+        title: 'Erro',
+        message:
+          error instanceof Error ? error.message : 'Erro ao salvar ocorrência',
+        buttonText: 'OK',
+      });
+      setShowAlertModal(true);
     } finally {
       setAddingOccurrence(false);
     }
@@ -232,6 +268,44 @@ export default function FrequentOccurrencesComponent() {
     }
   };
 
+  const handleSolutionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Se o usuário tentar remover o prefixo, não permitir
+    if (!value.startsWith('Ação 1: ')) {
+      setNewOccurrence({
+        ...newOccurrence,
+        solution: 'Ação 1: ',
+      });
+    } else {
+      setNewOccurrence({
+        ...newOccurrence,
+        solution: value,
+      });
+    }
+  };
+
+  const handleOccurrencesStatusChange = (e: any) => {
+    const newStatus = e.target.value;
+    setNewOccurrence({
+      ...newOccurrence,
+      occurrencesStatus: newStatus,
+      // Se mudar para EM_ABERTO, força o texto padrão
+      conclusion:
+        newStatus === 'EM_ABERTO'
+          ? 'Esta ocorrência está em aberto, atualize futuramente quando concluir.'
+          : newOccurrence.conclusion,
+    });
+  };
+
+  const handleConclusionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (newOccurrence.occurrencesStatus !== 'EM_ABERTO') {
+      setNewOccurrence({
+        ...newOccurrence,
+        conclusion: e.target.value,
+      });
+    }
+  };
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center">
@@ -250,7 +324,7 @@ export default function FrequentOccurrencesComponent() {
           Registre e acompanhe problemas <span>recorrentes</span>.
         </Typography>
 
-        <Box sx={styles.BoxCardPaper}>
+        <Box sx={styles.BoxCardPaperRegister}>
           <Stepper activeStep={step} orientation="vertical">
             {stepLabels.map((label) => (
               <Step key={label}>
@@ -279,12 +353,28 @@ export default function FrequentOccurrencesComponent() {
                     return options;
                   }
                   const lowerCaseInput = state.inputValue.toLowerCase().trim();
-                  return options.filter((option) =>
+
+                  // Primeiro, tenta a busca por prefixo (mantém a ordenação alfabética)
+                  const prefixMatches = options.filter((option) =>
                     option.companyName
                       .toLowerCase()
                       .trim()
                       .startsWith(lowerCaseInput),
                   );
+
+                  // Se encontrou resultados com busca por prefixo, retorna eles
+                  if (prefixMatches.length > 0) {
+                    return prefixMatches;
+                  }
+
+                  // Se não encontrou por prefixo, tenta a busca por termos
+                  const searchTerms = lowerCaseInput.split(/\s+/);
+                  return options.filter((option) => {
+                    const companyName = option.companyName.toLowerCase();
+                    return searchTerms.every((term) =>
+                      companyName.includes(term),
+                    );
+                  });
                 }}
                 getOptionKey={(option) => option.id}
                 renderInput={(params) => (
@@ -324,41 +414,50 @@ export default function FrequentOccurrencesComponent() {
               />
             )}
             {step === 2 && (
+              <FormControl fullWidth sx={styles.fontSizeInput}>
+                <InputLabel>Status da ocorrência?</InputLabel>
+                <Select
+                  value={newOccurrence.occurrencesStatus}
+                  label="Status da ocorrência?"
+                  onChange={handleOccurrencesStatusChange}
+                >
+                  <MenuItem value="EM_ABERTO">Em Aberto</MenuItem>
+                  <MenuItem value="CONCLUIDO">Concluído</MenuItem>
+                </Select>
+              </FormControl>
+            )}
+            {step === 3 && (
               <TextField
                 sx={styles.fontSizeInput}
                 label="Descreva a solução"
                 fullWidth
                 multiline
                 value={newOccurrence.solution}
-                onChange={(e) =>
-                  setNewOccurrence({
-                    ...newOccurrence,
-                    solution: e.target.value,
-                  })
-                }
+                onChange={handleSolutionChange}
+                placeholder="Ação 1: "
               />
             )}
-            {step === 3 && (
+            {step === 4 && (
               <TextField
                 sx={styles.fontSizeInput}
                 label="Informe a conclusão"
                 fullWidth
                 multiline
-                value={newOccurrence.conclusion}
-                onChange={(e) =>
-                  setNewOccurrence({
-                    ...newOccurrence,
-                    conclusion: e.target.value,
-                  })
+                value={
+                  newOccurrence.occurrencesStatus === 'EM_ABERTO'
+                    ? 'Esta ocorrência está em aberto, atualize futuramente quando concluir.'
+                    : newOccurrence.conclusion
                 }
+                onChange={handleConclusionChange}
+                disabled={newOccurrence.occurrencesStatus === 'EM_ABERTO'}
               />
             )}
-            {step === 4 && (
+            {step === 5 && (
               <Typography sx={sharedStyles.subtitleSize}>
                 Pronto para registrar esta ocorrência?
               </Typography>
             )}
-            {step === 5 && (
+            {step === 6 && (
               <Box>
                 <Typography sx={sharedStyles.subtitleSize}>
                   Armazene os arquivos relacionados:
@@ -485,7 +584,7 @@ export default function FrequentOccurrencesComponent() {
           <Box mt={2} display="flex" justifyContent="space-between">
             <Button
               onClick={handleStepperBack}
-              disabled={step === 0 || step === 5}
+              disabled={step === 0 || step === 6}
               sx={{
                 fontSize: { xs: '10px', sm: '12px' },
                 '&:hover': {
@@ -497,7 +596,7 @@ export default function FrequentOccurrencesComponent() {
               Voltar
             </Button>
 
-            {step < 4 && (
+            {step < 5 && (
               <Button
                 onClick={handleStepperNext}
                 disabled={step === 0 && !selectedClient}
@@ -513,7 +612,7 @@ export default function FrequentOccurrencesComponent() {
               </Button>
             )}
 
-            {step === 4 && (
+            {step === 5 && (
               <Button
                 variant="contained"
                 color="primary"
@@ -529,7 +628,7 @@ export default function FrequentOccurrencesComponent() {
               </Button>
             )}
 
-            {step === 5 && (
+            {step === 6 && (
               <Button
                 variant="contained"
                 onClick={handleProntoClick}
@@ -541,8 +640,49 @@ export default function FrequentOccurrencesComponent() {
           </Box>
         </Box>
 
-        <Box sx={styles.BoxCardPaper}>
+        <Typography
+          sx={{
+            ...styles.BoxFrequentOccurrencesTitle,
+            mt: 3,
+            mb: 3,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            textAlign: 'center',
+            '@media (max-width:450px)': {
+              mt: 2,
+              mb: 0,
+            },
+          }}
+        >
+          <WarningIcon color="warning" sx={{ mr: 1 }} />
+          Ocorrências <span>em Aberto</span>
+          <WarningIcon color="warning" sx={{ ml: 1 }} />
+        </Typography>
+        <Box sx={styles.BoxCardPaperRegistered}>
           <FrequentOccurrencesRegistered />
+        </Box>
+        <Typography
+          sx={{
+            ...styles.BoxFrequentOccurrencesTitle,
+            mt: 3,
+            mb: 3,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            textAlign: 'center',
+            '@media (max-width:450px)': {
+              mt: 2,
+              mb: 0,
+            },
+          }}
+        >
+          <CheckCircleIcon sx={{ color: 'success.main', mr: 1 }} />
+          Ocorrências <span>Concluídas</span>
+          <CheckCircleIcon sx={{ color: 'success.main', mr: 1 }} />
+        </Typography>
+        <Box sx={styles.BoxCardPaperRegistered}>
+          <FrequentOccurrencesRegisteredCompleted />
         </Box>
       </Box>
 

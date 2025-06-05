@@ -28,6 +28,17 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
     console.log('Request body:', body);
 
+    // Validação do occurrencesStatus
+    if (
+      !body.occurrencesStatus ||
+      !['EM_ABERTO', 'CONCLUIDO'].includes(body.occurrencesStatus)
+    ) {
+      return NextResponse.json(
+        { error: 'Status inválido. Deve ser EM_ABERTO ou CONCLUIDO' },
+        { status: 400 },
+      );
+    }
+
     // Verifica se a ocorrência existe antes de atualizar
     const existingOccurrence = await db
       .select()
@@ -48,6 +59,7 @@ export async function PUT(request: NextRequest) {
         problem: body.problem,
         solution: body.solution,
         conclusion: body.conclusion,
+        occurrencesStatus: body.occurrencesStatus,
         updatedAt: new Date(),
       })
       .where(eq(frequentOccurrences.id, idNumber))
@@ -56,6 +68,7 @@ export async function PUT(request: NextRequest) {
         problem: frequentOccurrences.problem,
         solution: frequentOccurrences.solution,
         conclusion: frequentOccurrences.conclusion,
+        occurrencesStatus: frequentOccurrences.occurrencesStatus,
         updatedAt: frequentOccurrences.updatedAt,
       })
       .execute();

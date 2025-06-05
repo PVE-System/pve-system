@@ -218,7 +218,12 @@ const styles = {
     p: 2,
     mb: 4,
     width: '100%',
-    maxWidth: 600,
+    maxWidth: '600px',
+    '@media (max-width:450px)': {
+      border: 'none',
+      minWidth: '300px',
+      mt: -2,
+    },
   },
 };
 

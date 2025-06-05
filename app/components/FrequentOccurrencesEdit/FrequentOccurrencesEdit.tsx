@@ -11,12 +11,17 @@ import {
   IconButton,
   Tooltip,
   Container,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from '@mui/material';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import styles from './styles';
 import sharedStyles from '@/app/styles/sharedStyles';
-import { orange, red } from '@mui/material/colors';
+import { orange, red, green, grey } from '@mui/material/colors';
 
 interface Occurrence {
   id: number;
@@ -29,6 +34,7 @@ interface Occurrence {
   client_corfioCode: string;
   user_name: string;
   operator_number?: string;
+  occurrencesStatus: string;
 }
 
 interface FileInfo {
@@ -50,11 +56,12 @@ export default function FrequentOccurrencesEdit() {
     problem: '',
     solution: '',
     conclusion: '',
+    occurrencesStatus: 'EM_ABERTO',
   });
   const [files, setFiles] = useState<FileInfo[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
-  const [deletingFile, setDeletingFile] = useState<string | null>(null);
+  const [filesToDelete, setFilesToDelete] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchOccurrence = async () => {
@@ -68,9 +75,10 @@ export default function FrequentOccurrencesEdit() {
         const data = await response.json();
         setOccurrence(data.occurrence);
         setFormData({
-          problem: data.occurrence.problem,
-          solution: data.occurrence.solution,
-          conclusion: data.occurrence.conclusion,
+          problem: data.occurrence.problem || '',
+          solution: data.occurrence.solution || '',
+          conclusion: data.occurrence.conclusion || '',
+          occurrencesStatus: data.occurrence.occurrencesStatus || 'EM_ABERTO',
         });
       } catch (error) {
         console.error('Erro ao buscar ocorrência:', error);
@@ -97,6 +105,28 @@ export default function FrequentOccurrencesEdit() {
     return date.toLocaleDateString('pt-BR');
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'EM_ABERTO':
+        return red[700];
+      case 'CONCLUIDO':
+        return green[700];
+      default:
+        return grey[500];
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'EM_ABERTO':
+        return 'Em Aberto';
+      case 'CONCLUIDO':
+        return 'Concluído';
+      default:
+        return status;
+    }
+  };
+
   const handleUpdate = async () => {
     if (!occurrenceId) return;
 
@@ -107,7 +137,19 @@ export default function FrequentOccurrencesEdit() {
         await uploadSelectedFiles();
       }
 
-      // Depois, atualizar os dados da ocorrência
+      // Depois, deletar os arquivos marcados para deleção
+      if (filesToDelete.length > 0) {
+        console.log('Deletando arquivos marcados:', filesToDelete);
+        await fetch('/api/deleteFileBlobByOccurrence', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ fileUrls: filesToDelete }),
+        });
+      }
+
+      // Por fim, atualizar os dados da ocorrência
       const response = await fetch(
         `/api/updateFrequentOccurrences?id=${occurrenceId}`,
         {
@@ -119,6 +161,7 @@ export default function FrequentOccurrencesEdit() {
             problem: formData.problem,
             solution: formData.solution,
             conclusion: formData.conclusion,
+            occurrencesStatus: formData.occurrencesStatus,
           }),
         },
       );
@@ -253,29 +296,11 @@ export default function FrequentOccurrencesEdit() {
     }
   };
 
-  // Função para deletar arquivo do blob
-  const handleFileDelete = async (fileUrl: string) => {
+  // Função para marcar arquivo para deleção
+  const handleFileDelete = (fileUrl: string) => {
     if (!fileUrl) return;
-
-    setDeletingFile(fileUrl);
-    try {
-      const response = await fetch('/api/deleteFileBlobByOccurrence', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ fileUrl }),
-      });
-
-      if (!response.ok) throw new Error('Erro ao deletar arquivo');
-
-      await fetchFiles(); // Atualiza a lista de arquivos
-    } catch (error) {
-      console.error('Erro ao deletar arquivo:', error);
-      alert('Erro ao deletar arquivo');
-    } finally {
-      setDeletingFile(null);
-    }
+    setFilesToDelete((prev) => [...prev, fileUrl]);
+    setFiles((prev) => prev.filter((file) => file.url !== fileUrl));
   };
 
   // Buscar arquivos quando o componente carrega
@@ -305,31 +330,74 @@ export default function FrequentOccurrencesEdit() {
     <Container fixed>
       <Box sx={sharedStyles.container}>
         <Paper sx={styles.BoxCardPaper} elevation={3}>
-          <Typography variant="h6">Ocorrência #{occurrence.id}</Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              /* justifyContent: 'space-between', */
+              /* alignItems: 'center', */
+              mb: 2,
+            }}
+          >
+            <Typography
+              sx={{
+                fontSize: { xs: '14px', sm: '16px' },
+                color: getStatusColor(
+                  occurrence?.occurrencesStatus || 'EM_ABERTO',
+                ),
+                fontWeight: 'bold',
+              }}
+            >
+              Status:{' '}
+              {getStatusText(occurrence?.occurrencesStatus || 'EM_ABERTO')}
+            </Typography>
+            <Typography sx={{ fontSize: { xs: '14px', sm: '18px' } }}>
+              Ocorrência #{occurrence?.id}
+            </Typography>
+          </Box>
           <Typography
             variant="subtitle2"
             gutterBottom
             sx={styles.cardPaperText}
           >
-            <strong>Cliente:</strong> {occurrence.client_name} -{' '}
-            {occurrence.client_corfioCode}
+            <strong>Cliente:</strong> {occurrence?.client_name} -{' '}
+            {occurrence?.client_corfioCode}
           </Typography>
           <Typography
             variant="subtitle2"
             gutterBottom
             sx={styles.cardPaperText}
           >
-            <span style={{ ...styles.spanText, marginRight: 6 }}>
-              {formatDate(occurrence.created_at)}.
-            </span>
-            Registrado por: {occurrence.user_name}.
+            Registrado por: {occurrence?.user_name}.
+          </Typography>
+          <Typography sx={{ ...styles.spanText }}>
+            {formatDate(occurrence?.created_at || '')}.
           </Typography>
 
           <Divider sx={{ marginY: 2, borderWidth: 1 }} />
 
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <FormControl fullWidth>
+              <InputLabel>Status da Ocorrência</InputLabel>
+              <Select
+                sx={styles.fontSizeInput}
+                value={formData.occurrencesStatus}
+                label="Status da Ocorrência:"
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    occurrencesStatus: e.target.value,
+                  }))
+                }
+              >
+                <MenuItem value="EM_ABERTO">Em Aberto</MenuItem>
+                <MenuItem value="CONCLUIDO">Concluído</MenuItem>
+              </Select>
+            </FormControl>
+
             <TextField
-              label="Problema"
+              sx={styles.fontSizeInput}
+              label="Problema:"
               multiline
               rows={4}
               value={formData.problem}
@@ -338,7 +406,8 @@ export default function FrequentOccurrencesEdit() {
             />
 
             <TextField
-              label="Solução"
+              sx={styles.fontSizeInput}
+              label="Ações para Solução:"
               multiline
               rows={4}
               value={formData.solution}
@@ -347,7 +416,8 @@ export default function FrequentOccurrencesEdit() {
             />
 
             <TextField
-              label="Conclusão"
+              sx={styles.fontSizeInput}
+              label="Conclusão Final:"
               multiline
               rows={4}
               value={formData.conclusion}
@@ -441,22 +511,17 @@ export default function FrequentOccurrencesEdit() {
                     <Typography variant="body2" sx={styles.cardPaperText}>
                       • {file.cleanedName}
                     </Typography>
-                    <Tooltip title="Deletar arquivo">
+                    <Tooltip title="Marcar para deleção">
                       <IconButton
                         size="small"
                         onClick={() => handleFileDelete(file.url)}
-                        disabled={deletingFile === file.url}
                         sx={{
                           '&:hover': {
                             color: red[700],
                           },
                         }}
                       >
-                        {deletingFile === file.url ? (
-                          <CircularProgress size={20} />
-                        ) : (
-                          <DeleteIcon />
-                        )}
+                        <DeleteIcon />
                       </IconButton>
                     </Tooltip>
                   </Box>

@@ -3,22 +3,23 @@ import { del } from '@vercel/blob';
 
 export async function DELETE(request: NextRequest) {
   try {
-    const { fileUrl } = await request.json();
+    const { fileUrls } = await request.json();
 
-    if (!fileUrl) {
+    if (!fileUrls || !Array.isArray(fileUrls) || fileUrls.length === 0) {
       return NextResponse.json(
-        { error: 'URL do arquivo não fornecida' },
+        { error: 'URLs dos arquivos não fornecidas' },
         { status: 400 },
       );
     }
 
-    await del(fileUrl);
+    // Deletar todos os arquivos em paralelo
+    await Promise.all(fileUrls.map((fileUrl) => del(fileUrl)));
 
-    return NextResponse.json({ message: 'Arquivo deletado com sucesso' });
+    return NextResponse.json({ message: 'Arquivos deletados com sucesso' });
   } catch (error) {
-    console.error('Erro ao deletar arquivo:', error);
+    console.error('Erro ao deletar arquivos:', error);
     return NextResponse.json(
-      { error: 'Erro ao deletar arquivo' },
+      { error: 'Erro ao deletar arquivos' },
       { status: 500 },
     );
   }

@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { db } from '@/app/db';
 import { frequentOccurrences, clients, users } from '@/app/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 
 export async function GET() {
   try {
@@ -11,6 +11,7 @@ export async function GET() {
       .select({
         id: frequentOccurrences.id,
         problem: frequentOccurrences.problem,
+        occurrencesStatus: frequentOccurrences.occurrencesStatus,
         solution: frequentOccurrences.solution,
         conclusion: frequentOccurrences.conclusion,
         attachments: frequentOccurrences.attachments,
@@ -23,12 +24,13 @@ export async function GET() {
       .from(frequentOccurrences)
       .leftJoin(clients, eq(frequentOccurrences.clientId, clients.id))
       .leftJoin(users, eq(frequentOccurrences.userId, users.id))
-      .orderBy(frequentOccurrences.createdAt);
+      .orderBy(desc(frequentOccurrences.id));
 
     // Transformar os dados para garantir que todos os campos necessários existam
     const formattedOccurrences = occurrences.map((row) => ({
       id: row.id,
       problem: row.problem || '',
+      occurrencesStatus: row.occurrencesStatus || 'EM_ABERTO',
       solution: row.solution || '',
       conclusion: row.conclusion || '',
       attachments: row.attachments || '',

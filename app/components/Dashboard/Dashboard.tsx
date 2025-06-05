@@ -241,6 +241,90 @@ const DashboardComponent = () => {
         </Box>
       </Box>
 
+      {/* Ocorrências Frequentes */}
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          textAlign: 'center',
+          alignItems: 'center',
+          gap: 1,
+        }}
+      >
+        <Typography
+          sx={{
+            ...styles.BoxFrequentOccurrencesTitle,
+            mt: 5,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            textAlign: 'center',
+            '@media (max-width:450px)': {
+              mt: 2,
+              mb: 0,
+            },
+          }}
+        >
+          <WarningIcon color="warning" sx={{ mr: 1 }} />
+          Ocorrências <span>Frequentes</span>
+          <WarningIcon color="warning" sx={{ ml: 1 }} />
+        </Typography>
+        <Typography sx={{ fontSize: '12px', mb: 2 }}>
+          Clique{' '}
+          <Link
+            href="/frequentOccurrencesPage"
+            color="warning.dark"
+            onClick={(e) => {}}
+            sx={{ cursor: 'pointer', textDecoration: 'underline' }}
+          >
+            aqui
+          </Link>{' '}
+          para criar e gerenciar ocorrências.
+        </Typography>
+      </Box>
+      <Box sx={{ ...styles.BoxFrequentOccurrences, mb: 3 }}>
+        <FrequentOccurrencesRegistered />
+      </Box>
+
+      <Typography
+        sx={{
+          ...styles.BoxFrequentOccurrencesTitle,
+          mt: 5,
+          mb: 2,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+          textAlign: 'center',
+          '@media (max-width:450px)': {
+            mt: 2,
+          },
+        }}
+      >
+        <Rating
+          name="read-only"
+          value={1}
+          readOnly
+          max={1}
+          sx={{
+            '& .MuiRating-icon': {
+              color: 'warning.main',
+            },
+          }}
+        />
+        Status de <span>Atividade</span>
+        <Rating
+          name="read-only"
+          value={1}
+          readOnly
+          max={1}
+          sx={{
+            '& .MuiRating-icon': {
+              color: 'warning.main',
+            },
+          }}
+        />
+      </Typography>
+
       <Box sx={styles.accordionContainer}>
         <Accordion
           sx={styles.accordionBg}
@@ -375,46 +459,6 @@ const DashboardComponent = () => {
       </Box>
       <Box>
         <DashboardExcelUpdateNotification />
-      </Box>
-
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          textAlign: 'center',
-          alignItems: 'center',
-          gap: 1,
-        }}
-      >
-        <Typography
-          sx={{
-            ...styles.BoxFrequentOccurrencesTitle,
-            mt: 5,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
-            textAlign: 'center',
-          }}
-        >
-          <WarningIcon color="warning" sx={{ mr: 1 }} />
-          Ocorrências <span>Frequentes</span>
-          <WarningIcon color="warning" sx={{ ml: 1 }} />
-        </Typography>
-        <Typography sx={{ fontSize: '12px' }}>
-          Clique{' '}
-          <Link
-            href="/frequentOccurrencesPage"
-            color="warning.dark"
-            onClick={(e) => {}}
-            sx={{ cursor: 'pointer', textDecoration: 'underline' }}
-          >
-            aqui
-          </Link>{' '}
-          para registrar uma ocorrência.
-        </Typography>
-      </Box>
-      <Box sx={{ ...styles.BoxFrequentOccurrences, mt: 3 }}>
-        <FrequentOccurrencesRegistered />
       </Box>
     </Container>
   );

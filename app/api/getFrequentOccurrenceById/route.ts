@@ -14,6 +14,14 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  const idNumber = Number(id);
+  if (isNaN(idNumber)) {
+    return NextResponse.json(
+      { error: 'ID da ocorrência inválido' },
+      { status: 400 },
+    );
+  }
+
   try {
     const occurrence = await db
       .select({
@@ -21,8 +29,9 @@ export async function GET(request: NextRequest) {
         problem: frequentOccurrences.problem,
         solution: frequentOccurrences.solution,
         conclusion: frequentOccurrences.conclusion,
+        occurrencesStatus: frequentOccurrences.occurrencesStatus,
         attachments: frequentOccurrences.attachments,
-        createdAt: frequentOccurrences.createdAt,
+        created_at: frequentOccurrences.createdAt,
         client_name: clients.companyName,
         client_corfioCode: clients.corfioCode,
         user_name: users.name,
@@ -31,8 +40,8 @@ export async function GET(request: NextRequest) {
       .from(frequentOccurrences)
       .leftJoin(clients, eq(frequentOccurrences.clientId, clients.id))
       .leftJoin(users, eq(frequentOccurrences.userId, users.id))
-      .where(eq(frequentOccurrences.id, Number(id)))
-      .execute();
+      .where(eq(frequentOccurrences.id, idNumber))
+      .limit(1);
 
     if (occurrence.length === 0) {
       return NextResponse.json(
@@ -42,17 +51,21 @@ export async function GET(request: NextRequest) {
     }
 
     const formattedOccurrence = {
-      ...occurrence[0],
-      created_at: occurrence[0].createdAt,
+      id: occurrence[0].id,
+      problem: occurrence[0].problem || '',
+      solution: occurrence[0].solution || '',
+      conclusion: occurrence[0].conclusion || '',
+      occurrencesStatus: occurrence[0].occurrencesStatus || 'EM_ABERTO',
+      attachments: occurrence[0].attachments || '',
+      created_at: occurrence[0].created_at,
+      client_name: occurrence[0].client_name || 'Cliente não encontrado',
+      client_corfioCode: occurrence[0].client_corfioCode || '',
       user_name: occurrence[0].user_name
         ? `${occurrence[0].operator_number} - ${occurrence[0].user_name}`
         : 'Usuário não encontrado',
     };
 
-    return NextResponse.json(
-      { occurrence: formattedOccurrence },
-      { status: 200 },
-    );
+    return NextResponse.json({ occurrence: formattedOccurrence });
   } catch (error) {
     console.error('Erro ao buscar ocorrência:', error);
     return NextResponse.json(

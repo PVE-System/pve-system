@@ -244,6 +244,9 @@ export const frequentOccurrences = pgTable('frequent_occurrences', {
   problem: text('problem'),
   solution: text('solution'),
   conclusion: text('conclusion'),
+  occurrencesStatus: varchar('occurrences_status', { length: 20 })
+    .notNull()
+    .default('EM_ABERTO'),
 
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
