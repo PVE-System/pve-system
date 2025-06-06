@@ -1,0 +1,1 @@
+ALTER TABLE "frequent_occurrences" ADD COLUMN "occurrences_status" varchar(20) DEFAULT 'EM_ABERTO' NOT NULL;

@@ -48,7 +48,7 @@ const stepsLabels = [
   'Arquivos anexados',
 ];
 
-export default function FrequentOccurrencesRegistered() {
+export default function FrequentOccurrencesRegisteredCompleted() {
   const router = useRouter();
   const [globalPage, setGlobalPage] = useState(0);
   const [occurrences, setOccurrences] = useState<Occurrence[]>([]);
@@ -72,10 +72,10 @@ export default function FrequentOccurrencesRegistered() {
         if (!response.ok) throw new Error('Erro ao buscar ocorrências');
         const data = await response.json();
 
-        // Filtrar apenas ocorrências com status EM_ABERTO
+        // Filtrar apenas ocorrências com status CONCLUIDO
         const filteredOccurrences = data.occurrences.filter(
           (occurrence: Occurrence) =>
-            occurrence.occurrencesStatus === 'EM_ABERTO',
+            occurrence.occurrencesStatus === 'CONCLUIDO',
         );
 
         setOccurrences(filteredOccurrences);
@@ -219,8 +219,6 @@ export default function FrequentOccurrencesRegistered() {
               whiteSpace: 'pre-wrap',
               wordBreak: 'break-word',
               padding: '5px',
-              /* border: '1px dotted grey', */
-              /* borderRadius: '2px', */
             }}
           >
             {occurrence.problem}

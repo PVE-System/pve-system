@@ -20,7 +20,21 @@
       "idx": 2,
       "version": "6",
       "when": 1741095136946,
-      "tag": "0003_include_business_groups_into_client_table",
+      "tag": "0002_include_business_groups_into_client_table",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1747995852729,
+      "tag": "0003_frequent_occurrences_table",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1748945655369,
+      "tag": "0004_includes_occurrencesStatus_in_frequentOccurrences_table",
       "breakpoints": true
     }
   ]
