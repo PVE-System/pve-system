@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
 
     if (!problem || !solution) {
       return NextResponse.json(
-        { error: 'Todos os campos de texto são obrigatórios' },
+        { Atenção: 'Todos os campos de texto são obrigatórios' },
         { status: 400 },
       );
     }

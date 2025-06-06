@@ -146,7 +146,10 @@ export default function FrequentOccurrencesComponent() {
       if (!response.ok) {
         const errorData = await response.json();
         console.error('Resposta de erro da API:', errorData);
-        throw new Error(errorData.error || 'Erro ao salvar ocorrência');
+        throw new Error(
+          errorData.error ||
+            'Não é possível concluir a ocorrência com um destes campos em branco, descreva sobre o ocorrido.',
+        );
       }
 
       const data = await response.json();
@@ -156,9 +159,11 @@ export default function FrequentOccurrencesComponent() {
     } catch (error) {
       console.error('Erro ao salvar ocorrência:', error);
       setAlertModalConfig({
-        title: 'Erro',
+        title: 'Atenção',
         message:
-          error instanceof Error ? error.message : 'Erro ao salvar ocorrência',
+          error instanceof Error
+            ? error.message
+            : 'Não é possível concluir a ocorrência com um destes campos em branco, descreva sobre o ocorrido.',
         buttonText: 'OK',
       });
       setShowAlertModal(true);

@@ -39,9 +39,6 @@ const AlertModalConfirmDelete: React.FC<AlertModalConfirmDeleteProps> = ({
         Tem certeza que deseja excluir esta ocorrência?
       </Typography>
       <Box sx={{ display: 'flex', gap: 2, mt: 2, justifyContent: 'center' }}>
-        <Button onClick={onClose} variant="contained">
-          Não
-        </Button>
         <Button
           onClick={onConfirm}
           variant="contained"
@@ -53,6 +50,9 @@ const AlertModalConfirmDelete: React.FC<AlertModalConfirmDeleteProps> = ({
           }}
         >
           Sim
+        </Button>
+        <Button onClick={onClose} variant="contained">
+          Não
         </Button>
       </Box>
     </Box>

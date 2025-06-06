@@ -22,6 +22,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import styles from './styles';
 import sharedStyles from '@/app/styles/sharedStyles';
 import { orange, red, green, grey } from '@mui/material/colors';
+import AlertModalGeneric from '../AlertModalGeneric/AlertModalGeneric';
 
 interface Occurrence {
   id: number;
@@ -62,6 +63,12 @@ export default function FrequentOccurrencesEdit() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [filesToDelete, setFilesToDelete] = useState<string[]>([]);
+  const [showAlertModal, setShowAlertModal] = useState(false);
+  const [alertModalConfig, setAlertModalConfig] = useState({
+    title: '',
+    message: '',
+    buttonText: 'OK',
+  });
 
   useEffect(() => {
     const fetchOccurrence = async () => {
@@ -130,6 +137,24 @@ export default function FrequentOccurrencesEdit() {
   const handleUpdate = async () => {
     if (!occurrenceId) return;
 
+    // Verificar se o status é CONCLUIDO e se há campos em branco
+    if (formData.occurrencesStatus === 'CONCLUIDO') {
+      if (
+        !formData.problem.trim() ||
+        !formData.solution.trim() ||
+        !formData.conclusion.trim()
+      ) {
+        setAlertModalConfig({
+          title: 'Atenção',
+          message:
+            'Não é possível concluir a ocorrência com um destes campos em branco, descreva sobre o ocorrido.',
+          buttonText: 'OK',
+        });
+        setShowAlertModal(true);
+        return;
+      }
+    }
+
     setSaving(true);
     try {
       // Primeiro, fazer upload dos arquivos selecionados
@@ -174,7 +199,12 @@ export default function FrequentOccurrencesEdit() {
       router.push('/frequentOccurrencesPage');
     } catch (error) {
       console.error('Erro ao atualizar ocorrência:', error);
-      alert('Erro ao atualizar ocorrência');
+      setAlertModalConfig({
+        title: 'Atenção',
+        message: 'Erro ao atualizar ocorrência',
+        buttonText: 'OK',
+      });
+      setShowAlertModal(true);
     } finally {
       setSaving(false);
     }
@@ -309,6 +339,10 @@ export default function FrequentOccurrencesEdit() {
       fetchFiles();
     }
   }, [occurrenceId, fetchFiles]);
+
+  const handleAlertModalClose = () => {
+    setShowAlertModal(false);
+  };
 
   if (loading) {
     return (
@@ -546,6 +580,15 @@ export default function FrequentOccurrencesEdit() {
           </Box>
         </Paper>
       </Box>
+
+      <AlertModalGeneric
+        open={showAlertModal}
+        onClose={handleAlertModalClose}
+        title={alertModalConfig.title}
+        message={alertModalConfig.message}
+        buttonText={alertModalConfig.buttonText}
+        onConfirm={handleAlertModalClose}
+      />
     </Container>
   );
 }
