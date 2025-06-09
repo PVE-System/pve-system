@@ -2,20 +2,28 @@ import { blueGrey, orange } from '@mui/material/colors';
 import { Theme } from '@mui/material';
 
 const styles = {
-  cardPaper: {
-    padding: 2,
-    marginBottom: 4,
-    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
-    transition: 'transform 0.1s ease',
-
+  BoxCardPaper: {
+    border: '2px solid #ccc',
+    borderRadius: 2,
+    p: 2,
+    mb: 4,
+    width: '100%',
+    maxWidth: 600,
     background: (theme: Theme) =>
       theme.palette.mode === 'light'
         ? blueGrey[100]
         : theme.palette.background.alternative,
+  },
 
-    /* '@media (max-width:450px)': {
-      border: 'none',
-    }, */
+  fontSizeInput: {
+    '& .MuiInputLabel-root': { fontSize: '14px' },
+    '& .MuiInputBase-input': { fontSize: '14px' },
+  },
+
+  buttonRegister: {
+    padding: { xs: '4px 8px', sm: '4px 8px' },
+    fontSize: { xs: '12px', sm: '14px' },
+    minWidth: { xs: '80px', sm: '80px' },
   },
 
   cardPaperText: {

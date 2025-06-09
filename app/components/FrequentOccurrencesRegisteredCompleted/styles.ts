@@ -12,10 +12,6 @@ const styles = {
       theme.palette.mode === 'light'
         ? blueGrey[100]
         : theme.palette.background.alternative,
-
-    /* '@media (max-width:450px)': {
-      border: 'none',
-    }, */
   },
 
   cardPaperText: {

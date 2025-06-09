@@ -1,6 +1,6 @@
 {
-  "id": "3c555cf7-0eed-474e-8df9-fa1082adae76",
-  "prevId": "d985cb4e-d24c-46a9-878a-e3d314962196",
+  "id": "e90a1a0f-2744-464b-9504-833e046da359",
+  "prevId": "3c555cf7-0eed-474e-8df9-fa1082adae76",
   "version": "6",
   "dialect": "postgresql",
   "tables": {
@@ -381,6 +381,13 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false
+        },
+        "occurrences_status": {
+          "name": "occurrences_status",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'EM_ABERTO'"
         },
         "created_at": {
           "name": "created_at",
