@@ -8,6 +8,8 @@ import { Container, useMediaQuery, useTheme } from '@mui/material';
 import Cookies from 'js-cookie';
 import styles from '@/app/components/ClientPageAllTabs/styles';
 
+import AlertModalClientPageOccurrencesNotification from '../AlertModalClientPageOccurrencesNotification/AlertModalClientPageOccurrencesNotification';
+
 import InfoIcon from '@mui/icons-material/Info';
 
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
@@ -167,6 +169,10 @@ export default function BasicTabs() {
 
   return (
     <Container maxWidth="lg" sx={styles.containerTabs}>
+      {/* Notificação de ocorrências */}
+      {clientId && (
+        <AlertModalClientPageOccurrencesNotification clientId={clientId} />
+      )}
       <Box>
         <Box sx={styles.boxTabs}>
           <Tabs
