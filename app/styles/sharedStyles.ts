@@ -115,13 +115,13 @@ const sharedStyles = {
     borderRadius: 2,
     boxShadow: 24,
     p: 4,
-    textAlign: 'center',
   },
 
   boxModal: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    textAlign: 'center',
   },
 
   modalAlert: {
@@ -136,9 +136,16 @@ const sharedStyles = {
     boxShadow: 24,
   },
 
+  modalText: {
+    fontSize: '18px',
+    // FontSize Mobile
+    '@media (max-width:450px)': {
+      fontSize: '14px',
+    },
+  },
+
   modalButton: {
-    marginTop: 2,
-    marginRight: 2,
+    margin: '10px',
   },
 };
 
