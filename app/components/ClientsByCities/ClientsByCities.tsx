@@ -116,7 +116,8 @@ const ClientsByCities = () => {
   const filteredClients = clients; // Agora é simples assim
 
   const handleRowClick = (clientId: string) => {
-    window.location.href = `/clientPage?id=${clientId}`;
+    /* window.location.href = `/clientPage?id=${clientId}`; */
+    window.open(`/clientPage?id=${clientId}`, '_blank');
   };
 
   if (loading) {

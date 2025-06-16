@@ -1,4 +1,6 @@
 // app/api/getAllUsers/route.ts
+export const dynamic = 'force-dynamic';
+
 import { db } from '@/app/db';
 import { users, User } from '@/app/db/schema';
 import { NextRequest, NextResponse } from 'next/server';
