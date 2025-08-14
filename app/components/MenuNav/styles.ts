@@ -47,6 +47,12 @@ const styles = {
   },
 
   textMenu: {
+    '& .MuiListItemButton-root': {
+      padding: '4px 16px',
+    },
+    '& .MuiListItemText-root .MuiTypography-root': {
+      fontSize: '14px',
+    },
     '& .MuiListItemText-root, & .MuiListItemIcon-root': {
       transition: 'color 0.3s', // Adicionando uma transição suave
     },

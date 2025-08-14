@@ -28,6 +28,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import CorporateFareIcon from '@mui/icons-material/CorporateFare';
 import PublicIcon from '@mui/icons-material/Public';
+import RouteIcon from '@mui/icons-material/Route';
+
 /* import HomeWorkIcon from '@mui/icons-material/HomeWork'; */
 import { useMediaQuery } from '@mui/material';
 import { useTheme } from '@/app/theme/ThemeContext';
@@ -172,6 +174,11 @@ export default function TemporaryDrawer() {
             icon: <CorporateFareIcon />,
             link: '/businessGroupPage',
           },
+          {
+            name: 'Rotas e Visitas',
+            icon: <RouteIcon />,
+            link: '/clientsVisits',
+          },
         ].map((item) => (
           <ListItem key={item.name} disablePadding>
             <ListItemButton component="a" href={item.link}>
@@ -281,7 +288,10 @@ export default function TemporaryDrawer() {
             </Box>
 
             <Typography variant="subtitle2" component="h1">
-              {renderAsIs(userData.name.slice(0, 25)) || 'Nome do Usuário'}
+              {/* {renderAsIs(userData.name.slice(0, 25)) || 'Nome do Usuário'} */}
+              {userData.name
+                ? renderAsIs(userData.name.slice(0, 25))
+                : 'Nome do Usuário'}
             </Typography>
           </Box>
 

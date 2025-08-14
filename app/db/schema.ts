@@ -257,3 +257,59 @@ export const frequentOccurrences = pgTable('frequent_occurrences', {
 
 export type FrequentOccurrence = typeof frequentOccurrences.$inferSelect;
 export type NewFrequentOccurrence = typeof frequentOccurrences.$inferInsert;
+
+// tabela para as rotas de visitas
+
+export const visitRoutes = pgTable('visit_routes', {
+  id: serial('id').primaryKey(),
+
+  userId: integer('user_id')
+    .references(() => users.id)
+    .notNull(),
+
+  routeName: varchar('route_name', { length: 100 }).notNull(),
+
+  scheduledDate: timestamp('scheduled_date').notNull(),
+
+  routeStatus: varchar('route_status', { length: 20 })
+    .notNull()
+    .default('EM_ABERTO'), // Valor inicial
+
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+
+  description: text('description'), // campo opcional para comentários sobre a rota
+});
+
+export type VisitRoute = typeof visitRoutes.$inferSelect;
+export type NewVisitRoute = typeof visitRoutes.$inferInsert;
+
+// tabela para os clientes que fazem parte das rotas de visitas
+
+export const visitRouteClients = pgTable('visit_route_clients', {
+  id: serial('id').primaryKey(),
+
+  visitRouteId: integer('visit_route_id')
+    .references(() => visitRoutes.id)
+    .notNull(),
+
+  clientId: integer('client_id').references(() => clients.id),
+
+  customerNameUnregistered: text('customer_name_unregistered'),
+
+  customerStateUnregistered: text('customer_state_unregistered'),
+  customerCityUnregistered: text('customer_city_unregistered'),
+  visitStatus: varchar('visit_status', { length: 20 })
+    .notNull()
+    .default('AGENDADO'),
+
+  currentVisitDescription: text('current_visit_description'),
+  lastVisitDescription: text('last_visit_description'),
+  lastVisitConfirmedAt: timestamp('last_visit_confirmed_at'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export type VisitRouteClient = typeof visitRouteClients.$inferSelect;
+export type NewVisitRouteClient = typeof visitRouteClients.$inferInsert;

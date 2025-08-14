@@ -1,0 +1,112 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { db } from '@/app/db';
+import { visitRouteClients, visitRoutes } from '@/app/db/schema';
+import { eq, and } from 'drizzle-orm';
+
+interface UpdateVisitRequest {
+  visitId: number;
+  userId: number;
+  visitStatus?: string;
+  currentVisitDescription?: string;
+  lastVisitDescription?: string;
+}
+
+export async function PUT(request: NextRequest) {
+  try {
+    const {
+      visitId,
+      userId,
+      visitStatus,
+      currentVisitDescription,
+      lastVisitDescription,
+    }: UpdateVisitRequest = await request.json();
+
+    // Validações básicas
+    if (!visitId) {
+      return NextResponse.json(
+        { error: 'visitId é obrigatório' },
+        { status: 400 },
+      );
+    }
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'userId é obrigatório' },
+        { status: 400 },
+      );
+    }
+
+    // Verificar se a visita existe e pertence ao usuário
+    const existingVisit = await db
+      .select()
+      .from(visitRouteClients)
+      .leftJoin(visitRoutes, eq(visitRouteClients.visitRouteId, visitRoutes.id))
+      .where(
+        and(eq(visitRouteClients.id, visitId), eq(visitRoutes.userId, userId)),
+      )
+      .limit(1);
+
+    if (existingVisit.length === 0) {
+      return NextResponse.json(
+        { error: 'Visita não encontrada ou não pertence ao usuário' },
+        { status: 404 },
+      );
+    }
+
+    // Preparar dados para atualização
+    const updateData: any = {
+      updatedAt: new Date(),
+    };
+
+    if (visitStatus !== undefined) {
+      updateData.visitStatus = visitStatus;
+    }
+
+    if (currentVisitDescription !== undefined) {
+      updateData.currentVisitDescription = currentVisitDescription;
+    }
+
+    if (lastVisitDescription !== undefined) {
+      updateData.lastVisitDescription = lastVisitDescription;
+    }
+
+    // Se o status for CONCLUIDO, atualizar lastVisitConfirmedAt
+    if (visitStatus === 'CONCLUIDO') {
+      updateData.lastVisitConfirmedAt = new Date();
+    }
+
+    // Atualizar a visita
+    const updatedVisit = await db
+      .update(visitRouteClients)
+      .set(updateData)
+      .where(eq(visitRouteClients.id, visitId))
+      .returning();
+
+    // Buscar o routeId da visita atualizada
+    const visitWithRoute = await db
+      .select({
+        visitRouteId: visitRouteClients.visitRouteId,
+      })
+      .from(visitRouteClients)
+      .where(eq(visitRouteClients.id, visitId))
+      .limit(1);
+
+    return NextResponse.json({
+      success: true,
+      visit: updatedVisit[0],
+      routeId: visitWithRoute[0]?.visitRouteId,
+      message: 'Visita atualizada com sucesso',
+    });
+  } catch (error: unknown) {
+    console.error('Erro ao atualizar visita:', error);
+
+    if (error instanceof Error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json(
+      { error: 'Erro interno do servidor' },
+      { status: 500 },
+    );
+  }
+}
