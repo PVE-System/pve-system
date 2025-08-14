@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/app/db';
 import {
@@ -10,8 +12,7 @@ import { eq, and } from 'drizzle-orm';
 
 export async function GET(request: NextRequest) {
   try {
-    /* const { searchParams } = new URL(request.url); */
-    const { searchParams } = request.nextUrl;
+    const { searchParams } = new URL(request.url);
     const routeId = searchParams.get('routeId');
     const userId = searchParams.get('userId');
 

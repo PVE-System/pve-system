@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/app/db';
 import { visitRouteClients, clients, visitRoutes } from '@/app/db/schema';
@@ -5,7 +7,7 @@ import { eq, and } from 'drizzle-orm';
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = request.nextUrl;
+    const { searchParams } = new URL(request.url);
     const visitId = searchParams.get('visitId');
     const userId = searchParams.get('userId');
 
