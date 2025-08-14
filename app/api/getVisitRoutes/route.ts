@@ -10,7 +10,7 @@ import { eq, and, gte, lte } from 'drizzle-orm';
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = request.nextUrl;
     const userId = searchParams.get('userId');
     const year = searchParams.get('year');
     const month = searchParams.get('month');
