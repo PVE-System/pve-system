@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -251,7 +251,7 @@ const ClientsVisitsRegisteredRoutesById: React.FC<
   const [loading, setLoading] = useState(true);
   const [updatingStatus, setUpdatingStatus] = useState(false);
 
-  const fetchRouteById = async () => {
+  const fetchRouteById = useCallback(async () => {
     if (!user) return;
 
     setLoading(true);
@@ -270,11 +270,11 @@ const ClientsVisitsRegisteredRoutesById: React.FC<
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, routeId]);
 
   useEffect(() => {
     fetchRouteById();
-  }, [user, routeId]);
+  }, [fetchRouteById]);
 
   const getStatusColor = (status: string) => {
     switch (status) {

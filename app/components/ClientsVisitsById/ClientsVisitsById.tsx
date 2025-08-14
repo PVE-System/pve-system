@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -177,7 +177,7 @@ const ClientsVisitsById: React.FC<ClientsVisitsByIdProps> = ({ visitId }) => {
     lastVisitDescription: '',
   });
 
-  const fetchVisitById = async () => {
+  const fetchVisitById = useCallback(async () => {
     if (!user) return;
 
     setLoading(true);
@@ -201,11 +201,11 @@ const ClientsVisitsById: React.FC<ClientsVisitsByIdProps> = ({ visitId }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, visitId]);
 
   useEffect(() => {
     fetchVisitById();
-  }, [user, visitId]);
+  }, [fetchVisitById]);
 
   const handleBack = () => {
     router.back();

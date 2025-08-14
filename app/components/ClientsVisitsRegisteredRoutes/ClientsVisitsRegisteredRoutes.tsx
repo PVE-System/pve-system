@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -268,7 +268,7 @@ const ClientsVisitsRegisteredRoutes = () => {
     { value: '12', label: 'Dezembro' },
   ];
 
-  const fetchRoutes = async () => {
+  const fetchRoutes = useCallback(async () => {
     if (!user) return;
 
     setLoading(true);
@@ -292,11 +292,11 @@ const ClientsVisitsRegisteredRoutes = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, selectedYear, selectedMonth]);
 
   useEffect(() => {
     fetchRoutes();
-  }, [user, selectedYear, selectedMonth]);
+  }, [fetchRoutes]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
