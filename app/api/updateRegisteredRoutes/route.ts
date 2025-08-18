@@ -5,14 +5,13 @@ import { eq, and } from 'drizzle-orm';
 
 interface UpdateRouteRequest {
   routeId: number;
-  userId: number;
   routeStatus?: string;
   description?: string;
 }
 
 export async function PUT(request: NextRequest) {
   try {
-    const { routeId, userId, routeStatus, description }: UpdateRouteRequest =
+    const { routeId, routeStatus, description }: UpdateRouteRequest =
       await request.json();
 
     // Validações básicas
@@ -23,23 +22,16 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'userId é obrigatório' },
-        { status: 400 },
-      );
-    }
-
-    // Verificar se a rota existe e pertence ao usuário
+    // Verificar se a rota existe
     const existingRoute = await db
       .select()
       .from(visitRoutes)
-      .where(and(eq(visitRoutes.id, routeId), eq(visitRoutes.userId, userId)))
+      .where(eq(visitRoutes.id, routeId))
       .limit(1);
 
     if (existingRoute.length === 0) {
       return NextResponse.json(
-        { error: 'Rota não encontrada ou não pertence ao usuário' },
+        { error: 'Rota não encontrada' },
         { status: 404 },
       );
     }
@@ -61,7 +53,7 @@ export async function PUT(request: NextRequest) {
     const updatedRoute = await db
       .update(visitRoutes)
       .set(updateData)
-      .where(and(eq(visitRoutes.id, routeId), eq(visitRoutes.userId, userId)))
+      .where(eq(visitRoutes.id, routeId))
       .returning();
 
     return NextResponse.json({

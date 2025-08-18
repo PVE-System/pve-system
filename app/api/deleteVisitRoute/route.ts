@@ -7,7 +7,6 @@ export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const routeId = searchParams.get('routeId');
-    const userId = searchParams.get('userId');
 
     if (!routeId) {
       return NextResponse.json(
@@ -16,28 +15,16 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'userId é obrigatório' },
-        { status: 400 },
-      );
-    }
-
-    // Verificar se a rota existe e pertence ao usuário
+    // Verificar se a rota existe
     const existingRoute = await db
       .select()
       .from(visitRoutes)
-      .where(
-        and(
-          eq(visitRoutes.id, parseInt(routeId)),
-          eq(visitRoutes.userId, parseInt(userId)),
-        ),
-      )
+      .where(eq(visitRoutes.id, parseInt(routeId)))
       .limit(1);
 
     if (existingRoute.length === 0) {
       return NextResponse.json(
-        { error: 'Rota não encontrada ou não pertence ao usuário' },
+        { error: 'Rota não encontrada' },
         { status: 404 },
       );
     }
@@ -48,14 +35,7 @@ export async function DELETE(request: NextRequest) {
       .where(eq(visitRouteClients.visitRouteId, parseInt(routeId)));
 
     // Deletar a rota
-    await db
-      .delete(visitRoutes)
-      .where(
-        and(
-          eq(visitRoutes.id, parseInt(routeId)),
-          eq(visitRoutes.userId, parseInt(userId)),
-        ),
-      );
+    await db.delete(visitRoutes).where(eq(visitRoutes.id, parseInt(routeId)));
 
     return NextResponse.json({
       message: 'Rota deletada com sucesso',

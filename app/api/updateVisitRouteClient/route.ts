@@ -5,7 +5,6 @@ import { eq, and } from 'drizzle-orm';
 
 interface UpdateVisitRequest {
   visitId: number;
-  userId: number;
   visitStatus?: string;
   currentVisitDescription?: string;
   lastVisitDescription?: string;
@@ -15,7 +14,6 @@ export async function PUT(request: NextRequest) {
   try {
     const {
       visitId,
-      userId,
       visitStatus,
       currentVisitDescription,
       lastVisitDescription,
@@ -29,26 +27,16 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'userId é obrigatório' },
-        { status: 400 },
-      );
-    }
-
-    // Verificar se a visita existe e pertence ao usuário
+    // Verificar se a visita existe
     const existingVisit = await db
       .select()
       .from(visitRouteClients)
-      .leftJoin(visitRoutes, eq(visitRouteClients.visitRouteId, visitRoutes.id))
-      .where(
-        and(eq(visitRouteClients.id, visitId), eq(visitRoutes.userId, userId)),
-      )
+      .where(eq(visitRouteClients.id, visitId))
       .limit(1);
 
     if (existingVisit.length === 0) {
       return NextResponse.json(
-        { error: 'Visita não encontrada ou não pertence ao usuário' },
+        { error: 'Visita não encontrada' },
         { status: 404 },
       );
     }
