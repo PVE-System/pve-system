@@ -13,19 +13,11 @@ import { eq, and, gte, lte } from 'drizzle-orm';
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = request.nextUrl;
-    const userId = searchParams.get('userId');
     const year = searchParams.get('year');
     const month = searchParams.get('month');
 
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'userId é obrigatório' },
-        { status: 400 },
-      );
-    }
-
-    // Buscar rotas do usuário com filtros
-    const whereConditions = [eq(visitRoutes.userId, parseInt(userId))];
+    // Buscar rotas com filtros (sem filtrar por usuário)
+    const whereConditions: any[] = [];
 
     if (year) {
       if (month) {
@@ -89,8 +81,8 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Buscar rotas do usuário com filtros
-    const allUserRoutes = await db
+    // Buscar rotas com filtros (todas as rotas)
+    const baseSelect = db
       .select({
         id: visitRoutes.id,
         userId: visitRoutes.userId,
@@ -103,9 +95,13 @@ export async function GET(request: NextRequest) {
         userName: users.name,
       })
       .from(visitRoutes)
-      .leftJoin(users, eq(visitRoutes.userId, users.id))
-      .where(and(...whereConditions))
-      .orderBy(visitRoutes.scheduledDate);
+      .leftJoin(users, eq(visitRoutes.userId, users.id));
+
+    const allUserRoutes = await (whereConditions.length > 0
+      ? baseSelect
+          .where(and(...whereConditions))
+          .orderBy(visitRoutes.scheduledDate)
+      : baseSelect.orderBy(visitRoutes.scheduledDate));
 
     // As rotas já estão filtradas pela consulta SQL
     const userRoutes = allUserRoutes;

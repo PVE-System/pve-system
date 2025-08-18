@@ -273,11 +273,10 @@ const ClientsVisitsRegisteredRoutes = () => {
 
     setLoading(true);
     try {
-      const params = new URLSearchParams({
-        userId: user.id,
-        year: selectedYear,
-        month: selectedMonth,
-      });
+      const params = new URLSearchParams();
+      params.set('userId', user.id);
+      if (selectedYear !== 'all') params.set('year', selectedYear);
+      if (selectedMonth !== 'all') params.set('month', selectedMonth);
 
       const response = await fetch(`/api/getVisitRoutes?${params}`);
       if (!response.ok) {

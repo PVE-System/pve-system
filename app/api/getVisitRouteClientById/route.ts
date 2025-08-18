@@ -9,18 +9,10 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const visitId = searchParams.get('visitId');
-    const userId = searchParams.get('userId');
 
     if (!visitId) {
       return NextResponse.json(
         { error: 'visitId é obrigatório' },
-        { status: 400 },
-      );
-    }
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'userId é obrigatório' },
         { status: 400 },
       );
     }
@@ -41,12 +33,7 @@ export async function GET(request: NextRequest) {
       })
       .from(visitRouteClients)
       .leftJoin(visitRoutes, eq(visitRouteClients.visitRouteId, visitRoutes.id))
-      .where(
-        and(
-          eq(visitRouteClients.id, parseInt(visitId)),
-          eq(visitRoutes.userId, parseInt(userId)),
-        ),
-      )
+      .where(eq(visitRouteClients.id, parseInt(visitId)))
       .limit(1);
 
     if (visit.length === 0) {
