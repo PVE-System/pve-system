@@ -106,6 +106,9 @@ export async function GET(request: NextRequest) {
       scheduledVisits: clientsWithDetails.filter(
         (client) => client.visitStatus === 'AGENDADO',
       ).length,
+      disinterestedVisits: clientsWithDetails.filter(
+        (client) => client.visitStatus === 'DESINTERESSADO',
+      ).length,
     };
 
     return NextResponse.json({

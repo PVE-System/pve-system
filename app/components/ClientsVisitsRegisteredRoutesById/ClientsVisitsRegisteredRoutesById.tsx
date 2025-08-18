@@ -236,6 +236,7 @@ interface VisitRoute {
   completedVisits: number;
   pendingVisits: number;
   scheduledVisits: number;
+  disinterestedVisits: number;
 }
 
 interface ClientsVisitsRegisteredRoutesByIdProps {
@@ -276,7 +277,7 @@ const ClientsVisitsRegisteredRoutesById: React.FC<
     fetchRouteById();
   }, [fetchRouteById]);
 
-  const getStatusColor = (status: string) => {
+  /* const getStatusColor = (status: string) => {
     switch (status) {
       case 'CONCLUIDO':
         return 'success';
@@ -286,12 +287,14 @@ const ClientsVisitsRegisteredRoutesById: React.FC<
         return 'info';
       case 'CANCELADO':
         return 'error';
+      case 'DESINTERESSADO':
+        return 'error';
       default:
         return 'default';
     }
-  };
+  }; */
 
-  const getStatusLabel = (status: string) => {
+  /* const getStatusLabel = (status: string) => {
     switch (status) {
       case 'CONCLUIDO':
         return 'Concluído';
@@ -301,10 +304,12 @@ const ClientsVisitsRegisteredRoutesById: React.FC<
         return 'Agendado';
       case 'CANCELADO':
         return 'Cancelado';
+      case 'DESINTERESSADO':
+        return 'Desinteressado';
       default:
         return status;
     }
-  };
+  }; */
 
   const formatDate = (dateString: string) => {
     if (!dateString) return 'Data não informada';
@@ -369,9 +374,9 @@ const ClientsVisitsRegisteredRoutesById: React.FC<
   };
 
   const handleEditRoute = () => {
-    // TODO: Implementar funcionalidade de editar rota
-    console.log('Editar rota:', route?.id);
-    alert('Funcionalidade de editar rota será implementada em breve.');
+    if (route?.id) {
+      router.push(`/clientsVisitsEditRoute?routeId=${route.id}`);
+    }
   };
 
   const handleStatusChange = async (newStatus: string) => {
@@ -625,6 +630,17 @@ const ClientsVisitsRegisteredRoutesById: React.FC<
                 sx={styles.chip}
               />
             </Box>
+            {/* Terceira linha: Desinteressados */}
+            {route.disinterestedVisits > 0 && (
+              <Box sx={styles.statsRow}>
+                <Chip
+                  label={`${route.disinterestedVisits} desinteressados`}
+                  color="error"
+                  size="medium"
+                  sx={styles.chip}
+                />
+              </Box>
+            )}
           </Box>
 
           {/* Lista de Clientes */}

@@ -238,6 +238,7 @@ interface VisitRoute {
   completedVisits: number;
   pendingVisits: number;
   scheduledVisits: number;
+  disinterestedVisits: number;
 }
 
 const ClientsVisitsRegisteredRoutes = () => {
@@ -297,7 +298,7 @@ const ClientsVisitsRegisteredRoutes = () => {
     fetchRoutes();
   }, [fetchRoutes]);
 
-  const getStatusColor = (status: string) => {
+  /* const getStatusColor = (status: string) => {
     switch (status) {
       case 'CONCLUIDO':
         return 'success';
@@ -307,12 +308,14 @@ const ClientsVisitsRegisteredRoutes = () => {
         return 'info';
       case 'CANCELADO':
         return 'error';
+      case 'DESINTERESSADO':
+        return 'error';
       default:
         return 'default';
     }
-  };
+  }; */
 
-  const getStatusLabel = (status: string) => {
+  /* const getStatusLabel = (status: string) => {
     switch (status) {
       case 'CONCLUIDO':
         return 'Concluído';
@@ -322,10 +325,12 @@ const ClientsVisitsRegisteredRoutes = () => {
         return 'Agendado';
       case 'CANCELADO':
         return 'Cancelado';
+      case 'DESINTERESSADO':
+        return 'Desinteressado';
       default:
         return status;
     }
-  };
+  }; */
 
   const formatDate = (dateString: string) => {
     if (!dateString) return 'Data não informada';
@@ -560,6 +565,17 @@ const ClientsVisitsRegisteredRoutes = () => {
                           sx={styles.chip}
                         />
                       </Box>
+                      {/* Terceira linha: Desinteressados */}
+                      {route.disinterestedVisits > 0 && (
+                        <Box sx={styles.statsRow}>
+                          <Chip
+                            label={`${route.disinterestedVisits} desinteressados`}
+                            color="error"
+                            size="small"
+                            sx={styles.chip}
+                          />
+                        </Box>
+                      )}
                     </Box>
 
                     {/* Lista de Rotas */}
