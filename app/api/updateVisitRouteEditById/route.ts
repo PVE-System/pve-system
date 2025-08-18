@@ -30,21 +30,16 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Verificar se a rota existe e pertence ao usuário
+    // Verificar se a rota existe (removida restrição de propriedade para permitir colaboração)
     const existingRoute = await db
       .select()
       .from(visitRoutes)
-      .where(
-        and(
-          eq(visitRoutes.id, parseInt(routeId)),
-          eq(visitRoutes.userId, parseInt(userId)),
-        ),
-      )
+      .where(eq(visitRoutes.id, parseInt(routeId)))
       .limit(1);
 
     if (existingRoute.length === 0) {
       return NextResponse.json(
-        { error: 'Rota não encontrada ou não pertence ao usuário' },
+        { error: 'Rota não encontrada' },
         { status: 404 },
       );
     }
