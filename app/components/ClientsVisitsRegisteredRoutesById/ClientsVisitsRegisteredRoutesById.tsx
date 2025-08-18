@@ -320,14 +320,7 @@ const ClientsVisitsRegisteredRoutesById: React.FC<
         return 'Data inválida';
       }
 
-      // Ajustar para o fuso horário local para evitar perda de um dia
-      const year = date.getFullYear();
-      const month = date.getMonth();
-      const day = date.getDate();
-
-      // Criar nova data no fuso horário local
-      const localDate = new Date(year, month, day);
-      return localDate.toLocaleDateString('pt-BR');
+      return date.toLocaleDateString('pt-BR');
     } catch (error) {
       console.error('Erro ao formatar data:', error);
       return 'Data inválida';

@@ -106,6 +106,25 @@ export async function GET(request: NextRequest) {
     // As rotas já estão filtradas pela consulta SQL
     const userRoutes = allUserRoutes;
 
+    // Função para converter timestamp UTC para data local
+    const convertUTCToLocalDate = (utcDate: Date | string | null) => {
+      if (!utcDate) return null;
+      try {
+        const date = new Date(utcDate);
+        if (isNaN(date.getTime())) return null;
+
+        // Extrair componentes da data UTC
+        const year = date.getUTCFullYear();
+        const month = date.getUTCMonth();
+        const day = date.getUTCDate();
+
+        // Criar nova data no fuso horário local
+        return new Date(year, month, day);
+      } catch {
+        return null;
+      }
+    };
+
     // Para cada rota, buscar os clientes associados
     const routesWithClients = await Promise.all(
       userRoutes.map(async (route) => {
@@ -157,6 +176,8 @@ export async function GET(request: NextRequest) {
 
         return {
           ...route,
+          // Converter scheduledDate para data local
+          scheduledDate: convertUTCToLocalDate(route.scheduledDate),
           clients: clientsWithDetails,
           totalClients: clientsWithDetails.length,
           completedVisits: clientsWithDetails.filter(

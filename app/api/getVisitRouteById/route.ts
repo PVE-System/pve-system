@@ -93,8 +93,29 @@ export async function GET(request: NextRequest) {
       }),
     );
 
+    // Função para converter timestamp UTC para data local
+    const convertUTCToLocalDate = (utcDate: Date | string | null) => {
+      if (!utcDate) return null;
+      try {
+        const date = new Date(utcDate);
+        if (isNaN(date.getTime())) return null;
+
+        // Extrair componentes da data UTC
+        const year = date.getUTCFullYear();
+        const month = date.getUTCMonth();
+        const day = date.getUTCDate();
+
+        // Criar nova data no fuso horário local
+        return new Date(year, month, day);
+      } catch {
+        return null;
+      }
+    };
+
     const routeWithClients = {
       ...routeData,
+      // Converter scheduledDate para data local
+      scheduledDate: convertUTCToLocalDate(routeData.scheduledDate),
       clients: clientsWithDetails,
       totalClients: clientsWithDetails.length,
       completedVisits: clientsWithDetails.filter(
