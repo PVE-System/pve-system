@@ -158,22 +158,32 @@ export async function GET(request: NextRequest) {
           }),
         );
 
+        // Função para formatar no padrão dd/MM/yyyy
+        function formatDateToDDMMYYYY(date: Date | string | null) {
+          if (!date) return null;
+          const d = new Date(date);
+          const day = String(d.getUTCDate()).padStart(2, '0');
+          const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+          const year = d.getUTCFullYear();
+          return `${day}/${month}/${year}`;
+        }
+
         return {
           ...route,
-          // Manter scheduledDate como vem do banco (sem conversão)
+          scheduledDate: formatDateToDDMMYYYY(route.scheduledDate), // <- formatando aqui
           clients: clientsWithDetails,
           totalClients: clientsWithDetails.length,
           completedVisits: clientsWithDetails.filter(
-            (client) => client.visitStatus === 'CONCLUIDO',
+            (client: any) => client.visitStatus === 'CONCLUIDO',
           ).length,
           pendingVisits: clientsWithDetails.filter(
-            (client) => client.visitStatus === 'PENDENTE',
+            (client: any) => client.visitStatus === 'PENDENTE',
           ).length,
           scheduledVisits: clientsWithDetails.filter(
-            (client) => client.visitStatus === 'AGENDADO',
+            (client: any) => client.visitStatus === 'AGENDADO',
           ).length,
           disinterestedVisits: clientsWithDetails.filter(
-            (client) => client.visitStatus === 'DESINTERESSADO',
+            (client: any) => client.visitStatus === 'DESINTERESSADO',
           ).length,
         };
       }),

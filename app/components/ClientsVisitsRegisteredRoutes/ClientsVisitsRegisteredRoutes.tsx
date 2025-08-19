@@ -215,6 +215,7 @@ interface RouteClient {
   customerStateUnregistered?: string;
   customerCityUnregistered?: string;
   visitStatus: string;
+
   clientDetails?: {
     id: number;
     companyName: string;
@@ -342,7 +343,7 @@ const ClientsVisitsRegisteredRoutes = () => {
       }
 
       return date.toLocaleDateString('pt-BR', {
-        timeZone: 'UTC', // 🔥 força UTC, sem aplicar offset
+        timeZone: 'America/Sao_Paulo', // garante formato no fuso correto
       });
     } catch (error) {
       console.error('Erro ao normalizar data:', error);
