@@ -332,7 +332,6 @@ const ClientsVisitsRegisteredRoutes = () => {
     }
   }; */
 
-  // Função para normalizar data - extrai apenas dia, mês e ano
   const normalizeDate = (dateString: string) => {
     if (!dateString) return 'Data não informada';
 
@@ -342,15 +341,9 @@ const ClientsVisitsRegisteredRoutes = () => {
         return 'Data inválida';
       }
 
-      // Extrair apenas os componentes de data (ignorar hora e fuso horário)
-      const year = date.getFullYear();
-      const month = date.getMonth();
-      const day = date.getDate();
-
-      // Criar nova data apenas com dia, mês e ano (sem hora)
-      const normalizedDate = new Date(year, month, day);
-
-      return normalizedDate.toLocaleDateString('pt-BR');
+      return date.toLocaleDateString('pt-BR', {
+        timeZone: 'UTC', // 🔥 força UTC, sem aplicar offset
+      });
     } catch (error) {
       console.error('Erro ao normalizar data:', error);
       return 'Data inválida';
