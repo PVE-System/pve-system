@@ -106,8 +106,26 @@ export async function GET(request: NextRequest) {
     // As rotas já estão filtradas pela consulta SQL
     const userRoutes = allUserRoutes;
 
-    // Remover conversão - deixar a data como vem do banco
-    // A normalização será feita no frontend
+    // Função para converter timestamp UTC para data local correta
+    const convertUTCToLocalDate = (utcDate: Date | string | null) => {
+      if (!utcDate) return null;
+      try {
+        const date = new Date(utcDate);
+        if (isNaN(date.getTime())) return null;
+
+        // Extrair componentes UTC e criar data local
+        const utcYear = date.getUTCFullYear();
+        const utcMonth = date.getUTCMonth();
+        const utcDay = date.getUTCDate();
+
+        // Criar nova data no fuso horário local
+        const localDate = new Date(utcYear, utcMonth, utcDay);
+
+        return localDate.toISOString();
+      } catch {
+        return null;
+      }
+    };
 
     // Para cada rota, buscar os clientes associados
     const routesWithClients = await Promise.all(
@@ -160,7 +178,8 @@ export async function GET(request: NextRequest) {
 
         return {
           ...route,
-          // Manter scheduledDate como vem do banco (sem conversão)
+          // Converter scheduledDate para data local correta
+          scheduledDate: convertUTCToLocalDate(route.scheduledDate),
           clients: clientsWithDetails,
           totalClients: clientsWithDetails.length,
           completedVisits: clientsWithDetails.filter(

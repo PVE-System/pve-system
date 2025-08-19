@@ -228,7 +228,7 @@ interface VisitRoute {
   id: number;
   userId: number;
   routeName: string;
-  scheduledDate: string; // Vem como timestamp do banco
+  scheduledDate: string; // Vem como ISO string corrigida da API
   routeStatus: string;
   description?: string;
   createdAt: string;
