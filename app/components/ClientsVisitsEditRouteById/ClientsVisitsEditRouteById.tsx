@@ -224,9 +224,16 @@ const ClientsVisitsEditRouteById: React.FC<ClientsVisitsEditRouteByIdProps> = ({
     }
   }, [user, routeId]);
 
-  // Formatar data para input (API já envia data local correta)
+  // Formatar data para input (API agora envia data formatada)
   const formatDateForInput = (dateString: string) => {
     if (!dateString) return '';
+
+    // Se a data já vem formatada da API (formato DD/MM/AAAA), retorna diretamente
+    if (dateString.includes('/')) {
+      return dateString;
+    }
+
+    // Fallback para datas em formato ISO
     try {
       const date = new Date(dateString);
       if (isNaN(date.getTime())) return '';

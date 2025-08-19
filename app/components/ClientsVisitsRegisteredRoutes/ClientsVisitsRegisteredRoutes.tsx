@@ -227,7 +227,7 @@ interface VisitRoute {
   id: number;
   userId: number;
   routeName: string;
-  scheduledDate: string;
+  scheduledDate: string; // Agora vem formatada como "DD/MM/AAAA"
   routeStatus: string;
   description?: string;
   createdAt: string;
@@ -335,14 +335,17 @@ const ClientsVisitsRegisteredRoutes = () => {
   const formatDate = (dateString: string) => {
     if (!dateString) return 'Data não informada';
 
+    // Se a data já vem formatada da API (formato DD/MM/AAAA), retorna diretamente
+    if (dateString.includes('/')) {
+      return dateString;
+    }
+
+    // Fallback para datas em formato ISO
     try {
       const date = new Date(dateString);
-
-      // Verificar se a data é válida
       if (isNaN(date.getTime())) {
         return 'Data inválida';
       }
-
       return date.toLocaleDateString('pt-BR');
     } catch (error) {
       console.error('Erro ao formatar data:', error);

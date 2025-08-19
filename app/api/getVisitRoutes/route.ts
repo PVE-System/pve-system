@@ -106,20 +106,21 @@ export async function GET(request: NextRequest) {
     // As rotas já estão filtradas pela consulta SQL
     const userRoutes = allUserRoutes;
 
-    // Função para converter timestamp UTC para data local
-    const convertUTCToLocalDate = (utcDate: Date | string | null) => {
+    // Função para converter timestamp UTC para data local formatada
+    const convertUTCToLocalDateString = (utcDate: Date | string | null) => {
       if (!utcDate) return null;
       try {
         const date = new Date(utcDate);
         if (isNaN(date.getTime())) return null;
 
-        // Extrair componentes da data UTC
-        const year = date.getUTCFullYear();
-        const month = date.getUTCMonth();
-        const day = date.getUTCDate();
-
-        // Criar nova data no fuso horário local
-        return new Date(year, month, day);
+        // Formatar diretamente como string no formato brasileiro
+        // Usando toLocaleDateString com timezone específico para garantir consistência
+        return date.toLocaleDateString('pt-BR', {
+          timeZone: 'America/Sao_Paulo',
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        });
       } catch {
         return null;
       }
@@ -176,8 +177,8 @@ export async function GET(request: NextRequest) {
 
         return {
           ...route,
-          // Converter scheduledDate para data local
-          scheduledDate: convertUTCToLocalDate(route.scheduledDate),
+          // Converter scheduledDate para data local formatada
+          scheduledDate: convertUTCToLocalDateString(route.scheduledDate),
           clients: clientsWithDetails,
           totalClients: clientsWithDetails.length,
           completedVisits: clientsWithDetails.filter(
