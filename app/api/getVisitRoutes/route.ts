@@ -106,25 +106,8 @@ export async function GET(request: NextRequest) {
     // As rotas já estão filtradas pela consulta SQL
     const userRoutes = allUserRoutes;
 
-    // Função para converter timestamp UTC para data local formatada
-    const convertUTCToLocalDateString = (utcDate: Date | string | null) => {
-      if (!utcDate) return null;
-      try {
-        const date = new Date(utcDate);
-        if (isNaN(date.getTime())) return null;
-
-        // Formatar diretamente como string no formato brasileiro
-        // Usando toLocaleDateString com timezone específico para garantir consistência
-        return date.toLocaleDateString('pt-BR', {
-          timeZone: 'America/Sao_Paulo',
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-        });
-      } catch {
-        return null;
-      }
-    };
+    // Remover conversão - deixar a data como vem do banco
+    // A normalização será feita no frontend
 
     // Para cada rota, buscar os clientes associados
     const routesWithClients = await Promise.all(
@@ -177,8 +160,7 @@ export async function GET(request: NextRequest) {
 
         return {
           ...route,
-          // Converter scheduledDate para data local formatada
-          scheduledDate: convertUTCToLocalDateString(route.scheduledDate),
+          // Manter scheduledDate como vem do banco (sem conversão)
           clients: clientsWithDetails,
           totalClients: clientsWithDetails.length,
           completedVisits: clientsWithDetails.filter(
