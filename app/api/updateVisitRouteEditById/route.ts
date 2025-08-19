@@ -44,15 +44,21 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Converter a data para o formato correto
+    // Converter a data para o formato correto em UTC
     let formattedDate: Date;
     try {
       // Assumindo que a data vem no formato DD/MM/AAAA
       const [day, month, year] = scheduledDate.split('/');
       formattedDate = new Date(
-        parseInt(year),
-        parseInt(month) - 1,
-        parseInt(day),
+        Date.UTC(
+          parseInt(year),
+          parseInt(month) - 1,
+          parseInt(day),
+          0,
+          0,
+          0,
+          0,
+        ),
       );
 
       if (isNaN(formattedDate.getTime())) {

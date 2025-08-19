@@ -333,7 +333,7 @@ const ClientsVisitsRegisteredRoutes = () => {
     }
   }; */
 
-  const normalizeDate = (dateString: string) => {
+  const formatDate = (dateString: string) => {
     if (!dateString) return 'Data não informada';
 
     try {
@@ -342,11 +342,9 @@ const ClientsVisitsRegisteredRoutes = () => {
         return 'Data inválida';
       }
 
-      return date.toLocaleDateString('pt-BR', {
-        timeZone: 'America/Sao_Paulo', // garante formato no fuso correto
-      });
+      return date.toLocaleDateString('pt-BR');
     } catch (error) {
-      console.error('Erro ao normalizar data:', error);
+      console.error('Erro ao formatar data:', error);
       return 'Data inválida';
     }
   };
@@ -502,7 +500,7 @@ const ClientsVisitsRegisteredRoutes = () => {
                           </Typography>
                         )}
                         <Typography sx={styles.routeDate}>
-                          Agendado para {normalizeDate(route.scheduledDate)}
+                          Agendado para {formatDate(route.scheduledDate)}
                         </Typography>
                       </Box>
                       <Chip

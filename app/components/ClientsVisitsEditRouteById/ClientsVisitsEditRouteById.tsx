@@ -181,7 +181,7 @@ const ClientsVisitsEditRouteById: React.FC<ClientsVisitsEditRouteByIdProps> = ({
 
       // Preencher os campos com os dados existentes
       setRouteName(route.routeName);
-      setScheduledDate(normalizeDateForInput(route.scheduledDate));
+      setScheduledDate(formatDateForInput(route.scheduledDate));
 
       // Converter clientes da rota para o formato esperado
       const existingClients = route.clients.map((routeClient: RouteClient) => {
@@ -224,23 +224,15 @@ const ClientsVisitsEditRouteById: React.FC<ClientsVisitsEditRouteByIdProps> = ({
     }
   }, [user, routeId]);
 
-  // Função para normalizar data para input - extrai apenas dia, mês e ano
-  const normalizeDateForInput = (dateString: string) => {
+  // Função para formatar data para input
+  const formatDateForInput = (dateString: string) => {
     if (!dateString) return '';
 
     try {
       const date = new Date(dateString);
       if (isNaN(date.getTime())) return '';
 
-      // Extrair apenas os componentes de data (ignorar hora e fuso horário)
-      const year = date.getFullYear();
-      const month = date.getMonth();
-      const day = date.getDate();
-
-      // Criar nova data apenas com dia, mês e ano (sem hora)
-      const normalizedDate = new Date(year, month, day);
-
-      return normalizedDate.toLocaleDateString('pt-BR');
+      return date.toLocaleDateString('pt-BR');
     } catch (error) {
       return '';
     }

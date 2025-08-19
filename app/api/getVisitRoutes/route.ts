@@ -158,19 +158,9 @@ export async function GET(request: NextRequest) {
           }),
         );
 
-        // Função para formatar no padrão dd/MM/yyyy
-        function formatDateToDDMMYYYY(date: Date | string | null) {
-          if (!date) return null;
-          const d = new Date(date);
-          const day = String(d.getUTCDate()).padStart(2, '0');
-          const month = String(d.getUTCMonth() + 1).padStart(2, '0');
-          const year = d.getUTCFullYear();
-          return `${day}/${month}/${year}`;
-        }
-
         return {
           ...route,
-          scheduledDate: formatDateToDDMMYYYY(route.scheduledDate), // <- formatando aqui
+          // Manter scheduledDate como vem do banco (sem conversão)
           clients: clientsWithDetails,
           totalClients: clientsWithDetails.length,
           completedVisits: clientsWithDetails.filter(

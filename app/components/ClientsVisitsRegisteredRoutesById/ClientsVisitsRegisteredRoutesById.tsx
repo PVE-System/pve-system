@@ -309,8 +309,7 @@ const ClientsVisitsRegisteredRoutesById: React.FC<
     }
   }; */
 
-  // Função para normalizar data - extrai apenas dia, mês e ano
-  const normalizeDate = (dateString: string) => {
+  const formatDate = (dateString: string) => {
     if (!dateString) return 'Data não informada';
 
     try {
@@ -319,17 +318,9 @@ const ClientsVisitsRegisteredRoutesById: React.FC<
         return 'Data inválida';
       }
 
-      // Extrair apenas os componentes de data (ignorar hora e fuso horário)
-      const year = date.getFullYear();
-      const month = date.getMonth();
-      const day = date.getDate();
-
-      // Criar nova data apenas com dia, mês e ano (sem hora)
-      const normalizedDate = new Date(year, month, day);
-
-      return normalizedDate.toLocaleDateString('pt-BR');
+      return date.toLocaleDateString('pt-BR');
     } catch (error) {
-      console.error('Erro ao normalizar data:', error);
+      console.error('Erro ao formatar data:', error);
       return 'Data inválida';
     }
   };
@@ -505,7 +496,7 @@ const ClientsVisitsRegisteredRoutesById: React.FC<
                 </Typography>
               )}
               <Typography sx={styles.routeDate}>
-                Agendado para {normalizeDate(route.scheduledDate)}
+                Agendado para {formatDate(route.scheduledDate)}
               </Typography>
             </Box>
             <Box
