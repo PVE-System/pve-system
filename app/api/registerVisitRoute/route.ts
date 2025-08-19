@@ -68,6 +68,7 @@ export async function POST(request: NextRequest) {
     const [, day, month, year] = dateMatch;
 
     // Criar a data em UTC para evitar problemas de fuso horário
+    // Como é uma data escolhida pelo usuário, vamos garantir que seja salva corretamente
     const parsedDate = new Date(
       Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day), 0, 0, 0, 0),
     );

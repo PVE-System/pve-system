@@ -228,7 +228,7 @@ interface VisitRoute {
   id: number;
   userId: number;
   routeName: string;
-  scheduledDate: string; // Vem como ISO string corrigida da API
+  scheduledDate: string; // Vem formatada como "DD/MM/AAAA" da API
   routeStatus: string;
   description?: string;
   createdAt: string;
@@ -336,6 +336,12 @@ const ClientsVisitsRegisteredRoutes = () => {
   const formatDate = (dateString: string) => {
     if (!dateString) return 'Data não informada';
 
+    // Se a data já vem formatada da API (DD/MM/AAAA), retorna diretamente
+    if (dateString.includes('/')) {
+      return dateString;
+    }
+
+    // Fallback para datas em formato ISO
     try {
       const date = new Date(dateString);
       if (isNaN(date.getTime())) {

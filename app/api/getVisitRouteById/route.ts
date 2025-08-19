@@ -49,6 +49,14 @@ export async function GET(request: NextRequest) {
 
     const routeData = route[0];
 
+    // Debug do fuso horário do servidor
+    console.log(
+      '🔍 DEBUG - Fuso horário do servidor:',
+      Intl.DateTimeFormat().resolvedOptions().timeZone,
+    );
+    console.log('🔍 DEBUG - Data atual do servidor:', new Date().toString());
+    console.log('🔍 DEBUG - Data atual UTC:', new Date().toISOString());
+
     // Buscar os clientes associados à rota
     const routeClients = await db
       .select({
@@ -93,31 +101,38 @@ export async function GET(request: NextRequest) {
       }),
     );
 
-    // Função para converter timestamp UTC para data local correta
-    const convertUTCToLocalDate = (utcDate: Date | string | null) => {
+    // Função para formatar data escolhida pelo usuário
+    const formatUserSelectedDate = (utcDate: Date | string | null) => {
       if (!utcDate) return null;
       try {
+        console.log('🔍 DEBUG - Data original do banco:', utcDate);
+        console.log('🔍 DEBUG - Tipo da data:', typeof utcDate);
+
         const date = new Date(utcDate);
+        console.log('🔍 DEBUG - Date object criado:', date);
+
         if (isNaN(date.getTime())) return null;
 
-        // Extrair componentes UTC e criar data local
-        const utcYear = date.getUTCFullYear();
-        const utcMonth = date.getUTCMonth();
-        const utcDay = date.getUTCDate();
+        // Para data escolhida pelo usuário, extrair apenas dia/mês/ano
+        // e formatar como DD/MM/AAAA
+        const day = date.getUTCDate().toString().padStart(2, '0');
+        const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+        const year = date.getUTCFullYear().toString();
 
-        // Criar nova data no fuso horário local
-        const localDate = new Date(utcYear, utcMonth, utcDay);
+        const result = `${day}/${month}/${year}`;
+        console.log('🔍 DEBUG - Resultado final:', result);
 
-        return localDate.toISOString();
-      } catch {
+        return result;
+      } catch (error) {
+        console.error('🔍 DEBUG - Erro na conversão:', error);
         return null;
       }
     };
 
     const routeWithClients = {
       ...routeData,
-      // Converter scheduledDate para data local correta
-      scheduledDate: convertUTCToLocalDate(routeData.scheduledDate),
+      // Formatar data escolhida pelo usuário
+      scheduledDate: formatUserSelectedDate(routeData.scheduledDate),
       clients: clientsWithDetails,
       totalClients: clientsWithDetails.length,
       completedVisits: clientsWithDetails.filter(

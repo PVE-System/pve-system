@@ -84,7 +84,7 @@ interface VisitRoute {
   id: number;
   userId: number;
   routeName: string;
-  scheduledDate: string;
+  scheduledDate: string; // Vem formatada como "DD/MM/AAAA" da API
   routeStatus: string;
   description?: string;
   createdAt: string;
@@ -228,11 +228,22 @@ const ClientsVisitsEditRouteById: React.FC<ClientsVisitsEditRouteByIdProps> = ({
   const formatDateForInput = (dateString: string) => {
     if (!dateString) return '';
 
+    // Se a data já vem formatada da API (DD/MM/AAAA), retorna diretamente
+    if (dateString.includes('/')) {
+      return dateString;
+    }
+
+    // Fallback para datas em formato ISO
     try {
       const date = new Date(dateString);
       if (isNaN(date.getTime())) return '';
 
-      return date.toLocaleDateString('pt-BR');
+      // Extrair componentes UTC e formatar como DD/MM/AAAA
+      const day = date.getUTCDate().toString().padStart(2, '0');
+      const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+      const year = date.getUTCFullYear().toString();
+
+      return `${day}/${month}/${year}`;
     } catch (error) {
       return '';
     }
