@@ -6,6 +6,7 @@ import {
   NewVisitRoute,
   NewVisitRouteClient,
 } from '@/app/db/schema';
+import { eq, and, desc, inArray, isNotNull } from 'drizzle-orm';
 
 interface ClientData {
   clientId?: number;
@@ -113,6 +114,63 @@ export async function POST(request: NextRequest) {
     }));
 
     await db.insert(visitRouteClients).values(routeClientsData).execute();
+
+    // 3. Transferir histórico de visitas para clientes cadastrados
+    const registeredClients = clients.filter((client) => client.clientId);
+
+    // Status que representam visitas já realizadas (não agendadas)
+    const completedStatuses = ['CONCLUIDO', 'PENDENTE', 'DESINTERESSADO'];
+
+    for (const client of registeredClients) {
+      if (client.clientId) {
+        try {
+          // Buscar a última visita do cliente que tenha currentVisitDescription preenchida
+          const lastVisit = await db
+            .select({
+              id: visitRouteClients.id,
+              currentVisitDescription:
+                visitRouteClients.currentVisitDescription,
+              lastVisitConfirmedAt: visitRouteClients.lastVisitConfirmedAt,
+              updatedAt: visitRouteClients.updatedAt, // ← Adicionado
+            })
+            .from(visitRouteClients)
+            .where(
+              and(
+                eq(visitRouteClients.clientId, client.clientId),
+                inArray(visitRouteClients.visitStatus, completedStatuses),
+                isNotNull(visitRouteClients.currentVisitDescription),
+              ),
+            )
+            .orderBy(desc(visitRouteClients.updatedAt)) // ← Mudança aqui!
+            .limit(1);
+
+          if (lastVisit.length > 0) {
+            const visit = lastVisit[0];
+
+            // Atualizar a nova visita com o histórico da última visita
+            await db
+              .update(visitRouteClients)
+              .set({
+                lastVisitDescription: visit.currentVisitDescription,
+                lastVisitConfirmedAt: visit.lastVisitConfirmedAt,
+                updatedAt: new Date(),
+              })
+              .where(
+                and(
+                  eq(visitRouteClients.clientId, client.clientId),
+                  eq(visitRouteClients.visitRouteId, routeId),
+                ),
+              );
+          }
+        } catch (error) {
+          console.error(
+            `Erro ao transferir histórico para cliente ${client.clientId}:`,
+            error,
+          );
+          // Continua o processo mesmo se houver erro em um cliente específico
+        }
+      }
+    }
 
     return NextResponse.json({
       success: true,
