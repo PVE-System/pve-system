@@ -29,6 +29,10 @@ interface ClientProfileProps {
   onImageChange?: (file: File) => void; // Callback para quando a imagem for alterada
   showTooltip?: boolean;
   enableImageUpload?: boolean;
+  lastVisitData?: {
+    hasHistory: boolean;
+    lastVisitConfirmedAt: string | null;
+  } | null;
 }
 
 // Função Renderizar o nome do cliente com tamanho menor
@@ -53,6 +57,7 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
   onImageChange, // Recebe o callback do componente pai
   showTooltip = false, // Valor padrão é false
   enableImageUpload = false,
+  lastVisitData,
 }) => {
   const { control } = useForm();
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -92,6 +97,32 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
     const formattedPhone = `55${cleanedPhone}`;
 
     return `https://wa.me/${formattedPhone}`;
+  };
+
+  // Função para formatar a data da última visita
+  const formatLastVisitDate = (dateString: string | null) => {
+    if (!dateString) return 'Pendente';
+
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      });
+    } catch (error) {
+      console.error('Erro ao formatar data:', error);
+      return 'Pendente';
+    }
+  };
+
+  // Função para obter o texto da última visita
+  const getLastVisitText = () => {
+    if (!lastVisitData || !lastVisitData.hasHistory) {
+      return 'Pendente';
+    }
+
+    return formatLastVisitDate(lastVisitData.lastVisitConfirmedAt);
   };
 
   return (
@@ -255,6 +286,20 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
             wordBreak: 'break-word',
           }}
         >
+          <Typography
+            variant="subtitle2"
+            component="div"
+            sx={{
+              marginBottom: '5px',
+              wordBreak: 'break-word',
+              color: lastVisitData?.hasHistory
+                ? 'text.primary'
+                : 'text.secondary',
+              fontWeight: lastVisitData?.hasHistory ? 'normal' : 'normal',
+            }}
+          >
+            Última Visita: {getLastVisitText()}
+          </Typography>
           <Typography
             variant="subtitle2"
             component="div"
