@@ -31,6 +31,7 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '@/app/contex/authContext';
 import { useRouter } from 'next/navigation';
+import styles from './styles';
 
 // Interface para o tipo dos dados do cliente
 interface Client {
@@ -97,43 +98,6 @@ interface VisitRoute {
 const renderAsIs = (str: any) => {
   if (typeof str !== 'string') return '';
   return str;
-};
-
-// Estilos inline para manter consistência
-const styles = {
-  container: {
-    background: (theme: Theme) =>
-      theme.palette.mode === 'light'
-        ? theme.palette.background.paper
-        : theme.palette.background.alternative,
-
-    borderRadius: '16px',
-    padding: '20px',
-    display: 'flex',
-    flexDirection: 'column',
-
-    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
-  },
-  fontSize: {
-    fontSize: {
-      xs: '10px',
-      sm: '12px',
-      md: '14px',
-    },
-  },
-  fontSizeClientName: {
-    fontSize: {
-      xs: '10px',
-      sm: '12px',
-      md: '14px',
-    },
-    fontWeight: 500,
-  },
-  rowHover: {
-    '&:hover': {
-      backgroundColor: 'action.hover',
-    },
-  },
 };
 
 interface ClientsVisitsEditRouteByIdProps {
