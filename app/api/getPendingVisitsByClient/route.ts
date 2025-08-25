@@ -7,6 +7,16 @@ import { eq, and, desc, inArray, isNotNull, gt } from 'drizzle-orm';
 
 export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url);
+    const statusFilter = searchParams.get('status') || 'PENDENTE'; // Padrão é PENDENTE
+
+    // Validar o filtro de status
+    if (!['PENDENTE', 'DESINTERESSADO'].includes(statusFilter)) {
+      return NextResponse.json(
+        { error: 'Status inválido. Use PENDENTE ou DESINTERESSADO' },
+        { status: 400 },
+      );
+    }
     // 1. Primeiro, buscar todos os clientes únicos que têm visitas
     const allClientsWithVisits = await db
       .select({
@@ -40,10 +50,11 @@ export async function GET(request: NextRequest) {
             clientName = clientInfo[0].companyName;
             isRegisteredClient = true;
 
-            // Buscar a visita PENDENTE mais recente deste cliente
+            // Buscar a visita com status filtrado mais recente deste cliente
             latestVisit = await db
               .select({
                 id: visitRouteClients.id,
+                visitRouteId: visitRouteClients.visitRouteId,
                 visitStatus: visitRouteClients.visitStatus,
                 routeName: visitRoutes.routeName,
                 scheduledDate: visitRoutes.scheduledDate,
@@ -57,7 +68,7 @@ export async function GET(request: NextRequest) {
               .where(
                 and(
                   eq(visitRouteClients.clientId, client.clientId),
-                  eq(visitRouteClients.visitStatus, 'PENDENTE'),
+                  eq(visitRouteClients.visitStatus, statusFilter),
                 ),
               )
               .orderBy(desc(visitRouteClients.updatedAt))
@@ -68,10 +79,11 @@ export async function GET(request: NextRequest) {
           clientName = client.customerNameUnregistered;
           isRegisteredClient = false;
 
-          // Buscar a visita PENDENTE mais recente deste cliente não cadastrado
+          // Buscar a visita com status filtrado mais recente deste cliente não cadastrado
           latestVisit = await db
             .select({
               id: visitRouteClients.id,
+              visitRouteId: visitRouteClients.visitRouteId,
               visitStatus: visitRouteClients.visitStatus,
               routeName: visitRoutes.routeName,
               scheduledDate: visitRoutes.scheduledDate,
@@ -88,17 +100,20 @@ export async function GET(request: NextRequest) {
                   visitRouteClients.customerNameUnregistered,
                   client.customerNameUnregistered,
                 ),
-                eq(visitRouteClients.visitStatus, 'PENDENTE'),
+                eq(visitRouteClients.visitStatus, statusFilter),
               ),
             )
             .orderBy(desc(visitRouteClients.updatedAt))
             .limit(1);
         }
 
-        // 3. Se encontrou uma visita PENDENTE, verificar se não há visitas finalizadas mais recentes
+        // 3. Se encontrou uma visita com status filtrado, verificar se não há visitas finalizadas mais recentes
         if (latestVisit && latestVisit.length > 0) {
-          // Buscar se existe alguma visita finalizada mais recente que a visita PENDENTE
-          const finalizingStatuses = ['CONCLUIDO', 'DESINTERESSADO'];
+          // Buscar se existe alguma visita finalizada mais recente que a visita com status filtrado
+          const finalizingStatuses = ['CONCLUIDO'];
+
+          // Para ambos os status (PENDENTE e DESINTERESSADO), precisamos verificar se há visitas CONCLUIDO mais recentes
+          // que substituiriam o status atual na lista
 
           let hasMoreRecentFinalizedVisit = false;
 
@@ -114,7 +129,7 @@ export async function GET(request: NextRequest) {
                 and(
                   eq(visitRouteClients.clientId, client.clientId),
                   inArray(visitRouteClients.visitStatus, finalizingStatuses),
-                  // Só considerar visitas mais recentes que a visita PENDENTE
+                  // Só considerar visitas mais recentes que a visita com status filtrado
                   gt(visitRouteClients.updatedAt, latestVisit[0].updatedAt),
                 ),
               )
@@ -137,7 +152,7 @@ export async function GET(request: NextRequest) {
                     client.customerNameUnregistered,
                   ),
                   inArray(visitRouteClients.visitStatus, finalizingStatuses),
-                  // Só considerar visitas mais recentes que a visita PENDENTE
+                  // Só considerar visitas mais recentes que a visita com status filtrado
                   gt(visitRouteClients.updatedAt, latestVisit[0].updatedAt),
                 ),
               )
@@ -147,10 +162,11 @@ export async function GET(request: NextRequest) {
             hasMoreRecentFinalizedVisit = finalizedVisit.length > 0;
           }
 
-          // Só retornar se NÃO há visitas finalizadas mais recentes
+          // Só retornar se NÃO há visitas finalizadas mais recentes (para ambos os status)
           if (!hasMoreRecentFinalizedVisit) {
             return {
               id: latestVisit[0].id,
+              visitRouteId: latestVisit[0].visitRouteId,
               clientName,
               visitStatus: latestVisit[0].visitStatus,
               routeName: latestVisit[0].routeName,
@@ -160,19 +176,19 @@ export async function GET(request: NextRequest) {
           }
         }
 
-        return null; // Cliente não tem visita pendente
+        return null; // Cliente não tem visita com o status filtrado
       }),
     );
 
-    // 4. Filtrar apenas os clientes com visitas pendentes
-    const pendingVisits = pendingVisitsByClient.filter(
+    // 4. Filtrar apenas os clientes com visitas do status filtrado
+    const filteredVisits = pendingVisitsByClient.filter(
       (visit) => visit !== null,
     );
 
     return NextResponse.json({
       success: true,
-      pendingVisits,
-      total: pendingVisits.length,
+      pendingVisits: filteredVisits,
+      total: filteredVisits.length,
     });
   } catch (error: unknown) {
     console.error('Erro ao buscar visitas pendentes por cliente:', error);

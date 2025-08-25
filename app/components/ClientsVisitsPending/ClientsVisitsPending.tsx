@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Table,
   TableBody,
@@ -14,12 +15,17 @@ import {
   CircularProgress,
   Typography,
   Paper,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
 import styles from './styles';
 
 // Interface para os dados das visitas pendentes
 interface PendingVisit {
   id: number;
+  visitRouteId: number;
   clientName: string; // companyName ou customerNameUnregistered
   visitStatus: string;
   routeName: string;
@@ -28,8 +34,12 @@ interface PendingVisit {
 }
 
 const ClientsVisitsPending: React.FC = () => {
+  const router = useRouter();
   const [pendingVisits, setPendingVisits] = useState<PendingVisit[]>([]);
   const [loading, setLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState<
+    'PENDENTE' | 'DESINTERESSADO'
+  >('PENDENTE');
   const isSmallScreen = useMediaQuery('(max-width:600px)');
 
   // Função para formatar a data escolhida pelo usuário
@@ -44,8 +54,14 @@ const ClientsVisitsPending: React.FC = () => {
         return 'Data inválida';
       }
 
+      // Como a data foi salva em UTC, precisamos ajustar para o fuso horário local
+      // A data foi salva como UTC mas representa uma data escolhida pelo usuário
+      const localDate = new Date(
+        date.getTime() + date.getTimezoneOffset() * 60000,
+      );
+
       // Formatar para DD/MM/AAAA
-      return date.toLocaleDateString('pt-BR', {
+      return localDate.toLocaleDateString('pt-BR', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
@@ -62,28 +78,35 @@ const ClientsVisitsPending: React.FC = () => {
     return str;
   };
 
-  // Buscar visitas pendentes
+  // Função para navegar para a página da rota em nova aba
+  const handleRowClick = (visitRouteId: number) => {
+    window.open(`/clientsVisitsRegisteredRoutes/${visitRouteId}`, '_blank');
+  };
+
+  // Buscar visitas com filtro de status
   useEffect(() => {
-    const fetchPendingVisits = async () => {
+    const fetchFilteredVisits = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/getPendingVisitsByClient');
+        const response = await fetch(
+          `/api/getPendingVisitsByClient?status=${statusFilter}`,
+        );
 
         if (!response.ok) {
-          throw new Error('Erro ao buscar visitas pendentes');
+          throw new Error('Erro ao buscar visitas');
         }
 
         const data = await response.json();
         setPendingVisits(data.pendingVisits);
       } catch (error) {
-        console.error('Erro ao buscar visitas pendentes:', error);
+        console.error('Erro ao buscar visitas:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPendingVisits();
-  }, []);
+    fetchFilteredVisits();
+  }, [statusFilter]);
 
   if (loading) {
     return (
@@ -100,6 +123,25 @@ const ClientsVisitsPending: React.FC = () => {
 
   return (
     <Container maxWidth="lg" sx={styles.container}>
+      {/* Filtro de Status */}
+      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
+        <FormControl sx={{ minWidth: 200 }}>
+          <InputLabel id="status-filter-label">Filtrar por Status</InputLabel>
+          <Select
+            labelId="status-filter-label"
+            id="status-filter"
+            value={statusFilter}
+            label="Filtrar por Status"
+            onChange={(e) =>
+              setStatusFilter(e.target.value as 'PENDENTE' | 'DESINTERESSADO')
+            }
+          >
+            <MenuItem value="PENDENTE">Pendentes</MenuItem>
+            <MenuItem value="DESINTERESSADO">Desinteressados</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
+
       <TableContainer>
         <Table>
           <TableHead>
@@ -124,7 +166,11 @@ const ClientsVisitsPending: React.FC = () => {
                   sx={{ py: 4, border: 'none' }}
                 >
                   <Typography variant="body2" color="text.secondary">
-                    Nenhuma visita pendente encontrada.
+                    Nenhuma visita{' '}
+                    {statusFilter === 'PENDENTE'
+                      ? 'pendente'
+                      : 'desinteressada'}{' '}
+                    encontrada.
                   </Typography>
                 </TableCell>
               </TableRow>
@@ -133,6 +179,7 @@ const ClientsVisitsPending: React.FC = () => {
                 <TableRow
                   key={visit.id}
                   sx={{ ...styles.rowHover, cursor: 'pointer' }}
+                  onClick={() => handleRowClick(visit.visitRouteId)}
                 >
                   <TableCell sx={styles.fontSize}>{index + 1}</TableCell>
                   <TableCell sx={styles.fontSize}>
@@ -162,8 +209,14 @@ const ClientsVisitsPending: React.FC = () => {
                             px: 1.5,
                             py: 0.5,
                             borderRadius: 1,
-                            backgroundColor: 'orange.100',
-                            color: 'orange.800',
+                            backgroundColor:
+                              visit.visitStatus === 'PENDENTE'
+                                ? 'orange.100'
+                                : 'red.100',
+                            color:
+                              visit.visitStatus === 'PENDENTE'
+                                ? 'orange.800'
+                                : 'red.800',
                             fontSize: '0.75rem',
                             fontWeight: 'medium',
                           }}
@@ -193,7 +246,8 @@ const ClientsVisitsPending: React.FC = () => {
       {pendingVisits.length > 0 && (
         <Box sx={{ mt: 2, textAlign: 'center' }}>
           <Typography variant="body2" color="text.secondary">
-            Total de {pendingVisits.length} visita(s) pendente(s)
+            Total de {pendingVisits.length} visita(s){' '}
+            {statusFilter === 'PENDENTE' ? 'pendente(s)' : 'desinteressada(s)'}
           </Typography>
         </Box>
       )}
