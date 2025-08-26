@@ -29,6 +29,7 @@ import {
 import { useAuth } from '@/app/contex/authContext';
 import { useRouter } from 'next/navigation';
 import styles from './styles';
+import AlertModalClientsVisitsRoute from '../AlertModalClientsVisitsRoute/AlertModalClientsVisitsRoute';
 
 // Função para renderizar o texto como está no banco
 const renderAsIs = (str: any) => {
@@ -84,6 +85,11 @@ const ClientsVisitsRegisteredRoutesById: React.FC<
   const [route, setRoute] = useState<VisitRoute | null>(null);
   const [loading, setLoading] = useState(true);
   const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [alertModal, setAlertModal] = useState({
+    open: false,
+    title: '',
+    message: '',
+  });
 
   const fetchRouteById = useCallback(async () => {
     if (!user) return;
@@ -225,10 +231,14 @@ const ClientsVisitsRegisteredRoutesById: React.FC<
       );
 
       console.log('Status da rota atualizado com sucesso:', result);
-      alert('Status da rota foi alterado com sucesso');
+      setAlertModal({
+        open: true,
+        title: 'Aviso:',
+        message: 'Status da rota foi alterado com sucesso!',
+      });
 
-      // Redirecionar para a página de rotas registradas
-      router.push('/clientsVisitsRegisteredRoutes');
+      // Redirecionar para a página de rotas registradas após fechar o modal
+      // router.push('/clientsVisitsRegisteredRoutes');
     } catch (error) {
       console.error('Erro ao atualizar status da rota:', error);
       alert(
@@ -239,6 +249,12 @@ const ClientsVisitsRegisteredRoutesById: React.FC<
     } finally {
       setUpdatingStatus(false);
     }
+  };
+
+  const handleCloseAlertModal = () => {
+    setAlertModal({ open: false, title: '', message: '' });
+    // Redirecionar para a página de rotas registradas após fechar o modal
+    router.push('/clientsVisitsRegisteredRoutes');
   };
 
   if (loading) {
@@ -265,6 +281,12 @@ const ClientsVisitsRegisteredRoutesById: React.FC<
 
   return (
     <Box sx={styles.container}>
+      <AlertModalClientsVisitsRoute
+        open={alertModal.open}
+        title={alertModal.title}
+        message={alertModal.message}
+        onClose={handleCloseAlertModal}
+      />
       {/* Card da Rota */}
       <Card sx={styles.card}>
         <CardContent sx={styles.cardContent}>

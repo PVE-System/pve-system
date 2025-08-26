@@ -26,6 +26,7 @@ import {
 import { useAuth } from '@/app/contex/authContext';
 import { useRouter } from 'next/navigation';
 import styles from './styles';
+import AlertModalClientsVisitsRoute from '../AlertModalClientsVisitsRoute/AlertModalClientsVisitsRoute';
 
 interface RouteClient {
   id: number;
@@ -73,6 +74,13 @@ const ClientsVisitsRegisteredRoutes = () => {
     (new Date().getMonth() + 1).toString(),
   );
   const [availableYears, setAvailableYears] = useState<number[]>([]);
+  const [alertModal, setAlertModal] = useState({
+    open: false,
+    title: '',
+    message: '',
+    isConfirmation: false,
+    onConfirm: null as (() => void) | null,
+  });
 
   const months = [
     { value: '1', label: 'Janeiro' },
@@ -162,11 +170,17 @@ const ClientsVisitsRegisteredRoutes = () => {
     if (!user) return;
 
     // Confirmação antes de deletar
-    const confirmed = window.confirm(
-      'Tem certeza que deseja excluir esta rota? Esta ação não pode ser desfeita.',
-    );
+    setAlertModal({
+      open: true,
+      title: 'Confirmar Exclusão:',
+      message: 'Tem certeza que deseja excluir esta rota?',
+      isConfirmation: true,
+      onConfirm: () => executeDeleteRoute(routeId),
+    });
+  };
 
-    if (!confirmed) return;
+  const executeDeleteRoute = async (routeId: number) => {
+    if (!user) return;
 
     try {
       const response = await fetch(
@@ -186,11 +200,27 @@ const ClientsVisitsRegisteredRoutes = () => {
         prevRoutes.filter((route) => route.id !== routeId),
       );
 
-      alert('Rota deletada com sucesso!');
+      setAlertModal({
+        open: true,
+        title: 'Aviso:',
+        message: 'Rota deletada com sucesso!',
+        isConfirmation: false,
+        onConfirm: null,
+      });
     } catch (error) {
       console.error('Erro ao deletar rota:', error);
       alert(error instanceof Error ? error.message : 'Erro ao deletar rota');
     }
+  };
+
+  const handleCloseAlertModal = () => {
+    setAlertModal({
+      open: false,
+      title: '',
+      message: '',
+      isConfirmation: false,
+      onConfirm: null,
+    });
   };
 
   if (loading) {
@@ -203,6 +233,15 @@ const ClientsVisitsRegisteredRoutes = () => {
 
   return (
     <Box sx={styles.container}>
+      <AlertModalClientsVisitsRoute
+        open={alertModal.open}
+        title={alertModal.title}
+        message={alertModal.message}
+        onClose={handleCloseAlertModal}
+        onConfirm={alertModal.onConfirm || undefined}
+        isConfirmation={alertModal.isConfirmation}
+        confirmText={alertModal.isConfirmation ? 'Confirmar' : 'OK'}
+      />
       {/* Filtros */}
       <Box sx={{ ...styles.filtersContainer, width: '100%' }}>
         <FormControl sx={styles.inputContainer}>

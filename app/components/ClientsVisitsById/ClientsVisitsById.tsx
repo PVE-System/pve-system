@@ -25,6 +25,7 @@ import {
 import { useAuth } from '@/app/contex/authContext';
 import { useRouter } from 'next/navigation';
 import styles from './styles';
+import AlertModalClientsVisitsRoute from '../AlertModalClientsVisitsRoute/AlertModalClientsVisitsRoute';
 
 // Função para renderizar o texto como está no banco
 const renderAsIs = (str: any) => {
@@ -65,6 +66,11 @@ const ClientsVisitsById: React.FC<ClientsVisitsByIdProps> = ({ visitId }) => {
     visitStatus: '',
     currentVisitDescription: '',
     lastVisitDescription: '',
+  });
+  const [alertModal, setAlertModal] = useState({
+    open: false,
+    title: '',
+    message: '',
   });
 
   const fetchVisitById = useCallback(async () => {
@@ -127,12 +133,16 @@ const ClientsVisitsById: React.FC<ClientsVisitsByIdProps> = ({ visitId }) => {
 
       const result = await response.json();
       console.log('Visita atualizada com sucesso:', result);
-      alert('Informações da visita atualizadas com sucesso!');
+      setAlertModal({
+        open: true,
+        title: 'Aviso:',
+        message: 'Informações da visita atualizadas com sucesso!',
+      });
 
-      // Redirecionar para a página da rota
-      if (result.routeId) {
-        router.push(`/clientsVisitsRegisteredRoutes/${result.routeId}`);
-      }
+      // Redirecionar para a página da rota após fechar o modal
+      // if (result.routeId) {
+      //   router.push(`/clientsVisitsRegisteredRoutes/${result.routeId}`);
+      // }
     } catch (error) {
       console.error('Erro ao atualizar visita:', error);
       alert(
@@ -140,6 +150,14 @@ const ClientsVisitsById: React.FC<ClientsVisitsByIdProps> = ({ visitId }) => {
       );
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleCloseAlertModal = () => {
+    setAlertModal({ open: false, title: '', message: '' });
+    // Redirecionar para a página da rota após fechar o modal
+    if (visit) {
+      router.push(`/clientsVisitsRegisteredRoutes/${visit.visitRouteId}`);
     }
   };
 
@@ -184,6 +202,12 @@ const ClientsVisitsById: React.FC<ClientsVisitsByIdProps> = ({ visitId }) => {
 
   return (
     <Box sx={styles.container}>
+      <AlertModalClientsVisitsRoute
+        open={alertModal.open}
+        title={alertModal.title}
+        message={alertModal.message}
+        onClose={handleCloseAlertModal}
+      />
       {/* Card da Visita */}
       <Card sx={styles.card}>
         <CardContent sx={styles.cardContent}>

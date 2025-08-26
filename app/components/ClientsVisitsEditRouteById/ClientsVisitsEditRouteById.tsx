@@ -32,6 +32,7 @@ import {
 import { useAuth } from '@/app/contex/authContext';
 import { useRouter } from 'next/navigation';
 import styles from './styles';
+import AlertModalClientsVisitsRoute from '../AlertModalClientsVisitsRoute/AlertModalClientsVisitsRoute';
 
 // Interface para o tipo dos dados do cliente
 interface Client {
@@ -123,6 +124,11 @@ const ClientsVisitsEditRouteById: React.FC<ClientsVisitsEditRouteByIdProps> = ({
   const [routeName, setRouteName] = useState('');
   const [scheduledDate, setScheduledDate] = useState('');
   const [routeData, setRouteData] = useState<VisitRoute | null>(null);
+  const [alertModal, setAlertModal] = useState({
+    open: false,
+    title: '',
+    message: '',
+  });
 
   const { user } = useAuth();
   const router = useRouter();
@@ -361,10 +367,14 @@ const ClientsVisitsEditRouteById: React.FC<ClientsVisitsEditRouteByIdProps> = ({
       const result = await response.json();
       console.log('Rota atualizada com sucesso:', result);
 
-      alert('Rota atualizada com sucesso!');
+      setAlertModal({
+        open: true,
+        title: 'Aviso:',
+        message: 'Rota atualizada com sucesso!',
+      });
 
-      // Redirecionar para a página da rota
-      router.push(`/clientsVisitsRegisteredRoutes/${routeId}`);
+      // Redirecionar para a página da rota após fechar o modal
+      // router.push(`/clientsVisitsRegisteredRoutes/${routeId}`);
     } catch (error) {
       console.error('Erro ao atualizar rota:', error);
       alert(error instanceof Error ? error.message : 'Erro ao atualizar rota');
@@ -422,6 +432,12 @@ const ClientsVisitsEditRouteById: React.FC<ClientsVisitsEditRouteByIdProps> = ({
     setScheduledDate(formattedValue);
   };
 
+  const handleCloseAlertModal = () => {
+    setAlertModal({ open: false, title: '', message: '' });
+    // Redirecionar para a página da rota após fechar o modal
+    router.push(`/clientsVisitsRegisteredRoutes/${routeId}`);
+  };
+
   const handleBack = () => {
     router.back();
   };
@@ -456,6 +472,12 @@ const ClientsVisitsEditRouteById: React.FC<ClientsVisitsEditRouteByIdProps> = ({
 
   return (
     <Container maxWidth="xl" sx={{ py: 2 }}>
+      <AlertModalClientsVisitsRoute
+        open={alertModal.open}
+        title={alertModal.title}
+        message={alertModal.message}
+        onClose={handleCloseAlertModal}
+      />
       <Box
         sx={{
           display: 'grid',

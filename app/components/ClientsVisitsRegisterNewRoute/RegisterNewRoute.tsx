@@ -30,6 +30,7 @@ import {
 import styles from './styles';
 import { useAuth } from '@/app/contex/authContext';
 import { useRouter } from 'next/navigation';
+import AlertModalClientsVisitsRoute from '../AlertModalClientsVisitsRoute/AlertModalClientsVisitsRoute';
 
 // Interface para o tipo dos dados do cliente
 interface Client {
@@ -73,6 +74,12 @@ const RegisterNewRoute = () => {
   const [unregisteredClientCity, setUnregisteredClientCity] = useState('');
   const [routeName, setRouteName] = useState('');
   const [scheduledDate, setScheduledDate] = useState('');
+  const [alertModal, setAlertModal] = useState({
+    open: false,
+    title: '',
+    message: '',
+  });
+  const [pendingRouteId, setPendingRouteId] = useState<number | null>(null);
 
   const { user } = useAuth();
   const router = useRouter();
@@ -219,12 +226,14 @@ const RegisterNewRoute = () => {
       setRouteName('');
       setScheduledDate('');
 
-      alert('Rota criada com sucesso!');
+      setPendingRouteId(result.routeId ?? null);
+      setAlertModal({
+        open: true,
+        title: 'Aviso:',
+        message: 'Rota criada com sucesso!',
+      });
 
-      // Redirecionar para a página da rota criada
-      if (result.routeId) {
-        router.push(`/clientsVisitsRegisteredRoutes/${result.routeId}`);
-      }
+      // Removido: navegação imediata. Agora só após fechar o modal
     } catch (error) {
       console.error('Erro ao criar rota:', error);
       alert(error instanceof Error ? error.message : 'Erro ao criar rota');
@@ -290,8 +299,23 @@ const RegisterNewRoute = () => {
     );
   }
 
+  const handleCloseAlertModal = () => {
+    const goTo = pendingRouteId;
+    setAlertModal({ open: false, title: '', message: '' });
+    setPendingRouteId(null);
+    if (goTo) {
+      router.push(`/clientsVisitsRegisteredRoutes/${goTo}`);
+    }
+  };
+
   return (
     <Container maxWidth="xl" sx={{ py: 2 }}>
+      <AlertModalClientsVisitsRoute
+        open={alertModal.open}
+        title={alertModal.title}
+        message={alertModal.message}
+        onClose={handleCloseAlertModal}
+      />
       <Box
         sx={{
           display: 'grid',
