@@ -8,7 +8,7 @@ import {
   clients,
   users,
 } from '@/app/db/schema';
-import { eq, and, gte, lte } from 'drizzle-orm';
+import { eq, and, gte, lte, desc, asc } from 'drizzle-orm';
 
 export async function GET(request: NextRequest) {
   try {
@@ -100,8 +100,8 @@ export async function GET(request: NextRequest) {
     const allUserRoutes = await (whereConditions.length > 0
       ? baseSelect
           .where(and(...whereConditions))
-          .orderBy(visitRoutes.scheduledDate)
-      : baseSelect.orderBy(visitRoutes.scheduledDate));
+          .orderBy(desc(visitRoutes.scheduledDate))
+      : baseSelect.orderBy(desc(visitRoutes.scheduledDate)));
 
     // As rotas já estão filtradas pela consulta SQL
     const userRoutes = allUserRoutes;
@@ -153,7 +153,8 @@ export async function GET(request: NextRequest) {
             lastVisitConfirmedAt: visitRouteClients.lastVisitConfirmedAt,
           })
           .from(visitRouteClients)
-          .where(eq(visitRouteClients.visitRouteId, route.id));
+          .where(eq(visitRouteClients.visitRouteId, route.id))
+          .orderBy(asc(visitRouteClients.id)); // Ordenar por ID (ordem de inserção)
 
         // Para clientes cadastrados, buscar informações adicionais
         const clientsWithDetails = await Promise.all(

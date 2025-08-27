@@ -675,7 +675,7 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
                 {buttonText}
               </Button>
             </Tooltip>
-            <Tooltip title={'Copia endereço para colar no GPS'}>
+            <Tooltip title={'Copiar endereço para colar no GPS'}>
               <Button
                 type="button"
                 variant="contained"

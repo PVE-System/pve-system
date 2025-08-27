@@ -46,7 +46,7 @@ const ClientsVisitsManager = () => {
           <CardContent sx={styles.cardContent}>
             <PendingActionsIcon sx={styles.cardIcon} />
             <Typography variant="h6" sx={styles.cardTitle}>
-              Clientes com visita pendente
+              Clientes com visita pendente e desinteressados
             </Typography>
           </CardContent>
         </Card>

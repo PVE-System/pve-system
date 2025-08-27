@@ -8,7 +8,7 @@ import {
   clients,
   users,
 } from '@/app/db/schema';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, asc } from 'drizzle-orm';
 
 export async function GET(request: NextRequest) {
   try {
@@ -71,7 +71,8 @@ export async function GET(request: NextRequest) {
         lastVisitConfirmedAt: visitRouteClients.lastVisitConfirmedAt,
       })
       .from(visitRouteClients)
-      .where(eq(visitRouteClients.visitRouteId, parseInt(routeId)));
+      .where(eq(visitRouteClients.visitRouteId, parseInt(routeId)))
+      .orderBy(asc(visitRouteClients.id)); // Ordenar por ID (ordem de inserção)
 
     // Para clientes cadastrados, buscar informações adicionais
     const clientsWithDetails = await Promise.all(

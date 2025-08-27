@@ -14,7 +14,7 @@ const ClientsVisitsPendingPage: React.FC = () => {
           Visitas <span>Pendentes</span> e <span>Desinteressados</span>
         </Typography>
         <Typography component="span" sx={sharedStyles.subtitleSize}>
-          Lista de clientes com status de visita <span>Pendente</span> ou{' '}
+          Lista de clientes com status de visita <span>pendente</span> ou{' '}
           <span>desinteressado</span>
         </Typography>
       </Box>

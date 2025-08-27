@@ -194,7 +194,7 @@ const ClientsVisitsPending: React.FC = () => {
                       {!isSmallScreen && (
                         <Typography variant="caption" color="text.secondary">
                           {visit.isRegisteredClient
-                            ? 'Cliente Cadastrado'
+                            ? ''
                             : 'Cliente Não Cadastrado'}
                         </Typography>
                       )}
