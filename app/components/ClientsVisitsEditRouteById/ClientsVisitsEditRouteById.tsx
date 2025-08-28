@@ -28,6 +28,8 @@ import {
   PersonOff as PersonOffIcon,
   Delete as DeleteIcon,
   ArrowBack as ArrowBackIcon,
+  Update as UpdateIcon,
+  Cancel as CancelIcon,
 } from '@mui/icons-material';
 import { useAuth } from '@/app/contex/authContext';
 import { useRouter } from 'next/navigation';
@@ -845,33 +847,57 @@ const ClientsVisitsEditRouteById: React.FC<ClientsVisitsEditRouteByIdProps> = ({
 
           {/* Botão Atualizar Rota */}
           <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-            <Button
-              variant="contained"
-              onClick={handleUpdateRoute}
-              disabled={
-                selectedClients.length === 0 ||
-                !routeName.trim() ||
-                !scheduledDate.trim() ||
-                isUpdatingRoute
-              }
+            <Box
               sx={{
-                backgroundColor: 'green',
-                '&:hover': {
-                  backgroundColor: 'darkgreen',
-                },
-                '&:disabled': {
-                  backgroundColor: 'green',
-                  opacity: 0.6,
-                },
-                minWidth: '150px',
+                display: 'flex',
+                flexDirection: { xs: 'column', sm: 'row' },
+                gap: { xs: 2, sm: 0 },
+                alignItems: 'center',
               }}
             >
-              {isUpdatingRoute ? (
-                <CircularProgress size={20} color="inherit" />
-              ) : (
-                'Atualizar Rota'
-              )}
-            </Button>
+              <Button
+                variant="contained"
+                startIcon={<UpdateIcon />}
+                onClick={handleUpdateRoute}
+                disabled={
+                  selectedClients.length === 0 ||
+                  !routeName.trim() ||
+                  !scheduledDate.trim() ||
+                  isUpdatingRoute
+                }
+                sx={{
+                  backgroundColor: 'green',
+                  '&:hover': {
+                    backgroundColor: 'darkgreen',
+                  },
+                  '&:disabled': {
+                    backgroundColor: 'green',
+                    opacity: 0.6,
+                  },
+                  fontSize: '12px',
+                  mr: { xs: 0, sm: 2 }, // Margem apenas em telas maiores
+                  width: { xs: '100%', sm: 'auto' }, // Largura total em mobile
+                }}
+              >
+                {isUpdatingRoute ? (
+                  <CircularProgress size={20} color="inherit" />
+                ) : (
+                  'Atualizar Rota'
+                )}
+              </Button>
+              <Button
+                variant="contained"
+                startIcon={<CancelIcon />}
+                onClick={handleBack}
+                disabled={isUpdatingRoute}
+                sx={{
+                  fontSize: '12px',
+                  width: { xs: '100%', sm: 'auto' }, // Largura total em mobile
+                }}
+              >
+                Cancelar
+              </Button>
+            </Box>
           </Box>
         </Box>
 

@@ -43,7 +43,7 @@ export async function PUT(request: NextRequest) {
 
     // Preparar dados para atualização
     const updateData: any = {
-      updatedAt: new Date(),
+      // updatedAt: new Date(), // Comentado para preservar ordem dos clientes
     };
 
     if (visitStatus !== undefined) {
@@ -58,9 +58,15 @@ export async function PUT(request: NextRequest) {
       updateData.lastVisitDescription = lastVisitDescription;
     }
 
-    // Se o status for CONCLUIDO, atualizar lastVisitConfirmedAt
-    if (visitStatus === 'CONCLUIDO') {
-      updateData.lastVisitConfirmedAt = new Date();
+    // Lógica para lastVisitConfirmedAt
+    if (visitStatus !== undefined) {
+      if (visitStatus === 'CONCLUIDO') {
+        // Se o status for CONCLUIDO, atualizar lastVisitConfirmedAt
+        updateData.lastVisitConfirmedAt = new Date();
+      } else {
+        // Se o status for qualquer outro valor, limpar lastVisitConfirmedAt
+        updateData.lastVisitConfirmedAt = null;
+      }
     }
 
     // Atualizar a visita

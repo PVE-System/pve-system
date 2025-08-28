@@ -21,6 +21,7 @@ import {
   PersonOff as PersonOffIcon,
   Visibility as VisibilityIcon,
   Save as SaveIcon,
+  Cancel as CancelIcon,
 } from '@mui/icons-material';
 import { useAuth } from '@/app/contex/authContext';
 import { useRouter } from 'next/navigation';
@@ -416,7 +417,13 @@ const ClientsVisitsById: React.FC<ClientsVisitsByIdProps> = ({ visitId }) => {
           </Box>
 
           {/* Ações */}
-          <Box sx={styles.actionsContainer}>
+          <Box
+            sx={{
+              ...styles.actionsContainer,
+              flexDirection: { xs: 'column', sm: 'row' },
+              gap: { xs: 2, sm: 0 },
+            }}
+          >
             <Button
               variant="contained"
               startIcon={<SaveIcon />}
@@ -428,6 +435,8 @@ const ClientsVisitsById: React.FC<ClientsVisitsByIdProps> = ({ visitId }) => {
                 '&:hover': {
                   backgroundColor: 'darkgreen',
                 },
+                mr: { xs: 0, sm: 2 }, // Margem apenas em telas maiores
+                width: { xs: '100%', sm: 'auto' }, // Largura total em mobile
               }}
             >
               {saving ? (
@@ -435,6 +444,18 @@ const ClientsVisitsById: React.FC<ClientsVisitsByIdProps> = ({ visitId }) => {
               ) : (
                 'Salvar Alterações'
               )}
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={<CancelIcon />}
+              onClick={handleBack}
+              disabled={saving}
+              sx={{
+                fontSize: '12px',
+                width: { xs: '100%', sm: 'auto' }, // Largura total em mobile
+              }}
+            >
+              Cancelar
             </Button>
           </Box>
         </CardContent>

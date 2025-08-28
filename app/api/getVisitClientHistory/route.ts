@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/app/db';
 import { visitRouteClients, visitRoutes } from '@/app/db/schema';
-import { eq, and, desc, ne, isNotNull, inArray } from 'drizzle-orm';
+import { eq, and, desc, isNotNull } from 'drizzle-orm';
 
 export async function GET(request: NextRequest) {
   try {
@@ -17,9 +17,6 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Status que representam visitas já realizadas (não agendadas)
-    const completedStatuses = ['CONCLUIDO', 'PENDENTE', 'DESINTERESSADO'];
-
     // Buscar a última visita do cliente que tenha currentVisitDescription preenchida
     const lastVisit = await db
       .select({
@@ -30,20 +27,22 @@ export async function GET(request: NextRequest) {
         visitStatus: visitRouteClients.visitStatus,
         routeName: visitRoutes.routeName,
         scheduledDate: visitRoutes.scheduledDate,
-        updatedAt: visitRouteClients.updatedAt, // ← Adicionado
+        updatedAt: visitRouteClients.updatedAt,
       })
       .from(visitRouteClients)
       .leftJoin(visitRoutes, eq(visitRouteClients.visitRouteId, visitRoutes.id))
       .where(
         and(
           eq(visitRouteClients.clientId, parseInt(clientId)),
-          // Buscar apenas visitas com status de visitas realizadas
-          inArray(visitRouteClients.visitStatus, completedStatuses),
+          // Buscar apenas visitas com status CONCLUIDO
+          eq(visitRouteClients.visitStatus, 'CONCLUIDO'),
+          // Buscar apenas visitas que tenham lastVisitConfirmedAt preenchida
+          isNotNull(visitRouteClients.lastVisitConfirmedAt),
           // Buscar apenas visitas que tenham alguma descrição
           isNotNull(visitRouteClients.currentVisitDescription),
         ),
       )
-      .orderBy(desc(visitRouteClients.updatedAt)) // ← Mudança aqui!
+      .orderBy(desc(visitRouteClients.lastVisitConfirmedAt))
       .limit(1);
 
     if (lastVisit.length === 0) {

@@ -25,6 +25,7 @@ import {
   CheckCircle as CheckCircleIcon,
   Error as ErrorIcon,
   HeartBroken as HeartBrokenIcon,
+  ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
 import { useAuth } from '@/app/contex/authContext';
 import { useRouter } from 'next/navigation';
@@ -151,7 +152,7 @@ const ClientsVisitsRegisteredRoutesById: React.FC<
   };
 
   const handleBack = () => {
-    router.back();
+    router.push('/clientsVisitsRegisteredRoutes');
   };
 
   const handleUpdateVisit = (clientId: number, clientName: string) => {
@@ -287,6 +288,29 @@ const ClientsVisitsRegisteredRoutesById: React.FC<
         message={alertModal.message}
         onClose={handleCloseAlertModal}
       />
+
+      {/* Botão Voltar */}
+      <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2, mt: -5 }}>
+        <Button
+          variant="contained"
+          size="small"
+          startIcon={<ArrowBackIcon />}
+          onClick={handleBack}
+          sx={{
+            fontSize: { xs: '11px', sm: '12px' },
+            backgroundColor: 'primary.main',
+            '&:hover': {
+              backgroundColor: 'primary.dark',
+            },
+            minWidth: { xs: '80px', sm: 'auto' },
+            height: { xs: '26px', sm: 'auto' },
+            px: { xs: 1, sm: 2 },
+          }}
+        >
+          Voltar
+        </Button>
+      </Box>
+
       {/* Card da Rota */}
       <Card sx={styles.card}>
         <CardContent sx={styles.cardContent}>
