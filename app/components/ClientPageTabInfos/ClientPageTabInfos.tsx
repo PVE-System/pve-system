@@ -33,6 +33,7 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
   const [salesData, setSalesData] = useState<{ [key: string]: any }>({});
   const [loading, setLoading] = useState(true); // Estado para controlar o carregamento
   const [buttonText, setButtonText] = useState('Excel');
+  const [localButtonText, setLocalButtonText] = useState('Local');
   const [businessGroups, setBusinessGroups] = useState<
     { id: number; name: string }[]
   >([]);
@@ -40,6 +41,10 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
     { operatorNumber: string; name: string }[]
   >([]);
   const [salesQuotes, setSalesQuotes] = useState<SalesQuote[]>([]);
+  const [lastVisitData, setLastVisitData] = useState<{
+    hasHistory: boolean;
+    lastVisitConfirmedAt: string | null;
+  } | null>(null);
 
   //Get Client Start
 
@@ -161,6 +166,31 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
 
   //Get salesInformation END
 
+  // Buscar histórico de visitas do cliente
+  useEffect(() => {
+    if (!clientId || isNaN(Number(clientId))) {
+      return;
+    }
+
+    const fetchVisitHistory = async () => {
+      try {
+        const response = await fetch(
+          `/api/getVisitClientHistory?clientId=${clientId}`,
+        );
+        if (!response.ok) {
+          console.error('Erro ao buscar histórico de visitas');
+          return;
+        }
+        const data = await response.json();
+        setLastVisitData(data);
+      } catch (error) {
+        console.error('Erro ao buscar histórico de visitas:', error);
+      }
+    };
+
+    fetchVisitHistory();
+  }, [clientId]);
+
   // Mapeamento dos nomes dos campos do banco de dados para nomes mais amigáveis
   const fieldLabels: { [key: string]: string } = {
     companyName: 'Nome da Empresa ou Pessoa',
@@ -216,9 +246,9 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
     fetchActiveUsers();
   }, []);
 
-  //Start Export PDF
+  //Start Export PDF. Esta Função teve seu uso adiado ou descontinuado, mas ficará comentado de backup.
 
-  const exportPDF = () => {
+  /* const exportPDF = () => {
     const doc = new jsPDF(); // Cria uma nova instância do jsPDF
 
     doc.setFontSize(12);
@@ -288,7 +318,7 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
     doc.save(
       `PVE Representações - Cadastro do Cliente ${clientData.companyName}.pdf`,
     ); // Salva o PDF
-  };
+  }; */
 
   //End Export PDF
 
@@ -469,6 +499,71 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
   };
   // End Export EXCEL
 
+  // Função para copiar endereço do cliente para GPS/Google Maps
+  const exportLocalGpsButton = () => {
+    if (!clientData) {
+      console.error('Dados do cliente não disponíveis');
+      return;
+    }
+
+    // Extrair dados do endereço
+    const { address, locationNumber, district, city, state, cep } = clientData;
+
+    // Formatar o endereço no padrão ideal para GPS/Google Maps
+    let formattedAddress = '';
+
+    // Primeira linha: Rua, Número - Bairro
+    if (address) {
+      formattedAddress += address;
+      if (locationNumber) {
+        formattedAddress += `, ${locationNumber}`;
+      }
+      if (district) {
+        formattedAddress += ` - ${district}`;
+      }
+    }
+
+    // Segunda linha: Cidade - Estado, CEP
+    if (city || state || cep) {
+      if (formattedAddress) {
+        formattedAddress += '\n';
+      }
+
+      if (city && state) {
+        formattedAddress += `${city} - ${state}`;
+      } else if (city) {
+        formattedAddress += city;
+      } else if (state) {
+        formattedAddress += state;
+      }
+
+      if (cep) {
+        if (formattedAddress && !formattedAddress.endsWith('\n')) {
+          formattedAddress += ', ';
+        }
+        formattedAddress += cep;
+      }
+    }
+
+    // Se não houver dados suficientes, usar apenas o que estiver disponível
+    if (!formattedAddress.trim()) {
+      formattedAddress = 'Endereço não disponível';
+    }
+
+    // Copiar para a área de transferência
+    navigator.clipboard
+      .writeText(formattedAddress)
+      .then(() => {
+        console.log('Endereço copiado com sucesso!');
+        setLocalButtonText('Copiado'); // Altera o texto do botão para "Copiado"
+        setTimeout(() => setLocalButtonText('Local'), 1500); // Volta para "Local" após 1.5 segundos
+      })
+      .catch((error) => {
+        console.error('Erro ao copiar endereço:', error);
+        alert('Erro ao copiar endereço. Tente novamente.');
+      });
+  };
+
   if (loading) {
     return (
       <Box sx={styles.loadComponent}>
@@ -558,6 +653,7 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
             imageUrl={clientData?.imageUrl}
             showTooltip={false} // Não mostra o Tooltip
             enableImageUpload={false}
+            lastVisitData={lastVisitData} // Passando dados da última visita
           />
           <Box sx={styles.boxButton}>
             <Tooltip title={'Copiar dados para colar na planilha'}>
@@ -579,14 +675,14 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
                 {buttonText}
               </Button>
             </Tooltip>
-            <Tooltip title={'Exportar dados e gerar arquivo PDF'}>
+            <Tooltip title={'Copiar endereço para colar no GPS'}>
               <Button
                 type="button"
                 variant="contained"
-                onClick={exportPDF}
+                onClick={exportLocalGpsButton}
                 sx={styles.exportButton}
               >
-                PDF
+                {localButtonText}
               </Button>
             </Tooltip>
             <Tooltip title={'Editar cliente'}>
