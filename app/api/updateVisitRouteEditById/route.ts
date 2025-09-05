@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/app/db';
 import { visitRoutes, visitRouteClients } from '@/app/db/schema';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, not, inArray } from 'drizzle-orm';
 
 export async function PUT(request: NextRequest) {
   try {
@@ -128,78 +128,187 @@ export async function PUT(request: NextRequest) {
         })
         .where(eq(visitRoutes.id, parseInt(routeId)));
 
-      // 2. Deletar todos os clientes existentes da rota
-      await tx
-        .delete(visitRouteClients)
+      // 2. Buscar clientes existentes para preservar IDs
+      const existingClients = await tx
+        .select({
+          id: visitRouteClients.id,
+          clientId: visitRouteClients.clientId,
+          customerNameUnregistered: visitRouteClients.customerNameUnregistered,
+          customerStateUnregistered:
+            visitRouteClients.customerStateUnregistered,
+          customerCityUnregistered: visitRouteClients.customerCityUnregistered,
+        })
+        .from(visitRouteClients)
         .where(eq(visitRouteClients.visitRouteId, parseInt(routeId)));
 
-      // 3. Inserir os novos clientes preservando status existentes
-      for (const client of clients) {
+      // 3. Criar mapa para mapear clientes existentes com novos dados
+      const clientMapping = new Map();
+
+      // Para clientes cadastrados
+      clients.forEach((client: any, index: number) => {
         if (client.clientId) {
-          // Cliente cadastrado
-          const existingData = existingStatusMap.get(
-            client.clientId.toString(),
+          const existingClient = existingClients.find(
+            (ec) => ec.clientId === parseInt(client.clientId),
           );
+          if (existingClient) {
+            clientMapping.set(existingClient.id, {
+              ...client,
+              orderIndex: index + 1,
+            });
+          }
+        }
+      });
 
-          // Usar dados enviados pelo frontend se disponíveis, senão usar dados existentes
-          const finalVisitStatus =
-            client.visitStatus || existingData?.visitStatus || 'AGENDADO';
-          const finalCurrentVisitDescription =
-            client.currentVisitDescription ||
-            existingData?.currentVisitDescription ||
-            null;
-          const finalLastVisitDescription =
-            client.lastVisitDescription ||
-            existingData?.lastVisitDescription ||
-            null;
-          // Converter lastVisitConfirmedAt para Date se for string
-          const finalLastVisitConfirmedAt =
-            safeDateConversion(client.lastVisitConfirmedAt) ||
-            safeDateConversion(existingData?.lastVisitConfirmedAt);
+      // Para clientes não cadastrados
+      clients.forEach((client: any, index: number) => {
+        if (client.customerNameUnregistered) {
+          const existingClient = existingClients.find(
+            (ec) =>
+              ec.customerNameUnregistered === client.customerNameUnregistered &&
+              ec.customerStateUnregistered ===
+                client.customerStateUnregistered &&
+              ec.customerCityUnregistered === client.customerCityUnregistered,
+          );
+          if (existingClient) {
+            clientMapping.set(existingClient.id, {
+              ...client,
+              orderIndex: index + 1,
+            });
+          }
+        }
+      });
 
-          await tx.insert(visitRouteClients).values({
-            visitRouteId: parseInt(routeId),
-            clientId: parseInt(client.clientId),
-            visitStatus: finalVisitStatus,
-            currentVisitDescription: finalCurrentVisitDescription,
-            lastVisitDescription: finalLastVisitDescription,
-            lastVisitConfirmedAt: finalLastVisitConfirmedAt,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          });
-        } else if (client.customerNameUnregistered) {
+      // 4. Atualizar clientes existentes com novo orderIndex
+      for (const [existingId, clientData] of clientMapping) {
+        const existingData = existingStatusMap.get(
+          clientData.clientId
+            ? clientData.clientId.toString()
+            : `${clientData.customerNameUnregistered}-${clientData.customerStateUnregistered}-${clientData.customerCityUnregistered}`,
+        );
+
+        if (clientData.clientId) {
+          // Cliente cadastrado
+          await tx
+            .update(visitRouteClients)
+            .set({
+              orderIndex: clientData.orderIndex,
+              visitStatus:
+                clientData.visitStatus ||
+                existingData?.visitStatus ||
+                'AGENDADO',
+              currentVisitDescription:
+                clientData.currentVisitDescription ||
+                existingData?.currentVisitDescription ||
+                null,
+              lastVisitDescription:
+                clientData.lastVisitDescription ||
+                existingData?.lastVisitDescription ||
+                null,
+              lastVisitConfirmedAt:
+                safeDateConversion(clientData.lastVisitConfirmedAt) ||
+                safeDateConversion(existingData?.lastVisitConfirmedAt),
+              updatedAt: new Date(),
+            })
+            .where(eq(visitRouteClients.id, existingId));
+        } else if (clientData.customerNameUnregistered) {
           // Cliente não cadastrado
-          const key = `${client.customerNameUnregistered}-${client.customerStateUnregistered || ''}-${client.customerCityUnregistered || ''}`;
-          const existingData = existingStatusMap.get(key);
+          await tx
+            .update(visitRouteClients)
+            .set({
+              orderIndex: clientData.orderIndex,
+              visitStatus:
+                clientData.visitStatus ||
+                existingData?.visitStatus ||
+                'AGENDADO',
+              currentVisitDescription:
+                clientData.currentVisitDescription ||
+                existingData?.currentVisitDescription ||
+                null,
+              lastVisitDescription:
+                clientData.lastVisitDescription ||
+                existingData?.lastVisitDescription ||
+                null,
+              lastVisitConfirmedAt:
+                safeDateConversion(clientData.lastVisitConfirmedAt) ||
+                safeDateConversion(existingData?.lastVisitConfirmedAt),
+              updatedAt: new Date(),
+            })
+            .where(eq(visitRouteClients.id, existingId));
+        }
+      }
 
-          // Usar dados enviados pelo frontend se disponíveis, senão usar dados existentes
-          const finalVisitStatus =
-            client.visitStatus || existingData?.visitStatus || 'AGENDADO';
-          const finalCurrentVisitDescription =
-            client.currentVisitDescription ||
-            existingData?.currentVisitDescription ||
-            null;
-          const finalLastVisitDescription =
-            client.lastVisitDescription ||
-            existingData?.lastVisitDescription ||
-            null;
-          // Converter lastVisitConfirmedAt para Date se for string
-          const finalLastVisitConfirmedAt =
-            safeDateConversion(client.lastVisitConfirmedAt) ||
-            safeDateConversion(existingData?.lastVisitConfirmedAt);
+      // 5. Remover clientes que não estão mais na lista
+      const clientIdsToKeep = Array.from(clientMapping.keys());
+      if (clientIdsToKeep.length > 0) {
+        await tx
+          .delete(visitRouteClients)
+          .where(
+            and(
+              eq(visitRouteClients.visitRouteId, parseInt(routeId)),
+              not(inArray(visitRouteClients.id, clientIdsToKeep)),
+            ),
+          );
+      } else {
+        // Se não há clientes para manter, remover todos
+        await tx
+          .delete(visitRouteClients)
+          .where(eq(visitRouteClients.visitRouteId, parseInt(routeId)));
+      }
 
-          await tx.insert(visitRouteClients).values({
+      // 6. Inserir clientes novos que ainda não existiam na rota
+      for (let index = 0; index < clients.length; index++) {
+        const client: any = clients[index];
+
+        // Verifica se já existe mapeamento (cliente existente). Se sim, pula.
+        let exists = false;
+        if (client.clientId) {
+          exists = existingClients.some(
+            (ec) => ec.clientId === parseInt(client.clientId),
+          );
+        } else if (client.customerNameUnregistered) {
+          exists = existingClients.some(
+            (ec) =>
+              ec.customerNameUnregistered === client.customerNameUnregistered &&
+              ec.customerStateUnregistered ===
+                client.customerStateUnregistered &&
+              ec.customerCityUnregistered === client.customerCityUnregistered,
+          );
+        }
+
+        if (!exists) {
+          const baseValues: any = {
             visitRouteId: parseInt(routeId),
-            customerNameUnregistered: client.customerNameUnregistered,
-            customerStateUnregistered: client.customerStateUnregistered || '',
-            customerCityUnregistered: client.customerCityUnregistered || '',
-            visitStatus: finalVisitStatus,
-            currentVisitDescription: finalCurrentVisitDescription,
-            lastVisitDescription: finalLastVisitDescription,
-            lastVisitConfirmedAt: finalLastVisitConfirmedAt,
+            orderIndex: index + 1,
+            visitStatus: client.visitStatus || 'AGENDADO',
+            currentVisitDescription: client.currentVisitDescription || null,
+            lastVisitDescription: client.lastVisitDescription || null,
+            lastVisitConfirmedAt:
+              client.visitStatus === 'CONCLUIDO'
+                ? safeDateConversion(client.lastVisitConfirmedAt) || new Date()
+                : null,
             createdAt: new Date(),
             updatedAt: new Date(),
-          });
+          };
+
+          if (client.clientId) {
+            // Inserir cliente cadastrado
+            await tx.insert(visitRouteClients).values({
+              ...baseValues,
+              clientId: parseInt(client.clientId),
+              customerNameUnregistered: null,
+              customerStateUnregistered: null,
+              customerCityUnregistered: null,
+            });
+          } else if (client.customerNameUnregistered) {
+            // Inserir cliente não cadastrado
+            await tx.insert(visitRouteClients).values({
+              ...baseValues,
+              clientId: null,
+              customerNameUnregistered: client.customerNameUnregistered,
+              customerStateUnregistered: client.customerStateUnregistered,
+              customerCityUnregistered: client.customerCityUnregistered,
+            });
+          }
         }
       }
     });

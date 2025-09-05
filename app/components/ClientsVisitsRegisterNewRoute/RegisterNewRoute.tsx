@@ -32,6 +32,23 @@ import styles from './styles';
 import { useAuth } from '@/app/contex/authContext';
 import { useRouter } from 'next/navigation';
 import AlertModalClientsVisitsRoute from '../AlertModalClientsVisitsRoute/AlertModalClientsVisitsRoute';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 // Interface para o tipo dos dados do cliente
 interface Client {
@@ -57,6 +74,180 @@ interface UnregisteredClient {
 const renderAsIs = (str: any) => {
   if (typeof str !== 'string') return '';
   return str;
+};
+
+// Componente SortableTableRow para cada linha da tabela
+const SortableTableRow = ({
+  client,
+  index,
+  isSmallScreen,
+  handleClientDetails,
+  handleRemoveClient,
+  isUnregisteredClient,
+}: {
+  client: any;
+  index: number;
+  isSmallScreen: boolean;
+  handleClientDetails: (id: string) => void;
+  handleRemoveClient: (id: string) => void;
+  isUnregisteredClient: (client: any) => boolean;
+}) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: client.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <TableRow
+      ref={setNodeRef}
+      style={style}
+      sx={{
+        ...styles.rowHover,
+        cursor: 'grab',
+        '&:active': {
+          cursor: 'grabbing',
+        },
+        backgroundColor: isDragging ? 'rgba(0, 0, 0, 0.05)' : 'inherit',
+      }}
+      {...attributes}
+      {...listeners}
+    >
+      <TableCell
+        sx={{
+          ...styles.fontSize,
+          width: '50px',
+          minWidth: '50px',
+        }}
+      >
+        {index + 1}
+      </TableCell>
+      <TableCell
+        sx={{
+          ...styles.fontSizeClientName,
+          width: 'auto',
+          minWidth: '120px',
+        }}
+      >
+        {renderAsIs(client.companyName.slice(0, isSmallScreen ? 25 : 35))}
+        {client.companyName.length > (isSmallScreen ? 25 : 35) && '...'}
+      </TableCell>
+      {!isSmallScreen && (
+        <>
+          <TableCell
+            sx={{
+              ...styles.fontSize,
+              width: '70px',
+              minWidth: '70px',
+            }}
+          >
+            {client.state || '-'}
+          </TableCell>
+          <TableCell
+            sx={{
+              ...styles.fontSize,
+              width: '100px',
+              minWidth: '100px',
+            }}
+          >
+            {client.city || '-'}
+          </TableCell>
+          <TableCell
+            sx={{
+              ...styles.fontSize,
+              width: '80px',
+              minWidth: '80px',
+            }}
+          >
+            {client.corfioCode || '-'}
+          </TableCell>
+        </>
+      )}
+      <TableCell
+        sx={{
+          ...styles.fontSize,
+          width: '90px',
+          minWidth: '90px',
+        }}
+      >
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Box
+            sx={{
+              width: '40px',
+              height: '32px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            {isUnregisteredClient(client) ? (
+              <Tooltip title="Cliente não cadastrado" arrow>
+                <IconButton
+                  size="small"
+                  sx={{
+                    color: 'orange',
+                    '&:hover': {
+                      backgroundColor: 'rgba(255, 165, 0, 0.1)',
+                    },
+                  }}
+                >
+                  <PersonOffIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            ) : (
+              <Tooltip title="Ver detalhes do cliente" arrow>
+                <IconButton
+                  size="small"
+                  color="primary"
+                  onClick={() => handleClientDetails(client.id)}
+                  sx={{
+                    '&:hover': {
+                      backgroundColor: 'rgba(25, 118, 210, 0.1)',
+                    },
+                  }}
+                >
+                  <VisibilityIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            )}
+          </Box>
+          <Box
+            sx={{
+              width: '40px',
+              height: '32px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Tooltip title="Remover da rota" arrow>
+              <IconButton
+                size="small"
+                color="error"
+                onClick={() => handleRemoveClient(client.id)}
+                sx={{
+                  '&:hover': {
+                    backgroundColor: 'rgba(211, 47, 47, 0.1)',
+                  },
+                }}
+              >
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        </Box>
+      </TableCell>
+    </TableRow>
+  );
 };
 
 const RegisterNewRoute = () => {
@@ -155,9 +346,10 @@ const RegisterNewRoute = () => {
 
   const handleRowClick = (client: Client) => {
     // Verifica se o cliente já está na lista selecionada
-    const isAlreadySelected = selectedClients.some(
-      (selected) => selected.id === client.id,
-    );
+    const isAlreadySelected = selectedClients.some((selected) => {
+      // Compara IDs convertendo ambos para string para garantir consistência
+      return String(selected.id) === String(client.id);
+    });
 
     if (!isAlreadySelected) {
       setSelectedClients((prev) => [...prev, client]);
@@ -290,6 +482,32 @@ const RegisterNewRoute = () => {
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formattedValue = formatDate(e.target.value);
     setScheduledDate(formattedValue);
+  };
+
+  // Configuração dos sensores para drag & drop
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
+  // Função para lidar com o fim do drag & drop
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (active.id !== over?.id) {
+      setSelectedClients((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over?.id);
+
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
   };
 
   if (loading) {
@@ -453,268 +671,178 @@ const RegisterNewRoute = () => {
                 minWidth: 0, // Permite que o container encolha
               }}
             >
-              <TableContainer sx={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
-                <Table sx={{ minWidth: 0, tableLayout: 'fixed' }}>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell
-                        sx={{
-                          ...styles.fontSize,
-                          width: '50px',
-                          minWidth: '50px',
-                        }}
-                      >
-                        Nº:
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...styles.fontSize,
-                          width: 'auto',
-                          minWidth: '120px',
-                        }}
-                      >
-                        Cliente:
-                      </TableCell>
-                      {!isSmallScreen && (
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <TableContainer
+                  sx={{ flex: 1, overflow: 'hidden auto', minWidth: 0 }}
+                >
+                  <Table sx={{ minWidth: 0, tableLayout: 'fixed' }}>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell
+                          sx={{
+                            ...styles.fontSize,
+                            width: '50px',
+                            minWidth: '50px',
+                          }}
+                        >
+                          Nº:
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            ...styles.fontSize,
+                            width: 'auto',
+                            minWidth: '120px',
+                          }}
+                        >
+                          Cliente:
+                        </TableCell>
+                        {!isSmallScreen && (
+                          <>
+                            <TableCell
+                              sx={{
+                                ...styles.fontSize,
+                                width: '70px',
+                                minWidth: '70px',
+                              }}
+                            >
+                              Estado:
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                ...styles.fontSize,
+                                width: '100px',
+                                minWidth: '100px',
+                              }}
+                            >
+                              Cidade:
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                ...styles.fontSize,
+                                width: '80px',
+                                minWidth: '80px',
+                              }}
+                            >
+                              Corfio:
+                            </TableCell>
+                          </>
+                        )}
+                        <TableCell
+                          sx={{
+                            ...styles.fontSize,
+                            width: '90px',
+                            minWidth: '90px',
+                          }}
+                        >
+                          Ações:
+                        </TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {selectedClients.length === 0 ? (
                         <>
-                          <TableCell
-                            sx={{
-                              ...styles.fontSize,
-                              width: '70px',
-                              minWidth: '70px',
-                            }}
-                          >
-                            Estado:
-                          </TableCell>
-                          <TableCell
-                            sx={{
-                              ...styles.fontSize,
-                              width: '100px',
-                              minWidth: '100px',
-                            }}
-                          >
-                            Cidade:
-                          </TableCell>
-                        </>
-                      )}
-                      <TableCell
-                        sx={{
-                          ...styles.fontSize,
-                          width: '90px',
-                          minWidth: '90px',
-                        }}
-                      >
-                        Ações:
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {selectedClients.length === 0 ? (
-                      <>
-                        <TableRow>
-                          <TableCell
-                            sx={{
-                              ...styles.fontSize,
-                              width: '50px',
-                              minWidth: '50px',
-                            }}
-                          >
-                            -
-                          </TableCell>
-                          <TableCell
-                            sx={{
-                              ...styles.fontSize,
-                              width: 'auto',
-                              minWidth: '120px',
-                            }}
-                          >
-                            -
-                          </TableCell>
-                          {!isSmallScreen && (
-                            <>
-                              <TableCell
-                                sx={{
-                                  ...styles.fontSize,
-                                  width: '70px',
-                                  minWidth: '70px',
-                                }}
-                              >
-                                -
-                              </TableCell>
-                              <TableCell
-                                sx={{
-                                  ...styles.fontSize,
-                                  width: '100px',
-                                  minWidth: '100px',
-                                }}
-                              >
-                                -
-                              </TableCell>
-                            </>
-                          )}
-                          <TableCell
-                            sx={{
-                              ...styles.fontSize,
-                              width: '90px',
-                              minWidth: '90px',
-                            }}
-                          >
-                            -
-                          </TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell
-                            colSpan={isSmallScreen ? 3 : 5}
-                            align="center"
-                            sx={{ py: 4, border: 'none' }}
-                          >
-                            <Typography variant="body2" color="text.secondary">
-                              Escolha os clientes para adicioná-los aqui em sua
-                              nova rota.
-                            </Typography>
-                          </TableCell>
-                        </TableRow>
-                      </>
-                    ) : (
-                      selectedClients.map((client, index) => (
-                        <TableRow key={client.id} sx={styles.rowHover}>
-                          <TableCell
-                            sx={{
-                              ...styles.fontSize,
-                              width: '50px',
-                              minWidth: '50px',
-                            }}
-                          >
-                            {index + 1}
-                          </TableCell>
-                          <TableCell
-                            sx={{
-                              ...styles.fontSizeClientName,
-                              width: 'auto',
-                              minWidth: '120px',
-                            }}
-                          >
-                            {renderAsIs(
-                              client.companyName.slice(
-                                0,
-                                isSmallScreen ? 25 : 35,
-                              ),
+                          <TableRow>
+                            <TableCell
+                              sx={{
+                                ...styles.fontSize,
+                                width: '50px',
+                                minWidth: '50px',
+                              }}
+                            >
+                              -
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                ...styles.fontSize,
+                                width: 'auto',
+                                minWidth: '120px',
+                              }}
+                            >
+                              -
+                            </TableCell>
+                            {!isSmallScreen && (
+                              <>
+                                <TableCell
+                                  sx={{
+                                    ...styles.fontSize,
+                                    width: '80px',
+                                    minWidth: '80px',
+                                  }}
+                                >
+                                  -
+                                </TableCell>
+                                <TableCell
+                                  sx={{
+                                    ...styles.fontSize,
+                                    width: '70px',
+                                    minWidth: '70px',
+                                  }}
+                                >
+                                  -
+                                </TableCell>
+                                <TableCell
+                                  sx={{
+                                    ...styles.fontSize,
+                                    width: '100px',
+                                    minWidth: '100px',
+                                  }}
+                                >
+                                  -
+                                </TableCell>
+                              </>
                             )}
-                            {client.companyName.length >
-                              (isSmallScreen ? 25 : 35) && '...'}
-                          </TableCell>
-                          {!isSmallScreen && (
-                            <>
-                              <TableCell
-                                sx={{
-                                  ...styles.fontSize,
-                                  width: '70px',
-                                  minWidth: '70px',
-                                }}
+                            <TableCell
+                              sx={{
+                                ...styles.fontSize,
+                                width: '90px',
+                                minWidth: '90px',
+                              }}
+                            >
+                              -
+                            </TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell
+                              colSpan={isSmallScreen ? 3 : 6}
+                              align="center"
+                              sx={{ py: 4, border: 'none' }}
+                            >
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
                               >
-                                {client.state || '-'}
-                              </TableCell>
-                              <TableCell
-                                sx={{
-                                  ...styles.fontSize,
-                                  width: '100px',
-                                  minWidth: '100px',
-                                }}
-                              >
-                                {client.city || '-'}
-                              </TableCell>
-                            </>
-                          )}
-                          <TableCell
-                            sx={{
-                              ...styles.fontSize,
-                              width: '90px',
-                              minWidth: '90px',
-                            }}
-                          >
-                            <Box sx={{ display: 'flex', gap: 1 }}>
-                              <Box
-                                sx={{
-                                  width: '40px',
-                                  height: '32px',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                }}
-                              >
-                                {isUnregisteredClient(client) ? (
-                                  <Tooltip title="Cliente não cadastrado" arrow>
-                                    <IconButton
-                                      size="small"
-                                      sx={{
-                                        color: 'orange',
-                                        '&:hover': {
-                                          backgroundColor:
-                                            'rgba(255, 165, 0, 0.1)',
-                                        },
-                                      }}
-                                    >
-                                      <PersonOffIcon fontSize="small" />
-                                    </IconButton>
-                                  </Tooltip>
-                                ) : (
-                                  <Tooltip
-                                    title="Ver detalhes do cliente"
-                                    arrow
-                                  >
-                                    <IconButton
-                                      size="small"
-                                      color="primary"
-                                      onClick={() =>
-                                        handleClientDetails(client.id)
-                                      }
-                                      sx={{
-                                        '&:hover': {
-                                          backgroundColor:
-                                            'rgba(25, 118, 210, 0.1)',
-                                        },
-                                      }}
-                                    >
-                                      <VisibilityIcon fontSize="small" />
-                                    </IconButton>
-                                  </Tooltip>
-                                )}
-                              </Box>
-                              <Box
-                                sx={{
-                                  width: '40px',
-                                  height: '32px',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                }}
-                              >
-                                <Tooltip title="Remover da rota" arrow>
-                                  <IconButton
-                                    size="small"
-                                    color="error"
-                                    onClick={() =>
-                                      handleRemoveClient(client.id)
-                                    }
-                                    sx={{
-                                      '&:hover': {
-                                        backgroundColor:
-                                          'rgba(211, 47, 47, 0.1)',
-                                      },
-                                    }}
-                                  >
-                                    <DeleteIcon fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                              </Box>
-                            </Box>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+                                Escolha os clientes para adicioná-los aqui em
+                                sua nova rota.
+                              </Typography>
+                            </TableCell>
+                          </TableRow>
+                        </>
+                      ) : (
+                        <SortableContext
+                          items={selectedClients.map((client) => client.id)}
+                          strategy={verticalListSortingStrategy}
+                        >
+                          {selectedClients.map((client, index) => (
+                            <SortableTableRow
+                              key={client.id}
+                              client={client}
+                              index={index}
+                              isSmallScreen={isSmallScreen}
+                              handleClientDetails={handleClientDetails}
+                              handleRemoveClient={handleRemoveClient}
+                              isUnregisteredClient={isUnregisteredClient}
+                            />
+                          ))}
+                        </SortableContext>
+                      )}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </DndContext>
             </Box>
 
             {/* Botão Criar Rota */}
@@ -975,6 +1103,7 @@ const RegisterNewRoute = () => {
                         <>
                           <TableCell sx={styles.fontSize}>Estado:</TableCell>
                           <TableCell sx={styles.fontSize}>Cidade:</TableCell>
+                          <TableCell sx={styles.fontSize}>Corfio:</TableCell>
                         </>
                       )}
                     </TableRow>
@@ -987,27 +1116,48 @@ const RegisterNewRoute = () => {
                         </TableCell>
                       </TableRow>
                     ) : (
-                      filteredClients.map((client) => (
-                        <TableRow
-                          key={client.id}
-                          sx={{ ...styles.rowHover, cursor: 'pointer' }}
-                          onClick={() => handleRowClick(client)}
-                        >
-                          <TableCell sx={styles.fontSizeClientName}>
-                            {renderAsIs(client.companyName.slice(0, 40))}
-                          </TableCell>
-                          {!isSmallScreen && (
-                            <>
-                              <TableCell sx={styles.fontSize}>
-                                {client.state || '-'}
-                              </TableCell>
-                              <TableCell sx={styles.fontSize}>
-                                {client.city || '-'}
-                              </TableCell>
-                            </>
-                          )}
-                        </TableRow>
-                      ))
+                      filteredClients.map((client) => {
+                        const isAlreadySelected = selectedClients.some(
+                          (selected) =>
+                            String(selected.id) === String(client.id),
+                        );
+
+                        return (
+                          <TableRow
+                            key={client.id}
+                            sx={{
+                              ...styles.rowHover,
+                              cursor: isAlreadySelected
+                                ? 'not-allowed'
+                                : 'pointer',
+                              opacity: isAlreadySelected ? 0.5 : 1,
+                              backgroundColor: isAlreadySelected
+                                ? 'rgba(0, 0, 0, 0.05)'
+                                : 'inherit',
+                            }}
+                            onClick={() =>
+                              !isAlreadySelected && handleRowClick(client)
+                            }
+                          >
+                            <TableCell sx={styles.fontSizeClientName}>
+                              {renderAsIs(client.companyName.slice(0, 40))}
+                            </TableCell>
+                            {!isSmallScreen && (
+                              <>
+                                <TableCell sx={styles.fontSize}>
+                                  {client.state || '-'}
+                                </TableCell>
+                                <TableCell sx={styles.fontSize}>
+                                  {client.city || '-'}
+                                </TableCell>
+                                <TableCell sx={styles.fontSize}>
+                                  {client.corfioCode || '-'}
+                                </TableCell>
+                              </>
+                            )}
+                          </TableRow>
+                        );
+                      })
                     )}
                   </TableBody>
                 </Table>

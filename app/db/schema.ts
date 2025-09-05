@@ -306,6 +306,9 @@ export const visitRouteClients = pgTable('visit_route_clients', {
   currentVisitDescription: text('current_visit_description'),
   lastVisitDescription: text('last_visit_description'),
   lastVisitConfirmedAt: timestamp('last_visit_confirmed_at'),
+
+  orderIndex: integer('order_index'), // Campo para ordenação manual dos clientes
+
   createdAt: timestamp('created_at').defaultNow().notNull(),
 
   updatedAt: timestamp('updated_at').defaultNow().notNull(),

@@ -104,14 +104,17 @@ export async function POST(request: NextRequest) {
     const routeId = createdRoute[0].id;
 
     // 2. Criar os registros dos clientes na rota
-    const routeClientsData: NewVisitRouteClient[] = clients.map((client) => ({
-      visitRouteId: routeId,
-      clientId: client.clientId || null,
-      customerNameUnregistered: client.customerNameUnregistered || null,
-      customerStateUnregistered: client.customerStateUnregistered || null,
-      customerCityUnregistered: client.customerCityUnregistered || null,
-      visitStatus: 'AGENDADO',
-    }));
+    const routeClientsData: NewVisitRouteClient[] = clients.map(
+      (client, index) => ({
+        visitRouteId: routeId,
+        clientId: client.clientId || null,
+        customerNameUnregistered: client.customerNameUnregistered || null,
+        customerStateUnregistered: client.customerStateUnregistered || null,
+        customerCityUnregistered: client.customerCityUnregistered || null,
+        visitStatus: 'AGENDADO',
+        orderIndex: index + 1, // Adicionar orderIndex baseado na posição
+      }),
+    );
 
     await db.insert(visitRouteClients).values(routeClientsData).execute();
 

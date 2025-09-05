@@ -151,10 +151,11 @@ export async function GET(request: NextRequest) {
             currentVisitDescription: visitRouteClients.currentVisitDescription,
             lastVisitDescription: visitRouteClients.lastVisitDescription,
             lastVisitConfirmedAt: visitRouteClients.lastVisitConfirmedAt,
+            orderIndex: visitRouteClients.orderIndex,
           })
           .from(visitRouteClients)
           .where(eq(visitRouteClients.visitRouteId, route.id))
-          .orderBy(asc(visitRouteClients.id)); // Ordenar por ID (ordem de inserção)
+          .orderBy(asc(visitRouteClients.orderIndex));
 
         // Para clientes cadastrados, buscar informações adicionais
         const clientsWithDetails = await Promise.all(
@@ -166,6 +167,7 @@ export async function GET(request: NextRequest) {
                   companyName: clients.companyName,
                   state: clients.state,
                   city: clients.city,
+                  corfioCode: clients.corfioCode,
                 })
                 .from(clients)
                 .where(eq(clients.id, routeClient.clientId))
