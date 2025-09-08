@@ -54,6 +54,7 @@ export async function GET(request: NextRequest) {
           companyName: clients.companyName,
           state: clients.state,
           city: clients.city,
+          corfioCode: clients.corfioCode,
         })
         .from(clients)
         .where(eq(clients.id, visitData.clientId))
