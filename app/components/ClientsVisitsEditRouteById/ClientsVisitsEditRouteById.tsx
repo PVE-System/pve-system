@@ -97,6 +97,7 @@ interface RouteClient {
     companyName: string;
     state: string;
     city: string;
+    corfioCode: string;
   } | null;
 }
 
@@ -353,7 +354,7 @@ const ClientsVisitsEditRouteById: React.FC<ClientsVisitsEditRouteByIdProps> = ({
           return {
             id: routeClient.clientDetails.id.toString(),
             companyName: routeClient.clientDetails.companyName,
-            corfioCode: '', // Não temos essa informação na rota
+            corfioCode: (routeClient.clientDetails as any).corfioCode || '', // Usar o valor real do banco
             clientCondition: '', // Não temos essa informação na rota
             rating: 0, // Não temos essa informação na rota
             state: routeClient.clientDetails.state,
@@ -691,428 +692,416 @@ const ClientsVisitsEditRouteById: React.FC<ClientsVisitsEditRouteByIdProps> = ({
   }
 
   return (
-    <Container maxWidth="xl" sx={{ py: 2 }}>
-      <AlertModalClientsVisitsRoute
-        open={alertModal.open}
-        title={alertModal.title}
-        message={alertModal.message}
-        onClose={handleCloseAlertModal}
-      />
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: {
-            xs: '1fr',
-            sm: '1fr',
-            md: '1fr 1fr',
-            lg: '1fr 1fr',
-            xl: '1fr 1fr',
-          },
-          gap: 3,
-          alignItems: 'start',
-        }}
-      >
-        {/* Seção de Clientes Selecionados */}
-        <Box
+    <>
+      {/* Botão Voltar */}
+      <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+        <Button
+          variant="contained"
+          size="small"
+          startIcon={<ArrowBackIcon />}
+          onClick={handleBack}
           sx={{
-            ...styles.container,
-            display: 'flex',
-            flexDirection: 'column',
-            height: '700px',
+            fontSize: { xs: '11px', sm: '12px' },
+            backgroundColor: 'primary.main',
+            '&:hover': {
+              backgroundColor: 'primary.dark',
+            },
+            minWidth: { xs: '80px', sm: 'auto' },
+            height: { xs: '26px', sm: 'auto' },
+            px: { xs: 1, sm: 2 },
           }}
         >
-          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-            <Typography
-              variant="h6"
-              sx={{
-                mb: 2,
-                fontWeight: 'bold',
-                fontSize: {
-                  xs: '14px',
-                  sm: '16px',
-                  md: '18px',
-                },
-              }}
-            >
-              Editar rota de visitas
-            </Typography>
-          </Box>
+          Voltar
+        </Button>
+      </Box>
 
-          {/* Inputs para nome da rota e data agendada */}
-          <Box sx={{ mb: 3 }}>
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: {
-                  xs: 'column',
-                  sm: 'row',
-                },
-                gap: 2,
-              }}
-            >
-              <TextField
-                label="Nome da Rota*"
-                value={routeName}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setRouteName(e.target.value)
-                }
-                placeholder="Digite o nome ou uma pequena descrição"
-                size="small"
-                sx={{
-                  flex: {
-                    xs: 'none',
-                    sm: 1,
-                  },
-                  '& .MuiInputLabel-root': {
-                    fontSize: '14px',
-                  },
-                  '& .MuiInputBase-input': {
-                    fontSize: '14px',
-                  },
-                }}
-              />
-              <TextField
-                label="Data da viagem*"
-                value={scheduledDate}
-                onChange={handleDateChange}
-                placeholder="DD/MM/AAAA"
-                size="small"
-                sx={{
-                  flex: {
-                    xs: 'none',
-                    sm: 1,
-                  },
-                  '& .MuiInputLabel-root': {
-                    fontSize: '14px',
-                  },
-                  '& .MuiInputBase-input': {
-                    fontSize: '14px',
-                  },
-                }}
-                inputProps={{
-                  maxLength: 10,
-                  title: 'Formato: DD/MM/AAAA',
-                }}
-              />
-            </Box>
-          </Box>
-
+      <Container maxWidth="xl" sx={{ py: 2 }}>
+        <AlertModalClientsVisitsRoute
+          open={alertModal.open}
+          title={alertModal.title}
+          message={alertModal.message}
+          onClose={handleCloseAlertModal}
+        />
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: '1fr',
+              sm: '1fr',
+              md: '1fr 1fr',
+              lg: '1fr 1fr',
+              xl: '1fr 1fr',
+            },
+            gap: 3,
+            alignItems: 'start',
+          }}
+        >
+          {/* Seção de Clientes Selecionados */}
           <Box
             sx={{
-              flex: 1,
+              ...styles.container,
               display: 'flex',
               flexDirection: 'column',
-              overflow: 'hidden',
-              minWidth: 0,
+              height: '700px',
             }}
           >
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
-            >
-              <TableContainer
-                sx={{ flex: 1, overflow: 'hidden auto', minWidth: 0 }}
+            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+              <Typography
+                variant="h6"
+                sx={{
+                  mb: 2,
+                  fontWeight: 'bold',
+                  fontSize: {
+                    xs: '14px',
+                    sm: '16px',
+                    md: '18px',
+                  },
+                }}
               >
-                <Table sx={{ minWidth: 0, tableLayout: 'fixed' }}>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell
-                        sx={{
-                          ...styles.fontSize,
-                          width: '50px',
-                          minWidth: '50px',
-                        }}
-                      >
-                        Nº:
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...styles.fontSize,
-                          width: 'auto',
-                          minWidth: '120px',
-                        }}
-                      >
-                        Cliente:
-                      </TableCell>
-                      {!isSmallScreen && (
+                Editar rota de visitas
+              </Typography>
+            </Box>
+
+            {/* Inputs para nome da rota e data agendada */}
+            <Box sx={{ mb: 3 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: {
+                    xs: 'column',
+                    sm: 'row',
+                  },
+                  gap: 2,
+                }}
+              >
+                <TextField
+                  label="Nome da Rota*"
+                  value={routeName}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setRouteName(e.target.value)
+                  }
+                  placeholder="Digite o nome ou uma pequena descrição"
+                  size="small"
+                  sx={{
+                    flex: {
+                      xs: 'none',
+                      sm: 1,
+                    },
+                    '& .MuiInputLabel-root': {
+                      fontSize: '14px',
+                    },
+                    '& .MuiInputBase-input': {
+                      fontSize: '14px',
+                    },
+                  }}
+                />
+                <TextField
+                  label="Data da viagem*"
+                  value={scheduledDate}
+                  onChange={handleDateChange}
+                  placeholder="DD/MM/AAAA"
+                  size="small"
+                  sx={{
+                    flex: {
+                      xs: 'none',
+                      sm: 1,
+                    },
+                    '& .MuiInputLabel-root': {
+                      fontSize: '14px',
+                    },
+                    '& .MuiInputBase-input': {
+                      fontSize: '14px',
+                    },
+                  }}
+                  inputProps={{
+                    maxLength: 10,
+                    title: 'Formato: DD/MM/AAAA',
+                  }}
+                />
+              </Box>
+            </Box>
+
+            <Box
+              sx={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden',
+                minWidth: 0,
+              }}
+            >
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <TableContainer
+                  sx={{ flex: 1, overflow: 'hidden auto', minWidth: 0 }}
+                >
+                  <Table sx={{ minWidth: 0, tableLayout: 'fixed' }}>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell
+                          sx={{
+                            ...styles.fontSize,
+                            width: '50px',
+                            minWidth: '50px',
+                          }}
+                        >
+                          Nº:
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            ...styles.fontSize,
+                            width: 'auto',
+                            minWidth: '120px',
+                          }}
+                        >
+                          Cliente:
+                        </TableCell>
+                        {!isSmallScreen && (
+                          <>
+                            <TableCell
+                              sx={{
+                                ...styles.fontSize,
+                                width: '70px',
+                                minWidth: '70px',
+                              }}
+                            >
+                              Estado:
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                ...styles.fontSize,
+                                width: '100px',
+                                minWidth: '100px',
+                              }}
+                            >
+                              Cidade:
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                ...styles.fontSize,
+                                width: '80px',
+                                minWidth: '80px',
+                              }}
+                            >
+                              Corfio:
+                            </TableCell>
+                          </>
+                        )}
+                        <TableCell
+                          sx={{
+                            ...styles.fontSize,
+                            width: '90px',
+                            minWidth: '90px',
+                          }}
+                        >
+                          Ações:
+                        </TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {selectedClients.length === 0 ? (
                         <>
-                          <TableCell
-                            sx={{
-                              ...styles.fontSize,
-                              width: '70px',
-                              minWidth: '70px',
-                            }}
-                          >
-                            Estado:
-                          </TableCell>
-                          <TableCell
-                            sx={{
-                              ...styles.fontSize,
-                              width: '100px',
-                              minWidth: '100px',
-                            }}
-                          >
-                            Cidade:
-                          </TableCell>
-                          <TableCell
-                            sx={{
-                              ...styles.fontSize,
-                              width: '80px',
-                              minWidth: '80px',
-                            }}
-                          >
-                            Corfio:
-                          </TableCell>
+                          <TableRow>
+                            <TableCell
+                              sx={{
+                                ...styles.fontSize,
+                                width: '50px',
+                                minWidth: '50px',
+                              }}
+                            >
+                              -
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                ...styles.fontSize,
+                                width: 'auto',
+                                minWidth: '120px',
+                              }}
+                            >
+                              -
+                            </TableCell>
+                            {!isSmallScreen && (
+                              <>
+                                <TableCell
+                                  sx={{
+                                    ...styles.fontSize,
+                                    width: '70px',
+                                    minWidth: '70px',
+                                  }}
+                                >
+                                  -
+                                </TableCell>
+                                <TableCell
+                                  sx={{
+                                    ...styles.fontSize,
+                                    width: '100px',
+                                    minWidth: '100px',
+                                  }}
+                                >
+                                  -
+                                </TableCell>
+                                <TableCell
+                                  sx={{
+                                    ...styles.fontSize,
+                                    width: '80px',
+                                    minWidth: '80px',
+                                  }}
+                                >
+                                  -
+                                </TableCell>
+                              </>
+                            )}
+                            <TableCell
+                              sx={{
+                                ...styles.fontSize,
+                                width: '90px',
+                                minWidth: '90px',
+                              }}
+                            >
+                              -
+                            </TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell
+                              colSpan={isSmallScreen ? 3 : 6}
+                              align="center"
+                              sx={{ py: 4, border: 'none' }}
+                            >
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                              >
+                                Nenhum cliente selecionado para esta rota.
+                              </Typography>
+                            </TableCell>
+                          </TableRow>
                         </>
+                      ) : (
+                        <SortableContext
+                          items={selectedClients.map((client) => client.id)}
+                          strategy={verticalListSortingStrategy}
+                        >
+                          {selectedClients.map((client, index) => (
+                            <SortableTableRow
+                              key={client.id}
+                              client={client}
+                              index={index}
+                              isSmallScreen={isSmallScreen}
+                              handleClientDetails={handleClientDetails}
+                              handleRemoveClient={handleRemoveClient}
+                              isUnregisteredClient={isUnregisteredClient}
+                            />
+                          ))}
+                        </SortableContext>
                       )}
-                      <TableCell
-                        sx={{
-                          ...styles.fontSize,
-                          width: '90px',
-                          minWidth: '90px',
-                        }}
-                      >
-                        Ações:
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {selectedClients.length === 0 ? (
-                      <>
-                        <TableRow>
-                          <TableCell
-                            sx={{
-                              ...styles.fontSize,
-                              width: '50px',
-                              minWidth: '50px',
-                            }}
-                          >
-                            -
-                          </TableCell>
-                          <TableCell
-                            sx={{
-                              ...styles.fontSize,
-                              width: 'auto',
-                              minWidth: '120px',
-                            }}
-                          >
-                            -
-                          </TableCell>
-                          {!isSmallScreen && (
-                            <>
-                              <TableCell
-                                sx={{
-                                  ...styles.fontSize,
-                                  width: '70px',
-                                  minWidth: '70px',
-                                }}
-                              >
-                                -
-                              </TableCell>
-                              <TableCell
-                                sx={{
-                                  ...styles.fontSize,
-                                  width: '100px',
-                                  minWidth: '100px',
-                                }}
-                              >
-                                -
-                              </TableCell>
-                              <TableCell
-                                sx={{
-                                  ...styles.fontSize,
-                                  width: '80px',
-                                  minWidth: '80px',
-                                }}
-                              >
-                                -
-                              </TableCell>
-                            </>
-                          )}
-                          <TableCell
-                            sx={{
-                              ...styles.fontSize,
-                              width: '90px',
-                              minWidth: '90px',
-                            }}
-                          >
-                            -
-                          </TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell
-                            colSpan={isSmallScreen ? 3 : 6}
-                            align="center"
-                            sx={{ py: 4, border: 'none' }}
-                          >
-                            <Typography variant="body2" color="text.secondary">
-                              Nenhum cliente selecionado para esta rota.
-                            </Typography>
-                          </TableCell>
-                        </TableRow>
-                      </>
-                    ) : (
-                      <SortableContext
-                        items={selectedClients.map((client) => client.id)}
-                        strategy={verticalListSortingStrategy}
-                      >
-                        {selectedClients.map((client, index) => (
-                          <SortableTableRow
-                            key={client.id}
-                            client={client}
-                            index={index}
-                            isSmallScreen={isSmallScreen}
-                            handleClientDetails={handleClientDetails}
-                            handleRemoveClient={handleRemoveClient}
-                            isUnregisteredClient={isUnregisteredClient}
-                          />
-                        ))}
-                      </SortableContext>
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </DndContext>
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </DndContext>
+            </Box>
+
+            {/* Botão Atualizar Rota */}
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: { xs: 'column', sm: 'row' },
+                  gap: { xs: 2, sm: 0 },
+                  alignItems: 'center',
+                }}
+              >
+                <Button
+                  variant="contained"
+                  startIcon={<UpdateIcon />}
+                  onClick={handleUpdateRoute}
+                  disabled={
+                    selectedClients.length === 0 ||
+                    !routeName.trim() ||
+                    !scheduledDate.trim() ||
+                    isUpdatingRoute
+                  }
+                  sx={{
+                    backgroundColor: 'green',
+                    '&:hover': {
+                      backgroundColor: 'darkgreen',
+                    },
+                    '&:disabled': {
+                      backgroundColor: 'green',
+                      opacity: 0.6,
+                    },
+                    fontSize: '12px',
+                    mr: { xs: 0, sm: 2 }, // Margem apenas em telas maiores
+                    width: { xs: '100%', sm: 'auto' }, // Largura total em mobile
+                  }}
+                >
+                  {isUpdatingRoute ? (
+                    <CircularProgress size={20} color="inherit" />
+                  ) : (
+                    'Atualizar Rota'
+                  )}
+                </Button>
+                <Button
+                  variant="contained"
+                  startIcon={<CancelIcon />}
+                  onClick={handleBack}
+                  disabled={isUpdatingRoute}
+                  sx={{
+                    fontSize: '12px',
+                    width: { xs: '100%', sm: 'auto' }, // Largura total em mobile
+                  }}
+                >
+                  Cancelar
+                </Button>
+              </Box>
+            </Box>
           </Box>
 
-          {/* Botão Atualizar Rota */}
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+          {/* Lista dos clientes cadastrados */}
+          <Box
+            sx={{
+              ...styles.container,
+              height: '700px',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+              <Typography
+                variant="h6"
+                sx={{
+                  mb: 2,
+                  fontWeight: 'bold',
+                  fontSize: {
+                    xs: '14px',
+                    sm: '16px',
+                    md: '18px',
+                  },
+                }}
+              >
+                Adicione mais clientes à sua rota
+              </Typography>
+            </Box>
+
             <Box
               sx={{
                 display: 'flex',
-                flexDirection: { xs: 'column', sm: 'row' },
-                gap: { xs: 2, sm: 0 },
-                alignItems: 'center',
+                justifyContent: 'center',
+                mb: 3,
+                gap: 2,
+                flexWrap: 'wrap',
               }}
             >
-              <Button
-                variant="contained"
-                startIcon={<UpdateIcon />}
-                onClick={handleUpdateRoute}
-                disabled={
-                  selectedClients.length === 0 ||
-                  !routeName.trim() ||
-                  !scheduledDate.trim() ||
-                  isUpdatingRoute
-                }
-                sx={{
-                  backgroundColor: 'green',
-                  '&:hover': {
-                    backgroundColor: 'darkgreen',
-                  },
-                  '&:disabled': {
-                    backgroundColor: 'green',
-                    opacity: 0.6,
-                  },
-                  fontSize: '12px',
-                  mr: { xs: 0, sm: 2 }, // Margem apenas em telas maiores
-                  width: { xs: '100%', sm: 'auto' }, // Largura total em mobile
-                }}
-              >
-                {isUpdatingRoute ? (
-                  <CircularProgress size={20} color="inherit" />
-                ) : (
-                  'Atualizar Rota'
-                )}
-              </Button>
-              <Button
-                variant="contained"
-                startIcon={<CancelIcon />}
-                onClick={handleBack}
-                disabled={isUpdatingRoute}
-                sx={{
-                  fontSize: '12px',
-                  width: { xs: '100%', sm: 'auto' }, // Largura total em mobile
-                }}
-              >
-                Cancelar
-              </Button>
-            </Box>
-          </Box>
-        </Box>
-
-        {/* Lista dos clientes cadastrados */}
-        <Box
-          sx={{
-            ...styles.container,
-            height: '700px',
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-            <Typography
-              variant="h6"
-              sx={{
-                mb: 2,
-                fontWeight: 'bold',
-                fontSize: {
-                  xs: '14px',
-                  sm: '16px',
-                  md: '18px',
-                },
-              }}
-            >
-              Adicione mais clientes à sua rota
-            </Typography>
-          </Box>
-
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              mb: 3,
-              gap: 2,
-              flexWrap: 'wrap',
-            }}
-          >
-            {/* Select de Estados */}
-            <FormControl sx={{ maxWidth: 250, width: '100%' }}>
-              <InputLabel id="state-filter-label">Filtrar por UF</InputLabel>
-              <Select
-                labelId="state-filter-label"
-                value={stateFilter}
-                label="Filtrar por UF"
-                onChange={(e) => setStateFilter(e.target.value)}
-                sx={{
-                  '& .MuiInputLabel-root': {
-                    fontSize: '14px',
-                  },
-                  '& .MuiSelect-select': {
-                    fontSize: '14px',
-                  },
-                }}
-              >
-                <MenuItem value="MS" sx={styles.fontSize}>
-                  MS
-                </MenuItem>
-                <MenuItem value="MT" sx={styles.fontSize}>
-                  MT
-                </MenuItem>
-                <MenuItem value="OUTRAS" sx={styles.fontSize}>
-                  Outras UF
-                </MenuItem>
-              </Select>
-            </FormControl>
-
-            {stateFilter && (
+              {/* Select de Estados */}
               <FormControl sx={{ maxWidth: 250, width: '100%' }}>
-                <InputLabel id="city-filter-label">
-                  Filtrar por Cidade
-                </InputLabel>
+                <InputLabel id="state-filter-label">Filtrar por UF</InputLabel>
                 <Select
-                  labelId="city-filter-label"
-                  value={cityFilter || 'Todas as cidades'}
-                  label="Filtrar por Cidade"
-                  onChange={(e) =>
-                    setCityFilter(
-                      e.target.value === 'Todas as cidades'
-                        ? ''
-                        : e.target.value,
-                    )
-                  }
-                  disabled={!stateFilter}
+                  labelId="state-filter-label"
+                  value={stateFilter}
+                  label="Filtrar por UF"
+                  onChange={(e) => setStateFilter(e.target.value)}
                   sx={{
                     '& .MuiInputLabel-root': {
                       fontSize: '14px',
@@ -1122,72 +1111,84 @@ const ClientsVisitsEditRouteById: React.FC<ClientsVisitsEditRouteByIdProps> = ({
                     },
                   }}
                 >
-                  <MenuItem value="Todas as cidades" sx={styles.fontSize}>
-                    Todas as cidades
+                  <MenuItem value="MS" sx={styles.fontSize}>
+                    MS
                   </MenuItem>
-                  {availableCities.length > 0 ? (
-                    availableCities.map((city) => (
-                      <MenuItem key={city} value={city} sx={styles.fontSize}>
-                        {city}
-                      </MenuItem>
-                    ))
-                  ) : (
-                    <MenuItem value="" sx={styles.fontSize}>
-                      {stateFilter
-                        ? 'Nenhuma cidade encontrada'
-                        : 'Selecione um Estado'}
-                    </MenuItem>
-                  )}
+                  <MenuItem value="MT" sx={styles.fontSize}>
+                    MT
+                  </MenuItem>
+                  <MenuItem value="OUTRAS" sx={styles.fontSize}>
+                    Outras UF
+                  </MenuItem>
                 </Select>
               </FormControl>
-            )}
-          </Box>
 
-          {/* Seção de Cliente Não Cadastrado */}
-          <Box sx={{ mb: 3 }}>
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 2,
-              }}
-            >
-              <TextField
-                label="Adicione um cliente não cadastrado"
-                value={unregisteredClientName}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setUnregisteredClientName(e.target.value)
-                }
-                placeholder="Digite o nome do cliente"
-                size="small"
-                fullWidth
-                sx={{
-                  '& .MuiInputLabel-root': {
-                    fontSize: '14px',
-                  },
-                  '& .MuiInputBase-input': {
-                    fontSize: '14px',
-                  },
-                }}
-              />
+              {stateFilter && (
+                <FormControl sx={{ maxWidth: 250, width: '100%' }}>
+                  <InputLabel id="city-filter-label">
+                    Filtrar por Cidade
+                  </InputLabel>
+                  <Select
+                    labelId="city-filter-label"
+                    value={cityFilter || 'Todas as cidades'}
+                    label="Filtrar por Cidade"
+                    onChange={(e) =>
+                      setCityFilter(
+                        e.target.value === 'Todas as cidades'
+                          ? ''
+                          : e.target.value,
+                      )
+                    }
+                    disabled={!stateFilter}
+                    sx={{
+                      '& .MuiInputLabel-root': {
+                        fontSize: '14px',
+                      },
+                      '& .MuiSelect-select': {
+                        fontSize: '14px',
+                      },
+                    }}
+                  >
+                    <MenuItem value="Todas as cidades" sx={styles.fontSize}>
+                      Todas as cidades
+                    </MenuItem>
+                    {availableCities.length > 0 ? (
+                      availableCities.map((city) => (
+                        <MenuItem key={city} value={city} sx={styles.fontSize}>
+                          {city}
+                        </MenuItem>
+                      ))
+                    ) : (
+                      <MenuItem value="" sx={styles.fontSize}>
+                        {stateFilter
+                          ? 'Nenhuma cidade encontrada'
+                          : 'Selecione um Estado'}
+                      </MenuItem>
+                    )}
+                  </Select>
+                </FormControl>
+              )}
+            </Box>
+
+            {/* Seção de Cliente Não Cadastrado */}
+            <Box sx={{ mb: 3 }}>
               <Box
                 sx={{
                   display: 'flex',
+                  flexDirection: 'column',
                   gap: 2,
-                  flexWrap: 'wrap',
                 }}
               >
                 <TextField
-                  label="Estado"
-                  value={unregisteredClientState}
+                  label="Adicione um cliente não cadastrado"
+                  value={unregisteredClientName}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setUnregisteredClientState(e.target.value)
+                    setUnregisteredClientName(e.target.value)
                   }
-                  placeholder="UF"
+                  placeholder="Digite o nome do cliente"
                   size="small"
+                  fullWidth
                   sx={{
-                    flex: 1,
-                    minWidth: '120px',
                     '& .MuiInputLabel-root': {
                       fontSize: '14px',
                     },
@@ -1196,129 +1197,157 @@ const ClientsVisitsEditRouteById: React.FC<ClientsVisitsEditRouteByIdProps> = ({
                     },
                   }}
                 />
-                <TextField
-                  label="Cidade"
-                  value={unregisteredClientCity}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setUnregisteredClientCity(e.target.value)
-                  }
-                  placeholder="Cidade"
-                  size="small"
+                <Box
                   sx={{
-                    flex: 1,
-                    minWidth: '120px',
-                    '& .MuiInputLabel-root': {
-                      fontSize: '14px',
+                    display: 'flex',
+                    gap: 2,
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <TextField
+                    label="Estado"
+                    value={unregisteredClientState}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setUnregisteredClientState(e.target.value)
+                    }
+                    placeholder="UF"
+                    size="small"
+                    sx={{
+                      flex: 1,
+                      minWidth: '120px',
+                      '& .MuiInputLabel-root': {
+                        fontSize: '14px',
+                      },
+                      '& .MuiInputBase-input': {
+                        fontSize: '14px',
+                      },
+                    }}
+                  />
+                  <TextField
+                    label="Cidade"
+                    value={unregisteredClientCity}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setUnregisteredClientCity(e.target.value)
+                    }
+                    placeholder="Cidade"
+                    size="small"
+                    sx={{
+                      flex: 1,
+                      minWidth: '120px',
+                      '& .MuiInputLabel-root': {
+                        fontSize: '14px',
+                      },
+                      '& .MuiInputBase-input': {
+                        fontSize: '14px',
+                      },
+                    }}
+                  />
+                </Box>
+                <Button
+                  variant="contained"
+                  onClick={handleAddUnregisteredClient}
+                  disabled={!unregisteredClientName.trim()}
+                  sx={{
+                    backgroundColor: 'green',
+                    '&:hover': {
+                      backgroundColor: 'darkgreen',
                     },
-                    '& .MuiInputBase-input': {
-                      fontSize: '14px',
+                    '&:disabled': {
+                      backgroundColor: 'grey',
+                      opacity: 0.6,
+                    },
+                    fontSize: {
+                      xs: '10px',
+                      sm: '12px',
+                      md: '14px',
+                    },
+                    minWidth: {
+                      xs: '120px',
+                      sm: '150px',
+                      md: '200px',
                     },
                   }}
-                />
+                >
+                  Adicionar Cliente Não Cadastrado
+                </Button>
               </Box>
-              <Button
-                variant="contained"
-                onClick={handleAddUnregisteredClient}
-                disabled={!unregisteredClientName.trim()}
-                sx={{
-                  backgroundColor: 'green',
-                  '&:hover': {
-                    backgroundColor: 'darkgreen',
-                  },
-                  '&:disabled': {
-                    backgroundColor: 'grey',
-                    opacity: 0.6,
-                  },
-                  fontSize: {
-                    xs: '10px',
-                    sm: '12px',
-                    md: '14px',
-                  },
-                  minWidth: {
-                    xs: '120px',
-                    sm: '150px',
-                    md: '200px',
-                  },
-                }}
-              >
-                Adicionar Cliente Não Cadastrado
-              </Button>
+            </Box>
+
+            {/* Tabela de Clientes */}
+            <Box sx={{ flex: 1, overflow: 'hidden' }}>
+              <TableContainer sx={{ height: '100%', overflow: 'auto' }}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={styles.fontSize}>Cliente:</TableCell>
+                      {!isSmallScreen && (
+                        <>
+                          <TableCell sx={styles.fontSize}>Estado:</TableCell>
+                          <TableCell sx={styles.fontSize}>Cidade:</TableCell>
+                          <TableCell sx={styles.fontSize}>Corfio:</TableCell>
+                        </>
+                      )}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {filteredClients.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={6} align="center">
+                          Nenhum cliente encontrado para o filtro selecionado.
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      filteredClients.map((client) => {
+                        const isAlreadySelected = selectedClients.some(
+                          (selected) =>
+                            String(selected.id) === String(client.id),
+                        );
+
+                        return (
+                          <TableRow
+                            key={client.id}
+                            sx={{
+                              ...styles.rowHover,
+                              cursor: isAlreadySelected
+                                ? 'not-allowed'
+                                : 'pointer',
+                              opacity: isAlreadySelected ? 0.5 : 1,
+                              backgroundColor: isAlreadySelected
+                                ? 'rgba(0, 0, 0, 0.05)'
+                                : 'inherit',
+                            }}
+                            onClick={() =>
+                              !isAlreadySelected && handleRowClick(client)
+                            }
+                          >
+                            <TableCell sx={styles.fontSizeClientName}>
+                              {renderAsIs(client.companyName.slice(0, 40))}
+                            </TableCell>
+                            {!isSmallScreen && (
+                              <>
+                                <TableCell sx={styles.fontSize}>
+                                  {client.state || '-'}
+                                </TableCell>
+                                <TableCell sx={styles.fontSize}>
+                                  {client.city || '-'}
+                                </TableCell>
+                                <TableCell sx={styles.fontSize}>
+                                  {client.corfioCode || '-'}
+                                </TableCell>
+                              </>
+                            )}
+                          </TableRow>
+                        );
+                      })
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
             </Box>
           </Box>
-
-          {/* Tabela de Clientes */}
-          <Box sx={{ flex: 1, overflow: 'hidden' }}>
-            <TableContainer sx={{ height: '100%', overflow: 'auto' }}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={styles.fontSize}>Cliente:</TableCell>
-                    {!isSmallScreen && (
-                      <>
-                        <TableCell sx={styles.fontSize}>Estado:</TableCell>
-                        <TableCell sx={styles.fontSize}>Cidade:</TableCell>
-                        <TableCell sx={styles.fontSize}>Corfio:</TableCell>
-                      </>
-                    )}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {filteredClients.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={6} align="center">
-                        Nenhum cliente encontrado para o filtro selecionado.
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    filteredClients.map((client) => {
-                      const isAlreadySelected = selectedClients.some(
-                        (selected) => String(selected.id) === String(client.id),
-                      );
-
-                      return (
-                        <TableRow
-                          key={client.id}
-                          sx={{
-                            ...styles.rowHover,
-                            cursor: isAlreadySelected
-                              ? 'not-allowed'
-                              : 'pointer',
-                            opacity: isAlreadySelected ? 0.5 : 1,
-                            backgroundColor: isAlreadySelected
-                              ? 'rgba(0, 0, 0, 0.05)'
-                              : 'inherit',
-                          }}
-                          onClick={() =>
-                            !isAlreadySelected && handleRowClick(client)
-                          }
-                        >
-                          <TableCell sx={styles.fontSizeClientName}>
-                            {renderAsIs(client.companyName.slice(0, 40))}
-                          </TableCell>
-                          {!isSmallScreen && (
-                            <>
-                              <TableCell sx={styles.fontSize}>
-                                {client.state || '-'}
-                              </TableCell>
-                              <TableCell sx={styles.fontSize}>
-                                {client.city || '-'}
-                              </TableCell>
-                              <TableCell sx={styles.fontSize}>
-                                {client.corfioCode || '-'}
-                              </TableCell>
-                            </>
-                          )}
-                        </TableRow>
-                      );
-                    })
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Box>
         </Box>
-      </Box>
-    </Container>
+      </Container>
+    </>
   );
 };
 
