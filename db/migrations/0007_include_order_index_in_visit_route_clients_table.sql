@@ -1,0 +1,1 @@
+ALTER TABLE "visit_route_clients" ADD COLUMN "order_index" integer;

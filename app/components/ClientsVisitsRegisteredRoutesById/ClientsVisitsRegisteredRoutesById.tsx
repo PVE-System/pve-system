@@ -53,6 +53,7 @@ interface RouteClient {
     companyName: string;
     state: string;
     city: string;
+    corfioCode: string;
   } | null;
 }
 
@@ -149,6 +150,13 @@ const ClientsVisitsRegisteredRoutesById: React.FC<
       return `${client.clientDetails.city} - ${client.clientDetails.state}`;
     }
     return `${client.customerCityUnregistered || 'N/A'} - ${client.customerStateUnregistered || 'N/A'}`;
+  };
+
+  const getClientCorfio = (client: RouteClient) => {
+    if (client.clientDetails) {
+      return client.clientDetails.corfioCode || 'N/D';
+    }
+    return 'N/D';
   };
 
   const handleBack = () => {
@@ -539,9 +547,21 @@ const ClientsVisitsRegisteredRoutesById: React.FC<
                     {renderAsIs(getClientDisplayName(client).slice(0, 40))}
                     {getClientDisplayName(client).length > 40 && '...'}
                   </Typography>
-                  <Typography sx={styles.clientLocation}>
-                    {getClientLocation(client)}
-                  </Typography>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: { xs: 'column', sm: 'row' },
+                      gap: { sm: 1 },
+                      alignItems: { xs: 'flex-start', sm: 'center' },
+                    }}
+                  >
+                    <Typography sx={styles.clientLocation}>
+                      {getClientLocation(client)}
+                    </Typography>
+                    <Typography sx={styles.clientLocation}>
+                      Corfio: {getClientCorfio(client)}
+                    </Typography>
+                  </Box>
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   {!client.clientDetails && (

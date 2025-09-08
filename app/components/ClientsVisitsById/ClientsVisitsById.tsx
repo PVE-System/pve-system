@@ -50,6 +50,7 @@ interface VisitRouteClient {
     companyName: string;
     state: string;
     city: string;
+    corfioCode: string;
   } | null;
 }
 
@@ -180,6 +181,13 @@ const ClientsVisitsById: React.FC<ClientsVisitsByIdProps> = ({ visitId }) => {
     return `${visit.customerCityUnregistered || 'N/A'} - ${visit.customerStateUnregistered || 'N/A'}`;
   };
 
+  const getClientCorfio = (visit: VisitRouteClient) => {
+    if (visit.clientDetails) {
+      return visit.clientDetails.corfioCode || 'N/D';
+    }
+    return 'N/D';
+  };
+
   if (loading) {
     return (
       <Box sx={styles.loadingContainer}>
@@ -230,17 +238,37 @@ const ClientsVisitsById: React.FC<ClientsVisitsByIdProps> = ({ visitId }) => {
                   {renderAsIs(getClientDisplayName(visit).slice(0, 40))}
                   {getClientDisplayName(visit).length > 40 && '...'}
                 </Typography>
-                <Typography
+                <Box
                   sx={{
-                    fontSize: '14px',
-                    color: 'text.secondary',
-                    '@media (max-width: 600px)': {
-                      fontSize: '12px',
-                    },
+                    display: 'flex',
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    gap: { xs: 0.5, sm: 1 },
+                    alignItems: { xs: 'flex-start', sm: 'center' },
                   }}
                 >
-                  {getClientLocation(visit)}
-                </Typography>
+                  <Typography
+                    sx={{
+                      fontSize: '14px',
+                      color: 'text.secondary',
+                      '@media (max-width: 600px)': {
+                        fontSize: '12px',
+                      },
+                    }}
+                  >
+                    {getClientLocation(visit)}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontSize: '14px',
+                      color: 'text.secondary',
+                      '@media (max-width: 600px)': {
+                        fontSize: '12px',
+                      },
+                    }}
+                  >
+                    Corfio: {getClientCorfio(visit)}
+                  </Typography>
+                </Box>
               </Box>
               <Box>
                 {visit.clientDetails ? (
