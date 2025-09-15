@@ -15,8 +15,13 @@ export async function GET(request: NextRequest) {
     const { searchParams } = request.nextUrl;
     const year = searchParams.get('year');
     const month = searchParams.get('month');
+    const requestedUserId = searchParams.get('userId');
 
-    // Buscar rotas com filtros (sem filtrar por usuário)
+    // Role e usuário a partir dos cookies
+    const userRole = request.cookies.get('role')?.value;
+    const cookieUserId = request.cookies.get('userId')?.value;
+
+    // Buscar rotas com filtros (com possível filtro por usuário)
     const whereConditions: any[] = [];
 
     if (year) {
@@ -78,6 +83,14 @@ export async function GET(request: NextRequest) {
 
         whereConditions.push(gte(visitRoutes.scheduledDate, startDate));
         whereConditions.push(lte(visitRoutes.scheduledDate, endDate));
+      }
+    }
+
+    // Filtro por usuário
+    if (userRole === 'vendedor externo') {
+      // Vendedor externo só pode ver as próprias rotas
+      if (cookieUserId) {
+        whereConditions.push(eq(visitRoutes.userId, parseInt(cookieUserId)));
       }
     }
 
