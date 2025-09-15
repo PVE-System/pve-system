@@ -162,6 +162,7 @@ function RegisterTeamComponent() {
             onChange={handleChange}
           >
             <MenuItem value="vendedor">Vendedor</MenuItem>
+            <MenuItem value="vendedor externo">Vendedor Externo</MenuItem>
             <MenuItem value="admin">Admin</MenuItem>
           </TextField>
 

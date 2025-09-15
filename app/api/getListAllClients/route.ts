@@ -3,10 +3,14 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { and, eq, not, inArray, ilike, or, asc, desc } from 'drizzle-orm';
 import { db } from '@/app/db';
-import { clients } from '@/app/db/schema';
+import { clients, users } from '@/app/db/schema';
 
 export async function GET(req: NextRequest) {
   try {
+    // Buscar role e userId dos cookies
+    const userRole = req.cookies.get('role')?.value;
+    const userId = req.cookies.get('userId')?.value;
+
     const page = req.nextUrl.searchParams.get('page');
 
     // Detecta a página pela URL
@@ -51,6 +55,26 @@ export async function GET(req: NextRequest) {
 
     // Filtros
     const whereConditions = [];
+
+    // Filtro para vendedor externo - sempre aplicar primeiro
+    if (userRole === 'vendedor externo' && userId) {
+      // Para vendedor externo, buscar o operatorNumber do usuário
+      const user = await db
+        .select({ operatorNumber: users.operatorNumber })
+        .from(users)
+        .where(eq(users.id, parseInt(userId)))
+        .limit(1);
+
+      if (user.length === 0) {
+        return NextResponse.json(
+          { error: 'Usuário não encontrado' },
+          { status: 404 },
+        );
+      }
+
+      const operatorNumber = user[0].operatorNumber;
+      whereConditions.push(eq(clients.responsibleSeller, operatorNumber));
+    }
 
     if (isMsPage) {
       whereConditions.push(eq(clients.state, 'MS'));
