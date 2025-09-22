@@ -264,6 +264,9 @@ export default function UsersTeamList() {
                           >
                             <MenuItem value="vendedor">Vendedor</MenuItem>
                             <MenuItem value="admin">Admin</MenuItem>
+                            <MenuItem value="vendedor externo">
+                              Vendedor Externo
+                            </MenuItem>
                           </TextField>
                         </TableCell>
                       )}

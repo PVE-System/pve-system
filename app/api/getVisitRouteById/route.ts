@@ -22,7 +22,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Buscar a rota específica
+    // Autorização por role (cookies)
+    const userRole = request.cookies.get('role')?.value;
+    const cookieUserId = request.cookies.get('userId')?.value;
+
+    // Buscar a rota específica (com restrição para vendedor externo)
     const route = await db
       .select({
         id: visitRoutes.id,
@@ -37,7 +41,14 @@ export async function GET(request: NextRequest) {
       })
       .from(visitRoutes)
       .leftJoin(users, eq(visitRoutes.userId, users.id))
-      .where(eq(visitRoutes.id, parseInt(routeId)))
+      .where(
+        userRole === 'vendedor externo' && cookieUserId
+          ? and(
+              eq(visitRoutes.id, parseInt(routeId)),
+              eq(visitRoutes.userId, parseInt(cookieUserId)),
+            )
+          : eq(visitRoutes.id, parseInt(routeId)),
+      )
       .limit(1);
 
     if (route.length === 0) {

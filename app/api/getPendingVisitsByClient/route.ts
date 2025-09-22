@@ -10,6 +10,10 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const statusFilter = searchParams.get('status') || 'PENDENTE'; // Padrão é PENDENTE
 
+    // Restringir por usuário quando vendedor externo
+    const userRole = request.cookies.get('role')?.value;
+    const cookieUserId = request.cookies.get('userId')?.value;
+
     // Validar o filtro de status
     if (!['PENDENTE', 'DESINTERESSADO'].includes(statusFilter)) {
       return NextResponse.json(
@@ -18,16 +22,30 @@ export async function GET(request: NextRequest) {
       );
     }
     // 1. Primeiro, buscar todos os clientes únicos que têm visitas
-    const allClientsWithVisits = await db
+    //    Se vendedor externo, considerar apenas visitas das rotas dele
+    const baseClientsWithVisits = db
       .select({
         clientId: visitRouteClients.clientId,
         customerNameUnregistered: visitRouteClients.customerNameUnregistered,
       })
       .from(visitRouteClients)
-      .groupBy(
-        visitRouteClients.clientId,
-        visitRouteClients.customerNameUnregistered,
+      .leftJoin(
+        visitRoutes,
+        eq(visitRouteClients.visitRouteId, visitRoutes.id),
       );
+
+    const allClientsWithVisits = await (userRole === 'vendedor externo' &&
+    cookieUserId
+      ? baseClientsWithVisits
+          .where(eq(visitRoutes.userId, parseInt(cookieUserId)))
+          .groupBy(
+            visitRouteClients.clientId,
+            visitRouteClients.customerNameUnregistered,
+          )
+      : baseClientsWithVisits.groupBy(
+          visitRouteClients.clientId,
+          visitRouteClients.customerNameUnregistered,
+        ));
 
     // 2. Para cada cliente, buscar sua visita mais recente
     const pendingVisitsByClient = await Promise.all(
@@ -51,6 +69,11 @@ export async function GET(request: NextRequest) {
             isRegisteredClient = true;
 
             // Buscar a visita com status filtrado mais recente deste cliente
+            const ownerCondLatest =
+              userRole === 'vendedor externo' && cookieUserId
+                ? [eq(visitRoutes.userId, parseInt(cookieUserId))]
+                : [];
+
             latestVisit = await db
               .select({
                 id: visitRouteClients.id,
@@ -69,6 +92,7 @@ export async function GET(request: NextRequest) {
                 and(
                   eq(visitRouteClients.clientId, client.clientId),
                   eq(visitRouteClients.visitStatus, statusFilter),
+                  ...ownerCondLatest,
                 ),
               )
               .orderBy(desc(visitRouteClients.updatedAt))
@@ -80,6 +104,11 @@ export async function GET(request: NextRequest) {
           isRegisteredClient = false;
 
           // Buscar a visita com status filtrado mais recente deste cliente não cadastrado
+          const ownerCondUnreg =
+            userRole === 'vendedor externo' && cookieUserId
+              ? [eq(visitRoutes.userId, parseInt(cookieUserId))]
+              : [];
+
           latestVisit = await db
             .select({
               id: visitRouteClients.id,
@@ -101,6 +130,7 @@ export async function GET(request: NextRequest) {
                   client.customerNameUnregistered,
                 ),
                 eq(visitRouteClients.visitStatus, statusFilter),
+                ...ownerCondUnreg,
               ),
             )
             .orderBy(desc(visitRouteClients.updatedAt))
@@ -119,18 +149,28 @@ export async function GET(request: NextRequest) {
 
           if (client.clientId) {
             // Para cliente cadastrado
+            const ownerCondFin =
+              userRole === 'vendedor externo' && cookieUserId
+                ? [eq(visitRoutes.userId, parseInt(cookieUserId))]
+                : [];
+
             const finalizedVisit = await db
               .select({
                 id: visitRouteClients.id,
                 updatedAt: visitRouteClients.updatedAt,
               })
               .from(visitRouteClients)
+              .leftJoin(
+                visitRoutes,
+                eq(visitRouteClients.visitRouteId, visitRoutes.id),
+              )
               .where(
                 and(
                   eq(visitRouteClients.clientId, client.clientId),
                   inArray(visitRouteClients.visitStatus, finalizingStatuses),
                   // Só considerar visitas mais recentes que a visita com status filtrado
                   gt(visitRouteClients.updatedAt, latestVisit[0].updatedAt),
+                  ...ownerCondFin,
                 ),
               )
               .orderBy(desc(visitRouteClients.updatedAt))
@@ -139,12 +179,21 @@ export async function GET(request: NextRequest) {
             hasMoreRecentFinalizedVisit = finalizedVisit.length > 0;
           } else if (client.customerNameUnregistered) {
             // Para cliente não cadastrado
+            const ownerCondFinUnreg =
+              userRole === 'vendedor externo' && cookieUserId
+                ? [eq(visitRoutes.userId, parseInt(cookieUserId))]
+                : [];
+
             const finalizedVisit = await db
               .select({
                 id: visitRouteClients.id,
                 updatedAt: visitRouteClients.updatedAt,
               })
               .from(visitRouteClients)
+              .leftJoin(
+                visitRoutes,
+                eq(visitRouteClients.visitRouteId, visitRoutes.id),
+              )
               .where(
                 and(
                   eq(
@@ -154,6 +203,7 @@ export async function GET(request: NextRequest) {
                   inArray(visitRouteClients.visitStatus, finalizingStatuses),
                   // Só considerar visitas mais recentes que a visita com status filtrado
                   gt(visitRouteClients.updatedAt, latestVisit[0].updatedAt),
+                  ...ownerCondFinUnreg,
                 ),
               )
               .orderBy(desc(visitRouteClients.updatedAt))
