@@ -15,7 +15,7 @@ import {
   Select,
   MenuItem,
 } from '@mui/material';
-import { blueGrey, orange } from '@mui/material/colors';
+import { blueGrey, orange, purple } from '@mui/material/colors';
 import {
   Route as RouteIcon,
   PersonOff as PersonOffIcon,
@@ -375,6 +375,10 @@ const ClientsVisitsRegisteredRoutesById: React.FC<
                 size="small"
                 onClick={handleEditRoute}
                 sx={{
+                  backgroundColor: purple[700],
+                  '&:hover': {
+                    backgroundColor: purple[600],
+                  },
                   fontSize: '12px',
                   height: '32px',
                   minWidth: 105,
@@ -400,11 +404,32 @@ const ClientsVisitsRegisteredRoutesById: React.FC<
                   value={route.routeStatus}
                   onChange={(e) => handleStatusChange(e.target.value)}
                   disabled={updatingStatus}
-                  sx={{
+                  sx={(theme) => ({
                     fontSize: '12px',
                     height: '32px',
+
+                    // Cores dinâmicas por status
+                    backgroundColor:
+                      route.routeStatus === 'CONCLUIDO'
+                        ? 'green'
+                        : theme.palette.primary.main,
+                    // Remover contorno/notched outline
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      border: 'none',
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      border: 'none',
+                    },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      border: 'none',
+                    },
+                    // Texto e ícone brancos
                     '& .MuiSelect-select': {
                       fontSize: '12px',
+                      color: theme.palette.common.white,
+                    },
+                    '& .MuiSelect-icon': {
+                      color: theme.palette.common.white,
                     },
                     '@media (max-width: 600px)': {
                       fontSize: '11px',
@@ -413,7 +438,7 @@ const ClientsVisitsRegisteredRoutesById: React.FC<
                         fontSize: '11px',
                       },
                     },
-                  }}
+                  })}
                 >
                   <MenuItem
                     value="EM_ABERTO"

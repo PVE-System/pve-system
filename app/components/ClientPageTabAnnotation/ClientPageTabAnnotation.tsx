@@ -44,6 +44,13 @@ const ClientPageTabAnnotation: React.FC<ClientPageTabAnnotationProps> = ({
   const [loadingFavorite, setLoadingFavorite] = React.useState<number | null>(
     null,
   );
+  const [lastVisitData, setLastVisitData] = useState<{
+    hasHistory: boolean;
+    lastVisitConfirmedAt: string | null;
+    lastVisitDescription?: string | null;
+    routeName?: string | null;
+    scheduledDate?: string | null;
+  } | null>(null);
 
   const router = useRouter();
 
@@ -100,6 +107,39 @@ const ClientPageTabAnnotation: React.FC<ClientPageTabAnnotationProps> = ({
 
     fetchData();
   }, [clientId, fetchClientData, fetchComments]);
+
+  // Buscar histórico de visitas do cliente (mesmo padrão das outras abas)
+  // Inclui polling para atualizar o conteúdo quando currentVisitDescription mudar
+  useEffect(() => {
+    if (!clientId || isNaN(Number(clientId))) {
+      return;
+    }
+
+    let intervalId: NodeJS.Timeout | null = null;
+
+    const fetchVisitHistory = async () => {
+      try {
+        const response = await fetch(
+          `/api/getVisitClientHistory?clientId=${clientId}`,
+        );
+        if (!response.ok) {
+          console.error('Erro ao buscar histórico de visitas');
+          return;
+        }
+        const data = await response.json();
+        setLastVisitData(data);
+      } catch (error) {
+        console.error('Erro ao buscar histórico de visitas:', error);
+      }
+    };
+
+    fetchVisitHistory();
+    intervalId = setInterval(fetchVisitHistory, 15000);
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [clientId]);
 
   const onSubmit = async (data: any) => {
     setLoadingPost(true); // Ativa o loading do botão "Publicar"
@@ -251,37 +291,63 @@ const ClientPageTabAnnotation: React.FC<ClientPageTabAnnotationProps> = ({
           readOnly={false}
           imageUrl={clientData?.imageUrl}
           enableImageUpload={false}
+          lastVisitData={lastVisitData}
         />
         <Box sx={styles.boxCol2}>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <Controller
-              name="comment"
-              control={control}
-              defaultValue=""
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  multiline
-                  minRows={3}
-                  maxRows={6}
-                  variant="filled"
-                  sx={styles.inputsCol2}
-                  InputProps={{
-                    style: { minHeight: '150px' },
-                  }}
-                />
-              )}
+          {/* Descrição atual da visita (somente leitura) */}
+          <Box>
+            <Typography variant="subtitle1" sx={{ fontSize: '14px' }}>
+              Descrição da visita mais recente:
+            </Typography>
+            <TextField
+              value={lastVisitData?.lastVisitDescription || ''}
+              placeholder="Sem descrição disponível"
+              variant="filled"
+              fullWidth
+              multiline
+              minRows={2}
+              InputProps={{ readOnly: true }}
+              sx={{
+                ...styles.inputsCol2,
+                '& .MuiInputBase-input': { fontSize: '14px' },
+              }}
             />
-            <Box sx={styles.boxButton}>
-              <Button
-                type="submit"
-                variant="contained"
-                sx={styles.postCommentsButton}
-              >
-                {loadingPost ? <CircularProgress size={24} /> : 'Publicar'}
-              </Button>
-            </Box>
-          </form>
+          </Box>
+          <Box>
+            <Typography variant="subtitle1" sx={{ fontSize: '14px' }}>
+              Publicar uma anotação:
+            </Typography>
+
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <Controller
+                name="comment"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    multiline
+                    minRows={3}
+                    maxRows={6}
+                    variant="filled"
+                    sx={styles.inputsCol2}
+                    InputProps={{
+                      style: { minHeight: '150px' },
+                    }}
+                  />
+                )}
+              />
+              <Box sx={styles.boxButton}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  sx={styles.postCommentsButton}
+                >
+                  {loadingPost ? <CircularProgress size={24} /> : 'Publicar'}
+                </Button>
+              </Box>
+            </form>
+          </Box>
           <Box>
             {Array.isArray(comments) &&
               comments.map((comment, index) => (
