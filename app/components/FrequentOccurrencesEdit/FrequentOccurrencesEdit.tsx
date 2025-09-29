@@ -24,6 +24,10 @@ import sharedStyles from '@/app/styles/sharedStyles';
 import { orange, red, green, grey } from '@mui/material/colors';
 import AlertModalGeneric from '../AlertModalGeneric/AlertModalGeneric';
 
+// Frase padrão utilizada quando a ocorrência está em aberto
+const DEFAULT_CONCLUSION_MESSAGE =
+  'Esta ocorrência está em aberto, atualize futuramente quando concluir.';
+
 interface Occurrence {
   id: number;
   problem: string;
@@ -148,6 +152,18 @@ export default function FrequentOccurrencesEdit() {
           title: 'Atenção',
           message:
             'Não é possível concluir a ocorrência com um destes campos em branco, descreva sobre o ocorrido.',
+          buttonText: 'OK',
+        });
+        setShowAlertModal(true);
+        return;
+      }
+
+      // Impedir conclusão se a "Conclusão Final" ainda contém a frase padrão
+      if (formData.conclusion.trim() === DEFAULT_CONCLUSION_MESSAGE) {
+        setAlertModalConfig({
+          title: 'Atenção',
+          message:
+            'Para concluir a ocorrência, é necessário informar o relato sobre a conclusão.',
           buttonText: 'OK',
         });
         setShowAlertModal(true);
