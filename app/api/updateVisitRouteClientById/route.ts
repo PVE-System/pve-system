@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/app/db';
 import { visitRouteClients, visitRoutes } from '@/app/db/schema';
 import { eq, and } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
 
 interface UpdateVisitRequest {
   visitId: number;
@@ -76,9 +77,47 @@ export async function PUT(request: NextRequest) {
       .where(eq(visitRouteClients.id, visitId))
       .returning();
 
+    // Descobrir a rota da visita atualizada
+    const visitWithRoute = await db
+      .select({ visitRouteId: visitRouteClients.visitRouteId })
+      .from(visitRouteClients)
+      .where(eq(visitRouteClients.id, visitId))
+      .limit(1);
+
+    const routeId = visitWithRoute[0]?.visitRouteId;
+
+    if (routeId) {
+      const remainingScheduled = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(visitRouteClients)
+        .where(
+          and(
+            eq(visitRouteClients.visitRouteId, routeId),
+            eq(visitRouteClients.visitStatus, 'AGENDADO'),
+          ),
+        );
+
+      const totalScheduled = Number(remainingScheduled[0]?.count ?? 0);
+
+      const isConcluded = totalScheduled === 0;
+      const newDescription = isConcluded
+        ? `Rota Concluída em: ${new Date().toLocaleDateString('pt-BR')}`
+        : 'Esta rota ainda não foi concluída.';
+
+      await db
+        .update(visitRoutes)
+        .set({
+          routeStatus: isConcluded ? 'CONCLUIDO' : 'EM_ABERTO',
+          description: newDescription,
+          updatedAt: new Date(),
+        })
+        .where(eq(visitRoutes.id, routeId));
+    }
+
     return NextResponse.json({
       success: true,
       visit: updatedVisit[0],
+      routeId,
       message: 'Visita atualizada com sucesso',
     });
   } catch (error: unknown) {

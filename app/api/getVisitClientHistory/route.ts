@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Buscar a última visita do cliente que tenha currentVisitDescription preenchida
+    // Buscar a última visita do cliente baseada em lastVisitConfirmedAt
     const lastVisit = await db
       .select({
         id: visitRouteClients.id,
@@ -25,6 +25,7 @@ export async function GET(request: NextRequest) {
         lastVisitDescription: visitRouteClients.lastVisitDescription,
         lastVisitConfirmedAt: visitRouteClients.lastVisitConfirmedAt,
         visitStatus: visitRouteClients.visitStatus,
+        visitRouteId: visitRouteClients.visitRouteId,
         routeName: visitRoutes.routeName,
         scheduledDate: visitRoutes.scheduledDate,
         updatedAt: visitRouteClients.updatedAt,
@@ -34,12 +35,8 @@ export async function GET(request: NextRequest) {
       .where(
         and(
           eq(visitRouteClients.clientId, parseInt(clientId)),
-          // Buscar apenas visitas com status CONCLUIDO
-          eq(visitRouteClients.visitStatus, 'CONCLUIDO'),
-          // Buscar apenas visitas que tenham lastVisitConfirmedAt preenchida
+          // Considera a última confirmação de visita registrada no backend
           isNotNull(visitRouteClients.lastVisitConfirmedAt),
-          // Buscar apenas visitas que tenham alguma descrição
-          isNotNull(visitRouteClients.currentVisitDescription),
         ),
       )
       .orderBy(desc(visitRouteClients.lastVisitConfirmedAt))
@@ -60,6 +57,7 @@ export async function GET(request: NextRequest) {
       lastVisitDescription:
         visit.currentVisitDescription || visit.lastVisitDescription,
       lastVisitConfirmedAt: visit.lastVisitConfirmedAt,
+      visitRouteId: visit.visitRouteId,
       routeName: visit.routeName,
       scheduledDate: visit.scheduledDate,
     });

@@ -36,6 +36,10 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
   const [loadingUpload, setLoadingUpload] = useState(false);
   const [loadingDownload, setLoadingDownload] = useState<string | null>(null);
   const [loadingDelete, setLoadingDelete] = useState<string | null>(null);
+  const [lastVisitData, setLastVisitData] = useState<{
+    hasHistory: boolean;
+    lastVisitConfirmedAt: string | null;
+  } | null>(null);
 
   const fetchClientData = useCallback(async () => {
     try {
@@ -144,6 +148,31 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
 
     fetchData();
   }, [clientId, fetchClientData, fetchFiles, tabIndex]);
+
+  // Buscar histórico de visitas do cliente (mesmo padrão aplicado nas outras abas)
+  useEffect(() => {
+    if (!clientId || isNaN(Number(clientId))) {
+      return;
+    }
+
+    const fetchVisitHistory = async () => {
+      try {
+        const response = await fetch(
+          `/api/getVisitClientHistory?clientId=${clientId}`,
+        );
+        if (!response.ok) {
+          console.error('Erro ao buscar histórico de visitas');
+          return;
+        }
+        const data = await response.json();
+        setLastVisitData(data);
+      } catch (error) {
+        console.error('Erro ao buscar histórico de visitas:', error);
+      }
+    };
+
+    fetchVisitHistory();
+  }, [clientId]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabIndex(newValue);
@@ -343,6 +372,7 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
           readOnly={false}
           imageUrl={clientData?.imageUrl}
           enableImageUpload={false}
+          lastVisitData={lastVisitData}
         />
         <Box sx={styles.boxCol2}>
           <Box>

@@ -69,6 +69,7 @@ const ClientsVisitsById: React.FC<ClientsVisitsByIdProps> = ({ visitId }) => {
     currentVisitDescription: '',
     lastVisitDescription: '',
   });
+  const [originalVisitStatus, setOriginalVisitStatus] = useState<string>('');
   const [alertModal, setAlertModal] = useState({
     open: false,
     title: '',
@@ -94,6 +95,7 @@ const ClientsVisitsById: React.FC<ClientsVisitsByIdProps> = ({ visitId }) => {
         currentVisitDescription: data.visit.currentVisitDescription || '',
         lastVisitDescription: data.visit.lastVisitDescription || '',
       });
+      setOriginalVisitStatus(data.visit.visitStatus);
     } catch (error) {
       console.error('Erro ao buscar visita:', error);
     } finally {
@@ -106,7 +108,11 @@ const ClientsVisitsById: React.FC<ClientsVisitsByIdProps> = ({ visitId }) => {
   }, [fetchVisitById]);
 
   const handleBack = () => {
-    router.back();
+    if (visit?.visitRouteId) {
+      router.push(`/clientsVisitsRegisteredRoutes/${visit.visitRouteId}`);
+    } else {
+      router.back();
+    }
   };
 
   const handleSave = async () => {
@@ -114,18 +120,24 @@ const ClientsVisitsById: React.FC<ClientsVisitsByIdProps> = ({ visitId }) => {
 
     setSaving(true);
     try {
+      const payload: any = {
+        visitId: visit.id,
+        userId: parseInt(user.id),
+        currentVisitDescription: formData.currentVisitDescription,
+        lastVisitDescription: formData.lastVisitDescription,
+      };
+
+      // Envia visitStatus apenas se o usuário alterou o status
+      if (formData.visitStatus !== originalVisitStatus) {
+        payload.visitStatus = formData.visitStatus;
+      }
+
       const response = await fetch('/api/updateVisitRouteClient', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          visitId: visit.id,
-          userId: parseInt(user.id),
-          visitStatus: formData.visitStatus,
-          currentVisitDescription: formData.currentVisitDescription,
-          lastVisitDescription: formData.lastVisitDescription,
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -211,6 +223,27 @@ const ClientsVisitsById: React.FC<ClientsVisitsByIdProps> = ({ visitId }) => {
 
   return (
     <Box sx={styles.container}>
+      {/* Botão Voltar */}
+      <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+        <Button
+          variant="contained"
+          size="small"
+          startIcon={<ArrowBackIcon />}
+          onClick={handleBack}
+          sx={{
+            fontSize: { xs: '11px', sm: '12px' },
+            backgroundColor: 'primary.main',
+            '&:hover': {
+              backgroundColor: 'primary.dark',
+            },
+            minWidth: { xs: '80px', sm: 'auto' },
+            height: { xs: '26px', sm: 'auto' },
+            px: { xs: 1, sm: 2 },
+          }}
+        >
+          Voltar
+        </Button>
+      </Box>
       <AlertModalClientsVisitsRoute
         open={alertModal.open}
         title={alertModal.title}

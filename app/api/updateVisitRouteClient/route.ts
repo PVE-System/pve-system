@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/app/db';
 import { visitRouteClients, visitRoutes } from '@/app/db/schema';
 import { eq, and } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
 
 interface UpdateVisitRequest {
   visitId: number;
@@ -59,13 +60,19 @@ export async function PUT(request: NextRequest) {
     }
 
     // Lógica para lastVisitConfirmedAt
+    // Só atualiza quando houver mudança real de status
     if (visitStatus !== undefined) {
-      if (visitStatus === 'CONCLUIDO') {
-        // Se o status for CONCLUIDO, atualizar lastVisitConfirmedAt
-        updateData.lastVisitConfirmedAt = new Date();
-      } else {
-        // Se o status for qualquer outro valor, limpar lastVisitConfirmedAt
-        updateData.lastVisitConfirmedAt = null;
+      const previousStatus = existingVisit[0].visitStatus as string | undefined;
+
+      // Apenas se mudou o status
+      if (previousStatus !== visitStatus) {
+        if (visitStatus === 'AGENDADO') {
+          // Se voltar para AGENDADO, limpa a confirmação
+          updateData.lastVisitConfirmedAt = null;
+        } else {
+          // Qualquer status diferente de AGENDADO registra a confirmação
+          updateData.lastVisitConfirmedAt = new Date();
+        }
       }
     }
 
@@ -85,10 +92,42 @@ export async function PUT(request: NextRequest) {
       .where(eq(visitRouteClients.id, visitId))
       .limit(1);
 
+    const routeId = visitWithRoute[0]?.visitRouteId;
+
+    // Se houver routeId, verificar se ainda existe algum cliente AGENDADO na rota
+    if (routeId) {
+      const remainingScheduled = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(visitRouteClients)
+        .where(
+          and(
+            eq(visitRouteClients.visitRouteId, routeId),
+            eq(visitRouteClients.visitStatus, 'AGENDADO'),
+          ),
+        );
+
+      const totalScheduled = Number(remainingScheduled[0]?.count ?? 0);
+
+      // Atualizar status e descrição da rota conforme contagem de AGENDADO
+      const isConcluded = totalScheduled === 0;
+      const newDescription = isConcluded
+        ? `Rota Concluída em: ${new Date().toLocaleDateString('pt-BR')}`
+        : 'Esta rota ainda não foi concluída.';
+
+      await db
+        .update(visitRoutes)
+        .set({
+          routeStatus: isConcluded ? 'CONCLUIDO' : 'EM_ABERTO',
+          description: newDescription,
+          updatedAt: new Date(),
+        })
+        .where(eq(visitRoutes.id, routeId));
+    }
+
     return NextResponse.json({
       success: true,
       visit: updatedVisit[0],
-      routeId: visitWithRoute[0]?.visitRouteId,
+      routeId,
       message: 'Visita atualizada com sucesso',
     });
   } catch (error: unknown) {

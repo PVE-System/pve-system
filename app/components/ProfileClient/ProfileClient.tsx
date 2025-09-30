@@ -32,6 +32,7 @@ interface ClientProfileProps {
   lastVisitData?: {
     hasHistory: boolean;
     lastVisitConfirmedAt: string | null;
+    visitRouteId?: number | null;
   } | null;
 }
 
@@ -286,20 +287,38 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
             wordBreak: 'break-word',
           }}
         >
-          <Typography
-            variant="subtitle2"
-            component="div"
-            sx={{
-              marginBottom: '5px',
-              wordBreak: 'break-word',
-              color: lastVisitData?.hasHistory
-                ? 'text.primary'
-                : 'text.secondary',
-              fontWeight: lastVisitData?.hasHistory ? 'normal' : 'normal',
-            }}
-          >
-            Última Visita: {getLastVisitText()}
-          </Typography>
+          <Tooltip title="Clique para ver esta rota">
+            <Typography
+              variant="subtitle2"
+              component="div"
+              sx={{
+                marginBottom: '5px',
+                wordBreak: 'break-word',
+                color: lastVisitData?.hasHistory
+                  ? 'text.primary'
+                  : 'text.secondary',
+                fontWeight: lastVisitData?.hasHistory ? 'normal' : 'normal',
+                cursor:
+                  lastVisitData?.hasHistory && lastVisitData?.visitRouteId
+                    ? 'pointer'
+                    : 'default',
+                textDecoration:
+                  lastVisitData?.hasHistory && lastVisitData?.visitRouteId
+                    ? 'underline'
+                    : 'none',
+              }}
+              onClick={() => {
+                if (lastVisitData?.hasHistory && lastVisitData?.visitRouteId) {
+                  window.open(
+                    `/clientsVisitsRegisteredRoutes/${lastVisitData.visitRouteId}`,
+                    '_blank',
+                  );
+                }
+              }}
+            >
+              Última Visita: {getLastVisitText()}
+            </Typography>
+          </Tooltip>
           <Typography
             variant="subtitle2"
             component="div"

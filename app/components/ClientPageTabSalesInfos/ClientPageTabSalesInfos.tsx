@@ -46,6 +46,10 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
   const [loading, setLoading] = useState(true);
   const [salesData, setSalesData] = useState<any>(null);
   const [clientData, setClientData] = useState<any>(null);
+  const [lastVisitData, setLastVisitData] = useState<{
+    hasHistory: boolean;
+    lastVisitConfirmedAt: string | null;
+  } | null>(null);
 
   const fetchClientData = useCallback(async () => {
     try {
@@ -76,6 +80,31 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
     if (!clientId) return;
     fetchClientData();
   }, [clientId, fetchClientData]);
+
+  // Buscar histórico de visitas do cliente (mesmo padrão dos outros componentes)
+  useEffect(() => {
+    if (!clientId || isNaN(Number(clientId))) {
+      return;
+    }
+
+    const fetchVisitHistory = async () => {
+      try {
+        const response = await fetch(
+          `/api/getVisitClientHistory?clientId=${clientId}`,
+        );
+        if (!response.ok) {
+          console.error('Erro ao buscar histórico de visitas');
+          return;
+        }
+        const data = await response.json();
+        setLastVisitData(data);
+      } catch (error) {
+        console.error('Erro ao buscar histórico de visitas:', error);
+      }
+    };
+
+    fetchVisitHistory();
+  }, [clientId]);
 
   const handleFieldUpdate = async (fieldName: string) => {
     setUpdatingFields((prev) => ({ ...prev, [fieldName]: true }));
@@ -195,6 +224,7 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
           readOnly={false}
           imageUrl={clientData?.imageUrl}
           enableImageUpload={false}
+          lastVisitData={lastVisitData}
         />
       </Box>
       <Box sx={styles.boxCol2}>

@@ -53,6 +53,10 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
   const [lastAddedQuoteId, setLastAddedQuoteId] = useState<number | null>(null);
   const [industry, setIndustry] = useState<string>('CORFIO');
   const [deleting, setDeleting] = useState<number | null>(null); // Armazena o ID da cotação sendo deletada
+  const [lastVisitData, setLastVisitData] = useState<{
+    hasHistory: boolean;
+    lastVisitConfirmedAt: string | null;
+  } | null>(null);
 
   const ITEMS_PER_PAGE = 5;
 
@@ -121,6 +125,31 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
   useEffect(() => {
     fetchQuotes(Number(year));
   }, [fetchQuotes, year]);
+
+  // Buscar histórico de visitas do cliente (mesmo padrão do ClientPageTabInfos)
+  useEffect(() => {
+    if (!clientId || isNaN(Number(clientId))) {
+      return;
+    }
+
+    const fetchVisitHistory = async () => {
+      try {
+        const response = await fetch(
+          `/api/getVisitClientHistory?clientId=${clientId}`,
+        );
+        if (!response.ok) {
+          console.error('Erro ao buscar histórico de visitas');
+          return;
+        }
+        const data = await response.json();
+        setLastVisitData(data);
+      } catch (error) {
+        console.error('Erro ao buscar histórico de visitas:', error);
+      }
+    };
+
+    fetchVisitHistory();
+  }, [clientId]);
 
   const addSalesQuote = async () => {
     setAddingQuote(true);
@@ -208,6 +237,7 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
           readOnly={false}
           imageUrl={clientData?.imageUrl || null}
           enableImageUpload={false}
+          lastVisitData={lastVisitData}
         />
         <Box sx={styles.boxCol2}>
           <Box sx={styles.boxInputAndButtons}>
