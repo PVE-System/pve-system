@@ -9,7 +9,9 @@ import {
   TextField,
   Tooltip,
   Typography,
+  Snackbar,
 } from '@mui/material';
+import Alert from '@mui/material/Alert';
 import { useForm, Controller } from 'react-hook-form';
 import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
 import styles from '@/app/components/ClientPageTabSalesInfos/styles';
@@ -50,6 +52,22 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
     hasHistory: boolean;
     lastVisitConfirmedAt: string | null;
   } | null>(null);
+  const [snackbarSuccessOpen, setSnackbarSuccessOpen] = useState(false);
+  const [snackbarError, setSnackbarError] = useState<{
+    open: boolean;
+    message?: string;
+    errorId?: string | null;
+    at?: string;
+    contentText?: string;
+  }>({ open: false });
+
+  const getVercelRequestId = (res: Response) => {
+    try {
+      return res.headers.get('x-vercel-id');
+    } catch {
+      return null;
+    }
+  };
 
   const fetchClientData = useCallback(async () => {
     try {
@@ -136,7 +154,22 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
       });
 
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        let errMsg = 'Não foi possível salvar seu registro';
+        let errorId = getVercelRequestId(response);
+        try {
+          const err = await response.json();
+          errMsg = err?.error || errMsg;
+          errorId = err?.errorId || errorId;
+        } catch {}
+        const at = new Date().toLocaleString();
+        setSnackbarError({
+          open: true,
+          message: `${errMsg}, tente novamente daqui alguns minutos`,
+          errorId,
+          at,
+          contentText: fieldValue || '',
+        });
+        return;
       }
 
       const result = await response.json();
@@ -150,8 +183,16 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
 
       // Revalidar dados para sincronização
       fetchClientData();
+      setSnackbarSuccessOpen(true);
     } catch (error) {
-      console.error('Error processing sales information:', error);
+      const at = new Date().toLocaleString();
+      setSnackbarError({
+        open: true,
+        message: (error as any)?.message || 'Erro desconhecido ao salvar',
+        errorId: null,
+        at,
+        contentText: getValues(fieldName) || '',
+      });
     } finally {
       setUpdatingFields((prev) => ({ ...prev, [fieldName]: false }));
     }
@@ -166,6 +207,8 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
         throw new Error('User ID is missing');
       }
 
+      const priorValue = getValues(fieldName) || '';
+
       const requestData = {
         clientId,
         userId: Number(userId),
@@ -179,13 +222,35 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
       });
 
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        let errMsg = 'Não foi possível salvar seu registro';
+        let errorId = getVercelRequestId(response);
+        try {
+          const err = await response.json();
+          errMsg = err?.error || errMsg;
+          errorId = err?.errorId || errorId;
+        } catch {}
+        const at = new Date().toLocaleString();
+        setSnackbarError({
+          open: true,
+          message: `${errMsg}, tente novamente daqui alguns minutos`,
+          errorId,
+          at,
+          contentText: priorValue,
+        });
+        return;
       }
 
       // Atualiza os dados após a exclusão
       await fetchClientData();
     } catch (error) {
-      console.error('Error deleting field:', error);
+      const at = new Date().toLocaleString();
+      setSnackbarError({
+        open: true,
+        message: (error as any)?.message || 'Erro desconhecido ao salvar',
+        errorId: null,
+        at,
+        contentText: getValues(fieldName) || '',
+      });
     } finally {
       setDeletingFields((prev) => ({ ...prev, [fieldName]: false })); // Remove o estado de carregamento
     }
@@ -300,6 +365,60 @@ const ClientPageTabSalesInfos: React.FC<ClientPageTabSalesInfosProps> = ({
           ))}
         </form>
       </Box>
+      {/* Snackbars de atualização/exclusão */}
+      <Snackbar
+        open={snackbarSuccessOpen}
+        autoHideDuration={8000}
+        onClose={() => setSnackbarSuccessOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setSnackbarSuccessOpen(false)}
+          severity="success"
+          sx={{ width: '100%' }}
+        >
+          Seu registro foi salvo com sucesso!
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={snackbarError.open}
+        onClose={() => setSnackbarError({ open: false })}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setSnackbarError({ open: false })}
+          severity="error"
+          sx={{ width: '100%', wordBreak: 'break-word' }}
+        >
+          Não foi possível salvar seu registro, tente novamente daqui alguns
+          minutos.
+          {snackbarError.message ? ` Detalhes: ${snackbarError.message}` : ''}
+          {snackbarError.errorId ? ` | Código: ${snackbarError.errorId}` : ''}
+          {snackbarError.at ? ` | ${snackbarError.at}` : ''}
+          {snackbarError.contentText
+            ? (() => {
+                const txt = snackbarError.contentText || '';
+                const short = txt.length > 20 ? `${txt.slice(0, 20)}...` : txt;
+                return ` | Conteúdo: ${short}`;
+              })()
+            : ''}
+          {snackbarError.contentText ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
+              <Button
+                color="primary"
+                variant="contained"
+                size="small"
+                onClick={() =>
+                  navigator.clipboard.writeText(snackbarError.contentText || '')
+                }
+              >
+                Copiar texto da sua publicação
+              </Button>
+            </Box>
+          ) : null}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

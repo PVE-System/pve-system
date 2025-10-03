@@ -12,8 +12,11 @@ import {
   Modal,
   TextField,
   Typography,
+  Snackbar,
 } from '@mui/material';
+import Alert from '@mui/material/Alert';
 import { useRouter } from 'next/navigation';
+import Cookies from 'js-cookie';
 
 import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
 import {
@@ -44,6 +47,7 @@ interface ClientData {
   id?: string;
   cnpj?: string;
   cpf?: string;
+  responsibleSeller?: string;
   // Outras propriedades do cliente
 }
 
@@ -185,6 +189,7 @@ const RegisterClient: React.FC = () => {
   );
 
   const [showModal, setShowModal] = useState(false);
+  const [snackbarAccessDenied, setSnackbarAccessDenied] = useState(false);
   const router = useRouter();
 
   // Função para buscar cidades com base no estado selecionado
@@ -471,6 +476,43 @@ const RegisterClient: React.FC = () => {
 
   const handleCloseModal = () => setShowModal(false);
 
+  // Função para verificar se o usuário tem acesso ao cliente
+  const handleViewClient = async () => {
+    const userRole = Cookies.get('role');
+
+    if (userRole === 'vendedor externo') {
+      try {
+        const userId = Cookies.get('userId');
+        if (!userId) {
+          setSnackbarAccessDenied(true);
+          return;
+        }
+
+        const res = await fetch(`/api/getUser/${userId}`);
+        if (!res.ok) {
+          setSnackbarAccessDenied(true);
+          return;
+        }
+        const userData = await res.json();
+        const operatorNumber = userData?.operatorNumber || null;
+
+        if (
+          !operatorNumber ||
+          duplicateClient?.responsibleSeller !== operatorNumber
+        ) {
+          setSnackbarAccessDenied(true);
+          return;
+        }
+      } catch {
+        setSnackbarAccessDenied(true);
+        return;
+      }
+    }
+
+    // Se passou na verificação ou não é vendedor externo, navegar para o cliente
+    window.open(`/clientPage?id=${duplicateClient?.id}`, '_blank');
+  };
+
   return (
     <Container maxWidth="lg">
       <Box sx={styles.container}>
@@ -705,15 +747,13 @@ const RegisterClient: React.FC = () => {
                 >
                   Fechar
                 </Button>
-                <a
-                  href={`/clientPage?id=${duplicateClient?.id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Button
+                  variant="contained"
+                  sx={sharedStyles.modalButton}
+                  onClick={handleViewClient}
                 >
-                  <Button variant="contained" sx={sharedStyles.modalButton}>
-                    Ver Cliente
-                  </Button>
-                </a>
+                  Ver Cliente
+                </Button>
               </Box>
             </Modal>
           </Box>
@@ -724,6 +764,21 @@ const RegisterClient: React.FC = () => {
           </Typography>
         )}
       </Box>
+
+      {/* Snackbar para acesso negado */}
+      <Snackbar
+        open={snackbarAccessDenied}
+        onClose={() => setSnackbarAccessDenied(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setSnackbarAccessDenied(false)}
+          severity="error"
+          sx={{ width: '100%' }}
+        >
+          Você não tem acesso a este cliente
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };
