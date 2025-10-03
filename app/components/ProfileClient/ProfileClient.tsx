@@ -355,8 +355,7 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
         <Dialog
           open={openDialog}
           onClose={() => setOpenDialog(false)}
-          maxWidth="sm"
-          fullWidth
+          maxWidth={false}
           PaperProps={{
             style: {
               borderRadius: 10,
@@ -368,15 +367,32 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
+              p: 0,
             }}
           >
-            <Image
-              src={previewImage || imageUrl || '/profile-placeholder.png'}
-              alt="Profile Picture"
-              width={500}
-              height={500}
-              style={{ borderRadius: '10px' }}
-            />
+            <Box
+              sx={{
+                // LARGURA efetiva do preview (xs/sm/md+)
+                width: { xs: 350, sm: 400, md: 600 },
+                // ALTURA efetiva do preview (mantém quadrado)
+                height: { xs: 350, sm: 400, md: 600 },
+                position: 'relative',
+                overflow: 'hidden',
+                borderRadius: '10px',
+              }}
+            >
+              <Image
+                src={previewImage || imageUrl || '/profile-placeholder.png'}
+                alt="Profile Picture"
+                fill
+                // LARGURA usada pelo Next.js para escolher a melhor resolução
+                sizes="(max-width: 600px) 350px, (max-width: 900px) 400px, 600px"
+                style={{
+                  objectFit: 'contain',
+                }}
+                priority
+              />
+            </Box>
           </DialogContent>
         </Dialog>
       </Box>

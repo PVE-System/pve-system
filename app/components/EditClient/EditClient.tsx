@@ -8,10 +8,15 @@ import {
   Modal,
   TextField,
   Typography,
+  Snackbar,
 } from '@mui/material';
+import Alert from '@mui/material/Alert';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { useForm, Controller, useWatch } from 'react-hook-form';
 
 import { useRouter, useSearchParams } from 'next/navigation';
+import Cookies from 'js-cookie';
 import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
 import {
   formatCPF,
@@ -157,6 +162,7 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [loadingSave, setLoadingSave] = useState(false);
@@ -176,6 +182,20 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
 
   const [cepPreenchido, setCepPreenchido] = useState(false);
   const [stateEditadoManualmente, setStateEditadoManualmente] = useState(false);
+  const [savingImage, setSavingImage] = useState(false);
+  const [snackbarConfirmOpen, setSnackbarConfirmOpen] = useState(false);
+  const [snackbarSuccessOpen, setSnackbarSuccessOpen] = useState(false);
+  const [snackbarError, setSnackbarError] = useState<{
+    open: boolean;
+    message?: string;
+    errorId?: string | null;
+    at?: string;
+  }>({ open: false });
+  const [snackbarAccessDenied, setSnackbarAccessDenied] = useState(false);
+
+  // Responsividade
+  const theme = useTheme();
+  const isXs = useMediaQuery(theme.breakpoints.down('sm'));
 
   // Observa os campos do formulário
   const companyName = watch('companyName');
@@ -336,43 +356,7 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
         data.stateRegistration = '';
       }
 
-      //Lidar com a imagem do client
-
-      if (imageFile && imageUrl) {
-        try {
-          console.log('Deletando imagem antiga:', clientId);
-          const deleteImageResponse = await fetch(
-            `/api/deleteImageClient?clientId=${clientId}&imageUrl=${encodeURIComponent(imageUrl)}`,
-            { method: 'DELETE' },
-          );
-
-          if (!deleteImageResponse.ok) {
-            const errorResponse = await deleteImageResponse.json();
-            throw new Error(
-              errorResponse.error || 'Erro ao deletar imagem antiga',
-            );
-          }
-        } catch (error) {
-          console.error('Erro ao deletar imagem antiga:', error);
-        }
-      }
-
-      if (imageFile) {
-        const formData = new FormData();
-        formData.append('file', imageFile);
-
-        const uploadResponse = await fetch(
-          `/api/uploadImageClient?pathname=clients/id=${clientId}/image-${Date.now()}&clientId=${clientId}`,
-          { method: 'POST', body: formData },
-        );
-
-        if (uploadResponse.ok) {
-          const uploadResult = await uploadResponse.json();
-          finalImageUrl = uploadResult.url;
-        } else {
-          console.error('Erro ao fazer upload da nova imagem');
-        }
-      }
+      // Não realizar upload de imagem aqui; o upload foi tratado no fluxo imediato
 
       const updatedData = {
         ...data,
@@ -404,10 +388,104 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
   };
 
   const handleImageChange = (file: File) => {
-    if (file) {
-      setImageFile(file);
-      const previewUrl = URL.createObjectURL(file);
-      setPreviewImage(previewUrl);
+    if (!file) return;
+    setPendingImageFile(file);
+    setImageFile(file);
+    const previewUrl = URL.createObjectURL(file);
+    setPreviewImage(previewUrl);
+    setSnackbarConfirmOpen(true);
+  };
+
+  const handleCancelImageSelection = () => {
+    setSnackbarConfirmOpen(false);
+    setPendingImageFile(null);
+    setImageFile(null);
+    setPreviewImage(null);
+  };
+
+  const getVercelRequestId = (res: Response) => {
+    try {
+      return res.headers.get('x-vercel-id');
+    } catch {
+      return null;
+    }
+  };
+
+  const handleConfirmSaveImage = async () => {
+    if (!pendingImageFile || !clientId) return;
+    setSnackbarConfirmOpen(false);
+    setSavingImage(true);
+    try {
+      const oldUrl = imageUrl;
+      const formData = new FormData();
+      formData.append('file', pendingImageFile);
+
+      const uploadResponse = await fetch(
+        `/api/uploadImageClient?pathname=clients/id=${clientId}/image-${Date.now()}&clientId=${clientId}`,
+        { method: 'POST', body: formData },
+      );
+
+      if (!uploadResponse.ok) {
+        let errMsg = 'Falha no upload da imagem';
+        let errorId = getVercelRequestId(uploadResponse);
+        try {
+          const j = await uploadResponse.json();
+          errMsg = j?.error || errMsg;
+          errorId = j?.errorId || errorId;
+        } catch {}
+        const at = new Date().toLocaleString();
+        setSnackbarError({ open: true, message: errMsg, errorId, at });
+        return;
+      }
+
+      const { url: newUrl, errorId } = await uploadResponse.json();
+
+      const updateRes = await fetch(`/api/updateClient?id=${clientId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageUrl: newUrl }),
+      });
+
+      if (!updateRes.ok) {
+        let errMsg = 'Falha ao salvar a imagem no cliente';
+        let updateErrorId = getVercelRequestId(updateRes);
+        try {
+          const j = await updateRes.json();
+          errMsg = j?.error || errMsg;
+          updateErrorId = j?.errorId || updateErrorId;
+        } catch {}
+        const at = new Date().toLocaleString();
+        setSnackbarError({
+          open: true,
+          message: errMsg,
+          errorId: updateErrorId,
+          at,
+        });
+        return;
+      }
+
+      if (oldUrl) {
+        // best-effort: remover imagem antiga em segundo plano
+        fetch(
+          `/api/deleteImageClient?clientId=${clientId}&imageUrl=${encodeURIComponent(oldUrl)}`,
+          { method: 'DELETE' },
+        ).catch(() => {});
+      }
+
+      setImageUrl(newUrl);
+      setPreviewImage(null);
+      setPendingImageFile(null);
+      setSnackbarSuccessOpen(true);
+    } catch (e: any) {
+      const at = new Date().toLocaleString();
+      setSnackbarError({
+        open: true,
+        message: e?.message || 'Erro desconhecido',
+        errorId: null,
+        at,
+      });
+    } finally {
+      setSavingImage(false);
     }
   };
 
@@ -611,6 +689,42 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
   // Lógica para fechar o modal
   const handleCloseModal = () => setShowModal(false);
 
+  // Verificar permissão antes de navegar para o cliente duplicado
+  const handleViewDuplicateClient = async () => {
+    const userRole = Cookies.get('role');
+
+    if (userRole === 'vendedor externo') {
+      try {
+        const userId = Cookies.get('userId');
+        if (!userId) {
+          setSnackbarAccessDenied(true);
+          return;
+        }
+
+        const res = await fetch(`/api/getUser/${userId}`);
+        if (!res.ok) {
+          setSnackbarAccessDenied(true);
+          return;
+        }
+        const userData = await res.json();
+        const operatorNumber = userData?.operatorNumber || null;
+
+        if (
+          !operatorNumber ||
+          duplicateClient?.responsibleSeller !== operatorNumber
+        ) {
+          setSnackbarAccessDenied(true);
+          return;
+        }
+      } catch {
+        setSnackbarAccessDenied(true);
+        return;
+      }
+    }
+
+    window.open(`/clientPage?id=${duplicateClient.id}`, '_blank');
+  };
+
   // Modal de duplicidade
   const renderDuplicateModal = () => (
     <Modal
@@ -632,15 +746,13 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
           Fechar
         </Button>
         {duplicateClient && (
-          <a
-            href={`/clientPage?id=${duplicateClient.id}`}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Button
+            variant="contained"
+            sx={sharedStyles.modalButton}
+            onClick={handleViewDuplicateClient}
           >
-            <Button variant="contained" sx={sharedStyles.modalButton}>
-              Ver Cliente
-            </Button>
-          </a>
+            Ver Cliente
+          </Button>
         )}
       </Box>
     </Modal>
@@ -688,7 +800,7 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
             readOnly={false}
             imageUrl={previewImage || imageUrl || undefined}
             onImageChange={handleImageChange}
-            enableImageUpload={true}
+            enableImageUpload={!savingImage}
           />
           <Box sx={styles.boxButton}>
             <Button
@@ -696,6 +808,7 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
               variant="contained"
               sx={styles.deleteButton}
               onClick={() => setShowDeleteModal(true)} // Abre o modal
+              disabled={loadingDelete || savingImage}
             >
               Deletar
             </Button>
@@ -738,12 +851,112 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
               variant="contained"
               sx={styles.editButton}
               onClick={() => handleSubmit(onSubmit)()}
-              disabled={loadingSave} // Desativa o botão enquanto está carregando
+              disabled={loadingSave || savingImage} // Desativa o botão enquanto está carregando
             >
               {loadingSave ? <CircularProgress size={24} /> : 'Salvar'}
             </Button>
           </Box>
         </Box>
+        {/* Snackbars para confirmação, sucesso e erro */}
+        <Snackbar
+          open={snackbarConfirmOpen}
+          onClose={() => !savingImage && setSnackbarConfirmOpen(false)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        >
+          <Box
+            sx={{
+              bgcolor: 'background.default',
+              borderRadius: 2,
+              boxShadow: 6,
+              p: 2,
+              /* mb: 5, */
+              /* maxWidth: 600, */
+              /* width: isXs ? 'calc(100% - 24px)' : 'auto', */
+            }}
+          >
+            <Typography
+              variant={isXs ? 'body2' : 'body1'}
+              textAlign={isXs ? 'center' : 'left'}
+            >
+              Salvar ou alterar esta imagem agora?
+            </Typography>
+            <Box
+              sx={{
+                display: 'flex',
+                gap: 1,
+                justifyContent: 'center',
+                mt: 1,
+                flexWrap: 'wrap',
+              }}
+            >
+              <Button
+                color="warning"
+                variant="contained"
+                size="small"
+                fullWidth={isXs}
+                onClick={handleCancelImageSelection}
+                disabled={savingImage}
+              >
+                Cancelar
+              </Button>
+              <Button
+                color="success"
+                variant="contained"
+                size="small"
+                fullWidth={isXs}
+                onClick={handleConfirmSaveImage}
+                disabled={savingImage}
+              >
+                Salvar
+              </Button>
+            </Box>
+          </Box>
+        </Snackbar>
+
+        <Snackbar
+          open={snackbarSuccessOpen}
+          autoHideDuration={8000}
+          onClose={() => setSnackbarSuccessOpen(false)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          sx={{
+            '& .MuiPaper-root': {
+              maxWidth: 600,
+              width: isXs ? 'calc(100% - 24px)' : 'auto',
+            },
+          }}
+        >
+          <Alert
+            onClose={() => setSnackbarSuccessOpen(false)}
+            severity="success"
+            sx={{ width: '100%' }}
+          >
+            Sua imagem foi salva com sucesso!
+          </Alert>
+        </Snackbar>
+
+        <Snackbar
+          open={snackbarError.open}
+          onClose={() => setSnackbarError({ open: false })}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          sx={{
+            '& .MuiPaper-root': {
+              maxWidth: 600,
+              width: isXs ? 'calc(100% - 24px)' : 'auto',
+            },
+          }}
+        >
+          <Alert
+            onClose={() => setSnackbarError({ open: false })}
+            severity="error"
+            sx={{ width: '100%', wordBreak: 'break-word' }}
+          >
+            Ops, ocorreu um erro ao salvar a imagem. Tente novamente em alguns
+            minutos.
+            {snackbarError.message ? ` Detalhes: ${snackbarError.message}` : ''}
+            {snackbarError.errorId ? ` | Código: ${snackbarError.errorId}` : ''}
+            {snackbarError.at ? ` | ${snackbarError.at}` : ''}
+          </Alert>
+        </Snackbar>
         <Box sx={styles.boxCol2}>
           <form>
             {/* Renderiza primeiro companyName e businessGroupId */}
@@ -929,6 +1142,20 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
           </form>
         </Box>
       </Box>
+      {/* Snackbar para acesso negado */}
+      <Snackbar
+        open={snackbarAccessDenied}
+        onClose={() => setSnackbarAccessDenied(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setSnackbarAccessDenied(false)}
+          severity="error"
+          sx={{ width: '100%' }}
+        >
+          Você não tem acesso a este cliente
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

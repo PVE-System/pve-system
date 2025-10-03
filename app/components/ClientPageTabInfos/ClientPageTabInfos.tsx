@@ -396,6 +396,7 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
       'businessGroupId',
       'rating',
       /* 'totalQuotes', */
+      'lastVisitConfirmedAt',
       'totalQuotesCurrent',
       'totalQuotesLastYear',
       'totalQuotesTwoYearsAgo',
@@ -445,6 +446,14 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
         const operatorNumber = clientData[key];
         const user = users.find((u) => u.operatorNumber === operatorNumber);
         return user ? `${user.operatorNumber} - ${user.name}` : operatorNumber;
+      }
+
+      // Formatação da data da última visita confirmada
+      if (key === 'lastVisitConfirmedAt') {
+        const dt = lastVisitData?.lastVisitConfirmedAt
+          ? new Date(lastVisitData.lastVisitConfirmedAt)
+          : null;
+        return dt ? dt.toLocaleDateString('pt-BR') : 'Visita Pendente';
       }
 
       if (key === 'rating') {

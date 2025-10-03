@@ -13,10 +13,12 @@ import {
   CircularProgress,
   Container,
   Tooltip,
+  Snackbar,
 } from '@mui/material';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import DeleteIcon from '@mui/icons-material/Delete';
+import Alert from '@mui/material/Alert';
 
 import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
 import styles from '@/app/components/ClientPageTabFiles/styles';
@@ -40,6 +42,21 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
     hasHistory: boolean;
     lastVisitConfirmedAt: string | null;
   } | null>(null);
+  const [snackbarSuccessOpen, setSnackbarSuccessOpen] = useState(false);
+  const [snackbarError, setSnackbarError] = useState<{
+    open: boolean;
+    message?: string;
+    errorId?: string | null;
+    at?: string;
+  }>({ open: false });
+
+  const getVercelRequestId = (res: Response) => {
+    try {
+      return res.headers.get('x-vercel-id');
+    } catch {
+      return null;
+    }
+  };
 
   const fetchClientData = useCallback(async () => {
     try {
@@ -281,13 +298,28 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
           };
 
           setFiles((prevFiles) => [...prevFiles, newFileWithDate]);
+          setSnackbarSuccessOpen(true);
 
           event.target.value = '';
         } else {
-          console.error('Error uploading file');
+          let errMsg = 'Erro ao enviar arquivo';
+          let errorId = getVercelRequestId(response);
+          try {
+            const err = await response.json();
+            errMsg = err?.error || errMsg;
+            errorId = err?.errorId || errorId;
+          } catch {}
+          const at = new Date().toLocaleString();
+          setSnackbarError({ open: true, message: errMsg, errorId, at });
         }
-      } catch (error) {
-        console.error('Error uploading file:', error);
+      } catch (error: any) {
+        const at = new Date().toLocaleString();
+        setSnackbarError({
+          open: true,
+          message: error?.message || 'Erro desconhecido no upload',
+          errorId: null,
+          at,
+        });
       } finally {
         setLoadingUpload(false);
       }
@@ -530,6 +562,39 @@ const ClientPageTabFiles: React.FC<ClientPageTabFilesProps> = ({
           </Box>
         </Box>
       </Box>
+      {/* Snackbars de upload */}
+      <Snackbar
+        open={snackbarSuccessOpen}
+        autoHideDuration={8000}
+        onClose={() => setSnackbarSuccessOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setSnackbarSuccessOpen(false)}
+          severity="success"
+          sx={{ width: '100%' }}
+        >
+          Arquivo anexado com sucesso!
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={snackbarError.open}
+        onClose={() => setSnackbarError({ open: false })}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setSnackbarError({ open: false })}
+          severity="error"
+          sx={{ width: '100%', wordBreak: 'break-word' }}
+        >
+          Ops, ocorreu um erro ao anexar o arquivo. Tente novamente em alguns
+          minutos.
+          {snackbarError.message ? ` Detalhes: ${snackbarError.message}` : ''}
+          {snackbarError.errorId ? ` | Código: ${snackbarError.errorId}` : ''}
+          {snackbarError.at ? ` | ${snackbarError.at}` : ''}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };
