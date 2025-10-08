@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Box,
   Button,
@@ -7,7 +7,9 @@ import {
   TextField,
   Tooltip,
   Typography,
+  Snackbar,
 } from '@mui/material';
+import Alert from '@mui/material/Alert';
 import { useForm, Controller } from 'react-hook-form';
 import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
 import styles from '@/app/components/ClientPageTabInfos/styles';
@@ -45,6 +47,19 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
     hasHistory: boolean;
     lastVisitConfirmedAt: string | null;
   } | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
+  const [savingImage, setSavingImage] = useState(false);
+  const [snackbarConfirmOpen, setSnackbarConfirmOpen] = useState(false);
+  const [snackbarSuccessOpen, setSnackbarSuccessOpen] = useState(false);
+  const [snackbarError, setSnackbarError] = useState<{
+    open: boolean;
+    message?: string;
+    errorId?: string | null;
+    at?: string;
+  }>({ open: false });
+  const hiddenFileInputRef = useRef<HTMLInputElement | null>(null);
 
   //Get Client Start
 
@@ -66,6 +81,7 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
         console.log('Client data received:', data);
         setClientData(data);
         setLoading(false);
+        setImageUrl(data?.imageUrl || null);
         Object.keys(data).forEach((key) => {
           setValue(key, data[key]);
         });
@@ -99,6 +115,164 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
   const getBusinessGroupName = (businessGroupId: number) => {
     const group = businessGroups.find((group) => group.id === businessGroupId);
     return group ? group.name : 'Grupo não encontrado';
+  };
+
+  // Handlers de imagem (padrão do EditClient)
+  const onAddImageClick = () => {
+    if (hiddenFileInputRef.current) {
+      hiddenFileInputRef.current.click();
+    }
+  };
+
+  const onDownloadImageClick = async () => {
+    const url = previewImage || imageUrl || clientData?.imageUrl;
+    if (!url) return;
+
+    const removeHashFromFileName = (fileName: string) => {
+      return fileName.replace(/-[^-]+\.[0-9a-z]+$/i, (match) => {
+        const ext = match.split('.').pop();
+        return `.${ext}`;
+      });
+    };
+
+    try {
+      const decoded = decodeURIComponent(url);
+      const rawName = decoded.split('/').pop() || 'imagem.jpg';
+      const cleanedName = removeHashFromFileName(rawName) || 'imagem.jpg';
+
+      const response = await fetch(url);
+      if (!response.ok) {
+        let errMsg = 'Falha ao baixar a imagem';
+        try {
+          const j = await response.json();
+          errMsg = j?.error || errMsg;
+        } catch {}
+        const at = new Date().toLocaleString();
+        setSnackbarError({ open: true, message: errMsg, errorId: null, at });
+        return;
+      }
+
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = cleanedName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(blobUrl);
+    } catch (error: any) {
+      const at = new Date().toLocaleString();
+      setSnackbarError({
+        open: true,
+        message: error?.message || 'Erro desconhecido ao baixar a imagem',
+        errorId: null,
+        at,
+      });
+    }
+  };
+
+  const handleLocalFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPendingImageFile(file);
+    const previewUrl = URL.createObjectURL(file);
+    setPreviewImage(previewUrl);
+    setSnackbarConfirmOpen(true);
+    // limpa input para permitir mesmo arquivo novamente
+    e.currentTarget.value = '';
+  };
+
+  const getVercelRequestId = (res: Response) => {
+    try {
+      return res.headers.get('x-vercel-id');
+    } catch {
+      return null;
+    }
+  };
+
+  const handleCancelImageSelection = () => {
+    setSnackbarConfirmOpen(false);
+    setPendingImageFile(null);
+    setPreviewImage(null);
+  };
+
+  const handleConfirmSaveImage = async () => {
+    if (!pendingImageFile || !clientId) return;
+    setSnackbarConfirmOpen(false);
+    setSavingImage(true);
+    try {
+      const oldUrl = imageUrl || clientData?.imageUrl || null;
+      const formData = new FormData();
+      formData.append('file', pendingImageFile);
+
+      const uploadResponse = await fetch(
+        `/api/uploadImageClient?pathname=clients/id=${clientId}/image-${Date.now()}&clientId=${clientId}`,
+        { method: 'POST', body: formData },
+      );
+
+      if (!uploadResponse.ok) {
+        let errMsg = 'Falha no upload da imagem';
+        let errorId = getVercelRequestId(uploadResponse);
+        try {
+          const j = await uploadResponse.json();
+          errMsg = j?.error || errMsg;
+          errorId = j?.errorId || errorId;
+        } catch {}
+        const at = new Date().toLocaleString();
+        setSnackbarError({ open: true, message: errMsg, errorId, at });
+        return;
+      }
+
+      const { url: newUrl } = await uploadResponse.json();
+
+      const updateRes = await fetch(`/api/updateClient?id=${clientId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageUrl: newUrl }),
+      });
+
+      if (!updateRes.ok) {
+        let errMsg = 'Falha ao salvar a imagem no cliente';
+        let updateErrorId = getVercelRequestId(updateRes);
+        try {
+          const j = await updateRes.json();
+          errMsg = j?.error || errMsg;
+          updateErrorId = j?.errorId || updateErrorId;
+        } catch {}
+        const at = new Date().toLocaleString();
+        setSnackbarError({
+          open: true,
+          message: errMsg,
+          errorId: updateErrorId,
+          at,
+        });
+        return;
+      }
+
+      if (oldUrl) {
+        fetch(
+          `/api/deleteImageClient?clientId=${clientId}&imageUrl=${encodeURIComponent(oldUrl)}`,
+          { method: 'DELETE' },
+        ).catch(() => {});
+      }
+
+      setImageUrl(newUrl);
+      setPreviewImage(null);
+      setPendingImageFile(null);
+      setSnackbarSuccessOpen(true);
+    } catch (e: any) {
+      const at = new Date().toLocaleString();
+      setSnackbarError({
+        open: true,
+        message: e?.message || 'Erro desconhecido',
+        errorId: null,
+        at,
+      });
+    } finally {
+      setSavingImage(false);
+    }
   };
 
   // Função para obter as cotações
@@ -659,10 +833,21 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
               setValue('clientCondition', condition)
             }
             readOnly={false} // Passando a propriedade readOnly
-            imageUrl={clientData?.imageUrl}
+            imageUrl={previewImage || imageUrl || clientData?.imageUrl}
             showTooltip={false} // Não mostra o Tooltip
             enableImageUpload={false}
             lastVisitData={lastVisitData} // Passando dados da última visita
+            showImageActions
+            onAddImageClick={onAddImageClick}
+            onDownloadImageClick={onDownloadImageClick}
+          />
+          <input
+            ref={hiddenFileInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={handleLocalFileChange}
+            disabled={savingImage}
           />
           <Box sx={styles.boxButton}>
             <Tooltip title={'Copiar dados para colar na planilha'}>
@@ -752,6 +937,80 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
           })}
         </Box>
       </Box>
+      {/* Snackbars de upload de imagem */}
+      <Snackbar
+        open={snackbarConfirmOpen}
+        onClose={() => !savingImage && setSnackbarConfirmOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Box
+          sx={{
+            bgcolor: 'background.default',
+            borderRadius: 2,
+            boxShadow: 6,
+            p: 2,
+          }}
+        >
+          <Typography variant="body1" textAlign="left">
+            Salvar ou alterar esta imagem agora?
+          </Typography>
+          <Box
+            sx={{ display: 'flex', gap: 1, justifyContent: 'center', mt: 1 }}
+          >
+            <Button
+              color="warning"
+              variant="contained"
+              size="small"
+              onClick={handleCancelImageSelection}
+              disabled={savingImage}
+            >
+              Cancelar
+            </Button>
+            <Button
+              color="success"
+              variant="contained"
+              size="small"
+              onClick={handleConfirmSaveImage}
+              disabled={savingImage}
+            >
+              Salvar
+            </Button>
+          </Box>
+        </Box>
+      </Snackbar>
+
+      <Snackbar
+        open={snackbarSuccessOpen}
+        autoHideDuration={8000}
+        onClose={() => setSnackbarSuccessOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setSnackbarSuccessOpen(false)}
+          severity="success"
+          sx={{ width: '100%' }}
+        >
+          Sua imagem foi salva com sucesso!
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={snackbarError.open}
+        onClose={() => setSnackbarError({ open: false })}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setSnackbarError({ open: false })}
+          severity="error"
+          sx={{ width: '100%', wordBreak: 'break-word' }}
+        >
+          Ops, ocorreu um erro ao salvar a imagem. Tente novamente em alguns
+          minutos.
+          {snackbarError.message ? ` Detalhes: ${snackbarError.message}` : ''}
+          {snackbarError.errorId ? ` | Código: ${snackbarError.errorId}` : ''}
+          {snackbarError.at ? ` | ${snackbarError.at}` : ''}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

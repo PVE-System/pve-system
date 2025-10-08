@@ -4,12 +4,15 @@ import React, { useState } from 'react';
 import {
   Box,
   Button,
+  IconButton,
   Dialog,
   DialogContent,
   Rating,
   Tooltip,
   Typography,
 } from '@mui/material';
+import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
+import DownloadIcon from '@mui/icons-material/Download';
 import { Controller, useForm } from 'react-hook-form';
 import Image from 'next/image';
 import styles from '@/app/components/ProfileClient/styles';
@@ -34,6 +37,9 @@ interface ClientProfileProps {
     lastVisitConfirmedAt: string | null;
     visitRouteId?: number | null;
   } | null;
+  showImageActions?: boolean; // controla exibição dos ícones de ação da imagem
+  onAddImageClick?: () => void; // callback para clicar em adicionar imagem
+  onDownloadImageClick?: () => void; // callback para clicar em baixar imagem
 }
 
 // Função Renderizar o nome do cliente com tamanho menor
@@ -59,6 +65,9 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
   showTooltip = false, // Valor padrão é false
   enableImageUpload = false,
   lastVisitData,
+  showImageActions = false,
+  onAddImageClick,
+  onDownloadImageClick,
 }) => {
   const { control } = useForm();
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -168,6 +177,33 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
             />
           )}
         </label>
+        {showImageActions ? (
+          <Box sx={{ display: 'flex', gap: 1, mt: -3, mb: 3 }}>
+            <Tooltip title="Adicionar imagem">
+              <IconButton
+                color="primary"
+                aria-label="adicionar imagem"
+                onClick={() => {
+                  if (onAddImageClick) onAddImageClick();
+                }}
+                disabled={readOnly}
+              >
+                <AddPhotoAlternateIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Baixar imagem">
+              <IconButton
+                color="primary"
+                aria-label="baixar imagem"
+                onClick={() => {
+                  if (onDownloadImageClick) onDownloadImageClick();
+                }}
+              >
+                <DownloadIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        ) : null}
         <Box sx={styles.statusRating}>
           <Tooltip title="Relacionado ao faturamento e frequência de pedidos deste cliente">
             <Typography variant="subtitle2" component="div">
