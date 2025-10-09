@@ -285,6 +285,32 @@ const AdminPageTabClientByUser = () => {
         }),
       );
 
+      // Buscar a data da última visita confirmada por cliente
+      const lastVisitMap: { [clientId: number]: string } = {};
+      await Promise.all(
+        filteredClients.map(async (client) => {
+          const cid = Number(client.id);
+          try {
+            const res = await fetch(
+              `/api/getVisitClientHistory?clientId=${cid}`,
+            );
+            if (!res.ok) {
+              lastVisitMap[cid] = 'Visita Pendente';
+              return;
+            }
+            const data = await res.json();
+            const dt = data?.lastVisitConfirmedAt
+              ? new Date(data.lastVisitConfirmedAt)
+              : null;
+            lastVisitMap[cid] = dt
+              ? dt.toLocaleDateString('pt-BR')
+              : 'Visita Pendente';
+          } catch {
+            lastVisitMap[cid] = 'Visita Pendente';
+          }
+        }),
+      );
+
       // Passa os dados extras para o exportador
       await copyClientsByUserToClipboard(
         clients,
@@ -294,6 +320,7 @@ const AdminPageTabClientByUser = () => {
         selectedOperator,
         setButtonText,
         quoteTotalsMap, // <--- Novo parâmetro
+        lastVisitMap,
       );
     } catch (error) {
       console.error('Erro detalhado:', error);
@@ -319,6 +346,7 @@ const AdminPageTabClientByUser = () => {
         totalQuotesTwoYearsAgo: number;
       };
     },
+    lastVisitMap: { [clientId: number]: string },
   ) => {
     const excludedFields = ['id', 'createdAt', 'clientCondition', 'imageUrl'];
 
@@ -351,6 +379,7 @@ const AdminPageTabClientByUser = () => {
       'marketSegmentNature',
       'businessGroupId',
       'rating',
+      'lastVisitConfirmedAt',
       'totalQuotesCurrent',
       'totalQuotesLastYear',
       'totalQuotesTwoYearsAgo',
@@ -406,6 +435,11 @@ const AdminPageTabClientByUser = () => {
             : operatorNumber;
         }
 
+        if (key === 'lastVisitConfirmedAt') {
+          const cid = Number(client.id);
+          return lastVisitMap[cid] || 'Visita Pendente';
+        }
+
         if (key === 'rating') {
           const ratingMap: { [key: number]: string } = {
             1: '1 - Pouco ativo',
@@ -418,8 +452,10 @@ const AdminPageTabClientByUser = () => {
         return client[key] || '';
       });
 
-      // Índice onde está a coluna "rating"
-      const ratingIndex = clientExcelColumnOrder.indexOf('rating');
+      // Índice onde está a coluna "lastVisitConfirmedAt" para inserir as cotações logo após
+      const lastVisitIndex = clientExcelColumnOrder.indexOf(
+        'lastVisitConfirmedAt',
+      );
 
       // Dados de cotação a inserir após "rating"
       const quoteTotals = quoteTotalsMap[clientId] || {
@@ -433,8 +469,8 @@ const AdminPageTabClientByUser = () => {
         quoteTotals.totalQuotesTwoYearsAgo,
       ];
 
-      // Insere os dados após a coluna "rating"
-      clientValues.splice(ratingIndex + 1, 0, ...quoteValues);
+      // Insere os dados logo após a coluna "lastVisitConfirmedAt"
+      clientValues.splice(lastVisitIndex + 1, 0, ...quoteValues);
 
       // Dados de vendas
       const salesValues = salesExcelColumnOrder.map((key) => {
