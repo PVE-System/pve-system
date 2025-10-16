@@ -16,6 +16,7 @@ export async function GET(request: NextRequest) {
     const year = searchParams.get('year');
     const month = searchParams.get('month');
     const requestedUserId = searchParams.get('userId');
+    const routeStatus = searchParams.get('routeStatus');
 
     // Role e usuário a partir dos cookies
     const userRole = request.cookies.get('role')?.value;
@@ -84,6 +85,11 @@ export async function GET(request: NextRequest) {
         whereConditions.push(gte(visitRoutes.scheduledDate, startDate));
         whereConditions.push(lte(visitRoutes.scheduledDate, endDate));
       }
+    }
+
+    // Filtro por status da rota
+    if (routeStatus && routeStatus !== 'all') {
+      whereConditions.push(eq(visitRoutes.routeStatus, routeStatus));
     }
 
     // Filtro por usuário
@@ -234,6 +240,7 @@ export async function GET(request: NextRequest) {
       filters: {
         year: year ? parseInt(year) : null,
         month: month ? parseInt(month) : null,
+        routeStatus: routeStatus && routeStatus !== 'all' ? routeStatus : null,
       },
     });
   } catch (error: unknown) {

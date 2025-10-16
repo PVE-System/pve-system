@@ -76,6 +76,7 @@ const ClientsVisitsRegisteredRoutes = () => {
   const [selectedMonth, setSelectedMonth] = useState<string>(
     (new Date().getMonth() + 1).toString(),
   );
+  const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [availableYears, setAvailableYears] = useState<number[]>([]);
   const [alertModal, setAlertModal] = useState({
     open: false,
@@ -86,6 +87,7 @@ const ClientsVisitsRegisteredRoutes = () => {
   });
 
   const months = [
+    { value: 'all', label: 'Todos' },
     { value: '1', label: 'Janeiro' },
     { value: '2', label: 'Fevereiro' },
     { value: '3', label: 'Março' },
@@ -109,6 +111,7 @@ const ClientsVisitsRegisteredRoutes = () => {
       params.set('userId', user.id);
       if (selectedYear !== 'all') params.set('year', selectedYear);
       if (selectedMonth !== 'all') params.set('month', selectedMonth);
+      if (selectedStatus !== 'all') params.set('routeStatus', selectedStatus);
 
       const response = await fetch(`/api/getVisitRoutes?${params}`);
       if (!response.ok) {
@@ -123,7 +126,7 @@ const ClientsVisitsRegisteredRoutes = () => {
     } finally {
       setLoading(false);
     }
-  }, [user, selectedYear, selectedMonth]);
+  }, [user, selectedYear, selectedMonth, selectedStatus]);
 
   useEffect(() => {
     fetchRoutes();
@@ -311,6 +314,20 @@ const ClientsVisitsRegisteredRoutes = () => {
                   {month.label}
                 </MenuItem>
               ))}
+            </Select>
+          </FormControl>
+
+          <FormControl sx={styles.inputContainer}>
+            <InputLabel>Status da Rota</InputLabel>
+            <Select
+              value={selectedStatus}
+              label="Status da rota"
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              size="small"
+            >
+              <MenuItem value="all">Todas</MenuItem>
+              <MenuItem value="EM_ABERTO">Em Aberto</MenuItem>
+              <MenuItem value="CONCLUIDO">Concluído</MenuItem>
             </Select>
           </FormControl>
         </Box>

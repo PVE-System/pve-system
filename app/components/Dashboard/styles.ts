@@ -22,7 +22,9 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     gap: 1,
-    minWidth: '200px',
+    alignItems: 'center',
+    marginBottom: '20px',
+    /* minWidth: '250px', */
   },
 
   cardsDashboard: {
@@ -32,11 +34,13 @@ const styles = {
         : theme.palette.background.default,
 
     height: '120px',
+    width: '250px',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: '12px',
+    /* ml: 13, */
 
     overflow: 'hidden',
     boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
@@ -44,12 +48,36 @@ const styles = {
     '&:hover': {
       transform: 'scale(1.05)',
     },
+
+    /* Efeito de reflexo nos cards*/
+    position: 'relative',
+    '&::after': {
+      content: '""',
+      position: 'absolute',
+      top: 0,
+      left: '-150%',
+      width: '120%',
+      height: '100%',
+      background: (theme: Theme) =>
+        theme.palette.mode === 'light'
+          ? 'linear-gradient(120deg, transparent 0%, rgba(0,0,0,0.20) 50%, transparent 90%)'
+          : 'linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.14) 50%, transparent 100%)',
+      transform: 'skewX(-20deg)',
+      transition: 'transform 1.0s ease, left 1.0s ease',
+      pointerEvents: 'none',
+      zIndex: 0,
+    },
+    '&:hover::after': {
+      left: '-10%',
+    },
   },
 
   cardContent: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+    position: 'relative',
+    zIndex: 1,
   },
 
   cardTitle: {
@@ -84,6 +112,76 @@ const styles = {
     borderRadius: '20px',
     fontSize: '14px',
     textTransform: 'none',
+  },
+
+  //Styles Cards Routes
+  cardsRoutesDashboard: {
+    backgroundColor: (theme: Theme) =>
+      theme.palette.mode === 'light'
+        ? theme.palette.background.default
+        : theme.palette.background.alternative,
+
+    height: '80px',
+    width: '250px',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: '12px',
+
+    overflow: 'hidden',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+    transition: 'transform 0.1s ease',
+    '&:hover': {
+      transform: 'scale(1.05)',
+    },
+
+    /* Efeito de reflexo nos cards*/
+    position: 'relative',
+    '&::after': {
+      content: '""',
+      position: 'absolute',
+      top: 0,
+      left: '-150%',
+      width: '120%',
+      height: '100%',
+      background: (theme: Theme) =>
+        theme.palette.mode === 'light'
+          ? 'linear-gradient(120deg, transparent 0%, rgba(0, 0, 0, 0.2) 50%, transparent 90%)'
+          : 'linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.14) 50%, transparent 100%)',
+      transform: 'skewX(-10deg)',
+      transition: 'transform 1.0s ease, left 1.0s ease',
+    },
+    '&:hover::after': {
+      left: '0%',
+    },
+  },
+
+  cardRoutesContent: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    textAlign: 'center',
+  },
+
+  cardRoutesTitle: {
+    fontSize: '14px',
+    '@media (max-width: 1000px)': {
+      fontSize: '12px',
+    },
+    '@media (max-width: 425px)': {
+      fontSize: '12px',
+    },
+  },
+
+  cardRoutesNumber: {
+    fontWeight: 'bold',
+    /* color: '#fff', */
+    fontSize: '16px',
+    color: (theme: Theme) =>
+      theme.palette.mode === 'light'
+        ? theme.palette.text.primary
+        : theme.palette.text.primary,
   },
 
   //Styles accordion

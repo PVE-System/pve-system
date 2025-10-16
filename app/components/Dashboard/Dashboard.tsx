@@ -24,6 +24,7 @@ import sharedStyles from '@/app/styles/sharedStyles';
 import styles from './styles';
 import { Rating } from '@mui/material';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
 import { red } from '@mui/material/colors';
 import DashboardExcelUpdateNotification from '../DashboardModalExcelUpdateNotification/DashboardExcelUpdateNotification';
 import FrequentOccurrencesRegistered from '../FrequentOccurrencesRegistered/FrequentOccurrencesRegistered';
@@ -47,8 +48,13 @@ interface ClientTotals {
 }
 
 const DashboardComponent = () => {
+  const router = useRouter();
   const [expanded, setExpanded] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [openRoutes, setOpenRoutes] = useState<
+    { id: number; routeName: string; scheduledDate: string }[]
+  >([]);
+  const [loadingOpenRoutes, setLoadingOpenRoutes] = useState(true);
 
   const [clientData, setClientData] = useState<ClientTotals>({
     Normal: 0,
@@ -108,6 +114,56 @@ const DashboardComponent = () => {
     fetchClients();
   }, []);
 
+  useEffect(() => {
+    const fetchOpenRoutes = async () => {
+      try {
+        setLoadingOpenRoutes(true);
+        const response = await fetch('/api/getVisitRoutes');
+        if (!response.ok) throw new Error('Erro ao buscar rotas');
+        const data = await response.json();
+        const routes = (data?.routes || []) as {
+          id: number;
+          routeName: string;
+          scheduledDate: string;
+          routeStatus: string;
+        }[];
+
+        const parseDate = (value: string): number => {
+          if (!value) return Number.POSITIVE_INFINITY;
+          // Formato vindo da API pode ser "DD/MM/AAAA" ou ISO
+          if (value.includes('/')) {
+            const [dd, mm, yyyy] = value.split('/');
+            const d = new Date(Number(yyyy), Number(mm) - 1, Number(dd));
+            return d.getTime();
+          }
+          const d = new Date(value);
+          return isNaN(d.getTime()) ? Number.POSITIVE_INFINITY : d.getTime();
+        };
+
+        const open = routes
+          .filter((r) => r.routeStatus === 'EM_ABERTO')
+          .sort(
+            (a, b) => parseDate(a.scheduledDate) - parseDate(b.scheduledDate),
+          )
+          .slice(0, 4)
+          .map((r) => ({
+            id: r.id,
+            routeName: r.routeName,
+            scheduledDate: r.scheduledDate,
+          }));
+
+        setOpenRoutes(open);
+      } catch (error) {
+        console.error('Erro ao buscar rotas em aberto:', error);
+        setOpenRoutes([]);
+      } finally {
+        setLoadingOpenRoutes(false);
+      }
+    };
+
+    fetchOpenRoutes();
+  }, []);
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center">
@@ -127,7 +183,19 @@ const DashboardComponent = () => {
         ...sharedStyles.container,
       }}
     >
-      <Box sx={styles.cardsAndPiaChartContainer}>
+      <Box
+        sx={{
+          /* ...styles.cardsAndPiaChartContainer, */
+          display: 'grid',
+          gridTemplateColumns: {
+            xs: '1fr',
+            md: '1fr auto 1fr',
+          },
+          alignItems: 'start',
+          columnGap: 3,
+          rowGap: 2,
+        }}
+      >
         {/* Contêiner de Cards */}
         <Box sx={styles.cardsBox}>
           {/* Card Cliente Normal */}
@@ -207,7 +275,7 @@ const DashboardComponent = () => {
                 sx={{
                   ...styles.cardTitle,
                   ...sharedStyles.subTitleFontFamily,
-                  color: 'red',
+                  color: red[800],
                 }}
               >
                 Cliente Suspenso
@@ -219,12 +287,12 @@ const DashboardComponent = () => {
                 title="Confira a lista destes clientes"
                 sx={{
                   ...styles.cardButton,
-                  backgroundColor: 'red',
+                  backgroundColor: red[800],
                   fontWeight: '600',
                   color: 'white',
 
                   '&:hover': {
-                    backgroundColor: red[600],
+                    backgroundColor: red[900],
                   },
                 }}
                 onClick={() => (window.location.href = '/clientsSuspendedList')}
@@ -235,9 +303,70 @@ const DashboardComponent = () => {
           </Card>
         </Box>
 
-        {/* Componente do Gráfico */}
-        <Box sx={{ flex: 1 }}>
+        {/* Coluna Central: Gráfico centralizado */}
+        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
           <DynamicChartComponent />
+        </Box>
+
+        {/* Coluna Direita: Cards de Rotas em Aberto */}
+        <Box
+          sx={{
+            /* width: { xs: '100%', md: 320 }, */ // melhorar responsividade
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+            alignItems: 'center',
+          }}
+        >
+          {loadingOpenRoutes ? (
+            <Box display="flex" justifyContent="center" alignItems="center">
+              {/* <CircularProgress size={24} /> */}
+            </Box>
+          ) : openRoutes.length === 0 ? (
+            <Card variant="outlined" sx={styles.cardsRoutesDashboard}>
+              <CardContent sx={styles.cardRoutesContent}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ textAlign: 'center' }}
+                >
+                  Nenhuma rota em aberto.
+                </Typography>
+              </CardContent>
+            </Card>
+          ) : (
+            openRoutes.map((route) => (
+              <Card
+                key={route.id}
+                variant="outlined"
+                sx={{ ...styles.cardsRoutesDashboard, cursor: 'pointer' }}
+                onClick={() =>
+                  window.open(
+                    `/clientsVisitsRegisteredRoutes/${route.id}`,
+                    '_blank',
+                  )
+                }
+              >
+                <CardContent sx={styles.cardRoutesContent}>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      ...styles.cardRoutesTitle,
+                      ...sharedStyles.subTitleFontFamily,
+                      color: 'primary.main',
+                    }}
+                  >
+                    {route.routeName && route.routeName.length > 35
+                      ? `${route.routeName.slice(0, 35)}...`
+                      : route.routeName}
+                  </Typography>
+                  <Typography variant="h5" sx={styles.cardRoutesNumber}>
+                    {route.scheduledDate || 'Data não informada'}
+                  </Typography>
+                </CardContent>
+              </Card>
+            ))
+          )}
         </Box>
       </Box>
 
@@ -260,7 +389,7 @@ const DashboardComponent = () => {
             gap: 1,
             textAlign: 'center',
             '@media (max-width:450px)': {
-              mt: 2,
+              mt: 6,
               mb: 0,
             },
           }}
