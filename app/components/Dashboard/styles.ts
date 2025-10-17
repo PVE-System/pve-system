@@ -1,6 +1,7 @@
 import { BorderColor } from '@mui/icons-material';
 import { Theme } from '@mui/material';
 import { blueGrey, orange } from '@mui/material/colors';
+import { he } from 'date-fns/locale';
 
 const styles = {
   cardsAndPiaChartContainer: {
@@ -132,6 +133,7 @@ const styles = {
     alignItems: 'center',
     padding: '8px', // Padding interno para melhor visual
     gap: 1,
+    height: '375px',
     maxHeight: '375px',
     width: {
       xs: '100%',

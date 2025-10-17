@@ -73,9 +73,7 @@ const ClientsVisitsRegisteredRoutes = () => {
   const [selectedYear, setSelectedYear] = useState<string>(
     new Date().getFullYear().toString(),
   );
-  const [selectedMonth, setSelectedMonth] = useState<string>(
-    (new Date().getMonth() + 1).toString(),
-  );
+  const [selectedMonth, setSelectedMonth] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [availableYears, setAvailableYears] = useState<number[]>([]);
   const [alertModal, setAlertModal] = useState({
