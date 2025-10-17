@@ -1,6 +1,6 @@
 import { BorderColor } from '@mui/icons-material';
 import { Theme } from '@mui/material';
-import { orange } from '@mui/material/colors';
+import { blueGrey, orange } from '@mui/material/colors';
 
 const styles = {
   cardsAndPiaChartContainer: {
@@ -115,28 +115,63 @@ const styles = {
   },
 
   //Styles Cards Routes
+  backgroundRoutesDashboard: {
+    backgroundColor: (theme: Theme) =>
+      theme.palette.mode === 'light'
+        ? blueGrey[100]
+        : theme.palette.background.alternative,
+
+    borderRadius: '12px',
+    border: (theme: Theme) =>
+      theme.palette.mode === 'light'
+        ? '1px solid rgba(0, 0, 0, 0.12)'
+        : '1px solid rgba(255, 255, 255, 0.12)',
+
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    padding: '8px', // Padding interno para melhor visual
+    gap: 1,
+    maxHeight: '375px',
+    width: {
+      xs: '100%',
+      sm: '332px',
+      md: '250px',
+    },
+
+    overflowY: 'auto', // Scroll vertical quando necessário
+    overflowX: 'hidden', // Evitar scroll horizontal
+
+    /*             justifySelf: {
+    xs: 'center',
+    sm: 'center',
+    md: 'auto',
+  }, */
+
+    '&::-webkit-scrollbar-track': (theme: Theme) => ({
+      backgroundColor: 'transparent',
+    }),
+  },
+
   cardsRoutesDashboard: {
     backgroundColor: (theme: Theme) =>
       theme.palette.mode === 'light'
         ? theme.palette.background.default
-        : theme.palette.background.alternative,
+        : theme.palette.background.default,
 
     height: '80px',
-    width: '250px',
+    width: '220px',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: '12px',
+    flexShrink: 0, // Evitar que o card seja comprimido
 
     overflow: 'hidden',
-    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
-    transition: 'transform 0.1s ease',
-    '&:hover': {
-      transform: 'scale(1.05)',
-    },
+    /* boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)', */
 
-    /* Efeito de reflexo nos cards*/
+    // Efeito de reflexo sem scale problemático
     position: 'relative',
     '&::after': {
       content: '""',
@@ -147,21 +182,31 @@ const styles = {
       height: '100%',
       background: (theme: Theme) =>
         theme.palette.mode === 'light'
-          ? 'linear-gradient(120deg, transparent 0%, rgba(0, 0, 0, 0.2) 50%, transparent 90%)'
+          ? 'linear-gradient(120deg, transparent 0%, rgba(0, 0, 0, 0.1) 50%, transparent 90%)'
           : 'linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.14) 50%, transparent 100%)',
       transform: 'skewX(-10deg)',
-      transition: 'transform 1.0s ease, left 1.0s ease',
+      transition: 'left 1.0s ease',
+      pointerEvents: 'none',
+      zIndex: 0,
     },
     '&:hover::after': {
       left: '0%',
+    },
+    '&:hover': {
+      boxShadow: '0 6px 25px rgba(0, 0, 0, 0.2)',
     },
   },
 
   cardRoutesContent: {
     display: 'flex',
     flexDirection: 'column',
+    justifyContent: 'center',
     alignItems: 'center',
     textAlign: 'center',
+    width: '100%',
+    height: '100%',
+    position: 'relative',
+    zIndex: 1,
   },
 
   cardRoutesTitle: {

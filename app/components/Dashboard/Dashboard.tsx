@@ -12,7 +12,9 @@ import {
   IconButton,
   Tooltip,
   Link,
+  Theme,
 } from '@mui/material';
+import { orange } from '@mui/material/colors';
 import { useEffect, useState } from 'react';
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
@@ -25,7 +27,7 @@ import styles from './styles';
 import { Rating } from '@mui/material';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
-import { red } from '@mui/material/colors';
+import { blueGrey, red } from '@mui/material/colors';
 import DashboardExcelUpdateNotification from '../DashboardModalExcelUpdateNotification/DashboardExcelUpdateNotification';
 import FrequentOccurrencesRegistered from '../FrequentOccurrencesRegistered/FrequentOccurrencesRegistered';
 
@@ -145,7 +147,6 @@ const DashboardComponent = () => {
           .sort(
             (a, b) => parseDate(a.scheduledDate) - parseDate(b.scheduledDate),
           )
-          .slice(0, 4)
           .map((r) => ({
             id: r.id,
             routeName: r.routeName,
@@ -189,11 +190,17 @@ const DashboardComponent = () => {
           display: 'grid',
           gridTemplateColumns: {
             xs: '1fr',
+            sm: '1fr',
             md: '1fr auto 1fr',
           },
           alignItems: 'start',
           columnGap: 3,
           rowGap: 2,
+          justifyContent: {
+            xs: 'center',
+            sm: 'center',
+            md: 'stretch',
+          },
         }}
       >
         {/* Contêiner de Cards */}
@@ -309,15 +316,7 @@ const DashboardComponent = () => {
         </Box>
 
         {/* Coluna Direita: Cards de Rotas em Aberto */}
-        <Box
-          sx={{
-            /* width: { xs: '100%', md: 320 }, */ // melhorar responsividade
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 2,
-            alignItems: 'center',
-          }}
-        >
+        <Box sx={styles.backgroundRoutesDashboard}>
           {loadingOpenRoutes ? (
             <Box display="flex" justifyContent="center" alignItems="center">
               {/* <CircularProgress size={24} /> */}
