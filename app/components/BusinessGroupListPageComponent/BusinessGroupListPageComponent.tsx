@@ -13,23 +13,28 @@ import {
   Box,
   useMediaQuery,
   CircularProgress,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
+  Typography,
 } from '@mui/material';
 import { Rating } from '@mui/material';
 import styles from './styles';
+// import styles from './styles';
 
 // Interface para o tipo dos dados do cliente
 interface Client {
-  id: string;
+  id: number;
   companyName: string;
   corfioCode: string;
   clientCondition: string;
   rating: number;
   state: string;
   city: string;
+  businessGroupId: number | null;
+}
+
+interface BusinessGroup {
+  id: number;
+  name: string;
+  createdAt: string;
 }
 
 // Função para renderizar o texto como está no banco
@@ -38,47 +43,28 @@ const renderAsIs = (str: any) => {
   return str;
 };
 
-const ClientsByCities = () => {
+const BusinessGroupListPageComponent = () => {
   const [clients, setClients] = useState<Client[]>([]);
-  const [allClients, setAllClients] = useState<Client[]>([]);
+  const [businessGroup, setBusinessGroup] = useState<BusinessGroup | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
-  const [stateFilter, setStateFilter] = useState('MS');
-  const [cityFilter, setCityFilter] = useState('');
-  const [availableCities, setAvailableCities] = useState<string[]>([]);
+  const [groupId, setGroupId] = useState<string | null>(null);
 
   const isSmallScreen = useMediaQuery('(max-width:600px)');
 
-  const fetchClientsByCities = async (state: string) => {
+  const fetchClientsByBusinessGroup = async (groupId: string) => {
     try {
       setLoading(true);
 
-      let url = `/api/getClientsByCities?state=${state}`;
-
-      const response = await fetch(url);
+      const response = await fetch(
+        `/api/getClientsByBusinessGroup?groupId=${groupId}`,
+      );
       if (!response.ok) throw new Error('Erro ao buscar clientes');
 
       const data = await response.json();
-      setAllClients(data.clients); // Armazena a lista completa de clientes do estado
-      setClients(data.clients); // Inicialmente, todos os clientes
-
-      //ordenar as cidades de A a Z
-      const uniqueSortedCities = Array.from(
-        new Set(
-          data.clients.map((client: Client) => client.city),
-        ) as Set<string>,
-      )
-        .filter(
-          (city): city is string =>
-            typeof city === 'string' && city.trim() !== '',
-        )
-        .sort((a, b) => {
-          const normalize = (s: string) => s.trim().toLowerCase();
-          return normalize(a).localeCompare(normalize(b), 'pt-BR', {
-            sensitivity: 'base',
-          });
-        });
-
-      setAvailableCities(uniqueSortedCities);
+      setBusinessGroup(data.businessGroup);
+      setClients(data.clients);
     } catch (error) {
       console.error('Erro ao buscar clientes:', error);
     } finally {
@@ -86,43 +72,29 @@ const ClientsByCities = () => {
     }
   };
 
-  // Buscar clientes sempre que mudar o estado
+  // Buscar clientes quando o componente carregar
   useEffect(() => {
-    if (stateFilter) {
-      fetchClientsByCities(stateFilter);
-      setCityFilter(''); // Limpa cidade ao mudar estado
+    const urlParams = new URLSearchParams(window.location.search);
+    const groupIdParam = urlParams.get('groupId');
+
+    if (groupIdParam) {
+      setGroupId(groupIdParam);
+      fetchClientsByBusinessGroup(groupIdParam);
     }
-  }, [stateFilter]);
+  }, []);
 
-  // Filtrar clientes quando mudar cidade
-  useEffect(() => {
-    let filtered = allClients.filter((client) => {
-      let matchesState = true;
-      let matchesCity = true;
-
-      if (stateFilter === 'MS') matchesState = client.state === 'MS';
-      else if (stateFilter === 'MT') matchesState = client.state === 'MT';
-      else if (stateFilter === 'OUTRAS')
-        matchesState = client.state !== 'MS' && client.state !== 'MT';
-
-      if (cityFilter) matchesCity = client.city === cityFilter;
-
-      return matchesState && matchesCity;
-    });
-
-    setClients(filtered);
-  }, [cityFilter, stateFilter, allClients]);
-
-  const filteredClients = clients; // Agora é simples assim
-
-  const handleRowClick = (clientId: string) => {
-    /* window.location.href = `/clientPage?id=${clientId}`; */
+  const handleRowClick = (clientId: number) => {
     window.open(`/clientPage?id=${clientId}`, '_blank');
   };
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="200px"
+      >
         <CircularProgress />
       </Box>
     );
@@ -130,86 +102,29 @@ const ClientsByCities = () => {
 
   return (
     <Container maxWidth="lg" sx={styles.container}>
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          mb: 3,
-          gap: 2, // Espaço entre os selects
-          flexWrap: 'wrap', // Responsivo caso fique apertado na tela pequena
-        }}
-      >
-        {/* Select de Estados */}
-        <FormControl sx={{ maxWidth: 250, width: '100%' }}>
-          <InputLabel id="state-filter-label">Filtrar por UF</InputLabel>
-          <Select
-            labelId="state-filter-label"
-            value={stateFilter}
-            label="Filtrar por UF"
-            onChange={(e) => setStateFilter(e.target.value)}
-            sx={{
-              '& .MuiInputLabel-root': {
-                fontSize: '14px', // Tamanho da fonte do label
-              },
-              '& .MuiSelect-select': {
-                fontSize: '14px', // Tamanho da fonte do valor selecionado
-              },
-            }}
+      {businessGroup && (
+        <Box
+          sx={{
+            mb: 3,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+          }}
+        >
+          <Typography
+            variant="h5"
+            component="h2"
+            sx={{ fontWeight: 'bold', mb: 1 }}
           >
-            <MenuItem value="MS" sx={styles.fontSize}>
-              MS
-            </MenuItem>
-            <MenuItem value="MT" sx={styles.fontSize}>
-              MT
-            </MenuItem>
-            <MenuItem value="OUTRAS" sx={styles.fontSize}>
-              Outras UF
-            </MenuItem>
-          </Select>
-        </FormControl>
+            {businessGroup.name}
+          </Typography>
 
-        {stateFilter && (
-          <FormControl sx={{ maxWidth: 250, width: '100%' }}>
-            <InputLabel id="city-filter-label">Filtrar por Cidade</InputLabel>
-            <Select
-              labelId="city-filter-label"
-              value={cityFilter || 'Todas as cidades'}
-              label="Filtrar por Cidade"
-              onChange={(e) =>
-                setCityFilter(
-                  e.target.value === 'Todas as cidades' ? '' : e.target.value,
-                )
-              }
-              disabled={!stateFilter}
-              sx={{
-                '& .MuiInputLabel-root': {
-                  fontSize: '14px', // Tamanho da fonte do label
-                },
-                '& .MuiSelect-select': {
-                  fontSize: '14px', // Tamanho da fonte do valor selecionado
-                },
-              }}
-            >
-              <MenuItem value="Todas as cidades" sx={styles.fontSize}>
-                Todas as cidades
-              </MenuItem>
-              {availableCities.length > 0 ? (
-                availableCities.map((city) => (
-                  <MenuItem key={city} value={city} sx={styles.fontSize}>
-                    {city}
-                  </MenuItem>
-                ))
-              ) : (
-                <MenuItem value="" sx={styles.fontSize}>
-                  {stateFilter
-                    ? 'Nenhuma cidade encontrada'
-                    : 'Selecione um Estado'}
-                </MenuItem>
-              )}
-            </Select>
-          </FormControl>
-        )}
-      </Box>
+          <Typography variant="body2" color="text.secondary">
+            Total de clientes: {clients.length}
+          </Typography>
+        </Box>
+      )}
 
       {/* Tabela de Clientes */}
       <TableContainer>
@@ -229,14 +144,14 @@ const ClientsByCities = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredClients.length === 0 ? (
+            {clients.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} align="center">
-                  Nenhum cliente encontrado para o filtro selecionado.
+                  Nenhum cliente encontrado neste grupo empresarial.
                 </TableCell>
               </TableRow>
             ) : (
-              filteredClients.map((client) => (
+              clients.map((client) => (
                 <TableRow
                   key={client.id}
                   sx={{ ...styles.rowHover, cursor: 'pointer' }}
@@ -259,7 +174,10 @@ const ClientsByCities = () => {
                       <TableCell sx={styles.fontSize}>
                         <Button
                           sx={{
-                            ...styles.buttonTagCondition,
+                            fontSize: '12px',
+                            padding: '4px 8px',
+                            minWidth: 'auto',
+                            textTransform: 'none',
                             backgroundColor:
                               client.clientCondition === 'Normal'
                                 ? 'green'
@@ -316,4 +234,4 @@ const ClientsByCities = () => {
   );
 };
 
-export default ClientsByCities;
+export default BusinessGroupListPageComponent;
