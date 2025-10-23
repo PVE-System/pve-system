@@ -16,6 +16,7 @@ import {
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import ListIcon from '@mui/icons-material/List';
 
 import sharedStyles from '@/app/styles/sharedStyles';
 import styles from './styles';
@@ -278,6 +279,20 @@ export default function BusinessGroupComponent() {
                   </Typography>
                 </Box>
                 <Box>
+                  {/* Botão de Lista */}
+                  <Tooltip title="Ver Clientes do Grupo">
+                    <IconButton
+                      onClick={() =>
+                        window.open(
+                          `/businessGroupListPage?groupId=${group.id}`,
+                          '_blank',
+                        )
+                      }
+                    >
+                      <ListIcon sx={styles.iconDownload} />
+                    </IconButton>
+                  </Tooltip>
+
                   {/* Botão de Editar */}
                   <Tooltip title="Editar Grupo">
                     <IconButton
@@ -328,6 +343,20 @@ export default function BusinessGroupComponent() {
                     {group.name}
                   </Typography>
                   <Box>
+                    {/* Botão de Lista */}
+                    <Tooltip title="Ver Clientes do Grupo">
+                      <IconButton
+                        onClick={() =>
+                          window.open(
+                            `/businessGroupListPage?groupId=${group.id}`,
+                            '_blank',
+                          )
+                        }
+                      >
+                        <ListIcon sx={styles.iconDownload} />
+                      </IconButton>
+                    </Tooltip>
+
                     {/* Botão de Editar */}
                     <Tooltip title="Editar Grupo">
                       <IconButton

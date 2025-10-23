@@ -22,7 +22,7 @@
 
 <h2>📁Project Structure:</h2>
 
-### FrontEnd
+## FrontEnd
 
 The project follows a modular organization to ensure maintainability and scalability:
 
@@ -42,7 +42,7 @@ Example: `app/components/ClientPageTabInfos/ClientPageTabInfos.tsx` is responsib
 
 Example: The styles for the ClientPageTabInfos component are defined in `app/components/ClientPageTabInfos/styles.ts`.
 
-### BackEnd
+## BackEnd
 
 - `app/api/`: Contains all backend logic and API endpoints, following the Next.js structure.
 
@@ -61,19 +61,19 @@ Due to some functionalities that emerged after the project went into production,
 - However, the `responsibleSeller` field in `clients` stores the same value as `operatorNumber` in `users`, creating a relationship between the tables.
 - Check out a method that has been implemented and documented in the file `app/api/getSalesQuotesByState/route.ts`.
 
-Spin up the database with:
+## LocalStorage Blob setup
 
-```bash
-npm run db:up
-```
+⚠️ Important:
 
-Spin down the database with:
+The blob file storage system in Vercel's Local Storage does not have an isolated environment for local development and testing. To avoid manipulating existing folders, it is necessary to take small precautions, such as:
 
-```bash
-npm run db:down
-```
+Option 1: Use existing clients, users, or occurrences;
 
-### Migrations
+Option 2: Create new clients, users, or occurrences directly in the production environment and then update the local database to continue with testing.
+
+These practices prevent the creation of situations that use folders with IDs already present in Local Storage. Otherwise, upon finishing and deleting the tests, the storage used in production could be affected.
+
+## Migrations
 
 Generate the database migration based on the schema changes:
 

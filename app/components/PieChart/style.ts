@@ -28,6 +28,26 @@ const styles = {
     '@media (max-width: 600px)': {
       height: 'auto',
     },
+
+    /* Efeito de reflexo no Gráfico*/
+    position: 'relative',
+    '&::after': {
+      content: '""',
+      position: 'absolute',
+      top: 0,
+      left: '-150%',
+      width: '120%',
+      height: '100%',
+      background: (theme: Theme) =>
+        theme.palette.mode === 'light'
+          ? 'linear-gradient(120deg, transparent 0%, rgba(0, 0, 0, 0.2) 50%, transparent 90%)'
+          : 'linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.14) 50%, transparent 100%)',
+      transform: 'skewX(-10deg)',
+      transition: 'transform 1.0s ease, left 1.0s ease',
+    },
+    '&:hover::after': {
+      left: '-10%',
+    },
   },
 };
 

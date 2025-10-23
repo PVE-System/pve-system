@@ -1,6 +1,7 @@
 import { BorderColor } from '@mui/icons-material';
 import { Theme } from '@mui/material';
-import { orange } from '@mui/material/colors';
+import { blueGrey, orange } from '@mui/material/colors';
+import { he } from 'date-fns/locale';
 
 const styles = {
   cardsAndPiaChartContainer: {
@@ -22,7 +23,9 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     gap: 1,
-    minWidth: '200px',
+    alignItems: 'center',
+    marginBottom: '20px',
+    /* minWidth: '250px', */
   },
 
   cardsDashboard: {
@@ -32,11 +35,13 @@ const styles = {
         : theme.palette.background.default,
 
     height: '120px',
+    width: '250px',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: '12px',
+    /* ml: 13, */
 
     overflow: 'hidden',
     boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
@@ -44,12 +49,36 @@ const styles = {
     '&:hover': {
       transform: 'scale(1.05)',
     },
+
+    /* Efeito de reflexo nos cards*/
+    position: 'relative',
+    '&::after': {
+      content: '""',
+      position: 'absolute',
+      top: 0,
+      left: '-150%',
+      width: '120%',
+      height: '100%',
+      background: (theme: Theme) =>
+        theme.palette.mode === 'light'
+          ? 'linear-gradient(120deg, transparent 0%, rgba(0,0,0,0.20) 50%, transparent 90%)'
+          : 'linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.14) 50%, transparent 100%)',
+      transform: 'skewX(-20deg)',
+      transition: 'transform 1.0s ease, left 1.0s ease',
+      pointerEvents: 'none',
+      zIndex: 0,
+    },
+    '&:hover::after': {
+      left: '-10%',
+    },
   },
 
   cardContent: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+    position: 'relative',
+    zIndex: 1,
   },
 
   cardTitle: {
@@ -84,6 +113,122 @@ const styles = {
     borderRadius: '20px',
     fontSize: '14px',
     textTransform: 'none',
+  },
+
+  //Styles Cards Routes
+  backgroundRoutesDashboard: {
+    backgroundColor: (theme: Theme) =>
+      theme.palette.mode === 'light'
+        ? blueGrey[100]
+        : theme.palette.background.alternative,
+
+    borderRadius: '12px',
+    border: (theme: Theme) =>
+      theme.palette.mode === 'light'
+        ? '1px solid rgba(0, 0, 0, 0.12)'
+        : '1px solid rgba(255, 255, 255, 0.12)',
+
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    padding: '8px', // Padding interno para melhor visual
+    gap: 1,
+    height: '375px',
+    maxHeight: '375px',
+    width: {
+      xs: '100%',
+      sm: '332px',
+      md: '250px',
+    },
+
+    overflowY: 'auto', // Scroll vertical quando necessário
+    overflowX: 'hidden', // Evitar scroll horizontal
+
+    /*             justifySelf: {
+    xs: 'center',
+    sm: 'center',
+    md: 'auto',
+  }, */
+
+    '&::-webkit-scrollbar-track': (theme: Theme) => ({
+      backgroundColor: 'transparent',
+    }),
+  },
+
+  cardsRoutesDashboard: {
+    backgroundColor: (theme: Theme) =>
+      theme.palette.mode === 'light'
+        ? theme.palette.background.default
+        : theme.palette.background.default,
+
+    height: '80px',
+    width: '220px',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: '12px',
+    flexShrink: 0, // Evitar que o card seja comprimido
+
+    overflow: 'hidden',
+    /* boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)', */
+
+    // Efeito de reflexo sem scale problemático
+    position: 'relative',
+    '&::after': {
+      content: '""',
+      position: 'absolute',
+      top: 0,
+      left: '-150%',
+      width: '120%',
+      height: '100%',
+      background: (theme: Theme) =>
+        theme.palette.mode === 'light'
+          ? 'linear-gradient(120deg, transparent 0%, rgba(0, 0, 0, 0.1) 50%, transparent 90%)'
+          : 'linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.14) 50%, transparent 100%)',
+      transform: 'skewX(-10deg)',
+      transition: 'left 1.0s ease',
+      pointerEvents: 'none',
+      zIndex: 0,
+    },
+    '&:hover::after': {
+      left: '0%',
+    },
+    '&:hover': {
+      boxShadow: '0 6px 25px rgba(0, 0, 0, 0.2)',
+    },
+  },
+
+  cardRoutesContent: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
+    width: '100%',
+    height: '100%',
+    position: 'relative',
+    zIndex: 1,
+  },
+
+  cardRoutesTitle: {
+    fontSize: '14px',
+    '@media (max-width: 1000px)': {
+      fontSize: '12px',
+    },
+    '@media (max-width: 425px)': {
+      fontSize: '12px',
+    },
+  },
+
+  cardRoutesNumber: {
+    fontWeight: 'bold',
+    /* color: '#fff', */
+    fontSize: '16px',
+    color: (theme: Theme) =>
+      theme.palette.mode === 'light'
+        ? theme.palette.text.primary
+        : theme.palette.text.primary,
   },
 
   //Styles accordion

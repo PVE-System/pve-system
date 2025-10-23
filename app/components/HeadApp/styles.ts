@@ -15,7 +15,11 @@ const styles = {
   },
   inputSearch: {
     /* margin: 'auto', */
-    width: '500px',
+
+    width: {
+      sm: '350px',
+      md: '500px',
+    },
     '@media (max-width:450px)': {
       width: '80%',
       left: '20px',

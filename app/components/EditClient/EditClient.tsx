@@ -10,6 +10,7 @@ import {
   Typography,
   Snackbar,
 } from '@mui/material';
+import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import Alert from '@mui/material/Alert';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -125,6 +126,14 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
   const searchParams = useSearchParams();
   const clientId = searchParams.get('id');
   const router = useRouter();
+
+  const handleBack = () => {
+    if (clientId) {
+      router.push(`/clientPage?id=${clientId}`);
+      return;
+    }
+    router.back();
+  };
 
   const { handleSubmit, control, setValue, watch } = useForm();
   const [clientData, setClientData] = useState<any>(null);
@@ -780,245 +789,210 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
   }
 
   return (
-    <Box sx={styles.contentTabs}>
-      <Box sx={styles.boxContent}>
-        {renderDuplicateModal()}
-        <Box>
-          <ClientProfile
-            rating={watch('rating')}
-            clientCondition={watch('clientCondition')}
-            companyName={companyName || clientData?.companyName || ''}
-            corfioCode={corfioCode || clientData?.corfioCode || ''}
-            whatsapp={whatsapp || clientData?.whatsapp || ''}
-            emailCommercial={
-              emailCommercial || clientData?.emailCommercial || ''
-            }
-            onRatingChange={(rating) => setValue('rating', rating)}
-            onConditionChange={(condition) =>
-              setValue('clientCondition', condition)
-            }
-            readOnly={false}
-            imageUrl={previewImage || imageUrl || undefined}
-            onImageChange={handleImageChange}
-            enableImageUpload={!savingImage}
-          />
-          <Box sx={styles.boxButton}>
-            <Button
-              type="button"
-              variant="contained"
-              sx={styles.deleteButton}
-              onClick={() => setShowDeleteModal(true)} // Abre o modal
-              disabled={loadingDelete || savingImage}
-            >
-              Deletar
-            </Button>
-            <Modal
-              open={showDeleteModal}
-              onClose={() => setShowDeleteModal(false)} // Fecha o modal
-              sx={sharedStyles.boxModal}
-            >
-              <Box sx={sharedStyles.modalAlert}>
-                <Typography variant="h6">Confirmação de Exclusão!</Typography>
-                <Typography variant="body1">
-                  Tem certeza de que deseja excluir este cliente?
-                </Typography>
-
-                <Button
-                  variant="contained"
-                  onClick={onDelete}
-                  sx={{
-                    ...sharedStyles.modalButton,
-                    backgroundColor: 'red',
-                    '&:hover': {
-                      backgroundColor: 'darkred',
-                    },
-                  }}
-                  disabled={loadingDelete} // Desativa o botão enquanto carrega
-                >
-                  {loadingDelete ? <CircularProgress size={24} /> : 'Deletar'}
-                </Button>
-                <Button
-                  variant="contained"
-                  onClick={() => setShowDeleteModal(false)} // Fecha o modal
-                  sx={sharedStyles.modalButton}
-                >
-                  Cancelar
-                </Button>
-              </Box>
-            </Modal>
-            <Button
-              type="button"
-              variant="contained"
-              sx={styles.editButton}
-              onClick={() => handleSubmit(onSubmit)()}
-              disabled={loadingSave || savingImage} // Desativa o botão enquanto está carregando
-            >
-              {loadingSave ? <CircularProgress size={24} /> : 'Salvar'}
-            </Button>
-          </Box>
-        </Box>
-        {/* Snackbars para confirmação, sucesso e erro */}
-        <Snackbar
-          open={snackbarConfirmOpen}
-          onClose={() => !savingImage && setSnackbarConfirmOpen(false)}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+    <Box>
+      <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+        <Button
+          variant="contained"
+          size="small"
+          startIcon={<ArrowBackIcon />}
+          onClick={handleBack}
+          sx={{
+            fontSize: { xs: '11px', sm: '12px' },
+            backgroundColor: 'primary.main',
+            '&:hover': { backgroundColor: 'primary.dark' },
+            minWidth: { xs: '80px', sm: 'auto' },
+            height: { xs: '26px', sm: 'auto' },
+            px: { xs: 1, sm: 2 },
+          }}
         >
-          <Box
-            sx={{
-              bgcolor: 'background.default',
-              borderRadius: 2,
-              boxShadow: 6,
-              p: 2,
-              /* mb: 5, */
-              /* maxWidth: 600, */
-              /* width: isXs ? 'calc(100% - 24px)' : 'auto', */
-            }}
-          >
-            <Typography
-              variant={isXs ? 'body2' : 'body1'}
-              textAlign={isXs ? 'center' : 'left'}
-            >
-              Salvar ou alterar esta imagem agora?
-            </Typography>
-            <Box
-              sx={{
-                display: 'flex',
-                gap: 1,
-                justifyContent: 'center',
-                mt: 1,
-                flexWrap: 'wrap',
-              }}
-            >
+          Voltar
+        </Button>
+      </Box>
+      <Box sx={styles.contentTabs}>
+        <Box sx={styles.boxContent}>
+          {renderDuplicateModal()}
+          <Box>
+            <ClientProfile
+              rating={watch('rating')}
+              clientCondition={watch('clientCondition')}
+              companyName={companyName || clientData?.companyName || ''}
+              corfioCode={corfioCode || clientData?.corfioCode || ''}
+              whatsapp={whatsapp || clientData?.whatsapp || ''}
+              emailCommercial={
+                emailCommercial || clientData?.emailCommercial || ''
+              }
+              onRatingChange={(rating) => setValue('rating', rating)}
+              onConditionChange={(condition) =>
+                setValue('clientCondition', condition)
+              }
+              readOnly={false}
+              imageUrl={previewImage || imageUrl || undefined}
+              onImageChange={handleImageChange}
+              enableImageUpload={!savingImage}
+            />
+            <Box sx={styles.boxButton}>
               <Button
-                color="warning"
+                type="button"
                 variant="contained"
-                size="small"
-                fullWidth={isXs}
-                onClick={handleCancelImageSelection}
-                disabled={savingImage}
+                sx={styles.deleteButton}
+                onClick={() => setShowDeleteModal(true)} // Abre o modal
+                disabled={loadingDelete || savingImage}
               >
-                Cancelar
+                Deletar
               </Button>
-              <Button
-                color="success"
-                variant="contained"
-                size="small"
-                fullWidth={isXs}
-                onClick={handleConfirmSaveImage}
-                disabled={savingImage}
+              <Modal
+                open={showDeleteModal}
+                onClose={() => setShowDeleteModal(false)} // Fecha o modal
+                sx={sharedStyles.boxModal}
               >
-                Salvar
+                <Box sx={sharedStyles.modalAlert}>
+                  <Typography variant="h6">Confirmação de Exclusão!</Typography>
+                  <Typography variant="body1">
+                    Tem certeza de que deseja excluir este cliente?
+                  </Typography>
+
+                  <Button
+                    variant="contained"
+                    onClick={onDelete}
+                    sx={{
+                      ...sharedStyles.modalButton,
+                      backgroundColor: 'red',
+                      '&:hover': {
+                        backgroundColor: 'darkred',
+                      },
+                    }}
+                    disabled={loadingDelete} // Desativa o botão enquanto carrega
+                  >
+                    {loadingDelete ? <CircularProgress size={24} /> : 'Deletar'}
+                  </Button>
+                  <Button
+                    variant="contained"
+                    onClick={() => setShowDeleteModal(false)} // Fecha o modal
+                    sx={sharedStyles.modalButton}
+                  >
+                    Cancelar
+                  </Button>
+                </Box>
+              </Modal>
+              <Button
+                type="button"
+                variant="contained"
+                sx={styles.editButton}
+                onClick={() => handleSubmit(onSubmit)()}
+                disabled={loadingSave || savingImage} // Desativa o botão enquanto está carregando
+              >
+                {loadingSave ? <CircularProgress size={24} /> : 'Salvar'}
               </Button>
             </Box>
           </Box>
-        </Snackbar>
-
-        <Snackbar
-          open={snackbarSuccessOpen}
-          autoHideDuration={8000}
-          onClose={() => setSnackbarSuccessOpen(false)}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-          sx={{
-            '& .MuiPaper-root': {
-              maxWidth: 600,
-              width: isXs ? 'calc(100% - 24px)' : 'auto',
-            },
-          }}
-        >
-          <Alert
-            onClose={() => setSnackbarSuccessOpen(false)}
-            severity="success"
-            sx={{ width: '100%' }}
+          {/* Snackbars para confirmação, sucesso e erro */}
+          <Snackbar
+            open={snackbarConfirmOpen}
+            onClose={() => !savingImage && setSnackbarConfirmOpen(false)}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
           >
-            Sua imagem foi salva com sucesso!
-          </Alert>
-        </Snackbar>
-
-        <Snackbar
-          open={snackbarError.open}
-          onClose={() => setSnackbarError({ open: false })}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-          sx={{
-            '& .MuiPaper-root': {
-              maxWidth: 600,
-              width: isXs ? 'calc(100% - 24px)' : 'auto',
-            },
-          }}
-        >
-          <Alert
-            onClose={() => setSnackbarError({ open: false })}
-            severity="error"
-            sx={{ width: '100%', wordBreak: 'break-word' }}
-          >
-            Ops, ocorreu um erro ao salvar a imagem. Tente novamente em alguns
-            minutos.
-            {snackbarError.message ? ` Detalhes: ${snackbarError.message}` : ''}
-            {snackbarError.errorId ? ` | Código: ${snackbarError.errorId}` : ''}
-            {snackbarError.at ? ` | ${snackbarError.at}` : ''}
-          </Alert>
-        </Snackbar>
-        <Box sx={styles.boxCol2}>
-          <form>
-            {/* Renderiza primeiro companyName e businessGroupId */}
-            {['companyName', 'businessGroupId'].map((key) => (
-              <Box key={key}>
-                <Typography variant="subtitle1">
-                  {fieldLabels[key] || key}
-                </Typography>
-                <Controller
-                  name={key}
-                  control={control}
-                  defaultValue={clientData[key] || ''}
-                  render={({ field }) => {
-                    if (key === 'businessGroupId') {
-                      return (
-                        <TextField
-                          {...field}
-                          select
-                          variant="filled"
-                          fullWidth
-                          sx={styles.inputsCol2}
-                          value={
-                            businessGroups.some((g) => g.id === field.value)
-                              ? field.value
-                              : ''
-                          }
-                        >
-                          {businessGroups.map((group) => (
-                            <MenuItem key={group.id} value={group.id}>
-                              {group.name}
-                            </MenuItem>
-                          ))}
-                        </TextField>
-                      );
-                    }
-
-                    return (
-                      <TextField
-                        {...field}
-                        variant="filled"
-                        sx={styles.inputsCol2}
-                        InputProps={{
-                          readOnly: false,
-                        }}
-                      />
-                    );
-                  }}
-                />
+            <Box
+              sx={{
+                bgcolor: 'background.default',
+                borderRadius: 2,
+                boxShadow: 6,
+                p: 2,
+                /* mb: 5, */
+                /* maxWidth: 600, */
+                /* width: isXs ? 'calc(100% - 24px)' : 'auto', */
+              }}
+            >
+              <Typography
+                variant={isXs ? 'body2' : 'body1'}
+                textAlign={isXs ? 'center' : 'left'}
+              >
+                Salvar ou alterar esta imagem agora?
+              </Typography>
+              <Box
+                sx={{
+                  display: 'flex',
+                  gap: 1,
+                  justifyContent: 'center',
+                  mt: 1,
+                  flexWrap: 'wrap',
+                }}
+              >
+                <Button
+                  color="warning"
+                  variant="contained"
+                  size="small"
+                  fullWidth={isXs}
+                  onClick={handleCancelImageSelection}
+                  disabled={savingImage}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  color="success"
+                  variant="contained"
+                  size="small"
+                  fullWidth={isXs}
+                  onClick={handleConfirmSaveImage}
+                  disabled={savingImage}
+                >
+                  Salvar
+                </Button>
               </Box>
-            ))}
+            </Box>
+          </Snackbar>
 
-            {/* Renderiza os outros campos, ignorando estes campos */}
-            {Object.keys(clientData)
-              .filter(
-                (key) =>
-                  key !== 'id' &&
-                  key !== 'createdAt' &&
-                  key !== 'imageUrl' &&
-                  key !== 'companyName' &&
-                  key !== 'businessGroupId',
-              )
-              .map((key) => (
+          <Snackbar
+            open={snackbarSuccessOpen}
+            autoHideDuration={8000}
+            onClose={() => setSnackbarSuccessOpen(false)}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            sx={{
+              '& .MuiPaper-root': {
+                maxWidth: 600,
+                width: isXs ? 'calc(100% - 24px)' : 'auto',
+              },
+            }}
+          >
+            <Alert
+              onClose={() => setSnackbarSuccessOpen(false)}
+              severity="success"
+              sx={{ width: '100%' }}
+            >
+              Sua imagem foi salva com sucesso!
+            </Alert>
+          </Snackbar>
+
+          <Snackbar
+            open={snackbarError.open}
+            onClose={() => setSnackbarError({ open: false })}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            sx={{
+              '& .MuiPaper-root': {
+                maxWidth: 600,
+                width: isXs ? 'calc(100% - 24px)' : 'auto',
+              },
+            }}
+          >
+            <Alert
+              onClose={() => setSnackbarError({ open: false })}
+              severity="error"
+              sx={{ width: '100%', wordBreak: 'break-word' }}
+            >
+              Ops, ocorreu um erro ao salvar a imagem. Tente novamente em alguns
+              minutos.
+              {snackbarError.message
+                ? ` Detalhes: ${snackbarError.message}`
+                : ''}
+              {snackbarError.errorId
+                ? ` | Código: ${snackbarError.errorId}`
+                : ''}
+              {snackbarError.at ? ` | ${snackbarError.at}` : ''}
+            </Alert>
+          </Snackbar>
+          <Box sx={styles.boxCol2}>
+            <form>
+              {/* Renderiza primeiro companyName e businessGroupId */}
+              {['companyName', 'businessGroupId'].map((key) => (
                 <Box key={key}>
                   <Typography variant="subtitle1">
                     {fieldLabels[key] || key}
@@ -1027,51 +1001,24 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
                     name={key}
                     control={control}
                     defaultValue={clientData[key] || ''}
-                    render={({ field: { onChange, value, ...restField } }) => {
-                      // Formatação específica para CPF, CNPJ, telefone e CEP
-                      const handleFormattedChange = (
-                        event: React.ChangeEvent<
-                          HTMLInputElement | HTMLTextAreaElement
-                        >,
-                      ) => {
-                        const { name, value } = event.target;
-                        let formattedValue = value;
-
-                        if (name === 'cpf') {
-                          formattedValue = formatCPF(value);
-                        } else if (name === 'cnpj') {
-                          formattedValue = formatCNPJ(value);
-                        } else if (name === 'phone' || name === 'whatsapp') {
-                          formattedValue = formatPhone(value);
-                        } else if (name === 'cep') {
-                          formattedValue = formatCEP(value);
-                          handleCEPChange(value.replace(/\D/g, ''));
-                        }
-
-                        onChange(formattedValue);
-                      };
-
-                      if (key === 'responsibleSeller') {
+                    render={({ field }) => {
+                      if (key === 'businessGroupId') {
                         return (
                           <TextField
-                            {...restField}
-                            value={
-                              users.some((u) => u.operatorNumber === value)
-                                ? value
-                                : ''
-                            }
-                            onChange={onChange}
+                            {...field}
                             select
                             variant="filled"
                             fullWidth
                             sx={styles.inputsCol2}
+                            value={
+                              businessGroups.some((g) => g.id === field.value)
+                                ? field.value
+                                : ''
+                            }
                           >
-                            {users.map((user) => (
-                              <MenuItem
-                                key={user.operatorNumber}
-                                value={user.operatorNumber}
-                              >
-                                {`${user.operatorNumber} - ${user.name}`}
+                            {businessGroups.map((group) => (
+                              <MenuItem key={group.id} value={group.id}>
+                                {group.name}
                               </MenuItem>
                             ))}
                           </TextField>
@@ -1080,82 +1027,170 @@ const ClientEditPage: React.FC<EditClientProps> = ({ setFormData }) => {
 
                       return (
                         <TextField
-                          {...restField}
-                          name={key}
-                          value={
-                            key === 'city'
-                              ? cities.includes(value)
-                                ? value
-                                : ''
-                              : key === 'state'
-                                ? states.includes(value)
-                                  ? value
-                                  : ''
-                                : value
-                          }
-                          onChange={(event) => {
-                            handleFormattedChange(event);
-                            if (key === 'state') {
-                              handleStateChange(event); // Reseta campos quando o estado muda manualmente
-                            }
-                            if (key === 'cep') {
-                              handleCEPChange(event.target.value); // Busca dados da API ao alterar o CEP
-                            }
-                          }}
+                          {...field}
                           variant="filled"
                           sx={styles.inputsCol2}
-                          InputProps={{ readOnly: false }}
-                          select={
-                            key === 'state' ||
-                            key === 'city' ||
-                            key in selectOptions
-                          }
-                          disabled={
-                            key === 'stateRegistration' &&
-                            icmsContributor === 'Não'
-                          }
-                        >
-                          {key === 'state' &&
-                            states.map((state) => (
-                              <MenuItem key={state} value={state}>
-                                {state}
-                              </MenuItem>
-                            ))}
-                          {key === 'city' &&
-                            cities.map((city) => (
-                              <MenuItem key={city} value={city}>
-                                {city}
-                              </MenuItem>
-                            ))}
-                          {key in selectOptions &&
-                            selectOptions[key].map((option) => (
-                              <MenuItem key={option} value={option}>
-                                {option}
-                              </MenuItem>
-                            ))}
-                        </TextField>
+                          InputProps={{
+                            readOnly: false,
+                          }}
+                        />
                       );
                     }}
                   />
                 </Box>
               ))}
-          </form>
+
+              {/* Renderiza os outros campos, ignorando estes campos */}
+              {Object.keys(clientData)
+                .filter(
+                  (key) =>
+                    key !== 'id' &&
+                    key !== 'createdAt' &&
+                    key !== 'imageUrl' &&
+                    key !== 'companyName' &&
+                    key !== 'businessGroupId',
+                )
+                .map((key) => (
+                  <Box key={key}>
+                    <Typography variant="subtitle1">
+                      {fieldLabels[key] || key}
+                    </Typography>
+                    <Controller
+                      name={key}
+                      control={control}
+                      defaultValue={clientData[key] || ''}
+                      render={({
+                        field: { onChange, value, ...restField },
+                      }) => {
+                        // Formatação específica para CPF, CNPJ, telefone e CEP
+                        const handleFormattedChange = (
+                          event: React.ChangeEvent<
+                            HTMLInputElement | HTMLTextAreaElement
+                          >,
+                        ) => {
+                          const { name, value } = event.target;
+                          let formattedValue = value;
+
+                          if (name === 'cpf') {
+                            formattedValue = formatCPF(value);
+                          } else if (name === 'cnpj') {
+                            formattedValue = formatCNPJ(value);
+                          } else if (name === 'phone' || name === 'whatsapp') {
+                            formattedValue = formatPhone(value);
+                          } else if (name === 'cep') {
+                            formattedValue = formatCEP(value);
+                            handleCEPChange(value.replace(/\D/g, ''));
+                          }
+
+                          onChange(formattedValue);
+                        };
+
+                        if (key === 'responsibleSeller') {
+                          return (
+                            <TextField
+                              {...restField}
+                              value={
+                                users.some((u) => u.operatorNumber === value)
+                                  ? value
+                                  : ''
+                              }
+                              onChange={onChange}
+                              select
+                              variant="filled"
+                              fullWidth
+                              sx={styles.inputsCol2}
+                            >
+                              {users.map((user) => (
+                                <MenuItem
+                                  key={user.operatorNumber}
+                                  value={user.operatorNumber}
+                                >
+                                  {`${user.operatorNumber} - ${user.name}`}
+                                </MenuItem>
+                              ))}
+                            </TextField>
+                          );
+                        }
+
+                        return (
+                          <TextField
+                            {...restField}
+                            name={key}
+                            value={
+                              key === 'city'
+                                ? cities.includes(value)
+                                  ? value
+                                  : ''
+                                : key === 'state'
+                                  ? states.includes(value)
+                                    ? value
+                                    : ''
+                                  : value
+                            }
+                            onChange={(event) => {
+                              handleFormattedChange(event);
+                              if (key === 'state') {
+                                handleStateChange(event); // Reseta campos quando o estado muda manualmente
+                              }
+                              if (key === 'cep') {
+                                handleCEPChange(event.target.value); // Busca dados da API ao alterar o CEP
+                              }
+                            }}
+                            variant="filled"
+                            sx={styles.inputsCol2}
+                            InputProps={{ readOnly: false }}
+                            select={
+                              key === 'state' ||
+                              key === 'city' ||
+                              key in selectOptions
+                            }
+                            disabled={
+                              key === 'stateRegistration' &&
+                              icmsContributor === 'Não'
+                            }
+                          >
+                            {key === 'state' &&
+                              states.map((state) => (
+                                <MenuItem key={state} value={state}>
+                                  {state}
+                                </MenuItem>
+                              ))}
+                            {key === 'city' &&
+                              cities.map((city) => (
+                                <MenuItem key={city} value={city}>
+                                  {city}
+                                </MenuItem>
+                              ))}
+                            {key in selectOptions &&
+                              selectOptions[key].map((option) => (
+                                <MenuItem key={option} value={option}>
+                                  {option}
+                                </MenuItem>
+                              ))}
+                          </TextField>
+                        );
+                      }}
+                    />
+                  </Box>
+                ))}
+            </form>
+          </Box>
         </Box>
-      </Box>
-      {/* Snackbar para acesso negado */}
-      <Snackbar
-        open={snackbarAccessDenied}
-        onClose={() => setSnackbarAccessDenied(false)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert
+        {/* Snackbar para acesso negado */}
+        <Snackbar
+          open={snackbarAccessDenied}
           onClose={() => setSnackbarAccessDenied(false)}
-          severity="error"
-          sx={{ width: '100%' }}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         >
-          Você não tem acesso a este cliente
-        </Alert>
-      </Snackbar>
+          <Alert
+            onClose={() => setSnackbarAccessDenied(false)}
+            severity="error"
+            sx={{ width: '100%' }}
+          >
+            Você não tem acesso a este cliente
+          </Alert>
+        </Snackbar>
+      </Box>
     </Box>
   );
 };

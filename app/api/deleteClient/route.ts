@@ -5,6 +5,8 @@ import {
   salesInformation,
   tabsViewed,
   salesQuotes,
+  visitRouteClients,
+  frequentOccurrences,
 } from '@/app/db/schema'; // Adicione a tabela tabs_viewed
 import { db } from '@/app/db';
 import { eq } from 'drizzle-orm';
@@ -23,6 +25,15 @@ export async function DELETE(request: NextRequest) {
 
   try {
     console.log(`Attempting to delete client with id: ${id}`);
+    // Remover linhas em visit_route_clients para este cliente antes da exclusão
+    await db
+      .delete(visitRouteClients)
+      .where(eq(visitRouteClients.clientId, Number(id)));
+
+    // Remover ocorrências frequentes relacionadas ao cliente
+    await db
+      .delete(frequentOccurrences)
+      .where(eq(frequentOccurrences.clientId, Number(id)));
 
     // Verifique se há registros na tabela `tabs_viewed`
     const tabsViewedCheck = await db
