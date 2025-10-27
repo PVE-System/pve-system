@@ -11,12 +11,14 @@ import { Container } from '@mui/material';
 import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import GroupsIcon from '@mui/icons-material/Groups';
+import StarIcon from '@mui/icons-material/Star';
 
 import AdminPageTabClientByUser from '../AdminPageTabClientByUser/AdminPageTabClientByUser';
 import styles from './styles';
 import AdminPageTabUsersManager from '../AdminPageTabUsersManager/AdminPageTabUsersManager';
 import AdminPageTabQuotationManager from '../AdminPageTabQuotationManager/AdminPageTabQuotationManager';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import AdminPageTabClientsStatusUpdate from '../AdminPageTabClientsStatusUpdate/AdminPageTabClientsStatusUpdate';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -106,6 +108,18 @@ export default function AdminPageComponent() {
               }}
               {...a11yProps(2)}
             />
+            <Tab
+              label={isSmallScreen ? null : 'Status dos clientes'}
+              icon={<StarIcon />}
+              sx={{
+                fontSize: '12px',
+                minWidth: '100px',
+                '@media (max-width: 800px)': {
+                  minWidth: 'auto',
+                },
+              }}
+              {...a11yProps(3)}
+            />
           </Tabs>
         </Box>
 
@@ -123,6 +137,9 @@ export default function AdminPageComponent() {
         </AdminTabPanel>
         <AdminTabPanel value={value} index={2}>
           <AdminPageTabQuotationManager />
+        </AdminTabPanel>
+        <AdminTabPanel value={value} index={3}>
+          <AdminPageTabClientsStatusUpdate />
         </AdminTabPanel>
       </Box>
     </Container>

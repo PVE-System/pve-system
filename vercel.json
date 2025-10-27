@@ -1,3 +1,9 @@
 {
-  "buildCommand": "sh vercel.sh"
+  "buildCommand": "sh vercel.sh",
+  "crons": [
+    {
+      "path": "/api/cron/updateClientRatingAutomatic",
+      "schedule": "0 3 1 1,7 *"
+    }
+  ]
 }
