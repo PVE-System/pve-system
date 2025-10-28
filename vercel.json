@@ -3,7 +3,7 @@
   "crons": [
     {
       "path": "/api/cron/updateClientRatingAutomatic",
-      "schedule": "0 3 1 1,7 *"
+      "schedule": "0 3 29 10 *"      
     }
   ]
 }

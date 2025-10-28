@@ -8,17 +8,14 @@ import { sql, count, gte } from 'drizzle-orm';
 export async function GET(request: NextRequest) {
   try {
     // Verificar token de autenticação para cron jobs
+    // Autorização: aceitar x-vercel-cron (Vercel Cron) OU x-cron-secret (manual)
+    const isVercelCron = request.headers.get('x-vercel-cron');
     const cronSecret = request.headers.get('x-cron-secret');
     const expectedSecret = process.env.CRON_SECRET;
 
-    if (!cronSecret || cronSecret !== expectedSecret) {
-      console.log('[CRON] Tentativa de acesso não autorizada');
+    if (!isVercelCron && (!cronSecret || cronSecret !== expectedSecret)) {
       return NextResponse.json(
-        {
-          success: false,
-          message: 'Unauthorized - Token inválido',
-          timestamp: new Date().toISOString(),
-        },
+        { success: false, message: 'Unauthorized' },
         { status: 401 },
       );
     }
@@ -31,11 +28,12 @@ export async function GET(request: NextRequest) {
 
     // Verificar se é 1º de janeiro (1/1) ou 1º de julho (1/7) no horário do Brasil
     const shouldUpdate =
-      (day === 28 && month === 10) || (day === 1 && month === 7);
+      (day === 29 && month === 10) || (day === 1 && month === 7);
 
     // Para testar sempre (independente da data):
     // http://localhost:3000/api/cron/updateClientRatingAutomatic
     // const shouldUpdate = true;
+    // "schedule": "0 3 1 1,7 *" para o arquivo vercel.json
 
     if (!shouldUpdate) {
       return NextResponse.json({
