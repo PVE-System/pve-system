@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
 
     // Verificar se é 1º de janeiro (1/1) ou 1º de julho (1/7) no horário do Brasil
     const shouldUpdate =
-      (day === 29 && month === 10) || (day === 1 && month === 7);
+      (day === 1 && month === 1) || (day === 1 && month === 7);
 
     // Para testar sempre (independente da data):
     // http://localhost:3000/api/cron/updateClientRatingAutomatic
@@ -86,9 +86,9 @@ export async function GET(request: NextRequest) {
         let newRating: number;
 
         // Determinar o rating baseado no número de cotações
-        if (quotesCount < 20) {
+        if (quotesCount < 10) {
           newRating = 1;
-        } else if (quotesCount <= 100) {
+        } else if (quotesCount <= 50) {
           newRating = 2;
         } else {
           newRating = 3;
