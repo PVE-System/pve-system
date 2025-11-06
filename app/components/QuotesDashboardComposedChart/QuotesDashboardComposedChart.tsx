@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ResponsiveContainer,
   ComposedChart,
@@ -22,10 +22,10 @@ export interface QuotesComposedChartDatum {
   count: number;
 }
 
-interface QuotesComposedChartProps {
-  data: QuotesComposedChartDatum[];
+interface QuotesDashboardComposedChartProps {
   title?: string;
   height?: number;
+  clientId?: number; // opcional: permitir filtrar por cliente se desejar
 }
 
 const CustomTooltip: React.FC<TooltipProps<number, string>> = ({
@@ -38,7 +38,7 @@ const CustomTooltip: React.FC<TooltipProps<number, string>> = ({
   return (
     <Box
       sx={{
-        backgroundColor: 'background.paper',
+        backgroundColor: 'background.alternative',
         border: '1px solid',
         borderColor: 'divider',
         borderRadius: 1,
@@ -55,11 +55,9 @@ const CustomTooltip: React.FC<TooltipProps<number, string>> = ({
   );
 };
 
-const QuotesComposedChart: React.FC<QuotesComposedChartProps> = ({
-  data,
-  title = 'Cotações (Composed)',
-  height = 300,
-}) => {
+const QuotesDashboardComposedChart: React.FC<
+  QuotesDashboardComposedChartProps
+> = ({ title = 'Gráfico sobre cotações:', height = 300, clientId }) => {
   const theme = useTheme();
   const isXs = useMediaQuery(theme.breakpoints.down('sm'));
   const isSm = useMediaQuery(theme.breakpoints.between('sm', 'md'));
@@ -68,13 +66,48 @@ const QuotesComposedChart: React.FC<QuotesComposedChartProps> = ({
   const tickFontSize = isXs ? 10 : isSm ? 12 : 13;
   const barSize = isXs ? 12 : 20;
 
+  const [data, setData] = useState<QuotesComposedChartDatum[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const qs = clientId ? `?clientId=${clientId}` : '';
+        const res = await fetch(`/api/getSalesQuotesLast12Months${qs}`);
+        const json = await res.json();
+        if (!res.ok || !json.success) {
+          throw new Error('Falha ao carregar dados do gráfico (12 meses)');
+        }
+        setData(json.data as QuotesComposedChartDatum[]);
+      } catch (e) {
+        console.error(e);
+        setData([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [clientId]);
+
   return (
-    <Box sx={{ width: '100%' }}>
+    <Box
+      sx={{
+        width: '100%',
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 2,
+
+        /* maxWidth: { xs: '100%', sm: '100%', md: '1200px', lg: '1400px' }, */
+        /* mx: 'auto', */ // Centraliza quando atinge maxWidth
+      }}
+    >
       <Typography
         sx={{
           mb: 2,
-          fontSize: { xs: '14px', md: '18px' },
-          pl: { xs: 2, md: 7 }, // Padding para alinhar titulo com o início do gráfico (espaço do eixo Y)
+          mt: 2,
+          fontSize: { xs: '12px', md: '18px' },
+          textAlign: 'center',
         }}
       >
         {title}
@@ -86,7 +119,7 @@ const QuotesComposedChart: React.FC<QuotesComposedChartProps> = ({
             // Responsive margin para telas menores
             margin={{
               top: 10,
-              right: 12,
+              right: isXs ? 20 : 40, // Mais espaço à direita em telas maiores
               bottom: isXs ? 20 : 10,
               left: isXs ? -40 : 0,
             }}
@@ -104,7 +137,6 @@ const QuotesComposedChart: React.FC<QuotesComposedChartProps> = ({
             <Area
               type="monotone"
               dataKey="count"
-              /* fill="#03213a" */
               fill="#033157"
               stroke="#90caf9"
             />
@@ -123,4 +155,4 @@ const QuotesComposedChart: React.FC<QuotesComposedChartProps> = ({
   );
 };
 
-export default QuotesComposedChart;
+export default QuotesDashboardComposedChart;

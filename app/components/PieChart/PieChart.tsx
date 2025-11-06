@@ -96,7 +96,11 @@ const SimpleChart = () => {
                   />
                 ))}
               </Pie>
-              <Legend />
+              <Legend
+                wrapperStyle={{
+                  marginLeft: 10, // Espaço para alinhar legenda com o gráfico
+                }}
+              />
             </PieChart>
           </Box>
           <Typography variant="body1" sx={{ mt: 2 }}>

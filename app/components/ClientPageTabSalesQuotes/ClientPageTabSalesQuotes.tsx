@@ -47,13 +47,12 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
   const [loadingQuotes, setLoadingQuotes] = useState(true);
   const [clientData, setClientData] = useState<any>(null);
   const [year, setYear] = useState(new Date().getFullYear() - 1);
-  const [inputYear, setInputYear] = useState<string>('');
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [totalQuotes, setTotalQuotes] = useState(0);
   const [addingQuote, setAddingQuote] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [showAllYears, setShowAllYears] = useState(false);
-  const [manualYearInput, setManualYearInput] = useState(false);
+  const [showAllYearsFirstChart, setShowAllYearsFirstChart] = useState(false);
   const [lastAddedQuoteId, setLastAddedQuoteId] = useState<number | null>(null);
   const [industry, setIndustry] = useState<string>('CORFIO');
   const [deleting, setDeleting] = useState<number | null>(null); // Armazena o ID da cotação sendo deletada
@@ -73,6 +72,10 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
   const scrollRestoreNeededRef = React.useRef<boolean>(false);
   const scrollYBeforeChangeRef = React.useRef<number>(0);
   const [leftYear, setLeftYear] = useState<number>(new Date().getFullYear());
+  // Ano do primeiro gráfico (padrão: ano atual)
+  const [firstChartYear, setFirstChartYear] = useState<number>(
+    new Date().getFullYear(),
+  );
 
   const ITEMS_PER_PAGE = 5;
 
@@ -207,14 +210,14 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
     );
   }, [fetchMonthlyTotalsByYear, year]);
 
-  // Buscar totais mensais para o gráfico do ano atual (fixo)
+  // Buscar totais mensais para o primeiro gráfico (controlado por firstChartYear)
   useEffect(() => {
     fetchMonthlyTotalsByYear(
-      currentYear,
+      firstChartYear,
       setLoadingCurrentYear,
       setCurrentYearChartData,
     );
-  }, [fetchMonthlyTotalsByYear, currentYear]);
+  }, [fetchMonthlyTotalsByYear, firstChartYear]);
 
   // Buscar histórico de visitas do cliente (mesmo padrão do ClientPageTabInfos)
   useEffect(() => {
@@ -282,25 +285,6 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
       console.error('Erro ao deletar cotação:', error);
     } finally {
       setDeleting(null); // Reseta o estado após a operação
-    }
-  };
-
-  const handleYearInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setInputYear(value); // Atualiza o estado temporário durante a digitação
-  };
-
-  const handleYearSubmit = () => {
-    const parsedYear = Number(inputYear);
-    if (!isNaN(parsedYear) && inputYear.length === 4) {
-      setYear(parsedYear); // Atualiza o ano principal quando válido
-      setManualYearInput(false); // Sai do modo manual
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'Enter') {
-      handleYearSubmit(); // Chama a lógica de submissão ao pressionar Enter
     }
   };
 
@@ -550,83 +534,113 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
               mb: 2,
             }}
           >
-            Compare o ano atual com outros anos.
+            Compare os anos selecionados.
           </Typography>
-          <Box sx={{ minWidth: 140 }}>
-            {!manualYearInput ? (
-              <TextField
-                label="Ano"
-                select
-                value={manualYearInput ? '' : year.toString()}
-                onChange={(e) => {
-                  const selectedValue = e.target.value;
-                  // Guardar posição do scroll antes de alterar o ano
-                  if (typeof window !== 'undefined') {
-                    scrollYBeforeChangeRef.current = window.scrollY;
-                    scrollRestoreNeededRef.current = true;
-                  }
-                  if (selectedValue === 'showMore') {
-                    setShowAllYears(true);
-                    return;
-                  }
-                  if (selectedValue === 'manualInput') {
-                    setManualYearInput(true);
-                    return;
-                  }
-                  const parsedYear = Number(selectedValue);
-                  if (!isNaN(parsedYear)) {
-                    setYear(parsedYear);
-                  }
-                }}
-                sx={{ width: 140 }}
-              >
-                {Array.from({ length: showAllYears ? 20 : 5 }, (_, i) => {
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 2,
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+            }}
+          >
+            {/* Input para o primeiro gráfico (padrão: ano atual) */}
+            <TextField
+              label="Gráfico 1"
+              select
+              value={firstChartYear.toString()}
+              onChange={(e) => {
+                const selectedValue = e.target.value;
+                if (selectedValue === 'showMore') {
+                  setShowAllYearsFirstChart(true);
+                  return;
+                }
+                const parsedYear = Number(selectedValue);
+                if (!Number.isNaN(parsedYear)) {
+                  setFirstChartYear(parsedYear);
+                }
+              }}
+              size="small"
+              sx={{ width: 140 }}
+            >
+              {Array.from(
+                { length: showAllYearsFirstChart ? 20 : 5 },
+                (_, i) => {
                   const yearOption = new Date().getFullYear() - i;
                   return (
                     <MenuItem key={yearOption} value={yearOption.toString()}>
                       {yearOption}
                     </MenuItem>
                   );
-                })}
-                {!showAllYears && (
-                  <MenuItem
-                    value="showMore"
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      setShowAllYears(true);
-                    }}
-                  >
-                    Ver mais anos...
+                },
+              )}
+              {!showAllYearsFirstChart && (
+                <MenuItem
+                  value="showMore"
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    setShowAllYearsFirstChart(true);
+                  }}
+                >
+                  Ver mais anos...
+                </MenuItem>
+              )}
+            </TextField>
+
+            {/* Input para o segundo gráfico (padrão: ano anterior) */}
+            <TextField
+              label="Gráfico 2"
+              select
+              value={year.toString()}
+              onChange={(e) => {
+                const selectedValue = e.target.value;
+                // Guardar posição do scroll antes de alterar o ano
+                if (typeof window !== 'undefined') {
+                  scrollYBeforeChangeRef.current = window.scrollY;
+                  scrollRestoreNeededRef.current = true;
+                }
+                if (selectedValue === 'showMore') {
+                  setShowAllYears(true);
+                  return;
+                }
+                const parsedYear = Number(selectedValue);
+                if (!isNaN(parsedYear)) {
+                  setYear(parsedYear);
+                }
+              }}
+              size="small"
+              sx={{ width: 140 }}
+            >
+              {Array.from({ length: showAllYears ? 20 : 5 }, (_, i) => {
+                const yearOption = new Date().getFullYear() - i;
+                return (
+                  <MenuItem key={yearOption} value={yearOption.toString()}>
+                    {yearOption}
                   </MenuItem>
-                )}
-                <MenuItem value="manualInput">Escolher ano...</MenuItem>
-              </TextField>
-            ) : (
-              <TextField
-                label="Ano"
-                type="number"
-                value={inputYear}
-                onChange={handleYearInput}
-                onKeyDown={handleKeyDown}
-                onBlur={handleYearSubmit}
-                sx={{ width: 140 }}
-                inputProps={{
-                  step: 1,
-                  min: 1900,
-                  max: new Date().getFullYear(),
-                }}
-              />
-            )}
+                );
+              })}
+              {!showAllYears && (
+                <MenuItem
+                  value="showMore"
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    setShowAllYears(true);
+                  }}
+                >
+                  Ver mais anos...
+                </MenuItem>
+              )}
+            </TextField>
           </Box>
         </Box>
       </Box>
 
-      {/* Gráfico Composed (Linha/Barra/Área) para o ano atual (fixo) */}
+      {/* Gráfico Composed (Linha/Barra/Área) para o primeiro gráfico */}
       <Box sx={{ mt: 5, overflowX: 'auto', overflowY: 'hidden' }}>
         <Box sx={{ minWidth: 520 }}>
           <QuotesComposedChart
             data={currentYearChartData}
-            title={`Cotações ${currentYear}. Total: ${currentYearChartData.reduce((acc, d) => acc + d.count, 0)}`}
+            title={`Cotações ${firstChartYear}. Total: ${currentYearChartData.reduce((acc, d) => acc + d.count, 0)}`}
             height={300}
           />
         </Box>
