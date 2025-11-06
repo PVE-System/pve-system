@@ -99,18 +99,24 @@ const SimpleChart = () => {
               <Legend />
             </PieChart>
           </Box>
-          <Typography
-            variant="body1"
+          <Box
             sx={{
               mt: 2,
-              display: 'block',
-              width: '100%',
-              flexBasis: { xs: '100%', sm: 'auto' },
+              display: 'flex',
+              flexDirection: { xs: 'column', sm: 'row' },
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: { xs: 0, sm: 0.5 },
               textAlign: 'center',
             }}
           >
-            Total de clientes cadastrados: <strong>{totalClients}</strong>
-          </Typography>
+            <Typography variant="body1" component="span">
+              Total de clientes cadastrados:
+            </Typography>
+            <Typography variant="body1" component="span">
+              <strong>{totalClients}</strong>
+            </Typography>
+          </Box>
         </CardContent>
       </Card>
     </Box>
