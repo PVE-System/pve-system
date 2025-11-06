@@ -96,14 +96,19 @@ const SimpleChart = () => {
                   />
                 ))}
               </Pie>
-              <Legend
-                wrapperStyle={{
-                  marginLeft: 10, // Espaço para alinhar legenda com o gráfico
-                }}
-              />
+              <Legend />
             </PieChart>
           </Box>
-          <Typography variant="body1" sx={{ mt: 2 }}>
+          <Typography
+            variant="body1"
+            sx={{
+              mt: 2,
+              display: 'block',
+              width: '100%',
+              flexBasis: { xs: '100%', sm: 'auto' },
+              textAlign: 'center',
+            }}
+          >
             Total de clientes cadastrados: <strong>{totalClients}</strong>
           </Typography>
         </CardContent>
