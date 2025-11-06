@@ -26,6 +26,7 @@ interface QuotesDashboardComposedChartProps {
   title?: string;
   height?: number;
   clientId?: number; // opcional: permitir filtrar por cliente se desejar
+  onLoadComplete?: () => void; // Callback quando o gráfico terminar de carregar
 }
 
 const CustomTooltip: React.FC<TooltipProps<number, string>> = ({
@@ -57,7 +58,12 @@ const CustomTooltip: React.FC<TooltipProps<number, string>> = ({
 
 const QuotesDashboardComposedChart: React.FC<
   QuotesDashboardComposedChartProps
-> = ({ title = 'Gráfico sobre cotações:', height = 300, clientId }) => {
+> = ({
+  title = 'Gráfico sobre cotações:',
+  height = 300,
+  clientId,
+  onLoadComplete,
+}) => {
   const theme = useTheme();
   const isXs = useMediaQuery(theme.breakpoints.down('sm'));
   const isSm = useMediaQuery(theme.breakpoints.between('sm', 'md'));
@@ -89,6 +95,17 @@ const QuotesDashboardComposedChart: React.FC<
     };
     fetchData();
   }, [clientId]);
+
+  // Notificar quando o gráfico terminar de carregar e renderizar
+  useEffect(() => {
+    if (!loading && data.length > 0 && onLoadComplete) {
+      // Aguardar um pouco para garantir que o gráfico renderizou completamente
+      const timer = setTimeout(() => {
+        onLoadComplete();
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [loading, data, onLoadComplete]);
 
   return (
     <Box

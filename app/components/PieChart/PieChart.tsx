@@ -96,7 +96,11 @@ const SimpleChart = () => {
                   />
                 ))}
               </Pie>
-              <Legend />
+              <Legend
+                wrapperStyle={{
+                  marginLeft: isSmallScreen ? '10px' : '0',
+                }}
+              />
             </PieChart>
           </Box>
           <Box

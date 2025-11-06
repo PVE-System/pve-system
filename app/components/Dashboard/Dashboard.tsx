@@ -122,17 +122,43 @@ const DashboardComponent = () => {
     fetchClients();
   }, []);
 
+  // Função para centralizar o scroll horizontal do gráfico
+  const centerChartScroll = React.useCallback(() => {
+    if (!isXs) return;
+    const el = chartScrollRef.current;
+    if (!el) return;
+
+    const centerScroll = () => {
+      if (el.scrollWidth > el.clientWidth) {
+        el.scrollLeft = (el.scrollWidth - el.clientWidth) / 2;
+      }
+    };
+
+    // Tentar centralizar imediatamente e após alguns delays
+    requestAnimationFrame(() => {
+      centerScroll();
+      setTimeout(centerScroll, 100);
+      setTimeout(centerScroll, 300);
+    });
+  }, [isXs]);
+
   // Centralizar scroll horizontal do gráfico em telas pequenas
   useEffect(() => {
     if (!isXs) return;
-    // centro após renderização
     const el = chartScrollRef.current;
     if (!el) return;
-    // usar rAF para aguardar layout
-    requestAnimationFrame(() => {
-      el.scrollLeft = Math.max(0, (el.scrollWidth - el.clientWidth) / 2);
+
+    // Observar mudanças no tamanho do conteúdo
+    const resizeObserver = new ResizeObserver(() => {
+      centerChartScroll();
     });
-  }, [isXs]);
+
+    resizeObserver.observe(el);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [isXs, centerChartScroll]);
 
   useEffect(() => {
     const fetchOpenRoutes = async () => {
@@ -396,7 +422,7 @@ const DashboardComponent = () => {
         ref={chartScrollRef}
       >
         <Box sx={{ minWidth: { xs: 520, md: 800 } }}>
-          <QuotesDashboardComposedChart />
+          <QuotesDashboardComposedChart onLoadComplete={centerChartScroll} />
         </Box>
       </Box>
 
