@@ -28,17 +28,22 @@ const styles = {
     width: '100%',
     maxWidth: '600px',
     margin: '0 auto',
-    gap: 5,
+    gap: 1,
     flexWrap: 'wrap',
   },
 
   inputAndButtomColumnLeft: {
     display: 'flex',
-    flexDirection: 'column',
-    gap: 2,
-    flex: 1,
-    minWidth: '200px',
-    maxWidth: '250px',
+    alignItems: 'center',
+    gap: 1,
+    minWidth: '400px',
+    maxWidth: '420px',
+    '@media (max-width: 800px)': {
+      flexDirection: 'column',
+      alignItems: 'center',
+      minWidth: '200px',
+      maxWidth: '230px',
+    },
   },
 
   buttonQuotesAdd: {

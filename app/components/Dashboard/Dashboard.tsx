@@ -13,9 +13,10 @@ import {
   Tooltip,
   Link,
   Theme,
+  useMediaQuery,
 } from '@mui/material';
 import { orange } from '@mui/material/colors';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -27,11 +28,13 @@ import styles from './styles';
 import { Rating } from '@mui/material';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
+import { useTheme } from '@mui/material/styles';
 import { blueGrey, red } from '@mui/material/colors';
 import DashboardExcelUpdateNotification from '../DashboardModalExcelUpdateNotification/DashboardExcelUpdateNotification';
 import FrequentOccurrencesRegistered from '../FrequentOccurrencesRegistered/FrequentOccurrencesRegistered';
 
 import WarningIcon from '@mui/icons-material/Warning';
+import QuotesDashboardComposedChart from '../QuotesDashboardComposedChart/QuotesDashboardComposedChart';
 
 const DynamicChartComponent = dynamic(
   () => import('@/app/components/PieChart/PieChart'),
@@ -51,6 +54,9 @@ interface ClientTotals {
 
 const DashboardComponent = () => {
   const router = useRouter();
+  const theme = useTheme();
+  const isXs = useMediaQuery(theme.breakpoints.down('sm'));
+  const chartScrollRef = useRef<HTMLDivElement | null>(null);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [openRoutes, setOpenRoutes] = useState<
@@ -115,6 +121,44 @@ const DashboardComponent = () => {
 
     fetchClients();
   }, []);
+
+  // Função para centralizar o scroll horizontal do gráfico
+  const centerChartScroll = React.useCallback(() => {
+    if (!isXs) return;
+    const el = chartScrollRef.current;
+    if (!el) return;
+
+    const centerScroll = () => {
+      if (el.scrollWidth > el.clientWidth) {
+        el.scrollLeft = (el.scrollWidth - el.clientWidth) / 2;
+      }
+    };
+
+    // Tentar centralizar imediatamente e após alguns delays
+    requestAnimationFrame(() => {
+      centerScroll();
+      setTimeout(centerScroll, 100);
+      setTimeout(centerScroll, 300);
+    });
+  }, [isXs]);
+
+  // Centralizar scroll horizontal do gráfico em telas pequenas
+  useEffect(() => {
+    if (!isXs) return;
+    const el = chartScrollRef.current;
+    if (!el) return;
+
+    // Observar mudanças no tamanho do conteúdo
+    const resizeObserver = new ResizeObserver(() => {
+      centerChartScroll();
+    });
+
+    resizeObserver.observe(el);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [isXs, centerChartScroll]);
 
   useEffect(() => {
     const fetchOpenRoutes = async () => {
@@ -368,6 +412,19 @@ const DashboardComponent = () => {
           )}
         </Box>
       </Box>
+      <Box
+        sx={{
+          width: { xs: '100%', md: '90%', lg: '90%' },
+          mt: 3,
+          overflowX: 'auto',
+          overflowY: 'hidden',
+        }}
+        ref={chartScrollRef}
+      >
+        <Box sx={{ minWidth: { xs: 520, md: 800 } }}>
+          <QuotesDashboardComposedChart onLoadComplete={centerChartScroll} />
+        </Box>
+      </Box>
 
       {/* Ocorrências Frequentes */}
       <Box
@@ -387,6 +444,7 @@ const DashboardComponent = () => {
             alignItems: 'center',
             gap: 1,
             textAlign: 'center',
+
             '@media (max-width:450px)': {
               mt: 6,
               mb: 0,

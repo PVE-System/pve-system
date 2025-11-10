@@ -358,7 +358,8 @@ const styles = {
   },
 
   BoxFrequentOccurrences: {
-    border: '2px solid #ccc',
+    border: '1px solid',
+    borderColor: 'divider',
     borderRadius: 2,
     p: 2,
     mb: 4,

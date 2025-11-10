@@ -96,12 +96,31 @@ const SimpleChart = () => {
                   />
                 ))}
               </Pie>
-              <Legend />
+              <Legend
+                wrapperStyle={{
+                  marginLeft: isSmallScreen ? '10px' : '0',
+                }}
+              />
             </PieChart>
           </Box>
-          <Typography variant="body1" sx={{ mt: 2 }}>
-            Total de clientes cadastrados: <strong>{totalClients}</strong>
-          </Typography>
+          <Box
+            sx={{
+              mt: 2,
+              display: 'flex',
+              flexDirection: { xs: 'column', sm: 'row' },
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: { xs: 0, sm: 0.5 },
+              textAlign: 'center',
+            }}
+          >
+            <Typography variant="body1" component="span">
+              Total de clientes cadastrados:
+            </Typography>
+            <Typography variant="body1" component="span">
+              <strong>{totalClients}</strong>
+            </Typography>
+          </Box>
         </CardContent>
       </Card>
     </Box>
