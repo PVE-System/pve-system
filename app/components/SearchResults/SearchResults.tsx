@@ -15,6 +15,9 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { Rating } from '@mui/material';
+import { orange } from '@mui/material/colors';
+import CircleIcon from '@mui/icons-material/Circle';
+import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
 import styles from '@/app/components/ClientsMsList/styles';
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -92,7 +95,7 @@ const SearchResults = () => {
                 <>
                   <TableCell sx={styles.fontSize}>Cód. Corfio:</TableCell>
                   <TableCell sx={styles.fontSize}>Condição:</TableCell>
-                  <TableCell sx={styles.fontSize}>Status:</TableCell>
+                  <TableCell sx={styles.fontSize}>Fluxo:</TableCell>
                 </>
               )}
             </TableRow>
@@ -154,6 +157,10 @@ const SearchResults = () => {
                         readOnly
                         size="medium"
                         max={3}
+                        icon={<CircleIcon sx={{ color: orange[800] }} />}
+                        emptyIcon={
+                          <CircleOutlinedIcon sx={{ color: 'grey' }} />
+                        }
                       />
                     </TableCell>
                   </>

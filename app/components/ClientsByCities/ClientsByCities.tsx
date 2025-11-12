@@ -19,6 +19,9 @@ import {
   MenuItem,
 } from '@mui/material';
 import { Rating } from '@mui/material';
+import { orange } from '@mui/material/colors';
+import CircleIcon from '@mui/icons-material/Circle';
+import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
 import styles from './styles';
 
 // Interface para o tipo dos dados do cliente
@@ -223,7 +226,7 @@ const ClientsByCities = () => {
                   <TableCell sx={styles.fontSize}>Cidade:</TableCell>
                   <TableCell sx={styles.fontSize}>Cód.Corfio:</TableCell>
                   <TableCell sx={styles.fontSize}>Condição:</TableCell>
-                  <TableCell sx={styles.fontSize}>Status:</TableCell>
+                  <TableCell sx={styles.fontSize}>Fluxo:</TableCell>
                 </>
               )}
             </TableRow>
@@ -302,6 +305,10 @@ const ClientsByCities = () => {
                           readOnly
                           size="medium"
                           max={3}
+                          icon={<CircleIcon sx={{ color: orange[800] }} />}
+                          emptyIcon={
+                            <CircleOutlinedIcon sx={{ color: 'grey' }} />
+                          }
                         />
                       </TableCell>
                     </>

@@ -632,9 +632,9 @@ const ClientPageTabInfos: React.FC<ClientPageTabInfosProps> = ({
 
       if (key === 'rating') {
         const ratingMap: { [key: number]: string } = {
-          1: '1 - Pouco ativo',
-          2: '2 - Moderado',
-          3: '3 - Ativo',
+          1: '1 - Fluxo Baixo',
+          2: '2 - Fluxo Moderado',
+          3: '3 - Fluxo Grande',
         };
         return ratingMap[clientData.rating] || 'Sem Status';
       }

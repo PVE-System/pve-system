@@ -17,6 +17,9 @@ import {
   Typography,
   useMediaQuery,
 } from '@mui/material';
+import { orange } from '@mui/material/colors';
+import CircleIcon from '@mui/icons-material/Circle';
+import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
 import styles from './styles';
 
 interface User {
@@ -442,9 +445,9 @@ const AdminPageTabClientByUser = () => {
 
         if (key === 'rating') {
           const ratingMap: { [key: number]: string } = {
-            1: '1 - Pouco ativo',
-            2: '2 - Moderado',
-            3: '3 - Ativo',
+            1: '1 - Fluxo Baixo',
+            2: '2 - Fluxo Moderado',
+            3: '3 - Fluxo Grande',
           };
           return ratingMap[client.rating] || 'Sem Status';
         }
@@ -600,7 +603,7 @@ const AdminPageTabClientByUser = () => {
                 <>
                   <TableCell sx={styles.fontSize}>Cód. Corfio:</TableCell>
                   <TableCell sx={styles.fontSize}>Condição:</TableCell>
-                  <TableCell sx={styles.fontSize}>Status:</TableCell>
+                  <TableCell sx={styles.fontSize}>Fluxo:</TableCell>
                 </>
               )}
             </TableRow>
@@ -669,6 +672,10 @@ const AdminPageTabClientByUser = () => {
                           readOnly
                           size="medium"
                           max={3}
+                          icon={<CircleIcon sx={{ color: orange[800] }} />}
+                          emptyIcon={
+                            <CircleOutlinedIcon sx={{ color: 'grey' }} />
+                          }
                         />
                       </TableCell>
                     </>
