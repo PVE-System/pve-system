@@ -13,6 +13,8 @@ import {
 } from '@mui/material';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import DownloadIcon from '@mui/icons-material/Download';
+import CircleIcon from '@mui/icons-material/Circle';
+import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
 import { Controller, useForm } from 'react-hook-form';
 import Image from 'next/image';
 import styles from '@/app/components/ProfileClient/styles';
@@ -207,7 +209,7 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
         <Box sx={styles.statusRating}>
           <Tooltip title="Relacionado ao faturamento e frequência de pedidos deste cliente">
             <Typography variant="subtitle2" component="div">
-              Status de Atividade:
+              Fluxo de Cotações:
             </Typography>
           </Tooltip>
           <Controller
@@ -227,6 +229,8 @@ const ClientProfile: React.FC<ClientProfileProps> = ({
                   }
                 }}
                 readOnly={readOnly}
+                icon={<CircleIcon sx={{ color: orange[800] }} />}
+                emptyIcon={<CircleOutlinedIcon sx={{ color: 'grey' }} />}
               />
             )}
           />

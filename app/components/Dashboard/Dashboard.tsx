@@ -21,7 +21,8 @@ import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import StarBorderIcon from '@mui/icons-material/StarBorder';
+import CircleIcon from '@mui/icons-material/Circle';
+import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import sharedStyles from '@/app/styles/sharedStyles';
 import styles from './styles';
@@ -486,29 +487,9 @@ const DashboardComponent = () => {
           },
         }}
       >
-        <Rating
-          name="read-only"
-          value={1}
-          readOnly
-          max={1}
-          sx={{
-            '& .MuiRating-icon': {
-              color: 'warning.main',
-            },
-          }}
-        />
-        Status de <span>Atividade</span>
-        <Rating
-          name="read-only"
-          value={1}
-          readOnly
-          max={1}
-          sx={{
-            '& .MuiRating-icon': {
-              color: 'warning.main',
-            },
-          }}
-        />
+        <CircleIcon sx={{ color: orange[800] }} />
+        Fluxo de <span>Cotações</span>
+        <CircleIcon sx={{ color: orange[800] }} />
       </Typography>
 
       <Box sx={styles.accordionContainer}>
@@ -527,11 +508,12 @@ const DashboardComponent = () => {
               value={3}
               readOnly
               max={3}
-              emptyIcon={<StarBorderIcon sx={styles.emptyIcon} />}
+              icon={<CircleIcon sx={{ color: orange[800] }} />}
+              emptyIcon={<CircleOutlinedIcon sx={styles.emptyIcon} />}
               sx={styles.ratingStars}
             />
             <Typography sx={styles.accordionTitle}>
-              <span>{ratingCounts.active}</span> Clientes ativos
+              <span>{ratingCounts.active}</span> Fluxo Grande
             </Typography>
             <FormatListBulletedIcon
               sx={styles.accordionIconList}
@@ -570,11 +552,12 @@ const DashboardComponent = () => {
               value={2}
               readOnly
               max={3}
-              emptyIcon={<StarBorderIcon sx={styles.emptyIcon} />}
+              icon={<CircleIcon sx={{ color: orange[800] }} />}
+              emptyIcon={<CircleOutlinedIcon sx={styles.emptyIcon} />}
               sx={styles.ratingStars}
             />
             <Typography sx={styles.accordionTitle}>
-              <span>{ratingCounts.moderate}</span> Clientes moderado
+              <span>{ratingCounts.moderate}</span> Fluxo Moderado
             </Typography>
             <FormatListBulletedIcon
               sx={styles.accordionIconList}
@@ -613,11 +596,12 @@ const DashboardComponent = () => {
               value={1}
               readOnly
               max={3}
-              emptyIcon={<StarBorderIcon sx={styles.emptyIcon} />}
+              icon={<CircleIcon sx={{ color: orange[800] }} />}
+              emptyIcon={<CircleOutlinedIcon sx={styles.emptyIcon} />}
               sx={styles.ratingStars}
             />
             <Typography sx={styles.accordionTitle}>
-              <span>{ratingCounts.inactive}</span> Clientes pouco ativo
+              <span>{ratingCounts.inactive}</span>Fluxo Baixo
             </Typography>
             <FormatListBulletedIcon
               sx={styles.accordionIconList}
