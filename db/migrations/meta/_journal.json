@@ -57,6 +57,13 @@
       "when": 1756909543785,
       "tag": "0007_include_order_index_in_visit_route_clients_table",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1763124041504,
+      "tag": "0008_include_quotes_success_in_sales_quotes_table",
+      "breakpoints": true
     }
   ]
 }

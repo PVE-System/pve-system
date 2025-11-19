@@ -165,6 +165,7 @@ export const salesQuotes = pgTable('sales_quotes', {
   industry: text('industry').notNull(),
   year: integer('year').notNull(),
   date: timestamp('date').defaultNow().notNull(),
+  quotesSuccess: boolean('quotes_success').notNull().default(false),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 

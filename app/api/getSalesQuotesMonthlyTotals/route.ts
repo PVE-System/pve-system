@@ -33,6 +33,7 @@ export async function GET(request: NextRequest) {
       .select({
         month: sql<number>`EXTRACT(MONTH FROM ${salesQuotes.date})::int`,
         total: sql<number>`COUNT(${salesQuotes.id})::int`,
+        totalSuccess: sql<number>`COUNT(CASE WHEN ${salesQuotes.quotesSuccess} = true THEN 1 END)::int`,
       })
       .from(salesQuotes)
       .where(
@@ -43,8 +44,10 @@ export async function GET(request: NextRequest) {
 
     // Normalizar para 12 meses (1..12)
     const monthToTotal = new Map<number, number>();
+    const monthToTotalSuccess = new Map<number, number>();
     for (const row of results) {
       monthToTotal.set(row.month, row.total);
+      monthToTotalSuccess.set(row.month, row.totalSuccess);
     }
 
     const data = Array.from({ length: 12 }, (_, idx) => {
@@ -52,6 +55,7 @@ export async function GET(request: NextRequest) {
       return {
         month: monthNumber,
         total: monthToTotal.get(monthNumber) ?? 0,
+        totalSuccess: monthToTotalSuccess.get(monthNumber) ?? 0,
       };
     });
 

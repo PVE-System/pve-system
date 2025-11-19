@@ -15,11 +15,12 @@ import {
 } from 'recharts';
 import { Box, Typography, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { orange } from '@mui/material/colors';
+import { green, orange } from '@mui/material/colors';
 
 export interface QuotesComposedChartDatum {
   label: string;
   count: number;
+  countSuccess?: number;
 }
 
 interface QuotesDashboardComposedChartProps {
@@ -35,7 +36,14 @@ const CustomTooltip: React.FC<TooltipProps<number, string>> = ({
   label,
 }) => {
   if (!active || !payload || payload.length === 0) return null;
-  const value = payload[0]?.value as number | undefined;
+
+  // Encontrar os valores de count e countSuccess
+  const totalValue = payload.find((p) => p.dataKey === 'count')?.value as
+    | number
+    | undefined;
+  const successValue = payload.find((p) => p.dataKey === 'countSuccess')
+    ?.value as number | undefined;
+
   return (
     <Box
       sx={{
@@ -51,7 +59,14 @@ const CustomTooltip: React.FC<TooltipProps<number, string>> = ({
       <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
         {label}
       </Typography>
-      <Typography variant="body2">Cotações: {value ?? 0}</Typography>
+      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+        Total: {totalValue ?? 0}
+      </Typography>
+      {successValue !== undefined && (
+        <Typography variant="body2" sx={{ color: green[700], fontWeight: 700 }}>
+          Concluídas: {successValue ?? 0}
+        </Typography>
+      )}
     </Box>
   );
 };
@@ -71,6 +86,11 @@ const QuotesDashboardComposedChart: React.FC<
   const computedHeight = height ?? (isXs ? 220 : isSm ? 260 : 300);
   const tickFontSize = isXs ? 10 : isSm ? 12 : 13;
   const barSize = isXs ? 12 : 20;
+
+  // Cores da área baseadas no tema
+  const areaFill = theme.palette.mode === 'light' ? '#598fbb' : '#033157';
+  const areaStroke =
+    theme.palette.mode === 'light' ? '#90caf9' : theme.palette.primary.light;
 
   const [data, setData] = useState<QuotesComposedChartDatum[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -154,16 +174,25 @@ const QuotesDashboardComposedChart: React.FC<
             <Area
               type="monotone"
               dataKey="count"
-              fill="#033157"
-              stroke="#90caf9"
+              fill={areaFill}
+              stroke={areaStroke}
             />
             <Bar dataKey="count" barSize={barSize} fill={orange[700]} />
+            <Bar dataKey="countSuccess" barSize={barSize} fill={green[700]} />
             <Line
               type="monotone"
               dataKey="count"
               stroke="#0d47a1"
               strokeWidth={2}
               dot={{ r: isXs ? 0 : 2 }}
+            />
+            <Line
+              type="monotone"
+              dataKey="countSuccess"
+              stroke={green[200]}
+              strokeWidth={2}
+              dot={{ r: isXs ? 0 : 2 }}
+              strokeDasharray="5 5"
             />
           </ComposedChart>
         </ResponsiveContainer>

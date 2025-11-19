@@ -16,9 +16,10 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { useForm, Controller } from 'react-hook-form';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import ClientProfile from '@/app/components/ProfileClient/ProfileClient';
 
 import { useRouter } from 'next/navigation';
@@ -38,6 +39,7 @@ interface ClientPageSalesQuotesProps {
 interface Quote {
   id: number;
   quoteIdentifier: string;
+  quotesSuccess: boolean;
 }
 
 const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
@@ -56,6 +58,7 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
   const [lastAddedQuoteId, setLastAddedQuoteId] = useState<number | null>(null);
   const [industry, setIndustry] = useState<string>('CORFIO');
   const [deleting, setDeleting] = useState<number | null>(null); // Armazena o ID da cotação sendo deletada
+  const [updating, setUpdating] = useState<number | null>(null); // Armazena o ID da cotação sendo atualizada
   const [lastVisitData, setLastVisitData] = useState<{
     hasHistory: boolean;
     lastVisitConfirmedAt: string | null;
@@ -177,8 +180,16 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
           'Dez',
         ];
         const data: QuotesComposedChartDatum[] = (
-          json.data as Array<{ month: number; total: number }>
-        ).map((m) => ({ label: monthLabels[m.month - 1], count: m.total }));
+          json.data as Array<{
+            month: number;
+            total: number;
+            totalSuccess: number;
+          }>
+        ).map((m) => ({
+          label: monthLabels[m.month - 1],
+          count: m.total,
+          countSuccess: m.totalSuccess,
+        }));
         setData(data);
       } catch (err) {
         console.error(err);
@@ -285,6 +296,29 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
       console.error('Erro ao deletar cotação:', error);
     } finally {
       setDeleting(null); // Reseta o estado após a operação
+    }
+  };
+
+  // Função para atualizar o status de conclusão da cotação
+  const toggleQuoteSuccess = async (
+    quoteId: number,
+    currentStatus: boolean,
+  ) => {
+    setUpdating(quoteId);
+    try {
+      const response = await fetch(`/api/updateSalesQuote?id=${quoteId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quotesSuccess: !currentStatus }),
+      });
+      if (!response.ok) throw new Error('Erro ao atualizar status da cotação');
+
+      // Atualiza a lista após a atualização
+      fetchQuotes(Number(leftYear));
+    } catch (error) {
+      console.error('Erro ao atualizar status da cotação:', error);
+    } finally {
+      setUpdating(null);
     }
   };
 
@@ -445,6 +479,36 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
                     </Typography>
                   )}
                   <Box>
+                    <Tooltip
+                      title={
+                        quote.quotesSuccess
+                          ? 'Desmarcar como concluída'
+                          : 'Marcar como concluída'
+                      }
+                    >
+                      <IconButton
+                        onClick={() =>
+                          toggleQuoteSuccess(quote.id, quote.quotesSuccess)
+                        }
+                        disabled={updating === quote.id}
+                        sx={{
+                          color: quote.quotesSuccess ? green[600] : 'inherit',
+                          '&:hover': {
+                            color: quote.quotesSuccess
+                              ? green[700]
+                              : green[600],
+                          },
+                        }}
+                      >
+                        {updating === quote.id ? (
+                          <CircularProgress size={24} />
+                        ) : quote.quotesSuccess ? (
+                          <CheckCircleIcon />
+                        ) : (
+                          <RadioButtonUncheckedIcon />
+                        )}
+                      </IconButton>
+                    </Tooltip>
                     <Tooltip title="Copiar código da negociação.">
                       <IconButton
                         sx={{
@@ -640,7 +704,7 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
         <Box sx={{ minWidth: 520 }}>
           <QuotesComposedChart
             data={currentYearChartData}
-            title={`Cotações ${firstChartYear}. Total: ${currentYearChartData.reduce((acc, d) => acc + d.count, 0)}`}
+            title={`Cotações ${firstChartYear} - Total: ${currentYearChartData.reduce((acc, d) => acc + d.count, 0)} - Concluídas: ${currentYearChartData.reduce((acc, d) => acc + (d.countSuccess ?? 0), 0)}`}
             height={300}
           />
         </Box>
@@ -651,7 +715,7 @@ const ClientPageTabSalesQuotes: React.FC<ClientPageSalesQuotesProps> = ({
         <Box sx={{ minWidth: 520 }}>
           <QuotesComposedChart
             data={monthlyChartData}
-            title={`Cotações ${year}. Total: ${monthlyChartData.reduce((acc, d) => acc + d.count, 0)}`}
+            title={`Cotações ${year} - Total: ${monthlyChartData.reduce((acc, d) => acc + d.count, 0)} - Concluídas: ${monthlyChartData.reduce((acc, d) => acc + (d.countSuccess ?? 0), 0)}`}
             height={300}
           />
         </Box>

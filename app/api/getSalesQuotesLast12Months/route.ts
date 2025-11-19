@@ -41,6 +41,7 @@ export async function GET(request: NextRequest) {
         year: sql<number>`EXTRACT(YEAR FROM ${salesQuotes.date})::int`,
         month: sql<number>`EXTRACT(MONTH FROM ${salesQuotes.date})::int`,
         total: sql<number>`COUNT(${salesQuotes.id})::int`,
+        totalSuccess: sql<number>`COUNT(CASE WHEN ${salesQuotes.quotesSuccess} = true THEN 1 END)::int`,
       })
       .from(salesQuotes)
       .where(baseWhere)
@@ -69,12 +70,18 @@ export async function GET(request: NextRequest) {
       'Dez',
     ];
     const keyToTotal = new Map<string, number>();
+    const keyToTotalSuccess = new Map<string, number>();
     rows.forEach((r) => {
       const ymKey = `${String(r.year)}-${String(r.month).padStart(2, '0')}`;
       keyToTotal.set(ymKey, r.total);
+      keyToTotalSuccess.set(ymKey, r.totalSuccess);
     });
 
-    const series = [] as { label: string; count: number }[];
+    const series = [] as {
+      label: string;
+      count: number;
+      countSuccess: number;
+    }[];
     for (let i = 0; i <= 12; i++) {
       const d = new Date(
         startWindow.getFullYear(),
@@ -83,7 +90,11 @@ export async function GET(request: NextRequest) {
       );
       const ymKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
       const label = `${monthLabelsPt[d.getMonth()]}/${String(d.getFullYear()).slice(-2)}`;
-      series.push({ label, count: keyToTotal.get(ymKey) ?? 0 });
+      series.push({
+        label,
+        count: keyToTotal.get(ymKey) ?? 0,
+        countSuccess: keyToTotalSuccess.get(ymKey) ?? 0,
+      });
     }
 
     return NextResponse.json({ success: true, data: series });
