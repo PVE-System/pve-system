@@ -2,15 +2,20 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/app/db/db';
-import { salesQuotes } from '@/app/db/schema';
+import { salesQuotes, clients, users } from '@/app/db/schema';
 import { and, eq, gte, sql } from 'drizzle-orm';
 
 // Retorna totais de cotações agrupados por mês nos últimos 12 meses
 // Opcionalmente filtra por clientId se informado na querystring
+// Filtra por operatorNumber se o usuário for "vendedor externo"
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const clientIdParam = searchParams.get('clientId');
+
+    // Buscar role e userId dos cookies
+    const userRole = request.cookies.get('role')?.value;
+    const userId = request.cookies.get('userId')?.value;
 
     const now = new Date();
     // início do mês atual
@@ -28,31 +33,72 @@ export async function GET(request: NextRequest) {
     const startWindow = new Date(startOfCurrentMonth);
     startWindow.setMonth(startWindow.getMonth() - 12);
 
-    // Agrupa por mês usando date_trunc('month', date)
-    const baseWhere = clientIdParam
-      ? and(
-          eq(salesQuotes.clientId, Number(clientIdParam)),
-          gte(salesQuotes.date, startWindow),
-        )
-      : gte(salesQuotes.date, startWindow);
+    // Construir condições WHERE
+    const whereConditions = [gte(salesQuotes.date, startWindow)];
 
-    const rows = await db
+    // Filtro para vendedor externo - sempre aplicar primeiro
+    let operatorNumber: string | null = null;
+    if (userRole === 'vendedor externo' && userId) {
+      // Para vendedor externo, buscar o operatorNumber do usuário
+      const user = await db
+        .select({ operatorNumber: users.operatorNumber })
+        .from(users)
+        .where(eq(users.id, parseInt(userId)))
+        .limit(1);
+
+      if (user.length === 0) {
+        return NextResponse.json(
+          { error: 'Usuário não encontrado' },
+          { status: 404 },
+        );
+      }
+
+      operatorNumber = user[0].operatorNumber;
+    }
+
+    // Filtro por clientId se informado
+    if (clientIdParam) {
+      whereConditions.push(eq(salesQuotes.clientId, Number(clientIdParam)));
+    }
+
+    // Construir query base
+    const baseQuery = db
       .select({
         year: sql<number>`EXTRACT(YEAR FROM ${salesQuotes.date})::int`,
         month: sql<number>`EXTRACT(MONTH FROM ${salesQuotes.date})::int`,
         total: sql<number>`COUNT(${salesQuotes.id})::int`,
         totalSuccess: sql<number>`COUNT(CASE WHEN ${salesQuotes.quotesSuccess} = true THEN 1 END)::int`,
       })
-      .from(salesQuotes)
-      .where(baseWhere)
-      .groupBy(
-        sql`EXTRACT(YEAR FROM ${salesQuotes.date})`,
-        sql`EXTRACT(MONTH FROM ${salesQuotes.date})`,
-      )
-      .orderBy(
-        sql`EXTRACT(YEAR FROM ${salesQuotes.date})`,
-        sql`EXTRACT(MONTH FROM ${salesQuotes.date})`,
-      );
+      .from(salesQuotes);
+
+    // Se for vendedor externo, fazer JOIN com clients para filtrar por operatorNumber
+    let rows;
+    if (operatorNumber) {
+      const baseWhere = and(...whereConditions);
+      rows = await baseQuery
+        .innerJoin(clients, eq(salesQuotes.clientId, clients.id))
+        .where(and(baseWhere, eq(clients.responsibleSeller, operatorNumber)))
+        .groupBy(
+          sql`EXTRACT(YEAR FROM ${salesQuotes.date})`,
+          sql`EXTRACT(MONTH FROM ${salesQuotes.date})`,
+        )
+        .orderBy(
+          sql`EXTRACT(YEAR FROM ${salesQuotes.date})`,
+          sql`EXTRACT(MONTH FROM ${salesQuotes.date})`,
+        );
+    } else {
+      const baseWhere = and(...whereConditions);
+      rows = await baseQuery
+        .where(baseWhere)
+        .groupBy(
+          sql`EXTRACT(YEAR FROM ${salesQuotes.date})`,
+          sql`EXTRACT(MONTH FROM ${salesQuotes.date})`,
+        )
+        .orderBy(
+          sql`EXTRACT(YEAR FROM ${salesQuotes.date})`,
+          sql`EXTRACT(MONTH FROM ${salesQuotes.date})`,
+        );
+    }
 
     // Normalizar para garantir 13 pontos (mês equivalente do ano anterior até o mês atual)
     const monthLabelsPt = [

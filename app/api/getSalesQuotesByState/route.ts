@@ -70,6 +70,7 @@ export async function GET(request: NextRequest) {
         id: salesQuotes.id,
         quoteName: salesQuotes.quoteName,
         clientId: salesQuotes.clientId,
+        quotesSuccess: salesQuotes.quotesSuccess,
       })
       .from(salesQuotes)
       .where(and(...whereConditions));
@@ -133,6 +134,7 @@ export async function GET(request: NextRequest) {
         clientMap[quote.clientId].quotes.push({
           id: quote.id,
           quoteName: quote.quoteName,
+          quotesSuccess: quote.quotesSuccess,
         });
       }
     }
