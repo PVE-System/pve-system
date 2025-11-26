@@ -11,7 +11,7 @@ const ClientsRating2ListPage: React.FC = () => {
       <HeadApp />
       <Box sx={sharedStyles.container}>
         <Typography variant="h4" component="h1" sx={sharedStyles.titlePage}>
-          Clientes com Status <span>Moderado</span>
+          Clientes com <span>Fluxo Moderado</span>
         </Typography>
       </Box>
       <ClientsRating2List />
