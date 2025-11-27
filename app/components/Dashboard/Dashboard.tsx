@@ -477,7 +477,6 @@ const DashboardComponent = () => {
         sx={{
           ...styles.BoxFrequentOccurrencesTitle,
           mt: 5,
-          mb: 2,
           display: 'flex',
           alignItems: 'center',
           gap: 1,
@@ -490,6 +489,9 @@ const DashboardComponent = () => {
         <CircleIcon sx={{ color: orange[800] }} />
         Fluxo de <span>Cotações</span>
         <CircleIcon sx={{ color: orange[800] }} />
+      </Typography>
+      <Typography variant="h6" sx={{ fontSize: '12px', mb: 2 }}>
+        Atualização semestral automática.
       </Typography>
 
       <Box sx={styles.accordionContainer}>
@@ -531,9 +533,7 @@ const DashboardComponent = () => {
                 ...sharedStyles.subTitleFontFamily,
               }}
             >
-              Fazem pedidos com frequência e confiam em nosso trabalho.
-              <br />
-              São clientes fidelizados que temos um bom relacionamento.
+              Clientes com mais de 50 cotações nos últimos 6 meses.
             </Typography>
           </AccordionDetails>
         </Accordion>
@@ -575,9 +575,7 @@ const DashboardComponent = () => {
                 ...sharedStyles.subTitleFontFamily,
               }}
             >
-              Fazem pedidos com uma certa frequência, mas poderia melhorar.
-              <br />
-              Compensa analisar os motivos e tentar fechar mais pedidos.
+              Clientes com 10 a 50 cotações nos últimos 6 meses.
             </Typography>
           </AccordionDetails>
         </Accordion>
@@ -619,10 +617,7 @@ const DashboardComponent = () => {
                 ...sharedStyles.subTitleFontFamily,
               }}
             >
-              Fazem pedidos com pouca frequência ou apenas uma única vez.
-              <br />
-              Importante fazer uma análise, entender os motivos, e se necessário
-              elaborar alguma estratégia.
+              Clientes com menos de 10 cotações nos últimos 6 meses.
             </Typography>
           </AccordionDetails>
         </Accordion>

@@ -11,7 +11,7 @@ const ClientsRating1ListPage: React.FC = () => {
       <HeadApp />
       <Box sx={sharedStyles.container}>
         <Typography variant="h4" component="h1" sx={sharedStyles.titlePage}>
-          Clientes com Status <span>Pouco Ativo</span>
+          Clientes com <span>Fluxo Baixo</span>
         </Typography>
       </Box>
       <ClientsRating1List />

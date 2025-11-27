@@ -16,6 +16,9 @@ import {
   useMediaQuery,
   Box,
 } from '@mui/material';
+import { green } from '@mui/material/colors';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import styles from './styles';
 
 interface Client {
@@ -33,6 +36,7 @@ interface SalesQuote {
   clientId: number;
   quoteName: string;
   quoteNumber: number;
+  quotesSuccess?: boolean;
 }
 
 interface ClientWithQuotes extends Client {
@@ -95,10 +99,17 @@ const SalesQuotesByState = () => {
     );
   }
 
-  //Calc Cotation
+  //Calc Quotations
 
   const totalQuotes = clientsWithQuotes.reduce(
     (acc, client) => acc + client.quotes.length,
+    0,
+  );
+
+  const totalQuotesSuccess = clientsWithQuotes.reduce(
+    (acc, client) =>
+      acc +
+      client.quotes.filter((quote) => quote.quotesSuccess === true).length,
     0,
   );
 
@@ -116,11 +127,13 @@ const SalesQuotesByState = () => {
 
       // Cabeçalho com nova ordem
       let textToCopy =
-        'CNPJ ou CPF\tNome da Empresa\tCódigo Corfio\tGrupo Empresarial\tEstado\tCidade\tResponsável\tCotação\n';
+        'CNPJ ou CPF\tNome da Empresa\tCódigo Corfio\tGrupo Empresarial\tEstado\tCidade\tResponsável\tCotação\tCotação concluída\n';
 
       clientsWithQuotes.forEach((client) => {
         client.quotes.forEach((quote) => {
-          textToCopy += `${client.cnpj || client.cpf || ''}\t${client.companyName}\t${client.corfioCode || ''}\t${client.businessGroup || ''}\t${client.state}\t${client.city || ''}\t${client.responsibleSeller || ''}\t${quote.quoteName}\n`;
+          const quoteConcluida =
+            quote.quotesSuccess === true ? quote.quoteName : '';
+          textToCopy += `${client.cnpj || client.cpf || ''}\t${client.companyName}\t${client.corfioCode || ''}\t${client.businessGroup || ''}\t${client.state}\t${client.city || ''}\t${client.responsibleSeller || ''}\t${quote.quoteName}\t${quoteConcluida}\n`;
         });
       });
 
@@ -250,9 +263,14 @@ const SalesQuotesByState = () => {
           textAlign: { xs: 'center', sm: 'left' },
         }}
       >
-        <Typography variant="subtitle2">
-          Total de cotações: <strong>{totalQuotes}</strong>
-        </Typography>
+        <Box>
+          <Typography variant="subtitle2">
+            Total de cotações: <strong>{totalQuotes}</strong>
+          </Typography>
+          <Typography variant="subtitle2">
+            Total concluídas: <strong>{totalQuotesSuccess}</strong>
+          </Typography>
+        </Box>
 
         <Tooltip title="Copiar dados para colar na planilha">
           <Button
@@ -288,6 +306,9 @@ const SalesQuotesByState = () => {
                   <TableCell sx={styles.fontSize}>Estado:</TableCell>
                   <TableCell sx={styles.fontSize}>Responsável:</TableCell>
                   <TableCell sx={styles.fontSize}>Nome da Cotação:</TableCell>
+                  <TableCell sx={styles.fontSize} align="center">
+                    <CheckCircleIcon sx={{ color: green[600] }} />
+                  </TableCell>
                 </>
               )}
             </TableRow>
@@ -295,7 +316,7 @@ const SalesQuotesByState = () => {
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={4} align="center">
+                <TableCell colSpan={5} align="center">
                   <CircularProgress />
                 </TableCell>
               </TableRow>
@@ -321,6 +342,13 @@ const SalesQuotesByState = () => {
                         <TableCell sx={styles.fontSize}>
                           {quote.quoteName}
                         </TableCell>
+                        <TableCell sx={styles.fontSize} align="center">
+                          {quote.quotesSuccess === true ? (
+                            <CheckCircleIcon sx={{ color: green[600] }} />
+                          ) : (
+                            <RadioButtonUncheckedIcon />
+                          )}
+                        </TableCell>
                       </>
                     )}
                   </TableRow>
@@ -328,7 +356,7 @@ const SalesQuotesByState = () => {
               )
             ) : (
               <TableRow>
-                <TableCell colSpan={4} align="center">
+                <TableCell colSpan={5} align="center">
                   <Typography sx={styles.fontSize}>
                     Nenhuma cotação encontrada para este filtro.
                   </Typography>
@@ -343,6 +371,3 @@ const SalesQuotesByState = () => {
 };
 
 export default SalesQuotesByState;
-function setButtonText(arg0: string): void {
-  throw new Error('Function not implemented.');
-}
