@@ -19,6 +19,7 @@ import { Rating } from '@mui/material';
 import { orange } from '@mui/material/colors';
 import CircleIcon from '@mui/icons-material/Circle';
 import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
+import Cookies from 'js-cookie';
 import styles from './styles';
 
 // Interface para o tipo dos dados do cliente
@@ -52,8 +53,15 @@ const BusinessGroupListPageComponent = () => {
   );
   const [loading, setLoading] = useState(true);
   const [groupId, setGroupId] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   const isSmallScreen = useMediaQuery('(max-width:600px)');
+
+  // Verificar role do usuário ao carregar o componente
+  useEffect(() => {
+    const role = Cookies.get('role');
+    setUserRole(role || null);
+  }, []);
 
   const fetchClientsByBusinessGroup = async (groupId: string) => {
     try {
@@ -86,6 +94,10 @@ const BusinessGroupListPageComponent = () => {
   }, []);
 
   const handleRowClick = (clientId: number) => {
+    // Vendedores externos não podem acessar a página do cliente
+    if (userRole === 'vendedor externo') {
+      return;
+    }
     window.open(`/clientPage?id=${clientId}`, '_blank');
   };
 
@@ -156,7 +168,11 @@ const BusinessGroupListPageComponent = () => {
               clients.map((client) => (
                 <TableRow
                   key={client.id}
-                  sx={{ ...styles.rowHover, cursor: 'pointer' }}
+                  sx={{
+                    ...styles.rowHover,
+                    cursor:
+                      userRole === 'vendedor externo' ? 'default' : 'pointer',
+                  }}
                   onClick={() => handleRowClick(client.id)}
                 >
                   <TableCell sx={styles.fontSize}>
